@@ -9,6 +9,6 @@
 #region
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.UoW {
+namespace DotLogix.Architecture.Domain.UoW {
     public interface IUnitOfWork : IUnitOfWorkContextFactory { }
 }

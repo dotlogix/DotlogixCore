@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DotLogix.Architecture.Infrastructure.UoW {
+﻿namespace DotLogix.Architecture.Domain.UoW {
     public interface IUnitOfWorkFactory {
         IUnitOfWork Create();
     }

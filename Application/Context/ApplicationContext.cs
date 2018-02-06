@@ -1,6 +1,6 @@
 ﻿using DotLogix.Architecture.Domain.Context;
 using DotLogix.Architecture.Domain.Services;
-using DotLogix.Architecture.Infrastructure.UoW;
+using DotLogix.Architecture.Domain.UoW;
 
 namespace DotLogix.Architecture.Application.Context {
     public class ApplicationContext : IApplicationContext

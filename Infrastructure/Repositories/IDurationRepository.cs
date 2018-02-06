@@ -1,0 +1,34 @@
+// ==================================================
+// Copyright 2016(C) , DotLogix
+// File:  IDurationRepository.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  18.07.2017
+// LastEdited:  06.09.2017
+// ==================================================
+
+#region
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using DotLogix.Architecture.Infrastructure.Entities;
+using DotLogix.Architecture.Infrastructure.Entities.Options;
+#endregion
+
+namespace DotLogix.Architecture.Infrastructure.Repositories {
+    public interface IDurationRepository<TEntity> : IRepository<TEntity>
+        where TEntity : class, ISimpleEntity, IDuration {
+        #region InRange
+        Task<IEnumerable<TEntity>> InRangeAsync(DateTime fromUtc, DateTime untilUtc);
+        Task<IEnumerable<TEntity>> StartedInRangeAsync(DateTime fromUtc, DateTime untilUtc);
+        Task<IEnumerable<TEntity>> EndedInRangeAsync(DateTime fromUtc, DateTime untilUtc);
+        #endregion
+        #region Before
+        Task<IEnumerable<TEntity>> StartedBeforeAsync(DateTime timeUtc);
+        Task<IEnumerable<TEntity>> EndedBeforeAsync(DateTime timeUtc);
+        #endregion
+        #region After
+        Task<IEnumerable<TEntity>> StartedAfterAsync(DateTime timeUtc);
+        Task<IEnumerable<TEntity>> EndedAfterAsync(DateTime timeUtc); 
+        #endregion
+    }
+}

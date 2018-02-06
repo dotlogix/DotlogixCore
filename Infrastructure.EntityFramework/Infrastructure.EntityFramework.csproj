@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>DotLogix.Infrastructure.EntityFramework</AssemblyName>
+    <RootNamespace>DotLogix.Architecture.Infrastructure.EntityFramework</RootNamespace>
+    <Company>DotLogix</Company>
+    <Product>DotLogix Architecture</Product>
+    <PackageId>DotLogix.Architecture.Infrastructure.EntityFramework</PackageId>
+    <Authors>DotLogix</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
+  </Target>
+
+</Project>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>DotLogix.Infrastructure</AssemblyName>
+    <RootNamespace>DotLogix.Architecture.Infrastructure</RootNamespace>
+    <Company>DotLogix</Company>
+    <Product>DotLogix Architecture</Product>
+    <PackageId>DotLogix.Architecture.Infrastructure</PackageId>
+    <Authors>DotLogix</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
+  </Target>
+
+</Project>

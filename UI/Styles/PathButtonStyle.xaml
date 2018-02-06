@@ -1,0 +1,65 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="clr-namespace:DotLogix.UI;assembly=DotLogix.UI"
+                    xmlns:controls="clr-namespace:DotLogix.UI.Controls">
+    <Style TargetType="controls:PathButton" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Stroke" Value="{DynamicResource Button.Foreground}" />
+        <Setter Property="Fill" Value="{DynamicResource Button.Foreground}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                        <ContentPresenter x:Name="contentPresenter" Focusable="False"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          Margin="{TemplateBinding Padding}" RecognizesAccessKey="True"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsDefaulted" Value="true">
+                            <Setter Property="BorderBrush" TargetName="border"
+                                    Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" TargetName="border"
+                                    Value="{DynamicResource Button.MouseOver.Background}" />
+                            <Setter Property="BorderBrush" TargetName="border"
+                                    Value="{DynamicResource Button.MouseOver.Border}" />
+                            <Setter Property="TextElement.Foreground" TargetName="contentPresenter"
+                                    Value="{DynamicResource Button.MouseOver.Foreground}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter Property="Background" TargetName="border"
+                                    Value="{DynamicResource Button.Pressed.Background}" />
+                            <Setter Property="BorderBrush" TargetName="border"
+                                    Value="{DynamicResource Button.Pressed.Border}" />
+                            <Setter Property="TextElement.Foreground" TargetName="contentPresenter"
+                                    Value="{DynamicResource Button.Pressed.Foreground}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Background" TargetName="border"
+                                    Value="{DynamicResource Button.Disabled.Background}" />
+                            <Setter Property="BorderBrush" TargetName="border"
+                                    Value="{DynamicResource Button.Disabled.Border}" />
+                            <Setter Property="TextElement.Foreground" TargetName="contentPresenter"
+                                    Value="{DynamicResource Button.Disabled.Foreground}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Stroke" Value="{DynamicResource Button.MouseOver.Foreground}" />
+                <Setter Property="Fill" Value="{DynamicResource Button.MouseOver.Foreground}" />
+            </Trigger>
+
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Stroke" Value="{DynamicResource Button.Pressed.Foreground}" />
+                <Setter Property="Fill" Value="{DynamicResource Button.Pressed.Foreground}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

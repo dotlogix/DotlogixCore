@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
+using DotLogix.Core.Rest.Server.Routes;
 using DotLogix.Core.Rest.Services;
 using DotLogix.Core.Rest.Services.Attributes;
 using DotLogix.Core.Rest.Services.Attributes.Events;
@@ -21,15 +22,17 @@ namespace TestApp
     class Program
     {
         static void Main(string[] args) {
-            var server = new WebServiceHost("http://127.0.0.1:1337/");
-            server.RegisterService<TestService>();
+            //var server = new WebServiceHost("http://127.0.0.1:1337/");
+            //server.RegisterService<TestService>();
 
-            server.Start();
-            while(Console.ReadLine() != "stop") {
-                server.TriggerServerEventAsync("TriggerAdd");
-            }
-            
-            server.Stop();
+            //server.Start();
+            //while(Console.ReadLine() != "stop") {
+            //    server.TriggerServerEventAsync("TriggerAdd");
+            //}
+
+            //server.Stop();
+
+            var rout = new PatternWebServiceRoute("<<test:g>>/<<id:n>>", HttpMethods.Get, new Auth(), 0);
             Console.Read();
 
 

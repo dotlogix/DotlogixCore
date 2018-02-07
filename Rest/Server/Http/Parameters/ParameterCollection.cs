@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  ParameterCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  29.01.2018
-// LastEdited:  31.01.2018
+// Created:  06.02.2018
+// LastEdited:  07.02.2018
 // ==================================================
 
 #region
@@ -15,7 +15,7 @@ using System.Text;
 
 namespace DotLogix.Core.Rest.Server.Http.Parameters {
     public class ParameterCollection : IEnumerable<Parameter> {
-        private readonly Dictionary<string, Parameter> _parametersDict = new Dictionary<string, Parameter>();
+        private readonly Dictionary<string, Parameter> _parametersDict = new Dictionary<string, Parameter>(StringComparer.InvariantCultureIgnoreCase);
         public Parameter this[string name] => GetParameter(name);
         public bool HasValues => _parametersDict.Count > 0;
 
@@ -37,6 +37,16 @@ namespace DotLogix.Core.Rest.Server.Http.Parameters {
                     throw new InvalidOperationException($"Parameter {existing.Name} does already exist");
             } else
                 _parametersDict.Add(parameter.Name, parameter);
+        }
+
+        public void Set(Parameter parameter, bool mergeIfExists = true) {
+            if(parameter == null)
+                return;
+            if(mergeIfExists && _parametersDict.TryGetValue(parameter.Name, out var existing)) {
+                existing.Merge(parameter);
+                return;
+            }
+            _parametersDict[parameter.Name] = parameter;
         }
 
         public void AddRange(IEnumerable<Parameter> parameters, bool mergeIfExists = true) {

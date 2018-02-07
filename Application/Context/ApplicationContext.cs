@@ -10,13 +10,13 @@ namespace DotLogix.Architecture.Application.Context {
 
         public ApplicationContext(IDomainContext domainContext, IUnitOfWork unitOfWork)
         {
-            this._domainContext = domainContext;
-            this._unitOfWork = unitOfWork;
+            _domainContext = domainContext;
+            _unitOfWork = unitOfWork;
         }
 
         public TService UseService<TService>() where TService : class, IDomainService
         {
-            return this._domainContext.UseService<TService>((IUnitOfWorkContextFactory)this._unitOfWork);
+            return _domainContext.UseService<TService>(_unitOfWork);
         }
     }
 }

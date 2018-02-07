@@ -11,6 +11,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
         StartsWith,
         EndsWith,
         Contains,
-        Regex
+        Regex,
+        Pattern,
     }
 }

@@ -1,6 +1,6 @@
 ﻿using DotLogix.Architecture.Domain.Services;
 using DotLogix.Architecture.Domain.Services.Providers;
-using DotLogix.Architecture.Infrastructure.UoW;
+using DotLogix.Architecture.Domain.UoW;
 
 namespace DotLogix.Architecture.Domain.Context {
     public class DomainContext : IDomainContext {

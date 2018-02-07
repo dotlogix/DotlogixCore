@@ -1,5 +1,5 @@
 ﻿using DotLogix.Architecture.Domain.Context;
-using DotLogix.Architecture.Infrastructure.UoW;
+using DotLogix.Architecture.Domain.UoW;
 
 namespace DotLogix.Architecture.Domain.Services {
     public abstract class DomainServiceBase : IDomainService{

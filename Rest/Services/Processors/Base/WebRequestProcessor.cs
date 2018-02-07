@@ -34,6 +34,8 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
 
         public virtual async Task ProcessAsync(WebRequestResult webRequestResult) {
             var parameters = CreateParameters(webRequestResult);
+            if(webRequestResult.Handled)
+                return;
             var result = await InvokeAsync(webRequestResult, parameters);
             webRequestResult.TrySetResult(result);
         }

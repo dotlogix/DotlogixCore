@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using DotLogix.Architecture.Domain.Context;
 using DotLogix.Architecture.Domain.Services.Factories;
-using DotLogix.Architecture.Infrastructure.UoW;
+using DotLogix.Architecture.Domain.UoW;
 
 namespace DotLogix.Architecture.Domain.Services.Providers {
     public class DomainServiceProvider : IDomainServiceProvider

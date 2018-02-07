@@ -1,5 +1,5 @@
 ﻿using DotLogix.Architecture.Domain.Context.Factories;
-using DotLogix.Architecture.Infrastructure.UoW;
+using DotLogix.Architecture.Domain.UoW;
 
 namespace DotLogix.Architecture.Application.Context.Factories
 {

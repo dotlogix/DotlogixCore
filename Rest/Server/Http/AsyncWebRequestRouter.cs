@@ -102,7 +102,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             var asyncHttpRequest = asyncHttpContext.Request;
 
             var httpMethod = asyncHttpRequest.HttpMethod;
-            var path = asyncHttpRequest.Url.LocalPath.Substring(1);
+            var path = asyncHttpRequest.Url.LocalPath;
 
             route = null;
             RouteMatch routeMatch = null;

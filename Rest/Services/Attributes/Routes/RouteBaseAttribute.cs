@@ -31,6 +31,8 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
                     return new ContainsWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
                 case RouteType.Regex:
                     return new RegexWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
+                case RouteType.Pattern:
+                    return new PatternWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(RouteType), RouteType, null);
             }

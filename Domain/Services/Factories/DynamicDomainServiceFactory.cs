@@ -1,6 +1,6 @@
 ﻿using System;
 using DotLogix.Architecture.Domain.Context;
-using DotLogix.Architecture.Infrastructure.UoW;
+using DotLogix.Architecture.Domain.UoW;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 

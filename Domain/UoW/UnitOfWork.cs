@@ -1,7 +1,7 @@
 ﻿using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Repositories.Provider;
 
-namespace DotLogix.Architecture.Infrastructure.UoW {
+namespace DotLogix.Architecture.Domain.UoW {
     public class UnitOfWork : IUnitOfWork {
         private readonly IEntityContextFactory _entityContextFactory;
         private readonly IRepositoryProvider _repoProvider;

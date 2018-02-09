@@ -13,14 +13,14 @@ using DotLogix.Architecture.Infrastructure.EntityContext;
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Factories {
     public class EfEntityContextFactory : IEntityContextFactory {
-        private readonly IDbContextFactory _contextFactory;
+        protected IDbContextFactory DbContextFactory { get; }
 
         public EfEntityContextFactory(IDbContextFactory contextFactory) {
-            _contextFactory = contextFactory;
+            DbContextFactory = contextFactory;
         }
 
-        public IEntityContext Create() {
-            return new EfEntityContext(_contextFactory.Create());
+        public virtual IEntityContext Create() {
+            return new EfEntityContext(DbContextFactory.Create());
         }
     }
 }

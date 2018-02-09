@@ -4,14 +4,14 @@ using DotLogix.Architecture.Domain.UoW;
 
 namespace DotLogix.Architecture.Domain.Context {
     public class DomainContext : IDomainContext {
-        private readonly IDomainServiceProvider _domainServiceProvider;
+        protected IDomainServiceProvider DomainServiceProvider { get; }
 
         public DomainContext(IDomainServiceProvider domainServiceProvider) {
-            _domainServiceProvider = domainServiceProvider;
+            DomainServiceProvider = domainServiceProvider;
         }
 
         public TService UseService<TService>(IUnitOfWorkContextFactory contextFactory) where TService : class, IDomainService {
-            return _domainServiceProvider.Create<TService>(this, contextFactory);
+            return DomainServiceProvider.Create<TService>(this, contextFactory);
         }
     }
 }

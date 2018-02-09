@@ -7,14 +7,14 @@ using DotLogix.Architecture.Infrastructure.Repositories.Provider;
 
 namespace DotLogix.Architecture.Domain.UoW {
     public class UnitOfWorkContext : IUnitOfWorkContext {
-        private readonly IEntityContext _entityContext;
-        private readonly IRepositoryProvider _repoProvider;
-        private readonly IDictionary<Type, IRepository> _repositoryInstances;
+        protected IEntityContext EntityContext { get; }
+        protected IRepositoryProvider RepoProvider { get; }
+        protected IDictionary<Type, IRepository> RepositoryInstances { get; }
 
         public UnitOfWorkContext(IEntityContext entityContext, IRepositoryProvider repoProvider) {
-            _entityContext = entityContext;
-            _repoProvider = repoProvider;
-            _repositoryInstances = new Dictionary<Type, IRepository>();
+            EntityContext = entityContext;
+            RepoProvider = repoProvider;
+            RepositoryInstances = new Dictionary<Type, IRepository>();
         }
 
         public IUnitOfWorkContext BeginContext() {
@@ -23,20 +23,20 @@ namespace DotLogix.Architecture.Domain.UoW {
 
         public TRepo UseRepository<TRepo>() where TRepo : IRepository {
             var repoInterface = typeof(TRepo);
-            if(_repositoryInstances.TryGetValue(repoInterface, out var existing))
+            if(RepositoryInstances.TryGetValue(repoInterface, out var existing))
                 return (TRepo)existing;
 
-            var newInstance = _repoProvider.Create<TRepo>(_entityContext);
-            _repositoryInstances.Add(repoInterface, newInstance);
+            var newInstance = RepoProvider.Create<TRepo>(EntityContext);
+            RepositoryInstances.Add(repoInterface, newInstance);
             return newInstance;
         }
 
         public Task CompleteAsync() {
-            return _entityContext.CompleteAsync();
+            return EntityContext.CompleteAsync();
         }
 
         public void Dispose() {
-            _entityContext?.Dispose();
+            EntityContext?.Dispose();
         }
     }
 }

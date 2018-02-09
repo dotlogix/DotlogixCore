@@ -3,17 +3,17 @@ using DotLogix.Architecture.Infrastructure.Repositories.Provider;
 
 namespace DotLogix.Architecture.Domain.UoW {
     public class UnitOfWork : IUnitOfWork {
-        private readonly IEntityContextFactory _entityContextFactory;
-        private readonly IRepositoryProvider _repoProvider;
+        protected IEntityContextFactory EntityContextFactory { get; }
+        protected IRepositoryProvider RepoProvider { get; }
 
         public UnitOfWork(IEntityContextFactory entityContextFactory, IRepositoryProvider repoProvider) {
-            _entityContextFactory = entityContextFactory;
-            _repoProvider = repoProvider;
+            EntityContextFactory = entityContextFactory;
+            RepoProvider = repoProvider;
         }
 
-        public IUnitOfWorkContext BeginContext() {
-            var entityContext = _entityContextFactory.Create();
-            return new UnitOfWorkContext(entityContext, _repoProvider);
+        public virtual IUnitOfWorkContext BeginContext() {
+            var entityContext = EntityContextFactory.Create();
+            return new UnitOfWorkContext(entityContext, RepoProvider);
         }
     }
 }

@@ -3,16 +3,16 @@ using DotLogix.Architecture.Infrastructure.Repositories.Provider;
 
 namespace DotLogix.Architecture.Domain.UoW {
     public class UnitOfWorkFactory : IUnitOfWorkFactory {
-        private readonly IRepositoryProvider _repositoryProvider;
-        private readonly IEntityContextFactory _entityContextFactory;
+        protected IRepositoryProvider RepositoryProvider { get; }
+        protected IEntityContextFactory EntityContextFactory { get; }
 
         public UnitOfWorkFactory(IRepositoryProvider repositoryProvider, IEntityContextFactory entityContextFactory) {
-            _repositoryProvider = repositoryProvider;
-            _entityContextFactory = entityContextFactory;
+            RepositoryProvider = repositoryProvider;
+            EntityContextFactory = entityContextFactory;
         }
 
-        public IUnitOfWork Create() {
-            return new UnitOfWork(_entityContextFactory, _repositoryProvider);
+        public virtual IUnitOfWork Create() {
+            return new UnitOfWork(EntityContextFactory, RepositoryProvider);
         }
     }
 }

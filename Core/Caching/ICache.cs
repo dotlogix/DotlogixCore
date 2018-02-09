@@ -16,5 +16,6 @@ namespace DotLogix.Core.Caching
         bool Remove(TKey key);
         bool TryRetrieve<TValue>(TKey key, out TValue value);
         bool TryRetrieve(TKey key, out object value);
+        void Cleanup();
     }
 }

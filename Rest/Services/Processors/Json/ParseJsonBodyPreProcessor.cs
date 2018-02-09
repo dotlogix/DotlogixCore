@@ -16,7 +16,7 @@ using DotLogix.Core.Rest.Server.Http.Parameters;
 
 namespace DotLogix.Core.Rest.Services.Processors.Json {
     public class ParseJsonBodyPreProcessor : IWebRequestProcessor {
-        public const string JsonDataParamName = "_jsonData";
+        public const string JsonDataParamName = "jsonData";
         public static IWebRequestProcessor Instance { get; } = new ParseJsonBodyPreProcessor();
         private ParseJsonBodyPreProcessor() { }
         public int Priority => int.MaxValue;

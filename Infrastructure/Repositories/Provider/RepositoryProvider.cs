@@ -6,20 +6,20 @@ using DotLogix.Architecture.Infrastructure.Repositories.Factories;
 
 namespace DotLogix.Architecture.Infrastructure.Repositories.Provider {
     public class RepositoryProvider : IRepositoryProvider {
-        private readonly Dictionary<Type, IRepositoryFactory> _repositoryFactories = new Dictionary<Type, IRepositoryFactory>();
+        protected Dictionary<Type, IRepositoryFactory> RepositoryFactories { get; } = new Dictionary<Type, IRepositoryFactory>();
 
-        public void RegisterFactory(Type repoInterface, IRepositoryFactory factory) {
-            _repositoryFactories.Add(repoInterface, factory);
+        public virtual void RegisterFactory(Type repoInterface, IRepositoryFactory factory) {
+            RepositoryFactories.Add(repoInterface, factory);
         }
 
-        public void RegisterFactory(Type repoType, Type repoInterface, Type contextType) {
+        public virtual void RegisterFactory(Type repoType, Type repoInterface, Type contextType) {
             var factory = DynamicRepositoryFactory.CreateFor(repoType, contextType);
             RegisterFactory(repoInterface, factory);
         }
 
 
-        public TRepoInterface Create<TRepoInterface>(IEntityContext entityContext) where TRepoInterface:IRepository{
-            if(_repositoryFactories.TryGetValue(typeof(TRepoInterface), out var factory) == false)
+        public virtual TRepoInterface Create<TRepoInterface>(IEntityContext entityContext) where TRepoInterface:IRepository{
+            if(RepositoryFactories.TryGetValue(typeof(TRepoInterface), out var factory) == false)
                 throw new ArgumentException($"Type {typeof(TRepoInterface)} is not registered for this provider", nameof(TRepoInterface));
             return (TRepoInterface)factory.Create(entityContext);
         }

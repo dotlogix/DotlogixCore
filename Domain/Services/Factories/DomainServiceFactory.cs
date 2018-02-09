@@ -4,13 +4,14 @@ using DotLogix.Architecture.Domain.UoW;
 
 namespace DotLogix.Architecture.Domain.Services.Factories {
     public class DomainServiceFactory : IDomainServiceFactory {
-        private readonly Func<IDomainContext, IUnitOfWorkContextFactory, IDomainService> _createDomainServiceFunc;
+        protected Func<IDomainContext, IUnitOfWorkContextFactory, IDomainService> CreateDomainServiceFunc { get; }
+
         public DomainServiceFactory(Func<IDomainContext, IUnitOfWorkContextFactory, IDomainService> createDomainServiceFunc) {
-            _createDomainServiceFunc = createDomainServiceFunc;
+            CreateDomainServiceFunc = createDomainServiceFunc;
         }
 
         public IDomainService Create(IDomainContext domainContext, IUnitOfWorkContextFactory uowContextFactory) {
-            return _createDomainServiceFunc.Invoke(domainContext, uowContextFactory);
+            return CreateDomainServiceFunc.Invoke(domainContext, uowContextFactory);
         }
     }
 }

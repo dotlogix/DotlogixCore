@@ -8,6 +8,7 @@
 
 namespace DotLogix.Core.Rest.Server.Routes {
     public enum RouteType {
+        Equals,
         StartsWith,
         EndsWith,
         Contains,

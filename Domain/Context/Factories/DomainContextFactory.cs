@@ -3,14 +3,15 @@ using DotLogix.Architecture.Domain.Services.Providers;
 namespace DotLogix.Architecture.Domain.Context.Factories {
     public class DomainContextFactory : IDomainContextFactory
     {
-        private readonly IDomainServiceProvider _domainServiceProvider;
+        protected IDomainServiceProvider DomainServiceProvider { get; }
+
         public DomainContextFactory(IDomainServiceProvider domainServiceProvider) {
-            _domainServiceProvider = domainServiceProvider;
+            DomainServiceProvider = domainServiceProvider;
         }
 
-        public IDomainContext Create()
+        public virtual IDomainContext Create()
         {
-            return new DomainContext(_domainServiceProvider);
+            return new DomainContext(DomainServiceProvider);
         }
     }
 }

@@ -23,6 +23,8 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
 
         protected override IWebServiceRoute CreateRoute(string pattern, HttpMethods acceptedMethods, IWebRequestProcessor requestProcessor) {
             switch(RouteType) {
+                case RouteType.Equals:
+                    return new EqualsWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
                 case RouteType.StartsWith:
                     return new StartsWithWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
                 case RouteType.EndsWith:

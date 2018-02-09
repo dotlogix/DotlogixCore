@@ -3,19 +3,19 @@ using DotLogix.Architecture.Domain.UoW;
 
 namespace DotLogix.Architecture.Domain.Services {
     public abstract class DomainServiceBase : IDomainService{
-        private readonly IDomainContext _domainContext;
-        private readonly IUnitOfWorkContextFactory _uowContextFactory;
+        protected IDomainContext DomainContext { get; }
+        protected IUnitOfWorkContextFactory UowContextFactory { get; }
 
         protected DomainServiceBase(IDomainContext domainContext, IUnitOfWorkContextFactory uowContextFactory) {
-            _domainContext = domainContext;
-            _uowContextFactory = uowContextFactory;
+            DomainContext = domainContext;
+            UowContextFactory = uowContextFactory;
         }
 
         protected IUnitOfWorkContext BeginContext() {
-            return _uowContextFactory.BeginContext();
+            return UowContextFactory.BeginContext();
         }
         protected TService UseService<TService>(IUnitOfWorkContextFactory uowContextFactory) where TService : class, IDomainService {
-            return _domainContext.UseService<TService>(uowContextFactory);
+            return DomainContext.UseService<TService>(uowContextFactory);
         }
     }
 }

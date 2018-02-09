@@ -19,8 +19,10 @@ namespace DotLogix.Core.Rest.Server.Routes {
 
         public override RouteMatch Match(HttpMethods method, string path) {
             if(((method & AcceptedRequests) != 0) && path.StartsWith(Pattern))
-                return new RouteMatch(true, path, Pattern.Length, null);
+                return new RouteMatch(true, path, path.Length, null);
             return RouteMatch.Empty;
         }
+
+        
     }
 }

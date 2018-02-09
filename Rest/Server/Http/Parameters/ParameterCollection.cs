@@ -15,7 +15,7 @@ using System.Text;
 
 namespace DotLogix.Core.Rest.Server.Http.Parameters {
     public class ParameterCollection : IEnumerable<Parameter> {
-        private readonly Dictionary<string, Parameter> _parametersDict = new Dictionary<string, Parameter>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly Dictionary<string, Parameter> _parametersDict = new Dictionary<string, Parameter>(StringComparer.OrdinalIgnoreCase);
         public Parameter this[string name] => GetParameter(name);
         public bool HasValues => _parametersDict.Count > 0;
 

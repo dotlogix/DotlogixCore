@@ -3,19 +3,22 @@
 namespace DotLogix.Core.Caching
 {
 
-    public interface ICache<TKey> : IDisposable{
+    public interface ICache<TKey, TValue> : IDisposable{
         TimeSpan CheckPolicyInterval { get; }
-        object this[TKey key] { get; }
-        bool Contains(TKey key);
+        TValue this[TKey key] { get; }
 
-        void Store(TKey key, object value, ICachePolicy policy = null);
-        TValue Retrieve<TValue>(TKey key);
-        object Retrieve(TKey key);
-        TValue Pop<TValue>(TKey key);
-        object Pop(TKey key);
-        bool Remove(TKey key);
-        bool TryRetrieve<TValue>(TKey key, out TValue value);
-        bool TryRetrieve(TKey key, out object value);
+
+        bool IsAlive(TKey key);
+
+        void Store(TKey key, TValue value, ICachePolicy policy = null);
+
+        TValue Retrieve(TKey key);
+        bool TryRetrieve(TKey key, out TValue value);
+
+        TValue Pop(TKey key);
+        bool TryPop(TKey key, out TValue value);
+
+        bool Discard(TKey key);
         void Cleanup();
     }
 }

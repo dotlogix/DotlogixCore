@@ -89,13 +89,13 @@ namespace DotLogix.Core.Rest.Server.Http {
             WebServiceContext.SetLocalContext(webServiceContext);
 
             // start of processing
-            var result = await ProcessRequest(asyncHttpContext, route);
+            await ProcessRequest(route, webServiceContext.Result);
             // end of processing
 
             WebServiceContext.SetLocalContext(null);
 
             var writer = route.WebRequestResultWriter ?? DefaultResultWriter;
-            await writer.WriteAsync(result);
+            await writer.WriteAsync(webServiceContext.Result);
         }
 
         private bool TryGetRoute(IAsyncHttpContext asyncHttpContext, out IWebServiceRoute route) {
@@ -123,8 +123,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             return true;
         }
 
-        private async Task<WebRequestResult> ProcessRequest(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route) {
-            var result = new WebRequestResult(asyncHttpContext);
+        private async Task ProcessRequest(IWebServiceRoute route, WebRequestResult result) {
 
             #region PreProcess
             if(_globalPreProcessors.Count > 0)
@@ -144,8 +143,6 @@ namespace DotLogix.Core.Rest.Server.Http {
             if(route.PostProcessors.Count > 0)
                 await ExecuteProcessorsAsync(result, route.PostProcessors);
             #endregion
-
-            return result;
         }
         #endregion
 

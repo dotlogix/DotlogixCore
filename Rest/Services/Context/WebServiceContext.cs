@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
 #endregion
 
@@ -21,6 +22,7 @@ namespace DotLogix.Core.Rest.Services.Context {
 
         public IAsyncHttpContext RequestContext { get; }
         public Guid ContextId { get; } = Guid.NewGuid();
+        public WebRequestResult Result { get; }
 
         #region Indexer
         public object this[string key] {
@@ -31,6 +33,7 @@ namespace DotLogix.Core.Rest.Services.Context {
 
         internal WebServiceContext(IAsyncHttpContext requestContext) {
             RequestContext = requestContext;
+            Result = new WebRequestResult(requestContext);
         }
 
         #region Set

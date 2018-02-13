@@ -10,7 +10,7 @@ namespace DotLogix.Core.Utils.Patterns {
             Max = max;
         }
 
-        public override string ToString() {
+        public string ToRegexString() {
             if(Max >= 0) {
                 return Min == Max
                            ? $"{{{Min}}}"
@@ -20,6 +20,20 @@ namespace DotLogix.Core.Utils.Patterns {
             return Min >= 0
                        ? $"{{{Min},}}"
                        : "+?";
+        }
+
+        public override string ToString()
+        {
+            if (Max >= 0)
+            {
+                return Min == Max
+                           ? $"{Min}"
+                           : $"{Math.Max(0, Min)}..{Max}";
+            }
+
+            return Min >= 0
+                       ? $"{Min}.."
+                       : "..";
         }
 
 
@@ -34,16 +48,16 @@ namespace DotLogix.Core.Utils.Patterns {
                 return false;
 
             var rangeSplit = rangeStr.IndexOf("..", StringComparison.Ordinal);
-            if(rangeSplit == -1) {
-                if(int.TryParse(rangeStr, out var minmax) == false)
+            switch(rangeSplit) {
+                case -1:
+                    if(int.TryParse(rangeStr, out var minmax) == false)
+                        return false;
+                    patternRange.Min = minmax;
+                    patternRange.Max = minmax;
+                    return true;
+                case 0 when rangeStr.Length == 2:
                     return false;
-                patternRange.Min = minmax;
-                patternRange.Max = minmax;
-                return true;
             }
-
-            if(rangeSplit == 0 && rangeStr.Length == 2)
-                return false;
 
             var minStr = rangeStr.Substring(0, rangeSplit);
             var maxStr = rangeStr.Substring(rangeSplit + 2);
@@ -53,7 +67,8 @@ namespace DotLogix.Core.Utils.Patterns {
 
             if((maxStr.Length != 0) && (int.TryParse(maxStr, out patternRange.Max) == false))
                 return false;
-            return true;
+
+            return patternRange.Min <= patternRange.Max;
         }
     }
 }

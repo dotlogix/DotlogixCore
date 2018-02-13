@@ -17,6 +17,10 @@ namespace DotLogix.Core.Rest.Server.Http.Mime {
             Code = code;
         }
 
+        public override string ToString() {
+            return Code;
+        }
+
         protected bool Equals(MimeType other) {
             return string.Equals(Code, other.Code);
         }

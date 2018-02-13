@@ -45,6 +45,7 @@ namespace DotLogix.Core.Nodes.Io
                         startIndex = i + 1;
                         break;
                     case ':':
+                    case ' ':
                         startIndex = i + 1;
                         continue;
                     case ',':

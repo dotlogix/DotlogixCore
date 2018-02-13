@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Extensions {
@@ -88,6 +89,8 @@ namespace DotLogix.Core.Extensions {
             return result.ToArray();
         }
 
+        #region Base64
+
         public static string ToBase64String(this string plain, Encoding encoding = null) {
             var bytes = (encoding ?? Encoding.UTF8).GetBytes(plain);
             return Convert.ToBase64String(bytes);
@@ -98,17 +101,9 @@ namespace DotLogix.Core.Extensions {
             return (encoding ?? Encoding.UTF8).GetString(bytes);
         }
 
-        public static TEnum ConvertToEnum<TEnum>(this string enumValue, bool ignoreCase = true) where TEnum : struct {
-            if(enumValue == null)
-                throw new ArgumentNullException(nameof(enumValue));
+        #endregion
 
-            var enumType = typeof(TEnum);
-            if(!enumType.IsEnum)
-                throw new ArgumentException("Type must be an enum", nameof(TEnum));
-            if(Enum.TryParse(enumValue, ignoreCase, out TEnum value))
-                return value;
-            throw new InvalidCastException($"{enumValue} is not a valid value of enum {enumType.GetFriendlyName()}");
-        }
+        #region SplitAndKeep
 
         public static IEnumerable<string> SplitAndKeep(this string value, params char[] delimiters) {
             return SplitAndKeep(value, int.MaxValue, StringSplitOptions.None, delimiters);
@@ -136,5 +131,140 @@ namespace DotLogix.Core.Extensions {
             }
             yield return value.Substring(startIndex);
         }
+
+        #endregion
+
+        #region Parse
+
+        public static object ParseTo(this string value, Type targetType)
+        {
+            if (TryParseTo(value, targetType, out var convertedValue) == false)
+                throw new
+                NotSupportedException($"Conversion between {value.GetType()} and {targetType} is not supported");
+            return convertedValue;
+        }
+
+        public static bool TryParseTo(this string value, Type targetType, out object target)
+        {
+            target = null;
+            var dataType = targetType.ToDataType();
+            if ((dataType.Flags & DataTypeFlags.Primitive) == 0)
+                return false;
+
+            bool result;
+            switch (dataType.Flags & DataTypeFlags.PrimitiveMask)
+            {
+                case DataTypeFlags.Guid:
+                    result = Guid.TryParse(value, out var guid);
+                    target = guid;
+                    break;
+                case DataTypeFlags.Bool:
+                    result = bool.TryParse(value, out var bo);
+                    target = bo;
+                    break;
+                case DataTypeFlags.Char:
+                    result = char.TryParse(value, out var c);
+                    target = c;
+                    break;
+                case DataTypeFlags.Enum:
+                    target = Enum.Parse(targetType, value);
+                    result = true;
+                    break;
+                case DataTypeFlags.SByte:
+                    result = sbyte.TryParse(value, out var sb);
+                    target = sb;
+                    break;
+                case DataTypeFlags.Byte:
+                    result = byte.TryParse(value, out var b);
+                    target = b;
+                    break;
+                case DataTypeFlags.Short:
+                    result = short.TryParse(value, out var s);
+                    target = s;
+                    break;
+                case DataTypeFlags.UShort:
+                    result = ushort.TryParse(value, out var us);
+                    target = us;
+                    break;
+                case DataTypeFlags.Int:
+                    result = int.TryParse(value, out var i);
+                    target = i;
+                    break;
+                case DataTypeFlags.UInt:
+                    result = uint.TryParse(value, out var ui);
+                    target = ui;
+                    break;
+                case DataTypeFlags.Long:
+                    result = long.TryParse(value, out var l);
+                    target = l;
+                    break;
+                case DataTypeFlags.ULong:
+                    result = ulong.TryParse(value, out var ul);
+                    target = ul;
+                    break;
+                case DataTypeFlags.Float:
+                    result = float.TryParse(value, out var f);
+                    target = f;
+                    break;
+                case DataTypeFlags.Double:
+                    result = double.TryParse(value, out var d);
+                    target = d;
+                    break;
+                case DataTypeFlags.Decimal:
+                    result = decimal.TryParse(value, out var dec);
+                    target = dec;
+                    break;
+                case DataTypeFlags.DateTime:
+                    result = DateTime.TryParse(value, out var dt);
+                    target = dt;
+                    break;
+                case DataTypeFlags.DateTimeOffset:
+                    result = DateTimeOffset.TryParse(value, out var dto);
+                    target = dto;
+                    break;
+                case DataTypeFlags.TimeSpan:
+                    result = TimeSpan.TryParse(value, out var ts);
+                    target = ts;
+                    break;
+                case DataTypeFlags.String:
+                    target = value;
+                    result = true;
+                    break;
+                default:
+                    return false;
+            }
+            return result;
+        }
+
+        public static TTarget ParseTo<TTarget>(this string value)
+        {
+            var targetType = typeof(TTarget);
+            return (TTarget)ParseTo(value, targetType);
+        }
+
+        public static bool TryParseTo<TTarget>(this string value, out TTarget target)
+        {
+            var targetType = typeof(TTarget);
+            if (TryParseTo(value, targetType, out var convertedValue))
+            {
+                target = (TTarget)convertedValue;
+                return true;
+            }
+            target = default(TTarget);
+            return false;
+        }
+
+        public static TEnum ConvertToEnum<TEnum>(this string enumValue, bool ignoreCase = true) where TEnum : struct {
+            if(enumValue == null)
+                throw new ArgumentNullException(nameof(enumValue));
+
+            var enumType = typeof(TEnum);
+            if(!enumType.IsEnum)
+                throw new ArgumentException("Type must be an enum", nameof(TEnum));
+            if(Enum.TryParse(enumValue, ignoreCase, out TEnum value))
+                return value;
+            throw new InvalidCastException($"{enumValue} is not a valid value of enum {enumType.GetFriendlyName()}");
+        }
+        #endregion
     }
 }

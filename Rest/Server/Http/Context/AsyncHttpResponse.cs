@@ -26,7 +26,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
             ContentType = MimeTypes.PlainText;
             ContentLength64 = 0;
             ContentEncoding = Encoding.UTF8;
-            StatusCode = HttpStatusCodes.Ok;
+            StatusCode = HttpStatusCodes.Success.Ok;
             OutputStream = new MemoryStream();
             HeaderParameters = new ParameterCollection();
             InitializeParameters();

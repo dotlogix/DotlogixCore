@@ -24,6 +24,12 @@ namespace DotLogix.Core.Rest.Server.Http.State {
             return Code == other.Code;
         }
 
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString() {
+            return $"{Code} {Description}";
+        }
+
         public override bool Equals(object obj) {
             if(ReferenceEquals(null, obj))
                 return false;

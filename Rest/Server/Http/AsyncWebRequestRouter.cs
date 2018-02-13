@@ -65,14 +65,14 @@ namespace DotLogix.Core.Rest.Server.Http {
         #region Processing
         async Task IAsyncHttpRequestHandler.HandleRequestAsync(IAsyncHttpContext asyncHttpContext) {
             if(TryGetRoute(asyncHttpContext, out var route) == false) {
-                await asyncHttpContext.Response.SendAsync(HttpStatusCodes.NotFound);
+                await asyncHttpContext.Response.SendAsync(HttpStatusCodes.ClientError.NotFound);
                 return;
             }
 
             if(asyncHttpContext.Request.HeaderParameters.TryGetParameterValue(EventSubscriptionParameterName, out var eventName)) {
                 if(_serverEvents.TryGetValue(eventName.ToString(), out var serverEvent) == false) {
                     await asyncHttpContext.Response.WriteToResponseStreamAsync("The event subscription could not be handled, because the event is not registered on the server");
-                    await asyncHttpContext.Response.SendAsync(HttpStatusCodes.BadRequest);
+                    await asyncHttpContext.Response.SendAsync(HttpStatusCodes.ClientError.BadRequest);
                     return;
                 }
                 asyncHttpContext.PreventAutoSend = true;

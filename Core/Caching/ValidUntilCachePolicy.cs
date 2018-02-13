@@ -13,7 +13,7 @@ namespace DotLogix.Core.Caching {
         }
 
         public bool HasExpired(DateTime timeStampUtc) {
-            return timeStampUtc < _validUntilUtc;
+            return timeStampUtc > _validUntilUtc;
         }
     }
 }

@@ -15,92 +15,84 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Caching {
-    public class Cache<TKey> : ICache<TKey> {
-        private readonly ConcurrentDictionary<TKey, CacheItem<TKey>> _cacheDict = new ConcurrentDictionary<TKey, CacheItem<TKey>>();
-        private readonly Timer _timer;
+    public class Cache<TKey, TValue> : ICache<TKey, TValue> {
+        public event EventHandler<CacheItemsDiscardedEventArgs<TKey, TValue>> ItemsDiscarded;
+        private readonly Timer _cleanupTimer;
+        private readonly ConcurrentDictionary<TKey, CacheItem<TKey, TValue>> _cacheItems = new ConcurrentDictionary<TKey, CacheItem<TKey, TValue>>();
 
-        /// <summary>
-        ///     Initialisiert eine neue Instanz der <see cref="T:System.Object" />-Klasse.
-        /// </summary>
+
+        public void Dispose() {
+            _cleanupTimer.Dispose();
+        }
+
+        public Cache(int checkPolicyInterval) : this(TimeSpan.FromMilliseconds(checkPolicyInterval)){
+        }
+
         public Cache(TimeSpan checkPolicyInterval) {
             CheckPolicyInterval = checkPolicyInterval;
-            _timer = new Timer(CheckPolicy, null, checkPolicyInterval, checkPolicyInterval);
+            _cleanupTimer = new Timer(state => Cleanup(), null, CheckPolicyInterval, CheckPolicyInterval);
         }
 
         public TimeSpan CheckPolicyInterval { get; }
 
-        public void Cleanup() {
-            var utcNow = DateTime.UtcNow;
-            var removedValues = new List<object>();
+        public TValue this[TKey key] => Retrieve(key);
 
-            foreach(var item in _cacheDict.Values) {
-                if((item.Policy == null) || (item.Policy.HasExpired(utcNow) == false))
-                    continue;
-
-                removedValues.Add(item.Value);
-                _cacheDict.TryRemove(item.Key, out _);
-                Remove(item.Key);
-            }
-
-            if(removedValues.Count > 0)
-                ValuesRemoved?.Invoke(this, new CacheCleanupEventArgs(removedValues));
+        public bool IsAlive(TKey key) {
+            return _cacheItems.ContainsKey(key);
         }
 
-        public object this[TKey key] => Retrieve(key);
-
-        public bool Contains(TKey key) {
-            return _cacheDict.ContainsKey(key);
+        public void Store(TKey key, TValue value, ICachePolicy policy = null) {
+            _cacheItems[key] = new CacheItem<TKey, TValue>(key, value, policy);
         }
 
-        public void Store(TKey key, object value, ICachePolicy policy = null) {
-            var item = new CacheItem<TKey>(key, value, policy);
-            _cacheDict[key] = item;
+        public TValue Retrieve(TKey key) {
+            return _cacheItems.TryGetValue(key, out var item) ? item.Value : default(TValue);
         }
 
-        public TValue Retrieve<TValue>(TKey key) {
-            return TryRetrieve(key, out TValue value) ? value : default(TValue);
-        }
-
-        public object Retrieve(TKey key) {
-            return TryRetrieve(key, out var value) ? value : null;
-        }
-
-        public TValue Pop<TValue>(TKey key) {
-            return Pop(key).TryConvertTo(out TValue value) ? value : default(TValue);
-        }
-
-        public object Pop(TKey key) {
-            return _cacheDict.TryRemove(key, out var item) ? item.Value : null;
-        }
-
-        public bool Remove(TKey key) {
-            return _cacheDict.TryRemove(key, out _);
-        }
-
-        public bool TryRetrieve<TValue>(TKey key, out TValue value) {
+        public bool TryRetrieve(TKey key, out TValue value) {
             value = default(TValue);
-            return TryRetrieve(key, out var valueAsObject) && valueAsObject.TryConvertTo(out value);
-        }
-
-        public bool TryRetrieve(TKey key, out object value) {
-            value = null;
-
-            if(_cacheDict.TryGetValue(key, out var item) == false)
+            if(_cacheItems.TryGetValue(key, out var item) == false)
                 return false;
-
             value = item.Value;
             return true;
         }
 
-        /// <inheritdoc />
-        public void Dispose() {
-            _timer?.Dispose();
+        public TValue Pop(TKey key) {
+            return _cacheItems.TryRemove(key, out var item) ? item.Value : default(TValue);
         }
 
-        public event EventHandler<CacheCleanupEventArgs> ValuesRemoved;
+        public bool TryPop(TKey key, out TValue value) {
+            value = default(TValue);
+            if (_cacheItems.TryRemove(key, out var item) == false)
+                return false;
+            value = item.Value;
+            return true;
+        }
 
-        private void CheckPolicy(object state) {
-            Cleanup();
+        public bool Discard(TKey key) {
+            if (_cacheItems.TryRemove(key, out var item) == false)
+                return false;
+
+            ItemsDiscarded?.Invoke(null, new CacheItemsDiscardedEventArgs<TKey, TValue>(item.ToSingleElementArray()));
+            return true;
+        }
+
+        public void Cleanup() {
+            if (_cacheItems.IsEmpty)
+                return;
+
+            var utcNow = DateTime.UtcNow;
+            var discardedItems = new List<CacheItem<TKey, TValue>>();
+            foreach(var cacheItem in _cacheItems.Values) {
+                if(cacheItem.Policy == null || cacheItem.Policy.HasExpired(utcNow) == false)
+                    continue;
+
+                discardedItems.Add(cacheItem);
+                _cacheItems.TryRemove(cacheItem.Key, out _);
+            }
+
+            if(discardedItems.Count > 0)
+                ItemsDiscarded?.Invoke(null, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems));
         }
     }
 }

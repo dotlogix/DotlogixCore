@@ -21,20 +21,20 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
             RouteType = routeType;
         }
 
-        protected override IWebServiceRoute CreateRoute(string pattern, HttpMethods acceptedMethods, IWebRequestProcessor requestProcessor) {
+        protected override IWebServiceRoute CreateRoute(int routeIndex, string pattern, HttpMethods acceptedMethods, IWebRequestProcessor requestProcessor) {
             switch(RouteType) {
                 case RouteType.Equals:
-                    return new EqualsWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
+                    return new EqualsWebServiceRoute(routeIndex, pattern, acceptedMethods, requestProcessor, Priority);
                 case RouteType.StartsWith:
-                    return new StartsWithWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
+                    return new StartsWithWebServiceRoute(routeIndex, pattern, acceptedMethods, requestProcessor, Priority);
                 case RouteType.EndsWith:
-                    return new EndsWithWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
+                    return new EndsWithWebServiceRoute(routeIndex, pattern, acceptedMethods, requestProcessor, Priority);
                 case RouteType.Contains:
-                    return new ContainsWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
+                    return new ContainsWebServiceRoute(routeIndex, pattern, acceptedMethods, requestProcessor, Priority);
                 case RouteType.Regex:
-                    return new RegexWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
+                    return new RegexWebServiceRoute(routeIndex, pattern, acceptedMethods, requestProcessor, Priority);
                 case RouteType.Pattern:
-                    return new PatternWebServiceRoute(pattern, acceptedMethods, requestProcessor, Priority);
+                    return new PatternWebServiceRoute(routeIndex, pattern, acceptedMethods, requestProcessor, Priority);
                 case RouteType.Fallback:
                     return new FallbackWebServiceRoute(routeIndex, pattern, acceptedMethods, requestProcessor, Priority);
                 default:

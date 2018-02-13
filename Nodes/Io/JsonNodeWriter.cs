@@ -82,7 +82,7 @@ namespace DotLogix.Core.Nodes.Io
         public override INodeWriter EndMap()
         {
             GoToParent(NodeIoOpCodes.EndMap, '}');
-            
+            _isFirstChild = false;
             return this;
         }
 
@@ -126,6 +126,7 @@ namespace DotLogix.Core.Nodes.Io
         public override INodeWriter EndList()
         {
             GoToParent(NodeIoOpCodes.EndList, ']');
+            _isFirstChild = false;
             return this;
         }
 

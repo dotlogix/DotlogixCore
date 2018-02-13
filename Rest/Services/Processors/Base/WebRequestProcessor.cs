@@ -2,11 +2,12 @@
 // Copyright 2018(C) , DotLogix
 // File:  WebRequestProcessor.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.01.2018
-// LastEdited:  31.01.2018
+// Created:  07.02.2018
+// LastEdited:  13.02.2018
 // ==================================================
 
 #region
+using System;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
@@ -36,8 +37,13 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
             var parameters = CreateParameters(webRequestResult);
             if(webRequestResult.Handled)
                 return;
-            var result = await InvokeAsync(webRequestResult, parameters);
-            webRequestResult.TrySetResult(result);
+
+            try {
+                var result = await InvokeAsync(webRequestResult, parameters);
+                webRequestResult.TrySetResult(result);
+            } catch(Exception e) {
+                webRequestResult.TrySetException(e);
+            }
         }
 
         protected virtual object[] CreateParameters(WebRequestResult webRequestResult) {

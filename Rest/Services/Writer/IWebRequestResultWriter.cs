@@ -31,13 +31,13 @@ namespace DotLogix.Core.Rest.Server.Http {
             if(requestResult.Succeed) {
                 message = JsonNodes.ToJson(requestResult.Result);
                 if(requestResult.Result == null)
-                    response.StatusCode = HttpStatusCodes.NoContent;
+                    response.StatusCode = HttpStatusCodes.Success.NoContent;
             } else {
-                if(response.StatusCode == HttpStatusCodes.Ok) {
+                if(response.StatusCode == HttpStatusCodes.Success.Ok) {
                     var restException = GetRestExceptionRecursive(requestResult.Exception);
                     response.StatusCode = restException != null
                                               ? restException.ErrorCode
-                                              : HttpStatusCodes.InternalServerError;
+                                              : HttpStatusCodes.ServerError.InternalServerError;
                 }
                 message = JsonNodes.ToJson(requestResult.Exception);
             }

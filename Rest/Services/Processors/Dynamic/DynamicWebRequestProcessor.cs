@@ -82,7 +82,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Dynamic {
             builder.AppendLine("Given Parameters:");
             AppendParameterValues(builder, request);
 
-            return new RestException(HttpStatusCodes.BadRequest, builder.ToString());
+            return new RestException(HttpStatusCodes.ClientError.BadRequest, builder.ToString());
         }
     }
 }

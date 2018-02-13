@@ -154,7 +154,7 @@ namespace DotLogix.Core.Rest.Server.Http {
 
         public static async Task SendErrorMessageAsync(IAsyncHttpResponse response, Exception exception) {
             var stringBuilder = new StringBuilder();
-            var httpStatusCode = HttpStatusCodes.InternalServerError;
+            var httpStatusCode = HttpStatusCodes.ServerError.InternalServerError;
             CreateExceptionMessage(stringBuilder, exception, ref httpStatusCode);
 
             response.StatusCode = httpStatusCode;

@@ -14,5 +14,6 @@ namespace DotLogix.Core.Rest.Server.Routes {
         Contains,
         Regex,
         Pattern,
+        Fallback,
     }
 }

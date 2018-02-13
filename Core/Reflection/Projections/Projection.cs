@@ -22,7 +22,7 @@ namespace DotLogix.Core.Reflection.Projections {
         }
         public virtual void ProjectRightToLeft(object left, object right)
         {
-            LeftSetter.Invoke(left, RightGetter.Invoke(left));
+            LeftSetter.Invoke(left, RightGetter.Invoke(right));
         }
     }
 }

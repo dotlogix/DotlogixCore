@@ -25,9 +25,9 @@ namespace DotLogix.Core.Rest.Server.Routes {
             AcceptedRequests = acceptedRequests;
             RequestProcessor = requestProcessor ?? throw new ArgumentNullException(nameof(requestProcessor));
             Priority = priority;
-            _preProcessors = new SortedCollection<IWebRequestProcessor>();
-            _postProcessors = new SortedCollection<IWebRequestProcessor>();
             RouteIndex = routeIndex;
+            _preProcessors = new SortedCollection<IWebRequestProcessor>(WebRequestProcessorComparer.Instance);
+            _postProcessors = new SortedCollection<IWebRequestProcessor>(WebRequestProcessorComparer.Instance);
         }
 
         public IReadOnlyCollection<IWebRequestProcessor> PostProcessors => _postProcessors;

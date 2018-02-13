@@ -24,13 +24,11 @@ namespace DotLogix.Core.Rest.Server.Http {
     public class AsyncWebRequestRouter : IAsyncHttpRequestHandler {
         public const string EventSubscriptionParameterName = "$eventSubscription";
 
-        public static readonly IComparer<IWebRequestProcessor> ProcessorPriorityComparer = new SelectorComparer<IWebRequestProcessor, int>(p => p.Priority);
-        public static readonly IComparer<IWebServiceRoute> ServerRoutePriorityComparer = new SelectorComparer<IWebServiceRoute, int>(p => p.Priority);
-        private readonly SortedCollection<IWebRequestProcessor> _globalPostProcessors = new SortedCollection<IWebRequestProcessor>(ProcessorPriorityComparer);
+        private readonly SortedCollection<IWebRequestProcessor> _globalPostProcessors = new SortedCollection<IWebRequestProcessor>(WebRequestProcessorComparer.Instance);
 
-        private readonly SortedCollection<IWebRequestProcessor> _globalPreProcessors = new SortedCollection<IWebRequestProcessor>(ProcessorPriorityComparer);
+        private readonly SortedCollection<IWebRequestProcessor> _globalPreProcessors = new SortedCollection<IWebRequestProcessor>(WebRequestProcessorComparer.Instance);
         private readonly Dictionary<string, WebServiceEvent> _serverEvents = new Dictionary<string, WebServiceEvent>();
-        private readonly SortedCollection<IWebServiceRoute> _serverRoutes = new SortedCollection<IWebServiceRoute>(ServerRoutePriorityComparer);
+        private readonly SortedCollection<IWebServiceRoute> _serverRoutes = new SortedCollection<IWebServiceRoute>(WebServiceRouteComparer.Instance);
 
 
         public int RegisteredRoutesCount => _serverRoutes.Count;

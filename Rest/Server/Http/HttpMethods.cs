@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  HttpMethods.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  29.01.2018
-// LastEdited:  31.01.2018
+// Created:  06.02.2018
+// LastEdited:  13.02.2018
 // ==================================================
 
 #region
@@ -22,5 +22,6 @@ namespace DotLogix.Core.Rest.Server.Http {
         Delete = 1 << 5,
         Trace = 1 << 6,
         Connect = 1 << 7
+        Any = Options | Get | Head | Post | Put | Delete | Trace | Connect
     }
 }

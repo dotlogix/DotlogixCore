@@ -61,11 +61,11 @@ namespace DotLogix.Core.Rest.Services {
         }
 
         public void AddGlobalPostProcessor(IWebRequestProcessor postProcessor) {
-            _router.AddGlobalPreProcessor(postProcessor);
+            _router.AddGlobalPostProcessor(postProcessor);
         }
 
         public void RemoveGlobalPostProcessor(IWebRequestProcessor postProcessor) {
-            _router.RemoveGlobalPreProcessor(postProcessor);
+            _router.RemoveGlobalPostProcessor(postProcessor);
         }
         #endregion
 
@@ -113,7 +113,7 @@ namespace DotLogix.Core.Rest.Services {
 
                 var serviceEvent = _router.GetOrAddServerEvent(eventAttribute.Name);
 
-                void TriggerEvent(object sender, EventArgs args) => serviceEvent.TriggerEventAsync();
+                async void TriggerEvent(object sender, EventArgs args) => await serviceEvent.TriggerEventAsync();
 
                 eventInfo.GetAddMethod().CreateDynamicInvoke().Invoke(serviceInstance, (EventHandler)TriggerEvent);
                 count++;

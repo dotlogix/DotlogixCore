@@ -20,6 +20,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
         IWebRequestResultWriter WebRequestResultWriter { get; }
 
 
+        int RouteIndex { get; }
         int Priority { get; }
         HttpMethods AcceptedRequests { get; }
         void AddPreProcessor(IWebRequestProcessor preProcessor);

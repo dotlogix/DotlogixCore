@@ -27,11 +27,11 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
             Pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
         }
 
-        public IWebServiceRoute BuildRoute(IWebService webService, DynamicInvoke dynamicInvoke, string pattern) {
+        public IWebServiceRoute BuildRoute(IWebService webService, int routeIndex, DynamicInvoke dynamicInvoke, string pattern) {
             var requestProcessor = CreateProcessor(webService, dynamicInvoke);
             var acceptedMethods = GetAcceptedHttpMethods(dynamicInvoke);
 
-            var route = CreateRoute(pattern, acceptedMethods, requestProcessor);
+            var route = CreateRoute(routeIndex, pattern, acceptedMethods, requestProcessor);
             RegisterInitialProcessors(route);
             return route;
         }
@@ -41,7 +41,7 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
         }
 
         protected abstract IWebRequestProcessor CreateProcessor(IWebService serviceInstance, DynamicInvoke dynamicInvoke);
-        protected abstract IWebServiceRoute CreateRoute(string pattern, HttpMethods acceptedMethods, IWebRequestProcessor requestProcessor);
+        protected abstract IWebServiceRoute CreateRoute(int routeIndex, string pattern, HttpMethods acceptedMethods, IWebRequestProcessor requestProcessor);
         protected virtual void RegisterInitialProcessors(IWebServiceRoute route) { }
     }
 }

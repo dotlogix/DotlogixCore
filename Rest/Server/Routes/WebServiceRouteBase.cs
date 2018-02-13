@@ -20,14 +20,14 @@ namespace DotLogix.Core.Rest.Server.Routes {
         private readonly SortedCollection<IWebRequestProcessor> _preProcessors;
         public string Pattern { get; }
 
-        protected WebServiceRouteBase(string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor,
-                                      int priority) {
+        protected WebServiceRouteBase(int routeIndex, string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor, int priority) {
             Pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
             AcceptedRequests = acceptedRequests;
             RequestProcessor = requestProcessor ?? throw new ArgumentNullException(nameof(requestProcessor));
             Priority = priority;
             _preProcessors = new SortedCollection<IWebRequestProcessor>();
             _postProcessors = new SortedCollection<IWebRequestProcessor>();
+            RouteIndex = routeIndex;
         }
 
         public IReadOnlyCollection<IWebRequestProcessor> PostProcessors => _postProcessors;
@@ -36,6 +36,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
         public IWebRequestProcessor RequestProcessor { get; }
         public IWebRequestResultWriter WebRequestResultWriter { get; set; }
         public HttpMethods AcceptedRequests { get; }
+        public int RouteIndex { get; }
         public int Priority { get; }
 
         public abstract RouteMatch Match(HttpMethods method, string path);

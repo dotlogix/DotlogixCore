@@ -18,8 +18,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
     public class RegexWebServiceRoute : WebServiceRouteBase {
         public Regex Regex { get; }
 
-        public RegexWebServiceRoute(string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor,
-                                    int priority) : base(pattern, acceptedRequests, requestProcessor, priority) {
+        public RegexWebServiceRoute(int routeIndex, string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor, int priority) : base(routeIndex, pattern, acceptedRequests, requestProcessor, priority) {
             Regex = new Regex(Pattern);
         }
 

@@ -4,10 +4,7 @@ using DotLogix.Core.Rest.Services.Processors;
 namespace DotLogix.Core.Rest.Server.Routes {
     public class EqualsWebServiceRoute : WebServiceRouteBase
     {
-        public EqualsWebServiceRoute(string pattern, HttpMethods acceptedRequests,
-                                     IWebRequestProcessor requestProcessor, int priority) :
-            base(pattern, acceptedRequests, requestProcessor, priority)
-        { }
+        public EqualsWebServiceRoute(int routeIndex, string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor, int priority) : base(routeIndex, pattern, acceptedRequests, requestProcessor, priority) { }
 
         public override RouteMatch Match(HttpMethods method, string path)
         {

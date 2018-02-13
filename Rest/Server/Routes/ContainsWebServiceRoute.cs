@@ -13,9 +13,7 @@ using DotLogix.Core.Rest.Services.Processors;
 
 namespace DotLogix.Core.Rest.Server.Routes {
     public class ContainsWebServiceRoute : WebServiceRouteBase {
-        public ContainsWebServiceRoute(string pattern, HttpMethods acceptedRequests,
-                                       IWebRequestProcessor requestProcessor, int priority) :
-            base(pattern, acceptedRequests, requestProcessor, priority) { }
+        public ContainsWebServiceRoute(int routeIndex, string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor, int priority) : base(routeIndex, pattern, acceptedRequests, requestProcessor, priority) { }
 
         public override RouteMatch Match(HttpMethods method, string path) {
             if(((method & AcceptedRequests) != 0) && path.Contains(Pattern))

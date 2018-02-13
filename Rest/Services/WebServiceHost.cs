@@ -21,6 +21,7 @@ using DotLogix.Core.Rest.Services.Processors;
 
 namespace DotLogix.Core.Rest.Services {
     public class WebServiceHost {
+        private int _currentRouteIndex;
         private readonly AsyncWebRequestRouter _router;
         public IAsyncHttpServer Server { get; }
 
@@ -87,7 +88,7 @@ namespace DotLogix.Core.Rest.Services {
                 else
                     route = routeAttribute.Pattern;
 
-                var serviceRoute = routeAttribute.BuildRoute(serviceInstance, dynamicInvoke, route);
+                var serviceRoute = routeAttribute.BuildRoute(serviceInstance, _currentRouteIndex++, dynamicInvoke, route);
                 if(serviceRoute == null)
                     continue;
 

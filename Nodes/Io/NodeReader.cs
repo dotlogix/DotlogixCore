@@ -9,33 +9,31 @@ namespace DotLogix.Core.Nodes.Io {
             _node = node;
         }
 
-        protected override IEnumerable<NodeIoOp> EnumerateOps() {
-            var list = new LinkedList<NodeIoOp>();
-            AddOpsRecursive(_node, list);
-            return list;
+        public override void CopyTo(INodeWriter nodeWriter) {
+            AddOpsRecursive(_node, nodeWriter);
         }
 
-        private static void AddOpsRecursive(Node node, ICollection<NodeIoOp> list) {
+        private static void AddOpsRecursive(Node node, INodeWriter nodeWriter) {
             switch(node.NodeType) {
                 case NodeTypes.Empty:
-                    list.Add(new NodeIoOp(NodeIoOpCodes.WriteValue, null, node.Name));
+                    nodeWriter.WriteValue(null, node.Name);
                     break;
                 case NodeTypes.Value:
-                    list.Add(new NodeIoOp(NodeIoOpCodes.WriteValue, null, node.Name));
+                    nodeWriter.WriteValue(null, node.Name);
                     break;
                 case NodeTypes.List:
-                    list.Add(new NodeIoOp(NodeIoOpCodes.BeginList, node.Name));
+                    nodeWriter.BeginList(node.Name);
                     foreach(var children in ((NodeList)node).Children()) {
-                        AddOpsRecursive(children, list);
+                        AddOpsRecursive(children, nodeWriter);
                     }
-                    list.Add(new NodeIoOp(NodeIoOpCodes.EndList));
+                    nodeWriter.EndList();
                     break;
                 case NodeTypes.Map:
-                    list.Add(new NodeIoOp(NodeIoOpCodes.BeginMap, node.Name));
+                    nodeWriter.BeginMap(node.Name);
                     foreach(var children in ((NodeMap)node).Children()) {
-                        AddOpsRecursive(children, list);
+                        AddOpsRecursive(children, nodeWriter);
                     }
-                    list.Add(new NodeIoOp(NodeIoOpCodes.EndMap));
+                    nodeWriter.EndMap();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

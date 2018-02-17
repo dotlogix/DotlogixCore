@@ -1,15 +1,13 @@
 ﻿namespace DotLogix.Core.Nodes.Io {
     public interface INodeWriter {
-        INodeWriter CopyFrom(INodeReader reader);
+        void BeginMap(string name = null);
+        void EndMap();
 
-        INodeWriter BeginMap(string name = null);
-        INodeWriter EndMap();
+        void BeginList(string name = null);
+        void EndList();
 
-        INodeWriter BeginList(string name = null);
-        INodeWriter EndList();
-
-        INodeWriter WriteValue(object value, string name = null);
-        INodeWriter AutoComplete();
-        INodeWriter ExecuteOperation(NodeIoOp operation);
+        void WriteValue(object value, string name = null);
+        void AutoComplete();
+        void ExecuteOperation(NodeIoOp operation);
     }
 }

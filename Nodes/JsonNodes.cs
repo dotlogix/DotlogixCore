@@ -10,7 +10,7 @@ namespace DotLogix.Core.Nodes {
         public static Node ToNode(string json) {
             var reader = new JsonNodeReader(json);
             var writer = new NodeWriter(false);
-            writer.CopyFrom(reader);
+            reader.CopyTo(writer);
             return writer.Root;
         }
         #endregion
@@ -24,7 +24,7 @@ namespace DotLogix.Core.Nodes {
             var builder = new StringBuilder(StringBuilderCapacity);
             var nodeReader = new NodeReader(node);
             var nodeWriter = new JsonNodeWriter(builder, formatter);
-            nodeWriter.CopyFrom(nodeReader);
+            nodeReader.CopyTo(nodeWriter);
             return builder.ToString();
         }
 

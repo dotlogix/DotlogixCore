@@ -14,21 +14,16 @@ namespace DotLogix.UI.Extensions {
     public static class FrameworkElementExtension {
         public static TTag GetTagValue<TTag>(this FrameworkElement sender) {
             var tag = sender.Tag;
-            if(tag is TTag)
-                return (TTag)tag;
-            return default(TTag);
+            return tag is TTag t ? t : default(TTag);
         }
 
         public static TTag GetTagValue<TTag>(this object sender) {
-            var fElement = sender as FrameworkElement;
-            return fElement == null ? default(TTag) : fElement.GetTagValue<TTag>();
+            return !(sender is FrameworkElement fElement) ? default(TTag) : fElement.GetTagValue<TTag>();
         }
 
         public static TTag GetDataContext<TTag>(this FrameworkElement sender) {
             var dataContext = sender.DataContext;
-            if(dataContext is TTag)
-                return (TTag)dataContext;
-            return default(TTag);
+            return dataContext is TTag t ? t : default(TTag);
         }
 
         public static TTag GetDataContext<TTag>(this object sender) {

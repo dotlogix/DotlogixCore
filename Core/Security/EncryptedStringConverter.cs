@@ -23,23 +23,20 @@ namespace DotLogix.Core.Security {
         }
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) {
-            var stringValue = value as string;
-            if(stringValue == null)
+            if(!(value is string stringValue))
                 throw new ArgumentNullException(nameof(value));
             return EncryptedString.FromEncryptedString(stringValue);
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value,
                                          Type destinationType) {
-            var encryptedString = value as EncryptedString;
-            if(encryptedString == null)
+            if(!(value is EncryptedString encryptedString))
                 throw new ArgumentNullException(nameof(value));
             return encryptedString.ToEncryptedString();
         }
 
         public override bool IsValid(ITypeDescriptorContext context, object value) {
-            var stringValue = value as string;
-            return (stringValue != null) && (stringValue.Length > 16);
+            return (value is string stringValue) && (stringValue.Length > 16);
         }
     }
 }

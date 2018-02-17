@@ -76,8 +76,7 @@ namespace DotLogix.UI.Animations {
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         protected virtual void AddChild(object child) {
-            var keyFrame = child as KeyFrame<TValue>;
-            if(keyFrame == null)
+            if(!(child is KeyFrame<TValue> keyFrame))
                 throw new ArgumentException("Child should be of type KeyFrame<" + typeof(TValue).Name + ">");
             KeyFrames.Add(keyFrame);
         }

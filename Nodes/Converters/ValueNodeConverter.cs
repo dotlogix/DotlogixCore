@@ -21,8 +21,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         public override object ConvertToObject(Node node) {
-            var nodeValue = node as NodeValue;
-            if(nodeValue != null)
+            if(node is NodeValue nodeValue)
                 return nodeValue.ConvertValue(Type);
             throw new ArgumentException("Node is not a NodeValue");
         }

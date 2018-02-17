@@ -41,8 +41,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         public override object ConvertToObject(Node node) {
-            var nodeMap = node as NodeMap;
-            if(nodeMap == null)
+            if(!(node is NodeMap nodeMap))
                 throw new ArgumentException("Node is not a NodeMap");
 
             var keyNode = nodeMap.GetChild(KeyNodeName);

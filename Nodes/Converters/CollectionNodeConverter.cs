@@ -39,8 +39,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         public override void Write(object instance, string rootName, INodeWriter writer) {
-            var values = instance as IEnumerable<T>;
-            if(values == null)
+            if(!(instance is IEnumerable<T> values))
                 throw new ArgumentException("Instance is not type of IEnumerable<T>");
             writer.BeginList(rootName);
             foreach(var value in values)
@@ -49,8 +48,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         public override object ConvertToObject(Node node) {
-            var nodeList = node as NodeList;
-            if(nodeList == null)
+            if(!(node is NodeList nodeList))
                 throw new ArgumentException("Node is not a NodeList");
             var children = nodeList.Children().ToArray();
             var childCount = children.Length;

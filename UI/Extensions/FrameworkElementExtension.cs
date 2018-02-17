@@ -27,8 +27,7 @@ namespace DotLogix.UI.Extensions {
         }
 
         public static TTag GetDataContext<TTag>(this object sender) {
-            var fElement = sender as FrameworkElement;
-            return fElement == null ? default(TTag) : fElement.GetDataContext<TTag>();
+            return !(sender is FrameworkElement fElement) ? default(TTag) : fElement.GetDataContext<TTag>();
         }
     }
 }

@@ -87,9 +87,9 @@ namespace DotLogix.UI.Controls {
         /// </summary>
         /// <param name="clock">the animation clock to notify completion status</param>
         private void VerifyAnimationCompletedStatus(AnimationClock clock) {
-            if(this._clock == null) {
-                this._clock = clock;
-                this._clock.Completed += delegate { IsCompleted = true; };
+            if(_clock == null) {
+                _clock = clock;
+                _clock.Completed += delegate { IsCompleted = true; };
             }
         }
 

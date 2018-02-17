@@ -22,7 +22,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
             var builder = new StringBuilder();
 
             var i = 0;
-            var patternStart = 0;
+            int patternStart;
 
             while((patternStart = pattern.IndexOf("<<", i, StringComparison.Ordinal)) != -1) {
                 if(patternStart > i)

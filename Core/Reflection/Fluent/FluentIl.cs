@@ -108,7 +108,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                 if((constructorInfo.IsPublic == false) && (allowNonPublic == false))
                     return null;
                 module = constructorInfo.Module;
-                parameters = constructorInfo?.GetParameters();
+                parameters = constructorInfo.GetParameters();
                 ctorName = declaringType.IsArray
                                ? $"{declaringType.GetElementType().Name}Array{parameters.Length}d"
                                : declaringType.Name;

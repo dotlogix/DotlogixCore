@@ -50,8 +50,7 @@ namespace DotLogix.Core.Nodes {
         }
 
         public TNode PopChild<TNode>(string name) where TNode : Node {
-            var node = GetChild(name) as TNode;
-            if(node == null)
+            if(!(GetChild(name) is TNode node))
                 return null;
 
             RemoveChild(name);

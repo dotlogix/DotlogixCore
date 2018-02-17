@@ -15,12 +15,35 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Extensions {
     public static class StringExtension {
-        public static int OccurancesOf(this string source, char character) {
-            var chars = source.ToCharArray();
+        public static int OccurancesOf(this string str, char character) {
+            return OccurancesOf(str.ToCharArray(), character, 0, str.Length, out _);
+        }
+
+        public static int OccurancesOf(this string str, char character, int start, int count)
+        {
+            return OccurancesOf(str.ToCharArray(), character, start, count, out _);
+        }
+
+        public static int OccurancesOf(this char[] chars, char character)
+        {
+            return OccurancesOf(chars, character, 0, chars.Length, out _);
+        }
+
+        public static int OccurancesOf(this char[] chars, char character, int start, int count) {
+            return OccurancesOf(chars, character, start, count, out _);
+        }
+
+        public static int OccurancesOf(this char[] chars, char character, int start, int count, out int lastOccurence) {
+            lastOccurence = -1;
+
             var occurances = 0;
-            for(var i = 0; i < chars.Length; i++) {
-                if(chars[i] == character)
-                    occurances++;
+            for (var i = start; i < start+count; i++)
+            {
+                if(chars[i] != character)
+                    continue;
+
+                occurances++;
+                lastOccurence = i;
             }
             return occurances;
         }

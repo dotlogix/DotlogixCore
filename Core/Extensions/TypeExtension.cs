@@ -56,6 +56,9 @@ namespace DotLogix.Core.Extensions {
         public static bool IsAssignableTo(this Type sourceType, Type targetType) {
             return targetType.IsAssignableFrom(sourceType);
         }
+        public static bool IsAssignableTo<TTarget>(this Type sourceType) {
+            return sourceType.IsAssignableTo(typeof(TTarget));
+        }
 
         public static bool IsEnumerable(this Type sourceType) {
             return IsEnumerable(sourceType, out _);
@@ -63,7 +66,7 @@ namespace DotLogix.Core.Extensions {
         public static bool IsEnumerable(this Type sourceType, out Type elementType) {
             if(sourceType.IsArray) {
                 elementType = sourceType.GetElementType();
-                return true;
+                return true; 
             }
 
             if(sourceType.IsAssignableToOpenGeneric(typeof(IEnumerable<>), out var genericTypeArguments)) {

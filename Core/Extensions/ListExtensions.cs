@@ -23,7 +23,7 @@ namespace DotLogix.Core.Extensions {
 
         public int Compare(T x, T y)
         {
-            return _comparableSelector.Invoke(y).CompareTo(_comparableSelector.Invoke(x));
+            return _comparableSelector.Invoke(x).CompareTo(_comparableSelector.Invoke(y));
         }
     }
 

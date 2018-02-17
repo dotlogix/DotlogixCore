@@ -7,28 +7,17 @@ namespace DotLogix.Core.Nodes.Io {
         protected NodeIoStateMachine StateMachine { get; } =
             new NodeIoStateMachine(NodeIoState.None, NodeIoOpCodes.BeginAny);
 
-        INodeWriter INodeWriter.ExecuteOperation(NodeIoOp operation) {
-            return ExecuteOperation(operation);
-        }
+        public abstract void BeginMap(string name = null);
 
-        public virtual INodeWriter CopyFrom(INodeReader reader) {
-            foreach(var op in reader.EnumerateOps()) {
-                ExecuteOperation(op);
-            }
-            return this;
-        }
+        public abstract void EndMap();
 
-        public abstract INodeWriter BeginMap(string name = null);
+        public abstract void BeginList(string name = null);
 
-        public abstract INodeWriter EndMap();
+        public abstract void EndList();
 
-        public abstract INodeWriter BeginList(string name = null);
+        public abstract void WriteValue(object value, string name = null);
 
-        public abstract INodeWriter EndList();
-
-        public abstract INodeWriter WriteValue(object value, string name = null);
-
-        public virtual INodeWriter AutoComplete() {
+        public virtual void AutoComplete() {
             while(StateMachine.CurrentState != NodeIoState.None) {
                 switch(StateMachine.CurrentState) {
                     case NodeIoState.InsideMap:
@@ -41,10 +30,9 @@ namespace DotLogix.Core.Nodes.Io {
                         throw new ArgumentOutOfRangeException();
                 }
             }
-            return this;
         }
 
-        protected virtual INodeWriter ExecuteOperation(NodeIoOp operation) {
+        public virtual void ExecuteOperation(NodeIoOp operation) {
             switch(operation.OpCode) {
                 case NodeIoOpCodes.None:
                     break;
@@ -65,7 +53,7 @@ namespace DotLogix.Core.Nodes.Io {
                     break;
                 case NodeIoOpCodes.SetName:
                     _currentName = operation.GetArg<string>(0);
-                    return this;
+                    return;
                 case NodeIoOpCodes.AutoComplete:
                     AutoComplete();
                     break;
@@ -73,7 +61,6 @@ namespace DotLogix.Core.Nodes.Io {
                     throw new ArgumentOutOfRangeException();
             }
             _currentName = null;
-            return this;
         }
     }
 }

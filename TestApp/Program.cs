@@ -32,7 +32,7 @@ namespace TestApp
 
             //server.Stop();
 
-            var rout = new PatternWebServiceRoute("<<test:g>>/<<id:n>>", HttpMethods.Get, new Auth(), 0);
+            var rout = new PatternWebServiceRoute(0,"<<test:g>>/<<id:n>>", HttpMethods.Get, new Auth(), 0);
             Console.Read();
 
 
@@ -63,7 +63,7 @@ namespace TestApp
         public bool IgnoreHandled { get; }
         public Task ProcessAsync(WebRequestResult webRequestResult) {
             if(webRequestResult.Context.Request.QueryParameters.TryGetParameterValue("auth", out var obj) == false || Equals(obj, "lol") == false) {
-                webRequestResult.SetException(new RestException(HttpStatusCodes.Unauthorized, "Fuck you"));
+                webRequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, "Fuck you"));
             }
             return Task.CompletedTask;
         }

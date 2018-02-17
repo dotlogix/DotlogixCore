@@ -21,37 +21,33 @@ namespace DotLogix.Core.Nodes.Io
             }
         }
 
-        public override INodeWriter BeginMap(string name = null) {
+        public override void BeginMap(string name = null) {
             if(StateMachine.GoToState(NodeIoState.InsideMap, NodeIoOpCodes.BeginMap, NodeIoOpCodes.BeginAny | NodeIoOpCodes.EndMap) == false)
                 throw new InvalidOperationException($"{NodeIoOpCodes.BeginMap} operation in state {StateMachine.CurrentState} is not allowed");
             
             var node = new NodeMap();
             GoToNewChild(name, node);
-            return this;
         }
 
-        public override INodeWriter EndMap() {
+        public override void EndMap() {
             GoToParent(NodeIoOpCodes.EndMap);
-            return this;
         }
 
-        public override INodeWriter BeginList(string name = null)
+        public override void BeginList(string name = null)
         {
             if (StateMachine.GoToState(NodeIoState.InsideList, NodeIoOpCodes.BeginList, NodeIoOpCodes.BeginAny | NodeIoOpCodes.EndList) == false)
                 throw new InvalidOperationException($"{NodeIoOpCodes.BeginList} operation in state {StateMachine.CurrentState} is not allowed");
 
             var node = new NodeList();
             GoToNewChild(name, node);
-            return this;
         }
 
-        public override INodeWriter EndList()
+        public override void EndList()
         {
             GoToParent(NodeIoOpCodes.EndList);
-            return this;
         }
 
-        public override INodeWriter WriteValue(object value, string name = null) {
+        public override void WriteValue(object value, string name = null) {
             if(StateMachine.IsAllowedOperation(NodeIoOpCodes.WriteValue) == false)
                 throw new InvalidOperationException($"{NodeIoOpCodes.WriteValue} operation in state {StateMachine.CurrentState} is not allowed");
 
@@ -84,7 +80,6 @@ namespace DotLogix.Core.Nodes.Io
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            return this;
         }
 
 
@@ -118,7 +113,7 @@ namespace DotLogix.Core.Nodes.Io
             if (StateMachine.GoToState(operation) == false)
                 throw new InvalidOperationException($"{operation.OpCode} operation in state {StateMachine.CurrentState} is not allowed");
 
-            _ancestor = ancestor as NodeCollection;
+            _ancestor = ancestor;
         }
 
         private void GoToNewChild(string name, NodeCollection node) {

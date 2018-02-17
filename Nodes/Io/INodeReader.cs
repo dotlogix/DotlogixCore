@@ -12,6 +12,6 @@ using System.Collections.Generic;
 
 namespace DotLogix.Core.Nodes.Io {
     public interface INodeReader {
-        IEnumerable<NodeIoOp> EnumerateOps();
+        void CopyTo(INodeWriter nodeWriter);
     }
 }

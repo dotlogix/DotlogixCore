@@ -20,7 +20,7 @@ namespace DotLogix.UI.Animations {
     /// </remarks>
     /// <typeparam name="T"> class </typeparam>
     public static class SingletonOf<T> where T : class, new() {
-        private static readonly T _instance = new T();
+        private static readonly T InstanceBack = new T();
 
         /// <summary>
         ///     Creates domain-wide singleton of specified type. Warning: Don't use it to initialize static member of the same type
@@ -28,10 +28,10 @@ namespace DotLogix.UI.Animations {
         /// </summary>
         public static T Instance {
             get {
-                Debug.Assert(_instance != null,
+                Debug.Assert(InstanceBack != null,
                              "SingletonOf<" + typeof(T) +
                              "> : Attempt to initialize static member of the same class. Member will be initialized to null");
-                return _instance;
+                return InstanceBack;
             }
         }
     }

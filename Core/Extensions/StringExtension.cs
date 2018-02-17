@@ -115,8 +115,8 @@ namespace DotLogix.Core.Extensions {
             return Convert.ToBase64String(bytes);
         }
 
-        public static string FromBase64String(this string base64string, Encoding encoding = null) {
-            var bytes = Convert.FromBase64String(base64string);
+        public static string FromBase64String(this string base64String, Encoding encoding = null) {
+            var bytes = Convert.FromBase64String(base64String);
             return (encoding ?? Encoding.UTF8).GetString(bytes);
         }
         #endregion

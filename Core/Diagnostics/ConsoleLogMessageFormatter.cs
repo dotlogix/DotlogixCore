@@ -13,11 +13,11 @@ using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Diagnostics {
     public class ConsoleLogMessageFormatter : ILogMessageFormatter {
-        private static readonly string padding =
+        private static readonly string Padding =
         $"\n{new string(' ', 8)} | {new string(' ', 8)} | {new string(' ', 15)} | {new string(' ', 15)} | {new string(' ', 15)} | "
         ;
 
-        private static readonly int paddingLength = 76;
+        private static readonly int PaddingLength = 76;
 
         public int ConsoleWidth { get; }
 
@@ -34,10 +34,10 @@ namespace DotLogix.Core.Diagnostics {
             var method = message.MethodName.SetLength(' ', 15);
             var thread = message.ThreadName.SetLength(' ', 15);
 
-            var messageLines = message.Message.WordWrap(ConsoleWidth - paddingLength);
+            var messageLines = message.Message.WordWrap(ConsoleWidth - PaddingLength);
             var formatted = $"{timeStamp} | {logLevel} | {context} | {method} | {thread} | ";
             if(messageLines.Length > 1)
-                formatted += string.Join(padding, messageLines);
+                formatted += string.Join(Padding, messageLines);
             else
                 formatted += messageLines[0];
 

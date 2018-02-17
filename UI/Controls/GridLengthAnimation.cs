@@ -37,7 +37,7 @@ namespace DotLogix.UI.Controls {
         public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(GridLength),
                                                                                            typeof(GridLengthAnimation));
 
-        private AnimationClock clock;
+        private AnimationClock _clock;
 
         /// <summary>
         ///     Marks the animation as completed
@@ -87,9 +87,9 @@ namespace DotLogix.UI.Controls {
         /// </summary>
         /// <param name="clock">the animation clock to notify completion status</param>
         private void VerifyAnimationCompletedStatus(AnimationClock clock) {
-            if(this.clock == null) {
-                this.clock = clock;
-                this.clock.Completed += delegate { IsCompleted = true; };
+            if(this._clock == null) {
+                this._clock = clock;
+                this._clock.Completed += delegate { IsCompleted = true; };
             }
         }
 

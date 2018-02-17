@@ -15,7 +15,7 @@ using DotLogix.Core.Interop.Structs;
 namespace DotLogix.Core.Interop {
     public static class Native {
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage([In] IntPtr hWnd, [In] uint Msg,
+        public static extern IntPtr SendMessage([In] IntPtr hWnd, [In] uint msg,
                                                 [In] IntPtr wParam, [In] IntPtr lParam);
 
         [DllImport("user32.dll")]

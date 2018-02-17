@@ -13,7 +13,7 @@ using System.Windows.Media;
 
 namespace DotLogix.UI.Animations {
     public class LinearGradientBrushAnimationHelper : GradientBrushAnimationHelper<LinearGradientBrush> {
-        private static readonly PointAnimationHelper _pointHelper = SingletonOf<PointAnimationHelper>.Instance;
+        private static readonly PointAnimationHelper PointHelper = SingletonOf<PointAnimationHelper>.Instance;
 
         protected override LinearGradientBrush Create() {
             return new LinearGradientBrush();
@@ -43,8 +43,8 @@ namespace DotLogix.UI.Animations {
                 return target;
 
             var brush = base.AddValues(value1, value2);
-            brush.StartPoint = _pointHelper.AddValues(value1.StartPoint, value2.StartPoint);
-            brush.EndPoint = _pointHelper.AddValues(value1.EndPoint, value2.EndPoint);
+            brush.StartPoint = PointHelper.AddValues(value1.StartPoint, value2.StartPoint);
+            brush.EndPoint = PointHelper.AddValues(value1.EndPoint, value2.EndPoint);
             return brush;
         }
 
@@ -55,15 +55,15 @@ namespace DotLogix.UI.Animations {
                 return target;
             }
             var brush = base.SubtractValue(value1, value2);
-            brush.StartPoint = _pointHelper.SubtractValue(value1.StartPoint, value2.StartPoint);
-            brush.EndPoint = _pointHelper.SubtractValue(value1.EndPoint, value2.EndPoint);
+            brush.StartPoint = PointHelper.SubtractValue(value1.StartPoint, value2.StartPoint);
+            brush.EndPoint = PointHelper.SubtractValue(value1.EndPoint, value2.EndPoint);
             return brush;
         }
 
         public override LinearGradientBrush ScaleValue(LinearGradientBrush value, double factor) {
             var brush = base.ScaleValue(value, factor);
-            brush.StartPoint = _pointHelper.ScaleValue(value.StartPoint, factor);
-            brush.EndPoint = _pointHelper.ScaleValue(value.EndPoint, factor);
+            brush.StartPoint = PointHelper.ScaleValue(value.StartPoint, factor);
+            brush.EndPoint = PointHelper.ScaleValue(value.EndPoint, factor);
             return brush;
         }
 
@@ -75,8 +75,8 @@ namespace DotLogix.UI.Animations {
                 return ScaleValue(to, progress);
             }
             var brush = base.InterpolateValue(from, to, progress);
-            brush.StartPoint = _pointHelper.InterpolateValue(from.StartPoint, to.StartPoint, progress);
-            brush.EndPoint = _pointHelper.InterpolateValue(from.EndPoint, to.EndPoint, progress);
+            brush.StartPoint = PointHelper.InterpolateValue(from.StartPoint, to.StartPoint, progress);
+            brush.EndPoint = PointHelper.InterpolateValue(from.EndPoint, to.EndPoint, progress);
             return brush;
         }
 

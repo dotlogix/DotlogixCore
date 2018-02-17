@@ -57,44 +57,44 @@ namespace DotLogix.UI.Animations {
             var to = AnimationHelper.GetZeroValue();
             var originValue = AnimationHelper.GetZeroValue();
 
-            const string DefaultOriginValueName = "defaultOriginValue";
-            const string DefaultDestinationValueName = "defaultDestinationValue";
+            const string defaultOriginValueName = "defaultOriginValue";
+            const string defaultDestinationValueName = "defaultDestinationValue";
 
             switch(_lane) {
                 case Lane.Default:
-                    ValidateValue(defaultOriginValue, DefaultOriginValueName);
-                    ValidateValue(defaultDestinationValue, DefaultDestinationValueName);
+                    ValidateValue(defaultOriginValue, defaultOriginValueName);
+                    ValidateValue(defaultDestinationValue, defaultDestinationValueName);
                     from = defaultOriginValue;
                     to = defaultDestinationValue;
 
                     break;
 
                 case Lane.FromOnly:
-                    ValidateValue(defaultDestinationValue, DefaultDestinationValueName);
+                    ValidateValue(defaultDestinationValue, defaultDestinationValueName);
                     from = _cache[0];
                     to = defaultDestinationValue;
                     break;
 
                 case Lane.ToOnly:
-                    ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                    ValidateValue(defaultOriginValue, defaultOriginValueName);
                     from = defaultOriginValue;
                     to = _cache[0];
                     break;
 
                 case Lane.ByOnly:
-                    ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                    ValidateValue(defaultOriginValue, defaultOriginValueName);
                     to = _cache[0];
                     if(AnimationHelper.IsAccumulable)
                         originValue = defaultOriginValue;
                     break;
 
                 case Lane.FromTo:
-                    ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                    ValidateValue(defaultOriginValue, defaultOriginValueName);
                     from = _cache[0];
                     to = _cache[1];
 
                     if(IsAdditive && AnimationHelper.IsAccumulable) {
-                        ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                        ValidateValue(defaultOriginValue, defaultOriginValueName);
                         originValue = defaultOriginValue;
                     }
                     break;
@@ -105,7 +105,7 @@ namespace DotLogix.UI.Animations {
                     to = AnimationHelper.AddValues(_cache[0], _cache[1]);
 
                     if(IsAdditive && AnimationHelper.IsAccumulable) {
-                        ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                        ValidateValue(defaultOriginValue, defaultOriginValueName);
                         originValue = defaultOriginValue;
                     }
                     break;

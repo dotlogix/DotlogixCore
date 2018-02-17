@@ -16,7 +16,7 @@ namespace DotLogix.Core.Extensions {
     ///     Helper actions to unify usage of nullable structures and classes.
     /// </summary>
     public static class NullableHelper {
-        private static readonly Type _nullableType = typeof(Nullable<>).GetGenericTypeDefinition();
+        private static readonly Type NullableType = typeof(Nullable<>).GetGenericTypeDefinition();
 
         /// <summary>
         ///     Verifies nullable for null value for both reference and value types
@@ -63,9 +63,9 @@ namespace DotLogix.Core.Extensions {
         public static bool AreTypesCompatible(Type type1, Type type2) {
             if(type1 == type2)
                 return true;
-            if(type1.IsGenericType && (type1.GetGenericTypeDefinition() == _nullableType))
+            if(type1.IsGenericType && (type1.GetGenericTypeDefinition() == NullableType))
                 type1 = Nullable.GetUnderlyingType(type1);
-            if(type2.IsGenericType && (type2.GetGenericTypeDefinition() == _nullableType))
+            if(type2.IsGenericType && (type2.GetGenericTypeDefinition() == NullableType))
                 type2 = Nullable.GetUnderlyingType(type2);
             return type1 == type2;
         }
@@ -90,7 +90,7 @@ namespace DotLogix.Core.Extensions {
         /// </remarks>
         /// <returns> </returns>
         public static bool IsNullable(this Type type) {
-            return !type.IsValueType || (type.IsGenericType && (type.GetGenericTypeDefinition() == _nullableType));
+            return !type.IsValueType || (type.IsGenericType && (type.GetGenericTypeDefinition() == NullableType));
         }
 
         /// <summary>

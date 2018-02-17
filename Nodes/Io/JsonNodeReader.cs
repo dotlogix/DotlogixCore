@@ -114,6 +114,9 @@ namespace DotLogix.Core.Nodes.Io
                         throw new JsonParsingException(i, json, "The current state is invalid");
                 }
             }
+
+            if(stateStack.Count > 0)
+                throw new JsonParsingException(json.Length-1, json, "Wrong end of json, make sure you are closing all opened ararys and objects");
         }
 
         private static bool TryGetValueFromString(string valueStr, out object value)

@@ -1,5 +1,15 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  JsonParsingException.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System;
 using DotLogix.Core.Extensions;
+#endregion
 
 namespace DotLogix.Core.Nodes.Io {
     public class JsonParsingException : Exception {
@@ -15,7 +25,7 @@ namespace DotLogix.Core.Nodes.Io {
 
             var nearStart = Math.Max(position - 10, 0);
             var nearEnd = Math.Min(nearStart + 20, json.Length);
-            Near = new string(json, nearStart, nearEnd-nearStart);
+            Near = new string(json, nearStart, nearEnd - nearStart);
         }
     }
 }

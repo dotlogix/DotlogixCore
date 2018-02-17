@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  DataType.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  05.10.2017
-// LastEdited:  01.11.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -24,7 +24,7 @@ namespace DotLogix.Core.Types {
 
         public DataType ElementDataType => ElementType?.ToDataType();
 
-        public DataType(DataTypeFlags flags, Type type, Type underlayingType = null, Type elementType=null) {
+        public DataType(DataTypeFlags flags, Type type, Type underlayingType = null, Type elementType = null) {
             Flags = flags;
             Type = type;
             UnderlayingType = underlayingType;

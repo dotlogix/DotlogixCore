@@ -1,5 +1,15 @@
-﻿using System.Windows;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ExpanderDoubleAnimation.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System.Windows;
 using System.Windows.Media.Animation;
+#endregion
 
 namespace DotLogix.UI.Controls {
     /// <summary>
@@ -79,9 +89,10 @@ namespace DotLogix.UI.Controls {
                 toVal = ReverseValue.Value;
             }
 
-            if(fromVal > toVal)
+            if(fromVal > toVal) {
                 return ((1 - animationClock.CurrentProgress.Value) *
                         (fromVal - toVal)) + toVal;
+            }
             return (animationClock.CurrentProgress.Value *
                     (toVal - fromVal)) + fromVal;
         }

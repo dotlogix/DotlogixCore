@@ -1,5 +1,15 @@
-﻿using System.Windows;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  SplineKeyFrame.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System.Windows;
 using System.Windows.Media.Animation;
+#endregion
 
 namespace DotLogix.UI.Animations {
     /// <summary>

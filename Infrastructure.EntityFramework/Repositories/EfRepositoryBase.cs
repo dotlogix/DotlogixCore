@@ -1,4 +1,13 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  EfRepositoryBase.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -7,12 +16,13 @@ using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext;
 using DotLogix.Architecture.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+#endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.Repositories {
-    public abstract class EfRepositoryBase<TEntity> : RepositoryBase<IEfEntityContext>, IRepository<TEntity> where TEntity : class, ISimpleEntity
-    {
+    public abstract class EfRepositoryBase<TEntity> : RepositoryBase<IEfEntityContext>, IRepository<TEntity> where TEntity : class, ISimpleEntity {
         protected DbContext DbContext { get; }
         protected DbSet<TEntity> DbSet { get; }
+
         protected EfRepositoryBase(IEfEntityContext entityContext) : base(entityContext) {
             DbContext = EntityContext.DbContext;
             DbSet = DbContext.Set<TEntity>();

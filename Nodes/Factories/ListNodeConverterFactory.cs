@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ListNodeConverterFactory.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.08.2017
-// LastEdited:  10.09.2017
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -34,9 +34,9 @@ namespace DotLogix.Core.Nodes.Factories {
                 return false;
 
             var type = dataType.Type;
-            if(type.IsArray) {
+            if(type.IsArray)
                 converter = CreateArrayConverter(dataType);
-            } else if(type.IsGenericType) {
+            else if(type.IsGenericType) {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
                 if(genericTypeDefinition == typeof(IEnumerable<>))
                     converter = CreateArrayConverter(dataType);
@@ -44,9 +44,8 @@ namespace DotLogix.Core.Nodes.Factories {
                     converter = CreateCollectionConverter(dataType);
                 else
                     return false;
-            } else {
+            } else
                 return false;
-            }
 
             return true;
         }

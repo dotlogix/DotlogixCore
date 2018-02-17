@@ -1,16 +1,15 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  Log.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using DotLogix.Core.Extensions;
 #endregion
@@ -95,15 +94,11 @@ namespace DotLogix.Core.Diagnostics {
             if(Logger.IsLoggingDisabled(LogLevels.Error))
                 return;
 
-            if (exception is AggregateException ae)
-            {
+            if(exception is AggregateException ae) {
                 foreach(var inner in ae.InnerExceptions)
                     Error(inner);
-            }
-            else if (exception.InnerException != null)
-            {
+            } else if(exception.InnerException != null)
                 Error(exception.InnerException);
-            }
 
 
             var message = exception.Message + "\n" + exception.StackTrace;
@@ -116,15 +111,11 @@ namespace DotLogix.Core.Diagnostics {
             if(Logger.IsLoggingDisabled(LogLevels.Critical))
                 return;
 
-            if (exception is AggregateException ae)
-            {
+            if(exception is AggregateException ae) {
                 foreach(var inner in ae.InnerExceptions)
                     Critical(inner);
-            }
-            else if (exception.InnerException != null)
-            {
+            } else if(exception.InnerException != null)
                 Critical(exception.InnerException);
-            }
 
             var message = exception.Message + "\n" + exception.StackTrace;
 

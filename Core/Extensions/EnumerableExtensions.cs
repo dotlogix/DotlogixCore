@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  EnumerableExtensions.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -20,7 +20,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         public static DiffCollection<T> Diff<T, TKey>(this IEnumerable<T> left, IEnumerable<T> right, Func<T, TKey> keySelector) where TKey : IComparable {
-            return new DiffCollection<T>(left, right, new SelectorEqualityComparer<T,TKey>(keySelector));
+            return new DiffCollection<T>(left, right, new SelectorEqualityComparer<T, TKey>(keySelector));
         }
 
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, bool emptyIfNull = true) {
@@ -66,31 +66,28 @@ namespace DotLogix.Core.Extensions {
                     if(enumerator.MoveNext()) {
                         yield return enumerator.Current;
                         queue.Enqueue(enumerator);
-                    } else {
+                    } else
                         enumerator.Dispose();
-                    }
                 }
             } finally {
-                if(queue != null)
-                    foreach(var enumerator in queue) {
+                if(queue != null) {
+                    foreach(var enumerator in queue)
                         enumerator.Dispose();
-                    }
+                }
             }
         }
 
         public static IEnumerable<T> Concat<T>(this IEnumerable<IEnumerable<T>> enumerables) {
             foreach(var enumerable in enumerables) {
-                foreach(var value in enumerable) {
+                foreach(var value in enumerable)
                     yield return value;
-                }
             }
         }
 
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<IEnumerable<T>> enumerables) {
             var list = new List<T>();
-            foreach(var enumerable in enumerables) {
+            foreach(var enumerable in enumerables)
                 list.AddRange(enumerable);
-            }
             return list.Shuffle();
         }
 

@@ -1,7 +1,17 @@
-﻿using System.Collections.Generic;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ISnapshotFactory.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using DotLogix.Core.Reflection.Dynamics;
+#endregion
 
 namespace DotLogix.Core.Tracking.Snapshots {
     public interface ISnapshotFactory {
@@ -10,6 +20,7 @@ namespace DotLogix.Core.Tracking.Snapshots {
 
     public class DiffSnapshotFactory : ISnapshotFactory {
         private readonly DynamicAccessor[] _accessors;
+
         public DiffSnapshotFactory(IEnumerable<DynamicAccessor> accessors) {
             _accessors = accessors.ToArray();
         }
@@ -18,8 +29,10 @@ namespace DotLogix.Core.Tracking.Snapshots {
             return new DiffSnapshot(target, _accessors);
         }
     }
+
     public class PropertyChangedSnapshotFactory : ISnapshotFactory {
         private readonly DynamicAccessor[] _accessors;
+
         public PropertyChangedSnapshotFactory(IEnumerable<DynamicAccessor> accessors) {
             _accessors = accessors.ToArray();
         }

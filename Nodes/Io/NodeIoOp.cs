@@ -1,4 +1,12 @@
-﻿namespace DotLogix.Core.Nodes.Io {
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodeIoOp.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+namespace DotLogix.Core.Nodes.Io {
     public struct NodeIoOp {
         public object[] Args;
         public NodeIoOpCodes OpCode;

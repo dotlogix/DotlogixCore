@@ -1,4 +1,14 @@
-﻿using DotLogix.Core.Reflection.Dynamics;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  TrackedValue.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using DotLogix.Core.Reflection.Dynamics;
+#endregion
 
 namespace DotLogix.Core.Tracking.Snapshots {
     public class TrackedValue {

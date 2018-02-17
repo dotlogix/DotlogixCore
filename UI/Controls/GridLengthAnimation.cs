@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  GridLengthAnimation.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -121,14 +121,14 @@ namespace DotLogix.UI.Controls {
                 toVal = ReverseValue;
             } else
             //check to see if this is the last tick of the animation clock.
-            if(animationClock.CurrentProgress.Value == 1.0) {
+            if(animationClock.CurrentProgress.Value == 1.0)
                 return To;
-            }
 
-            if(fromVal > toVal)
+            if(fromVal > toVal) {
                 return new GridLength(((1 - animationClock.CurrentProgress.Value) *
                                        (fromVal - toVal)) + toVal,
                                       From.IsStar ? GridUnitType.Star : GridUnitType.Pixel);
+            }
             return new GridLength((animationClock.CurrentProgress.Value *
                                    (toVal - fromVal)) + fromVal, From.IsStar ? GridUnitType.Star : GridUnitType.Pixel);
         }

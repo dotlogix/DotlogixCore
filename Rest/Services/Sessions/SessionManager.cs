@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  SessionManager.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  09.02.2018
-// LastEdited:  10.02.2018
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region

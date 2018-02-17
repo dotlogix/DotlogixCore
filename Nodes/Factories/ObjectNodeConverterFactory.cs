@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ObjectNodeConverterFactory.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.08.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -20,7 +20,7 @@ namespace DotLogix.Core.Nodes.Factories {
                 return false;
             if((dataType.Flags & DataTypeFlags.CategoryMask) != DataTypeFlags.Complex)
                 return false;
-            
+
             converter = new ObjectNodeConverter(dataType, AccessorTypes.Property, true);
             return true;
         }

@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  NullableHelper.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -109,9 +109,10 @@ namespace DotLogix.UI.Animations {
         /// <exception cref="InvalidCastException">throws if types are incompatible</exception>
         [Conditional("DEBUG")]
         public static void ValidateTypesCompatibility<T1, T2>() {
-            if(!AreTypesCompatible<T1, T2>())
+            if(!AreTypesCompatible<T1, T2>()) {
                 throw new InvalidCastException("Types are incompatible for usage with NullableHelper. [ " +
                                                typeof(T1).ReadableName() + " vs " + typeof(T2).ReadableName() + "]");
+            }
         }
 
         /// <summary>

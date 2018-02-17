@@ -1,14 +1,13 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  FluentIlGenerator.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
 using System;
-using System.Diagnostics.SymbolStore;
 using System.Reflection;
 using System.Reflection.Emit;
 #endregion

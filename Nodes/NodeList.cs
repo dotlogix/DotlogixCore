@@ -1,28 +1,39 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodeList.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System;
+#endregion
 
 namespace DotLogix.Core.Nodes {
     public class NodeList : NodeCollection {
+        public Node this[int index] => GetChild(index);
+
         public NodeList(string name) : this() {
             InternalName = name;
         }
+
         public NodeList() : base(NodeTypes.List) { }
 
-        public Node this[int index] => GetChild(index);
         public override void AddChild(Node node) {
             if(node.InternalName != null)
                 throw new InvalidOperationException("Children in a node list can not have a name");
             base.AddChild(node);
         }
 
-        public virtual TNode CreateChild<TNode>() where TNode : Node, new()
-        {
+        public virtual TNode CreateChild<TNode>() where TNode : Node, new() {
             var node = new TNode();
             AddChild(node);
             return node;
         }
 
         public Node GetChild(int index) {
-            if(index < 0 || index > NodeList.Count)
+            if((index < 0) || (index > NodeList.Count))
                 return null;
             return NodeList[index];
         }
@@ -40,7 +51,7 @@ namespace DotLogix.Core.Nodes {
             var next = GetChild(index);
             var prev = GetChild(index - 1);
 
-            if(next == null && prev == null) {
+            if((next == null) && (prev == null)) {
                 AddChild(node);
                 return;
             }
@@ -48,15 +59,13 @@ namespace DotLogix.Core.Nodes {
             NodeList.Insert(index, node);
 
             // apply next
-            if (next != null)
-            {
+            if(next != null) {
                 next.Previous = node;
                 node.Next = next;
             }
 
             // apply prev
-            if (prev != null)
-            {
+            if(prev != null) {
                 prev.Next = node;
                 node.Previous = prev;
             }
@@ -95,9 +104,9 @@ namespace DotLogix.Core.Nodes {
             return node;
         }
 
-        public TNode PopChild<TNode>(int index) where TNode : Node{
+        public TNode PopChild<TNode>(int index) where TNode : Node {
             var node = GetChild(index) as TNode;
-            if (node == null)
+            if(node == null)
                 return null;
 
             RemoveChild(index);
@@ -105,7 +114,7 @@ namespace DotLogix.Core.Nodes {
         }
 
         public void ReplaceChild(int index, Node node) {
-            if (node.InternalName != null)
+            if(node.InternalName != null)
                 throw new InvalidOperationException("Children in a node list can not have a name");
             var child = GetChild(index);
             ReplaceChild(child, node, index);
@@ -123,8 +132,7 @@ namespace DotLogix.Core.Nodes {
             throw new InvalidOperationException("Children in a node list can not have a name");
         }
 
-        protected override Node SelectNodeInternal(string pathToken)
-        {
+        protected override Node SelectNodeInternal(string pathToken) {
             return int.TryParse(pathToken, out var index) ? GetChild(index) : null;
         }
     }

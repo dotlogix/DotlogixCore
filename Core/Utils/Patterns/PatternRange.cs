@@ -1,4 +1,14 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  PatternRange.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
 using System;
+#endregion
 
 namespace DotLogix.Core.Utils.Patterns {
     public struct PatternRange {
@@ -22,10 +32,8 @@ namespace DotLogix.Core.Utils.Patterns {
                        : "+?";
         }
 
-        public override string ToString()
-        {
-            if (Max >= 0)
-            {
+        public override string ToString() {
+            if(Max >= 0) {
                 return Min == Max
                            ? $"{Min}"
                            : $"{Math.Max(0, Min)}..{Max}";

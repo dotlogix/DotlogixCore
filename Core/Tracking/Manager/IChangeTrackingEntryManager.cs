@@ -1,10 +1,18 @@
-﻿using System.Collections.Generic;
-using DotLogix.Core.Tracking.Entries;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  IChangeTrackingEntryManager.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
 
-namespace DotLogix.Core.Tracking.Manager
-{
-    public interface IChangeTrackingEntryManager
-    {
+#region
+using System.Collections.Generic;
+using DotLogix.Core.Tracking.Entries;
+#endregion
+
+namespace DotLogix.Core.Tracking.Manager {
+    public interface IChangeTrackingEntryManager {
         IEnumerable<IChangeTrackingEntry> Entries { get; }
 
         IChangeTrackingEntry GetEntry(object target);

@@ -1,5 +1,15 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  GridLengthAnimationHelper.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
 using System;
 using System.Windows;
+#endregion
 
 namespace DotLogix.UI.Animations {
     public sealed class GridLengthAnimationHelper : IAnimationHelper<GridLength> {

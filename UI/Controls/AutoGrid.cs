@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  AutoGrid.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -108,10 +108,9 @@ namespace DotLogix.UI.Controls {
         }
 
         protected override Size MeasureOverride(Size availableSize) {
-            GetSize(availableSize, out Size itemSize, out Size realSize);
-            foreach(UIElement child in Children) {
+            GetSize(availableSize, out var itemSize, out var realSize);
+            foreach(UIElement child in Children)
                 child.Measure(itemSize);
-            }
             return realSize;
         }
 
@@ -168,7 +167,7 @@ namespace DotLogix.UI.Controls {
         }
 
         protected override Size ArrangeOverride(Size finalSize) {
-            GetSize(finalSize, out Size itemSize, out Size realSize);
+            GetSize(finalSize, out var itemSize, out var realSize);
             var padding = ItemPadding;
             var paddedItemWidth = itemSize.Width + padding;
             var paddedItemHeight = itemSize.Height + padding;

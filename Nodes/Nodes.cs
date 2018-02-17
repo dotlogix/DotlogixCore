@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  Nodes.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  05.11.2017
-// LastEdited:  05.11.2017
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -78,7 +78,7 @@ namespace DotLogix.Core.Nodes {
                 throw new ArgumentNullException(nameof(instanceType));
 
             var converter = CreateConverter(instanceType);
-            if (converter == null) {
+            if(converter == null) {
                 writer.WriteValue(null, name);
                 return;
             }
@@ -120,10 +120,8 @@ namespace DotLogix.Core.Nodes {
             if((node == null) || (node.NodeType == NodeTypes.Empty))
                 return type.GetDefaultValue();
             var converter = CreateConverter(type);
-            if (converter == null)
-            {
+            if(converter == null)
                 return type.GetDefaultValue();
-            }
 
             return converter.ConvertToObject(node);
         }

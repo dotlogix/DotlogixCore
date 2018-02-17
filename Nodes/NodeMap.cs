@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  NodeMap.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  18.10.2017
-// LastEdited:  18.10.2017
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -94,8 +94,7 @@ namespace DotLogix.Core.Nodes {
             RenameChild(node, newName);
         }
 
-        protected override Node SelectNodeInternal(string pathToken)
-        {
+        protected override Node SelectNodeInternal(string pathToken) {
             return GetChild(pathToken);
         }
     }

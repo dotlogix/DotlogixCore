@@ -1,4 +1,14 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ISessionManager.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System;
+#endregion
 
 namespace DotLogix.Core.Rest.Services.Sessions {
     public interface ISessionManager<TSession> where TSession : ISession {

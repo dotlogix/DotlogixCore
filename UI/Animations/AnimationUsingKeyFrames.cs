@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  AnimationUsingKeyFrames.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -173,13 +173,11 @@ namespace DotLogix.UI.Animations {
             TValue currValue;
             if(currKeyFrameRefIdx == keyFrameCount)
             // After the last key frame - take last frame value
-            {
                 currValue = GetResolvedKeyFrame(keyFrameCount - 1).Value;
-            } else if(currTime == _keyFrameRefs[currKeyFrameRefIdx].ResolvedTime)
+            else if(currTime == _keyFrameRefs[currKeyFrameRefIdx].ResolvedTime)
             // Exactly on a key frame. 
-            {
                 currValue = GetResolvedKeyFrame(currKeyFrameRefIdx).Value;
-            } else if(currKeyFrameRefIdx == 0) {
+            else if(currKeyFrameRefIdx == 0) {
                 // before first frame - special case
                 var baseValue = IsAdditive && AnimationHelper.IsAccumulable
                                     ? AnimationHelper.GetZeroValue()
@@ -199,12 +197,13 @@ namespace DotLogix.UI.Animations {
             if(AnimationHelper.IsAccumulable) {
                 if(IsCumulative) {
                     var currentRepeat = animationClock.CurrentIteration.GetValueOrDefault() - 1;
-                    if(currentRepeat > 0)
+                    if(currentRepeat > 0) {
                         currValue =
                         AnimationHelper.AddValues(currValue,
                                                   AnimationHelper.
                                                   ScaleValue(GetResolvedKeyFrame(keyFrameCount - 1).Value,
                                                              currentRepeat));
+                    }
                 }
                 if(IsAdditive)
                     return AnimationHelper.AddValues(defaultOriginValue, currValue);
@@ -216,14 +215,12 @@ namespace DotLogix.UI.Animations {
             var keyFrameCount = _keyFrameRefs.Length;
             var currKeyFrameRefIdx = 0;
             // Skip all frames before the time. 
-            while((currKeyFrameRefIdx < keyFrameCount) && (currTime > _keyFrameRefs[currKeyFrameRefIdx].ResolvedTime)) {
+            while((currKeyFrameRefIdx < keyFrameCount) && (currTime > _keyFrameRefs[currKeyFrameRefIdx].ResolvedTime))
                 currKeyFrameRefIdx++;
-            }
             // select last one from multiple frames with same key time. 
             while((currKeyFrameRefIdx < (keyFrameCount - 1)) &&
-                  (currTime == _keyFrameRefs[currKeyFrameRefIdx + 1].ResolvedTime)) {
+                  (currTime == _keyFrameRefs[currKeyFrameRefIdx + 1].ResolvedTime))
                 currKeyFrameRefIdx++;
-            }
             return currKeyFrameRefIdx;
         }
         #endregion
@@ -256,11 +253,12 @@ namespace DotLogix.UI.Animations {
         public TKeyFrameCollection KeyFrames {
             get {
                 ReadPreamble();
-                if(_keyFrames == null)
+                if(_keyFrames == null) {
                     if(IsFrozen)
                         _keyFrames = GetEmptyKeyFrames();
                     else
                         KeyFrames = new TKeyFrameCollection();
+                }
 
                 return _keyFrames;
             }
@@ -306,9 +304,8 @@ namespace DotLogix.UI.Animations {
             var keyFrameCount = KeyFrameList.Count;
             _keyFrameRefs = new KeyFrameRef[keyFrameCount];
             // Initialize the OriginalIndex.
-            for(var idx = 0; idx < keyFrameCount; idx++) {
+            for(var idx = 0; idx < keyFrameCount; idx++)
                 _keyFrameRefs[idx].OriginalIndex = idx;
-            }
 
             var uniformRangeList = new List<KeyFrameRange>();
             // Resolve Percent and Time key frames. Collect Uniform blocks, check if paced key frames exists

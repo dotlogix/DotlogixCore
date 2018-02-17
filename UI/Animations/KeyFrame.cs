@@ -22,7 +22,7 @@ namespace DotLogix.UI.Animations {
         /// </summary>
         public TValue InterpolateValue(TValue baseValue, double keyFrameProgress) {
             if((keyFrameProgress < 0.0) || (keyFrameProgress > 1.0))
-                throw new ArgumentOutOfRangeException("keyFrameProgress");
+                throw new ArgumentOutOfRangeException(nameof(keyFrameProgress));
 
             return InterpolateValueCore(baseValue, keyFrameProgress);
         }

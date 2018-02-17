@@ -20,11 +20,11 @@ namespace DotLogix.UI.Animations {
         public sealed override object GetCurrentValue(object defaultOriginValue, object defaultDestinationValue,
                                                       AnimationClock animationClock) {
             if(defaultOriginValue == null)
-                throw new ArgumentNullException("defaultOriginValue");
+                throw new ArgumentNullException(nameof(defaultOriginValue));
             if(defaultDestinationValue == null)
-                throw new ArgumentNullException("defaultDestinationValue");
+                throw new ArgumentNullException(nameof(defaultDestinationValue));
             if(animationClock == null)
-                throw new ArgumentNullException("animationClock");
+                throw new ArgumentNullException(nameof(animationClock));
 
             ReadPreamble();
             if(animationClock.CurrentState == ClockState.Stopped)

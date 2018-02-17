@@ -59,7 +59,7 @@ namespace DotLogix.UI.Animations {
         #region IAddChild
         void IAddChild.AddChild(object child) {
             if(child == null)
-                throw new ArgumentNullException("child");
+                throw new ArgumentNullException(nameof(child));
             WritePreamble();
             AddChild(child);
             WritePostscript();
@@ -67,7 +67,7 @@ namespace DotLogix.UI.Animations {
 
         void IAddChild.AddText(string childText) {
             if(childText == null)
-                throw new ArgumentNullException("childText");
+                throw new ArgumentNullException(nameof(childText));
             AddText(childText);
         }
 
@@ -264,7 +264,7 @@ namespace DotLogix.UI.Animations {
             }
             set {
                 if(value == null)
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 WritePreamble();
                 if(_keyFrames == value)
                     return;

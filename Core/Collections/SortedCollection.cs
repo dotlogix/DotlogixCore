@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  SortedCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  22.12.2017
-// LastEdited:  07.01.2018
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -14,8 +14,7 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Collections {
-    public class SortedCollection<T> : ICollection<T>, IReadOnlyCollection<T>
-    {
+    public class SortedCollection<T> : ICollection<T>, IReadOnlyCollection<T> {
         private readonly IComparer<T> _comparer;
         private readonly List<T> _itemList = new List<T>();
 

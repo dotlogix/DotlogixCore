@@ -1,10 +1,20 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  JsonNodes.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
 using System;
 using System.Text;
 using DotLogix.Core.Nodes.Io;
+#endregion
 
 namespace DotLogix.Core.Nodes {
     public static class JsonNodes {
-        private const int StringBuilderCapacity=256;
+        private const int StringBuilderCapacity = 256;
 
         #region ToNode
         public static Node ToNode(string json) {

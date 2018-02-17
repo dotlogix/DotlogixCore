@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  WebServiceHost.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  29.01.2018
-// LastEdited:  31.01.2018
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -21,8 +21,8 @@ using DotLogix.Core.Rest.Services.Processors;
 
 namespace DotLogix.Core.Rest.Services {
     public class WebServiceHost {
-        private int _currentRouteIndex;
         private readonly AsyncWebRequestRouter _router;
+        private int _currentRouteIndex;
         public IAsyncHttpServer Server { get; }
 
         public WebServiceHost(ConcurrencyOptions concurrencyOptions = null) {
@@ -109,7 +109,7 @@ namespace DotLogix.Core.Rest.Services {
             var events = serviceType.GetEvents();
             foreach(var eventInfo in events) {
                 var eventAttribute = eventInfo.GetCustomAttribute<WebServiceEventAttribute>();
-                if (eventAttribute == null)
+                if(eventAttribute == null)
                     continue;
 
                 var serviceEvent = _router.GetOrAddServerEvent(eventAttribute.Name);
@@ -120,7 +120,7 @@ namespace DotLogix.Core.Rest.Services {
                 count++;
             }
 
-            if (count > 0)
+            if(count > 0)
                 Log.Debug($"Bound {count} events to webservice {serviceInstance.Name}");
         }
 
@@ -135,18 +135,15 @@ namespace DotLogix.Core.Rest.Services {
             return _router.AddServerEvent(name);
         }
 
-        public WebServiceEvent GetServerEvent(string name)
-        {
+        public WebServiceEvent GetServerEvent(string name) {
             return _router.GetServerEvent(name);
         }
 
-        public WebServiceEvent GetOrAddServerEvent(string name)
-        {
+        public WebServiceEvent GetOrAddServerEvent(string name) {
             return _router.GetOrAddServerEvent(name);
         }
 
-        public Task TriggerServerEventAsync(string name)
-        {
+        public Task TriggerServerEventAsync(string name) {
             return _router.TriggerServerEventAsync(name);
         }
         #endregion

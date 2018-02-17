@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  DoubleAnimationHelper.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -45,9 +45,7 @@ namespace DotLogix.UI.Animations {
             return Math.Abs(to - from);
         }
 
-        bool IAnimationHelper<double>.IsAccumulable {
-            get { return true; }
-        }
+        bool IAnimationHelper<double>.IsAccumulable => true;
         #endregion IAnimationHelper
     }
 }

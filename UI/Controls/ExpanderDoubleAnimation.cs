@@ -1,5 +1,15 @@
-﻿using System.Windows;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ExpanderDoubleAnimation.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System.Windows;
 using System.Windows.Media.Animation;
+#endregion
 
 namespace DotLogix.UI.Controls {
     /// <summary>
@@ -33,24 +43,24 @@ namespace DotLogix.UI.Controls {
         ///     CLR Wrapper for the From depenendency property
         /// </summary>
         public double? From {
-            get { return (double?)GetValue(FromProperty); }
-            set { SetValue(FromProperty, value); }
+            get => (double?)GetValue(FromProperty);
+            set => SetValue(FromProperty, value);
         }
 
         /// <summary>
         ///     CLR Wrapper for the To property
         /// </summary>
         public double? To {
-            get { return (double?)GetValue(ToProperty); }
-            set { SetValue(ToProperty, value); }
+            get => (double?)GetValue(ToProperty);
+            set => SetValue(ToProperty, value);
         }
 
         /// <summary>
         ///     Sets the reverse value for the second animation
         /// </summary>
         public double? ReverseValue {
-            get { return (double)GetValue(ReverseValueProperty); }
-            set { SetValue(ReverseValueProperty, value); }
+            get => (double)GetValue(ReverseValueProperty);
+            set => SetValue(ReverseValueProperty, value);
         }
 
 
@@ -79,9 +89,10 @@ namespace DotLogix.UI.Controls {
                 toVal = ReverseValue.Value;
             }
 
-            if(fromVal > toVal)
+            if(fromVal > toVal) {
                 return ((1 - animationClock.CurrentProgress.Value) *
                         (fromVal - toVal)) + toVal;
+            }
             return (animationClock.CurrentProgress.Value *
                     (toVal - fromVal)) + fromVal;
         }

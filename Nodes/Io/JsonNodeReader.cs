@@ -1,14 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  JsonNodeReader.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
 
-namespace DotLogix.Core.Nodes.Io
-{
+#region
+using System;
+using System.Collections.Generic;
+#endregion
+
+namespace DotLogix.Core.Nodes.Io {
     public class JsonNodeReader : NodeReaderBase {
         [Flags]
-        public enum JsonCharacter
-        {
+        public enum JsonCharacter {
             None = 0,
             End = 1 << 0,
             OpenObject = 1 << 1,
@@ -23,26 +29,22 @@ namespace DotLogix.Core.Nodes.Io
 
         private readonly char[] _json;
 
-        public JsonNodeReader(string json)
-        {
+        public JsonNodeReader(string json) {
             _json = json.ToCharArray();
         }
 
-        public override void CopyTo(INodeWriter nodeWriter)
-        {
+        public override void CopyTo(INodeWriter nodeWriter) {
             var stateStack = new Stack<NodeIoState>();
             var json = _json;
             string name = null;
             var allowedCharacters = JsonCharacter.OpenObject | JsonCharacter.OpenList | JsonCharacter.String | JsonCharacter.Other | JsonCharacter.End;
 
-            for (var i = 0; i < json.Length; i++)
-            {
+            for(var i = 0; i < json.Length; i++) {
                 var nextCharacter = NextJsonCharacter(json, ref i);
-                if ((allowedCharacters & nextCharacter) == 0)
+                if((allowedCharacters & nextCharacter) == 0)
                     throw new JsonParsingException(i, json, $"Character {json[i]} is not allowed in the current state, allowed characters are {allowedCharacters:F}");
 
-                switch (nextCharacter)
-                {
+                switch(nextCharacter) {
                     case JsonCharacter.End:
                         allowedCharacters = JsonCharacter.None;
                         continue;
@@ -56,13 +58,12 @@ namespace DotLogix.Core.Nodes.Io
                         continue;
                     case JsonCharacter.CloseObject:
                     case JsonCharacter.CloseList:
-                        if (stateStack.Pop() == NodeIoState.InsideMap)
+                        if(stateStack.Pop() == NodeIoState.InsideMap)
                             nodeWriter.EndMap();
                         else
                             nodeWriter.EndList();
 
-                        if (stateStack.Count == 0)
-                        {
+                        if(stateStack.Count == 0) {
                             allowedCharacters = JsonCharacter.End;
                             continue;
                         }
@@ -81,8 +82,7 @@ namespace DotLogix.Core.Nodes.Io
                     case JsonCharacter.String:
                         i++;
                         var str = NextJsonString(json, ref i);
-                        if ((stateStack.Peek() == NodeIoState.InsideMap) && (name == null))
-                        {
+                        if((stateStack.Peek() == NodeIoState.InsideMap) && (name == null)) {
                             name = str;
                             allowedCharacters = JsonCharacter.ValueAssignment;
                             continue;
@@ -114,12 +114,13 @@ namespace DotLogix.Core.Nodes.Io
                         throw new JsonParsingException(i, json, "The current state is invalid");
                 }
             }
+
+            if(stateStack.Count > 0)
+                throw new JsonParsingException(json.Length - 1, json, "Wrong end of json, make sure you are closing all opened ararys and objects");
         }
 
-        private static bool TryGetValueFromString(string valueStr, out object value)
-        {
-            switch (valueStr)
-            {
+        private static bool TryGetValueFromString(string valueStr, out object value) {
+            switch(valueStr) {
                 case "null":
                     value = null;
                     return true;
@@ -130,18 +131,15 @@ namespace DotLogix.Core.Nodes.Io
                     value = false;
                     return true;
                 default:
-                    if (double.TryParse(valueStr, out var number) == false)
-                    {
+                    if(double.TryParse(valueStr, out var number) == false) {
                         value = null;
                         return false;
                     }
 
                     // calculate if number is an integer
-                    if ((number <= int.MaxValue) && (number >= int.MinValue))
-                    {
+                    if((number <= int.MaxValue) && (number >= int.MinValue)) {
                         var truncated = Math.Truncate(number);
-                        if (Math.Abs(number - truncated) <= (double.Epsilon * 100))
-                        {
+                        if(Math.Abs(number - truncated) <= (double.Epsilon * 100)) {
                             value = (int)number;
                             return true;
                         }
@@ -151,20 +149,16 @@ namespace DotLogix.Core.Nodes.Io
             }
         }
 
-        private static string NextJsonString(char[] json, ref int pos)
-        {
+        private static string NextJsonString(char[] json, ref int pos) {
             var escaped = false;
-            for (var i = pos; i < json.Length; i++)
-            {
+            for(var i = pos; i < json.Length; i++) {
                 var current = json[i];
-                if (escaped && (current >= ' '))
-                {
+                if(escaped && (current >= ' ')) {
                     escaped = false;
                     continue;
                 }
 
-                switch (current)
-                {
+                switch(current) {
                     case '/':
                     case '\b':
                     case '\f':
@@ -173,7 +167,7 @@ namespace DotLogix.Core.Nodes.Io
                     case '\t':
                         throw new JsonParsingException(pos, json, $"The character {current} is not allowed in the current state. Maybe your string is not escaped correctly");
                     default:
-                        if (current < ' ')
+                        if(current < ' ')
                             throw new JsonParsingException(pos, json, $"The character {current} is not allowed in the current state. Maybe your string is not escaped correctly");
                         continue;
                     case '\"':
@@ -188,12 +182,9 @@ namespace DotLogix.Core.Nodes.Io
             throw new JsonParsingException(pos, json, "The string never ends");
         }
 
-        private static object NextJsonValue(char[] json, ref int position)
-        {
-            for (var i = position; i < json.Length; i++)
-            {
-                switch (json[i])
-                {
+        private static object NextJsonValue(char[] json, ref int position) {
+            for(var i = position; i < json.Length; i++) {
+                switch(json[i]) {
                     case ' ':
                     case '\n':
                     case '\r':
@@ -202,7 +193,7 @@ namespace DotLogix.Core.Nodes.Io
                     case ']':
                     case '}':
                         var valueStr = new string(json, position, i - position);
-                        if (TryGetValueFromString(valueStr, out var obj) == false)
+                        if(TryGetValueFromString(valueStr, out var obj) == false)
                             throw new JsonParsingException(position, json, $"Value can not be parsed make sure {valueStr} is a valid json value");
                         position = i;
                         return obj;
@@ -211,13 +202,10 @@ namespace DotLogix.Core.Nodes.Io
             throw new JsonParsingException(position, json, "Can not find end of value string");
         }
 
-        public JsonCharacter NextJsonCharacter(char[] json, ref int position)
-        {
-            for (; position < json.Length; position++)
-            {
+        public JsonCharacter NextJsonCharacter(char[] json, ref int position) {
+            for(; position < json.Length; position++) {
                 var current = json[position];
-                switch (current)
-                {
+                switch(current) {
                     case ' ':
                     case '\t':
                     case '\n':

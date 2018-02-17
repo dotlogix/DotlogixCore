@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  EfInsertOnlyRepository.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  24.08.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -23,6 +23,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Repositories {
     public class EfInsertOnlyRepository<TEntity> : EfRepositoryBase<TEntity>, IInsertOnlyRepository<TEntity>
         where TEntity : class, ISimpleEntity, IInsertOnly {
         protected EfInsertOnlyRepository(IEfEntityContext entityContext) : base(entityContext) { }
+
         public override void Add(TEntity entity) {
             entity.IsActive = true;
             DbSet.Add(entity);
@@ -40,9 +41,8 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Repositories {
         }
 
         public override void RemoveRange(IEnumerable<TEntity> entities) {
-            foreach (var entity in entities) {
+            foreach(var entity in entities)
                 entity.IsActive = false;
-            }
         }
 
         public virtual async Task<TEntity> GetAsync(int id, InsertOnlyFilterModes includeFilter) {

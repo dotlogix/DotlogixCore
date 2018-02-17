@@ -1,9 +1,18 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  PatternWebServiceRoute.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
 using System;
 using System.Text;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Processors;
-using DotLogix.Core.Utils;
 using DotLogix.Core.Utils.Patterns;
+#endregion
 
 namespace DotLogix.Core.Rest.Server.Routes {
     public class PatternWebServiceRoute : RegexWebServiceRoute {
@@ -13,7 +22,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
             var builder = new StringBuilder();
 
             var i = 0;
-            var patternStart = 0;
+            int patternStart;
 
             while((patternStart = pattern.IndexOf("<<", i, StringComparison.Ordinal)) != -1) {
                 if(patternStart > i)
@@ -36,18 +45,16 @@ namespace DotLogix.Core.Rest.Server.Routes {
         }
 
         private static string Parse(string s) {
-            var parts = s.Split(new[]{'|'},3);
+            var parts = s.Split(new[] {'|'}, 3);
             var name = parts[0];
             string typeStr;
             string variantStr;
-            if (parts.Length > 1 && string.IsNullOrEmpty(parts[1]) == false) {
-                var typeSplit = parts[1].Split(new[] { ':' }, 2);
+            if((parts.Length > 1) && (string.IsNullOrEmpty(parts[1]) == false)) {
+                var typeSplit = parts[1].Split(new[] {':'}, 2);
                 typeStr = typeSplit[0];
                 variantStr = typeSplit.Length > 1 ? typeSplit[1] : null;
-            }
-            else
-            {
-                typeStr ="any";
+            } else {
+                typeStr = "any";
                 variantStr = null;
             }
 

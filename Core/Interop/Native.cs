@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  Native.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -15,7 +15,7 @@ using DotLogix.Core.Interop.Structs;
 namespace DotLogix.Core.Interop {
     public static class Native {
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage([In] IntPtr hWnd, [In] uint Msg,
+        public static extern IntPtr SendMessage([In] IntPtr hWnd, [In] uint msg,
                                                 [In] IntPtr wParam, [In] IntPtr lParam);
 
         [DllImport("user32.dll")]

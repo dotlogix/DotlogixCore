@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  IRepository.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -15,9 +15,7 @@ using DotLogix.Architecture.Infrastructure.Entities;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {
-    public interface IRepository {
-        
-    }
+    public interface IRepository { }
 
     public interface IRepository<TEntity> : IRepository where TEntity : class, ISimpleEntity {
         #region Get
@@ -28,17 +26,13 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         #endregion
 
         #region Add
-
         void Add(TEntity entity);
         void AddRange(IEnumerable<TEntity> entities);
-
         #endregion
 
         #region Remove
-
         void Remove(TEntity entity);
         void RemoveRange(IEnumerable<TEntity> entities);
-
         #endregion
     }
 }

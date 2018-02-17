@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  AsyncHttpServer.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  29.01.2018
-// LastEdited:  31.01.2018
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -132,9 +132,8 @@ namespace DotLogix.Core.Rest.Server.Http {
 
             try {
                 await _requestHandler.HandleRequestAsync(httpContext);
-                if(response.IsSent == false && httpContext.PreventAutoSend == false) {
+                if((response.IsSent == false) && (httpContext.PreventAutoSend == false))
                     await response.SendAsync();
-                }
             } catch(Exception e) {
                 Log.Error(e);
                 await OnError(response, e);

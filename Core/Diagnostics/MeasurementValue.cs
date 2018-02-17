@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  MeasurementValue.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -18,9 +18,8 @@ namespace DotLogix.Core.Diagnostics {
             get => _historySize;
             set {
                 var newHist = new TValue[value];
-                for(var i = 0; (i < _historySize) && (i < value); i++) {
+                for(var i = 0; (i < _historySize) && (i < value); i++)
                     newHist[i] = History[i];
-                }
                 History = newHist;
                 _historySize = value;
             }
@@ -47,9 +46,8 @@ namespace DotLogix.Core.Diagnostics {
         public event EventHandler<ValueChangedEventArgs<TValue>> ValueChanged;
 
         public void UpdateValue(TValue newValue) {
-            for(var i = (int)_historySize - 1; i > 0; i--) {
+            for(var i = (int)_historySize - 1; i > 0; i--)
                 History[i] = History[i - 1];
-            }
             History[0] = Current;
             Current = newValue;
         }

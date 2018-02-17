@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  KeyFrame.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -22,7 +22,7 @@ namespace DotLogix.UI.Animations {
         /// </summary>
         public TValue InterpolateValue(TValue baseValue, double keyFrameProgress) {
             if((keyFrameProgress < 0.0) || (keyFrameProgress > 1.0))
-                throw new ArgumentOutOfRangeException("keyFrameProgress");
+                throw new ArgumentOutOfRangeException(nameof(keyFrameProgress));
 
             return InterpolateValueCore(baseValue, keyFrameProgress);
         }
@@ -60,8 +60,8 @@ namespace DotLogix.UI.Animations {
         ///     The value that associated animation should reach at KeyTime.
         /// </summary>
         public TValue Value {
-            get { return (TValue)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
+            get => (TValue)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
         }
 
         #region IKeyFrame
@@ -69,13 +69,13 @@ namespace DotLogix.UI.Animations {
         ///     The time at which associated animation value should be equal to the Value property.
         /// </summary>
         public KeyTime KeyTime {
-            get { return (KeyTime)GetValue(KeyTimeProperty); }
-            set { SetValue(KeyTimeProperty, value); }
+            get => (KeyTime)GetValue(KeyTimeProperty);
+            set => SetValue(KeyTimeProperty, value);
         }
 
         object IKeyFrame.Value {
-            get { return Value; }
-            set { Value = (TValue)value; }
+            get => Value;
+            set => Value = (TValue)value;
         }
         #endregion
         #endregion

@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ExtendedWindow.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -29,8 +29,8 @@ namespace DotLogix.UI.Controls {
                                                                                                                   )));
 
         public object AdditionalToolBarContent {
-            get { return GetValue(AdditionalToolBarContentProperty); }
-            set { SetValue(AdditionalToolBarContentProperty, value); }
+            get => GetValue(AdditionalToolBarContentProperty);
+            set => SetValue(AdditionalToolBarContentProperty, value);
         }
 
         public ExtendedWindow() {

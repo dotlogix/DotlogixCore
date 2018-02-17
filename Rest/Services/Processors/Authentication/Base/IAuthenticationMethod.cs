@@ -1,10 +1,18 @@
-﻿using System.Threading.Tasks;
-using DotLogix.Core.Rest.Server.Http;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  IAuthenticationMethod.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
 
-namespace DotLogix.Core.Rest.Services.Processors.Authentication.Base
-{
-    public interface IAuthenticationMethod
-    {
+#region
+using System.Threading.Tasks;
+using DotLogix.Core.Rest.Server.Http;
+#endregion
+
+namespace DotLogix.Core.Rest.Services.Processors.Authentication.Base {
+    public interface IAuthenticationMethod {
         string Name { get; }
         string[] SupportedDataFormats { get; }
 

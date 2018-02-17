@@ -1,9 +1,18 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodeIoOpCodes.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System;
+#endregion
 
 namespace DotLogix.Core.Nodes.Io {
     [Flags]
-    public enum NodeIoOpCodes
-    {
+    public enum NodeIoOpCodes {
         None = 0,
         BeginMap = 1 << 0,
         EndMap = 1 << 1,

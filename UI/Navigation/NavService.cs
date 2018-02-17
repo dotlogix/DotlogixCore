@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  NavService.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -37,9 +37,8 @@ namespace DotLogix.UI.Navigation {
             if(_currentPageIndex < 0)
                 _currentPageIndex = 0;
 
-            foreach(var navPage in _navList) {
+            foreach(var navPage in _navList)
                 navPage.NavService = this;
-            }
         }
 
         public void GoBack() {
@@ -80,15 +79,13 @@ namespace DotLogix.UI.Navigation {
         }
 
         private IEnumerable<NavPage> GetForwardStack() {
-            for(var i = _currentPageIndex + 1; i < _navList.Count; i++) {
+            for(var i = _currentPageIndex + 1; i < _navList.Count; i++)
                 yield return _navList[i];
-            }
         }
 
         private IEnumerable<NavPage> GetBackStack() {
-            for(var i = _currentPageIndex - 1; i >= 0; i--) {
+            for(var i = _currentPageIndex - 1; i >= 0; i--)
                 yield return _navList[i];
-            }
         }
     }
 }

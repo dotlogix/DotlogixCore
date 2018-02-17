@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ObjectExtension.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -35,29 +35,29 @@ namespace DotLogix.Core.Extensions {
             yield return value;
         }
 
-        #region Convert
+        public static DataType GetDataType(this object instance) {
+            return DataTypeConverter.Instance.GetDataType(instance);
+        }
 
-        public static object ConvertTo(this object value, Type targetType)
-        {
-            if (TryConvertTo(value, targetType, out var convertedValue) == false)
+        #region Convert
+        public static object ConvertTo(this object value, Type targetType) {
+            if(TryConvertTo(value, targetType, out var convertedValue) == false) {
                 throw new
                 NotSupportedException($"Conversion between {value.GetType()} and {targetType} is not supported");
+            }
             return convertedValue;
         }
 
-        public static bool TryConvertTo(this object value, Type targetType, out object target)
-        {
-            if (value == null)
-            {
-                if (targetType.IsValueType)
+        public static bool TryConvertTo(this object value, Type targetType, out object target) {
+            if(value == null) {
+                if(targetType.IsValueType)
                     throw new ArgumentNullException(nameof(value), "Can not convert null to value type");
                 target = default(object);
                 return true;
             }
 
             var sourceType = value.GetType();
-            if (targetType.IsAssignableFrom(sourceType))
-            {
+            if(targetType.IsAssignableFrom(sourceType)) {
                 target = value;
                 return true;
             }
@@ -67,15 +67,13 @@ namespace DotLogix.Core.Extensions {
 
             var sourceTypeConverter = TypeDescriptor.GetConverter(sourceType);
 
-            if (sourceTypeConverter.CanConvertTo(targetType))
-            {
+            if(sourceTypeConverter.CanConvertTo(targetType)) {
                 target = sourceTypeConverter.ConvertTo(value, targetType);
                 return true;
             }
 
             var targetTypeConverter = TypeDescriptor.GetConverter(targetType);
-            if (targetTypeConverter.CanConvertFrom(sourceType))
-            {
+            if(targetTypeConverter.CanConvertFrom(sourceType)) {
                 target = targetTypeConverter.ConvertFrom(value);
                 return true;
             }
@@ -83,29 +81,20 @@ namespace DotLogix.Core.Extensions {
             return false;
         }
 
-        public static TTarget ConvertTo<TTarget>(this object value)
-        {
+        public static TTarget ConvertTo<TTarget>(this object value) {
             var targetType = typeof(TTarget);
             return (TTarget)ConvertTo(value, targetType);
         }
 
-        public static bool TryConvertTo<TTarget>(this object value, out TTarget target)
-        {
+        public static bool TryConvertTo<TTarget>(this object value, out TTarget target) {
             var targetType = typeof(TTarget);
-            if (TryConvertTo(value, targetType, out var convertedValue))
-            {
+            if(TryConvertTo(value, targetType, out var convertedValue)) {
                 target = (TTarget)convertedValue;
                 return true;
             }
             target = default(TTarget);
             return false;
         }
-
         #endregion
-
-        public static DataType GetDataType(this object instance)
-        {
-            return DataTypeConverter.Instance.GetDataType(instance);
-        }
     }
 }

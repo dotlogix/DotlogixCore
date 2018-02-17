@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ListExtensions.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -12,48 +12,39 @@ using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Extensions {
-    public class SelectorComparer<T, TKey> : IComparer<T> where TKey : IComparable
-    {
+    public class SelectorComparer<T, TKey> : IComparer<T> where TKey : IComparable {
         private readonly Func<T, TKey> _comparableSelector;
 
-        public SelectorComparer(Func<T, TKey> comparableSelector)
-        {
-            this._comparableSelector = comparableSelector;
+        public SelectorComparer(Func<T, TKey> comparableSelector) {
+            _comparableSelector = comparableSelector;
         }
 
-        public int Compare(T x, T y)
-        {
+        public int Compare(T x, T y) {
             return _comparableSelector.Invoke(x).CompareTo(_comparableSelector.Invoke(y));
         }
     }
 
-    public class SelectorEqualityComparer<T, TKey> : IEqualityComparer<T> where TKey : IComparable
-    {
+    public class SelectorEqualityComparer<T, TKey> : IEqualityComparer<T> where TKey : IComparable {
         private readonly Func<T, TKey> _comparableSelector;
 
-        public SelectorEqualityComparer(Func<T, TKey> comparableSelector)
-        {
-            this._comparableSelector = comparableSelector;
-        }
-
-        public int Compare(T x, T y)
-        {
-            return _comparableSelector(x).CompareTo(_comparableSelector(y));
+        public SelectorEqualityComparer(Func<T, TKey> comparableSelector) {
+            _comparableSelector = comparableSelector;
         }
 
         public bool Equals(T x, T y) {
-            
             return Equals(_comparableSelector(x), _comparableSelector(y));
         }
 
         public int GetHashCode(T x) {
             return _comparableSelector(x).GetHashCode();
         }
+
+        public int Compare(T x, T y) {
+            return _comparableSelector(x).CompareTo(_comparableSelector(y));
+        }
     }
 
     public static class ListExtensions {
-        
-
         public static T[] TakeLast<T>(this IList<T> list, int count) {
             if(count < 0)
                 throw new ArgumentException("Count has to be greater or equal zero", nameof(count));
@@ -62,9 +53,8 @@ namespace DotLogix.Core.Extensions {
             count = Math.Min(count, listCount);
             var elements = new T[count];
             var startIndex = listCount - count;
-            for(var i = 0; i < count; i++) {
+            for(var i = 0; i < count; i++)
                 elements[i] = list[startIndex + i];
-            }
             return elements;
         }
 
@@ -75,25 +65,21 @@ namespace DotLogix.Core.Extensions {
             return list;
         }
 
-        public static void InsertSorted<T>(this List<T> list, T item) where T : IComparable<T>
-        {
-            if (list.Count == 0)
-            {
+        public static void InsertSorted<T>(this List<T> list, T item) where T : IComparable<T> {
+            if(list.Count == 0) {
                 list.Add(item);
                 return;
             }
-            if (list[list.Count - 1].CompareTo(item) <= 0)
-            {
+            if(list[list.Count - 1].CompareTo(item) <= 0) {
                 list.Add(item);
                 return;
             }
-            if (list[0].CompareTo(item) >= 0)
-            {
+            if(list[0].CompareTo(item) >= 0) {
                 list.Insert(0, item);
                 return;
             }
-            int index = list.BinarySearch(item);
-            if (index < 0)
+            var index = list.BinarySearch(item);
+            if(index < 0)
                 index = ~index;
             list.Insert(index, item);
         }
@@ -102,25 +88,21 @@ namespace DotLogix.Core.Extensions {
             InsertSorted(list, item, new SelectorComparer<T, TKey>(comparableSelector));
         }
 
-        public static void InsertSorted<T>(this List<T> list, T item, IComparer<T> comparer)
-        {
-            if (list.Count == 0)
-            {
+        public static void InsertSorted<T>(this List<T> list, T item, IComparer<T> comparer) {
+            if(list.Count == 0) {
                 list.Add(item);
                 return;
             }
-            if (comparer.Compare(list[list.Count - 1], item) <= 0)
-            {
+            if(comparer.Compare(list[list.Count - 1], item) <= 0) {
                 list.Add(item);
                 return;
             }
-            if (comparer.Compare(list[0], item) >= 0)
-            {
+            if(comparer.Compare(list[0], item) >= 0) {
                 list.Insert(0, item);
                 return;
             }
-            int index = list.BinarySearch(item);
-            if (index < 0)
+            var index = list.BinarySearch(item);
+            if(index < 0)
                 index = ~index;
             list.Insert(index, item);
         }

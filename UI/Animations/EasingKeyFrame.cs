@@ -1,5 +1,15 @@
-﻿using System.Windows;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  EasingKeyFrame.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System.Windows;
 using System.Windows.Media.Animation;
+#endregion
 
 namespace DotLogix.UI.Animations {
     /// <summary>
@@ -49,8 +59,8 @@ namespace DotLogix.UI.Animations {
         ///     Defines modifier of the animation progress.
         /// </summary>
         public IEasingFunction EasingFunction {
-            get { return (IEasingFunction)GetValue(EasingFunctionProperty); }
-            set { SetValue(EasingFunctionProperty, value); }
+            get => (IEasingFunction)GetValue(EasingFunctionProperty);
+            set => SetValue(EasingFunctionProperty, value);
         }
         #endregion
     }

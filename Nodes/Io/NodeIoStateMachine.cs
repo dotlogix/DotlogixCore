@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  NodeIoStateMachine.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  24.10.2017
-// LastEdited:  25.10.2017
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region

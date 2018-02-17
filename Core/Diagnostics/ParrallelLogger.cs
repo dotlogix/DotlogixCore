@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ParrallelLogger.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -80,9 +80,8 @@ namespace DotLogix.Core.Diagnostics {
 
             while(_queuedMessages.Count > 0) {
                 var queuedMessage = _queuedMessages.Dequeue();
-                foreach(var currentReceiver in _receivers) {
+                foreach(var currentReceiver in _receivers)
                     currentReceiver.Log(queuedMessage);
-                }
             }
             return true;
         }
@@ -113,9 +112,8 @@ namespace DotLogix.Core.Diagnostics {
                         continue;
                 }
 
-                foreach(var currentReceiver in _currentReceivers) {
+                foreach(var currentReceiver in _currentReceivers)
                     currentReceiver.Log(currentMessage);
-                }
             }
         }
 

@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  CollectionNodeConverter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  30.08.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -39,8 +39,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         public override void Write(object instance, string rootName, INodeWriter writer) {
-            var values = instance as IEnumerable<T>;
-            if(values == null)
+            if(!(instance is IEnumerable<T> values))
                 throw new ArgumentException("Instance is not type of IEnumerable<T>");
             writer.BeginList(rootName);
             foreach(var value in values)
@@ -49,24 +48,20 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         public override object ConvertToObject(Node node) {
-            var nodeList = node as NodeList;
-            if(nodeList == null)
+            if(!(node is NodeList nodeList))
                 throw new ArgumentException("Node is not a NodeList");
             var children = nodeList.Children().ToArray();
             var childCount = children.Length;
             var array = new T[childCount];
-            for(var i = 0; i < childCount; i++) {
+            for(var i = 0; i < childCount; i++)
                 array[i] = (T)Nodes.ToObject(children[i], _elementType);
-            }
-            
-            if(_isDefaultCtor == false) {
+
+            if(_isDefaultCtor == false)
                 return _ctor.Invoke((IEnumerable<T>)array);
-            }
 
             var collection = (ICollection<T>)_ctor.Invoke();
-            foreach(var value in array) {
+            foreach(var value in array)
                 collection.Add(value);
-            }
             return collection;
         }
     }

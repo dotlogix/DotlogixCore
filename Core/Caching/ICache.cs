@@ -1,9 +1,17 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ICache.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
 
-namespace DotLogix.Core.Caching
-{
+#region
+using System;
+#endregion
 
-    public interface ICache<TKey, TValue> : IDisposable{
+namespace DotLogix.Core.Caching {
+    public interface ICache<TKey, TValue> : IDisposable {
         TimeSpan CheckPolicyInterval { get; }
         TValue this[TKey key] { get; }
 

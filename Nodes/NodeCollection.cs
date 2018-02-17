@@ -1,11 +1,20 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodeCollection.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DotLogix.Core.Extensions;
+#endregion
 
 namespace DotLogix.Core.Nodes {
-    public abstract class NodeCollection : Node
-    {
+    public abstract class NodeCollection : Node {
         protected List<Node> NodeList { get; } = new List<Node>();
         public int ChildCount => NodeList.Count;
 
@@ -34,17 +43,14 @@ namespace DotLogix.Core.Nodes {
             return NodeList.OfType<TNode>();
         }
 
-        public IEnumerable<Node> Decendents()
-        {
-            foreach (var node in NodeList)
-            {
+        public IEnumerable<Node> Decendents() {
+            foreach(var node in NodeList) {
                 yield return node;
                 var collection = node as NodeCollection;
                 if(collection == null)
                     continue;
-                foreach (var decendent in collection.Decendents()) {
+                foreach(var decendent in collection.Decendents())
                     yield return decendent;
-                }
             }
         }
 
@@ -69,10 +75,9 @@ namespace DotLogix.Core.Nodes {
             return count >= 0 ? NodeList[count] : null;
         }
 
-        public TNode LastChild<TNode>() where TNode : Node
-        {
+        public TNode LastChild<TNode>() where TNode : Node {
             for(var i = NodeList.Count - 1; i >= 0; i--) {
-                if (NodeList[i] is TNode typedNode)
+                if(NodeList[i] is TNode typedNode)
                     return typedNode;
             }
             return null;
@@ -92,14 +97,12 @@ namespace DotLogix.Core.Nodes {
             var next = node.Next;
             var prev = node.Previous;
 
-            if (next != null)
-            {
+            if(next != null) {
                 next.Previous = prev;
                 node.Next = null;
             }
 
-            if (prev != null)
-            {
+            if(prev != null) {
                 prev.Next = next;
                 node.Previous = null;
             }
@@ -124,15 +127,15 @@ namespace DotLogix.Core.Nodes {
         }
 
         protected void ReplaceChild(Node oldNode, Node newNode, int index) {
-            if (oldNode == null)
+            if(oldNode == null)
                 throw new ArgumentNullException(nameof(oldNode));
-            if (newNode == null)
+            if(newNode == null)
                 throw new ArgumentNullException(nameof(newNode));
 
-            if (oldNode == newNode)
+            if(oldNode == newNode)
                 return;
 
-            if (oldNode.Ancestor != this)
+            if(oldNode.Ancestor != this)
                 throw new InvalidOperationException("This node is not a child of this collection");
 
             newNode.Ancestor = this;

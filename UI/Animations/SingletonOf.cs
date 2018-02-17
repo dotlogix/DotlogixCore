@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  SingletonOf.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -20,7 +20,7 @@ namespace DotLogix.UI.Animations {
     /// </remarks>
     /// <typeparam name="T"> class </typeparam>
     public static class SingletonOf<T> where T : class, new() {
-        private static readonly T _instance = new T();
+        private static readonly T InstanceBack = new T();
 
         /// <summary>
         ///     Creates domain-wide singleton of specified type. Warning: Don't use it to initialize static member of the same type
@@ -28,10 +28,10 @@ namespace DotLogix.UI.Animations {
         /// </summary>
         public static T Instance {
             get {
-                Debug.Assert(_instance != null,
+                Debug.Assert(InstanceBack != null,
                              "SingletonOf<" + typeof(T) +
                              "> : Attempt to initialize static member of the same class. Member will be initialized to null");
-                return _instance;
+                return InstanceBack;
             }
         }
     }

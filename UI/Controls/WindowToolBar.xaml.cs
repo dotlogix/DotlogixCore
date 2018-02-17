@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  WindowToolBar.xaml.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -41,13 +41,13 @@ namespace DotLogix.UI.Controls {
         ;
 
         public object AdditionalContent {
-            get { return GetValue(AdditionalContentProperty); }
-            set { SetValue(AdditionalContentProperty, value); }
+            get => GetValue(AdditionalContentProperty);
+            set => SetValue(AdditionalContentProperty, value);
         }
 
         public Window ParentWindow {
-            get { return (Window)GetValue(ParentWindowProperty); }
-            set { SetValue(ParentWindowProperty, value); }
+            get => (Window)GetValue(ParentWindowProperty);
+            set => SetValue(ParentWindowProperty, value);
         }
 
         public WindowToolBar() {
@@ -72,10 +72,11 @@ namespace DotLogix.UI.Controls {
 
         private void Maximize_Click(object sender, RoutedEventArgs e) {
             var window = ParentWindow;
-            if(window != null)
+            if(window != null) {
                 window.WindowState = window.WindowState == WindowState.Maximized
                                          ? WindowState.Normal
                                          : WindowState.Maximized;
+            }
         }
 
         private void Close_Click(object sender, RoutedEventArgs e) {

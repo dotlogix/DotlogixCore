@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2017(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  EfOrderedEfRepository.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.12.2017
-// LastEdited:  11.12.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region

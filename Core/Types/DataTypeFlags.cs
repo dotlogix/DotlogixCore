@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
-// File:  Flags.cs
+// Copyright 2018(C) , DotLogix
+// File:  DataTypeFlags.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  09.09.2017
-// LastEdited:  09.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -53,7 +53,7 @@ namespace DotLogix.Core.Types {
         PrimitiveMask = Guid | Bool | Enum | TextMask | NumericMask | TimeMask | Object,
         TimeMask = DateTime | TimeSpan,
         TextMask = String | Char,
-        CategoryMask = Primitive | Complex | Collection, 
+        CategoryMask = Primitive | Complex | Collection,
         #endregion
     }
 }

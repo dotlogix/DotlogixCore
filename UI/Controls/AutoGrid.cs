@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  AutoGrid.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -73,45 +73,44 @@ namespace DotLogix.UI.Controls {
                                                                                                     (default(double)));
 
         public double ItemPadding {
-            get { return (double)GetValue(ItemPaddingProperty); }
-            set { SetValue(ItemPaddingProperty, value); }
+            get => (double)GetValue(ItemPaddingProperty);
+            set => SetValue(ItemPaddingProperty, value);
         }
 
         public double MinItemWidth {
-            get { return (double)GetValue(MinItemWidthProperty); }
-            set { SetValue(MinItemWidthProperty, value); }
+            get => (double)GetValue(MinItemWidthProperty);
+            set => SetValue(MinItemWidthProperty, value);
         }
 
         public double MaxItemWidth {
-            get { return (double)GetValue(MaxItemWidthProperty); }
-            set { SetValue(MaxItemWidthProperty, value); }
+            get => (double)GetValue(MaxItemWidthProperty);
+            set => SetValue(MaxItemWidthProperty, value);
         }
 
         public double MinItemHeight {
-            get { return (double)GetValue(MinItemHeightProperty); }
-            set { SetValue(MinItemHeightProperty, value); }
+            get => (double)GetValue(MinItemHeightProperty);
+            set => SetValue(MinItemHeightProperty, value);
         }
 
         public double MaxItemHeight {
-            get { return (double)GetValue(MaxItemHeightProperty); }
-            set { SetValue(MaxItemHeightProperty, value); }
+            get => (double)GetValue(MaxItemHeightProperty);
+            set => SetValue(MaxItemHeightProperty, value);
         }
 
         public bool LimitToChildCount {
-            get { return (bool)GetValue(LimitToChildCountProperty); }
-            set { SetValue(LimitToChildCountProperty, value); }
+            get => (bool)GetValue(LimitToChildCountProperty);
+            set => SetValue(LimitToChildCountProperty, value);
         }
 
         public Orientation Orientation {
-            get { return (Orientation)GetValue(OrientationProperty); }
-            set { SetValue(OrientationProperty, value); }
+            get => (Orientation)GetValue(OrientationProperty);
+            set => SetValue(OrientationProperty, value);
         }
 
         protected override Size MeasureOverride(Size availableSize) {
-            GetSize(availableSize, out Size itemSize, out Size realSize);
-            foreach(UIElement child in Children) {
+            GetSize(availableSize, out var itemSize, out var realSize);
+            foreach(UIElement child in Children)
                 child.Measure(itemSize);
-            }
             return realSize;
         }
 
@@ -168,7 +167,7 @@ namespace DotLogix.UI.Controls {
         }
 
         protected override Size ArrangeOverride(Size finalSize) {
-            GetSize(finalSize, out Size itemSize, out Size realSize);
+            GetSize(finalSize, out var itemSize, out var realSize);
             var padding = ItemPadding;
             var paddedItemWidth = itemSize.Width + padding;
             var paddedItemHeight = itemSize.Height + padding;

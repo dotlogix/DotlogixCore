@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  TypeExtension.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -56,6 +56,7 @@ namespace DotLogix.Core.Extensions {
         public static bool IsAssignableTo(this Type sourceType, Type targetType) {
             return targetType.IsAssignableFrom(sourceType);
         }
+
         public static bool IsAssignableTo<TTarget>(this Type sourceType) {
             return sourceType.IsAssignableTo(typeof(TTarget));
         }
@@ -63,10 +64,11 @@ namespace DotLogix.Core.Extensions {
         public static bool IsEnumerable(this Type sourceType) {
             return IsEnumerable(sourceType, out _);
         }
+
         public static bool IsEnumerable(this Type sourceType, out Type elementType) {
             if(sourceType.IsArray) {
                 elementType = sourceType.GetElementType();
-                return true; 
+                return true;
             }
 
             if(sourceType.IsAssignableToOpenGeneric(typeof(IEnumerable<>), out var genericTypeArguments)) {
@@ -74,7 +76,7 @@ namespace DotLogix.Core.Extensions {
                 return true;
             }
 
-            if (sourceType.IsAssignableTo(typeof(IEnumerable))){
+            if(sourceType.IsAssignableTo(typeof(IEnumerable))) {
                 elementType = typeof(object);
                 return true;
             }
@@ -152,9 +154,8 @@ namespace DotLogix.Core.Extensions {
                 interfaces = interfaces.Where(i => i.IsGenericType);
                 if(autoOpenGenericType)
                     interfaces = interfaces.Select(i => i.GetGenericTypeDefinition());
-            } else if(autoOpenGenericType) {
+            } else if(autoOpenGenericType)
                 interfaces = interfaces.Select(OpenIfGenericType);
-            }
 
             return interfaces;
         }

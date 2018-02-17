@@ -43,24 +43,24 @@ namespace DotLogix.UI.Controls {
         ///     CLR Wrapper for the From depenendency property
         /// </summary>
         public double? From {
-            get { return (double?)GetValue(FromProperty); }
-            set { SetValue(FromProperty, value); }
+            get => (double?)GetValue(FromProperty);
+            set => SetValue(FromProperty, value);
         }
 
         /// <summary>
         ///     CLR Wrapper for the To property
         /// </summary>
         public double? To {
-            get { return (double?)GetValue(ToProperty); }
-            set { SetValue(ToProperty, value); }
+            get => (double?)GetValue(ToProperty);
+            set => SetValue(ToProperty, value);
         }
 
         /// <summary>
         ///     Sets the reverse value for the second animation
         /// </summary>
         public double? ReverseValue {
-            get { return (double)GetValue(ReverseValueProperty); }
-            set { SetValue(ReverseValueProperty, value); }
+            get => (double)GetValue(ReverseValueProperty);
+            set => SetValue(ReverseValueProperty, value);
         }
 
 

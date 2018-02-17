@@ -27,7 +27,7 @@ namespace DotLogix.UI.Navigation {
         private NavService _navService;
 
         public NavService NavService {
-            get { return _navService; }
+            get => _navService;
             set {
                 if(!Equals(_navService.NavFrame, this))
                     throw new InvalidOperationException("The navframe of the navigation service is not valid");
@@ -37,8 +37,8 @@ namespace DotLogix.UI.Navigation {
         }
 
         public NavPage Page {
-            get { return (NavPage)GetValue(PageProperty); }
-            internal set { SetValue(PageProperty, value); }
+            get => (NavPage)GetValue(PageProperty);
+            internal set => SetValue(PageProperty, value);
         }
 
         public NavFrame() {

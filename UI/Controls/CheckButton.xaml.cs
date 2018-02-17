@@ -67,23 +67,23 @@ namespace DotLogix.UI.Controls {
                                                                                                         DarkGray));
 
         public bool IsChecked {
-            get { return (bool)GetValue(IsCheckedProperty); }
-            set { SetValue(IsCheckedProperty, value); }
+            get => (bool)GetValue(IsCheckedProperty);
+            set => SetValue(IsCheckedProperty, value);
         }
 
         public string Text {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
         }
 
         public Brush CheckedBrush {
-            get { return (Brush)GetValue(CheckedBrushProperty); }
-            set { SetValue(CheckedBrushProperty, value); }
+            get => (Brush)GetValue(CheckedBrushProperty);
+            set => SetValue(CheckedBrushProperty, value);
         }
 
         public Brush UncheckedBrush {
-            get { return (Brush)GetValue(UncheckedBrushProperty); }
-            set { SetValue(UncheckedBrushProperty, value); }
+            get => (Brush)GetValue(UncheckedBrushProperty);
+            set => SetValue(UncheckedBrushProperty, value);
         }
 
         public CheckButton() {
@@ -93,8 +93,8 @@ namespace DotLogix.UI.Controls {
         }
 
         public event RoutedEventHandler Unchecked {
-            add { AddHandler(UncheckedEvent, value); }
-            remove { RemoveHandler(UncheckedEvent, value); }
+            add => AddHandler(UncheckedEvent, value);
+            remove => RemoveHandler(UncheckedEvent, value);
         }
 
         private void OnTrigger(object sender, EventArgs e) {

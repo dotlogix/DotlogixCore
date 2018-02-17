@@ -38,8 +38,8 @@ namespace DotLogix.UI.Controls.SplitViewPrimitives {
         ///     Gets the <see cref="SplitView.CompactPaneLength" /> value as a GridLength.
         /// </summary>
         public GridLength CompactPaneGridLength {
-            get { return (GridLength)GetValue(CompactPaneGridLengthProperty); }
-            private set { SetValue(CompactPaneGridLengthProperty, value); }
+            get => (GridLength)GetValue(CompactPaneGridLengthProperty);
+            private set => SetValue(CompactPaneGridLengthProperty, value);
         }
 
         internal static readonly DependencyProperty CompactPaneGridLengthProperty =
@@ -52,8 +52,8 @@ namespace DotLogix.UI.Controls.SplitViewPrimitives {
         ///     Gets the negative of the <see cref="SplitView.OpenPaneLength" /> value.
         /// </summary>
         public double NegativeOpenPaneLength {
-            get { return (double)GetValue(NegativeOpenPaneLengthProperty); }
-            private set { SetValue(NegativeOpenPaneLengthProperty, value); }
+            get => (double)GetValue(NegativeOpenPaneLengthProperty);
+            private set => SetValue(NegativeOpenPaneLengthProperty, value);
         }
 
         internal static readonly DependencyProperty NegativeOpenPaneLengthProperty =
@@ -67,8 +67,8 @@ namespace DotLogix.UI.Controls.SplitViewPrimitives {
         ///     the <see cref="SplitView.OpenPaneLength" /> value.
         /// </summary>
         public double NegativeOpenPaneLengthMinusCompactLength {
-            get { return (double)GetValue(NegativeOpenPaneLengthMinusCompactLengthProperty); }
-            set { SetValue(NegativeOpenPaneLengthMinusCompactLengthProperty, value); }
+            get => (double)GetValue(NegativeOpenPaneLengthMinusCompactLengthProperty);
+            set => SetValue(NegativeOpenPaneLengthMinusCompactLengthProperty, value);
         }
 
         internal static readonly DependencyProperty NegativeOpenPaneLengthMinusCompactLengthProperty =
@@ -81,8 +81,8 @@ namespace DotLogix.UI.Controls.SplitViewPrimitives {
         ///     Gets the <see cref="SplitView.OpenPaneLength" /> value as a GridLength.
         /// </summary>
         public GridLength OpenPaneGridLength {
-            get { return (GridLength)GetValue(OpenPaneGridLengthProperty); }
-            private set { SetValue(OpenPaneGridLengthProperty, value); }
+            get => (GridLength)GetValue(OpenPaneGridLengthProperty);
+            private set => SetValue(OpenPaneGridLengthProperty, value);
         }
 
         internal static readonly DependencyProperty OpenPaneGridLengthProperty =
@@ -95,8 +95,8 @@ namespace DotLogix.UI.Controls.SplitViewPrimitives {
         ///     Gets the <see cref="SplitView.OpenPaneLength" /> value.
         /// </summary>
         public double OpenPaneLength {
-            get { return (double)GetValue(OpenPaneLengthProperty); }
-            private set { SetValue(OpenPaneLengthProperty, value); }
+            get => (double)GetValue(OpenPaneLengthProperty);
+            private set => SetValue(OpenPaneLengthProperty, value);
         }
 
         internal static readonly DependencyProperty OpenPaneLengthProperty =
@@ -110,8 +110,8 @@ namespace DotLogix.UI.Controls.SplitViewPrimitives {
         ///     <see cref="SplitView.OpenPaneLength" /> value.
         /// </summary>
         public double OpenPaneLengthMinusCompactLength {
-            get { return (double)GetValue(OpenPaneLengthMinusCompactLengthProperty); }
-            private set { SetValue(OpenPaneLengthMinusCompactLengthProperty, value); }
+            get => (double)GetValue(OpenPaneLengthMinusCompactLengthProperty);
+            private set => SetValue(OpenPaneLengthMinusCompactLengthProperty, value);
         }
 
         internal static readonly DependencyProperty OpenPaneLengthMinusCompactLengthProperty =

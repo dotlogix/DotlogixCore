@@ -41,13 +41,13 @@ namespace DotLogix.UI.Controls {
         ;
 
         public object AdditionalContent {
-            get { return GetValue(AdditionalContentProperty); }
-            set { SetValue(AdditionalContentProperty, value); }
+            get => GetValue(AdditionalContentProperty);
+            set => SetValue(AdditionalContentProperty, value);
         }
 
         public Window ParentWindow {
-            get { return (Window)GetValue(ParentWindowProperty); }
-            set { SetValue(ParentWindowProperty, value); }
+            get => (Window)GetValue(ParentWindowProperty);
+            set => SetValue(ParentWindowProperty, value);
         }
 
         public WindowToolBar() {

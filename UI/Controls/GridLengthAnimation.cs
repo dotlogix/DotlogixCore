@@ -48,32 +48,30 @@ namespace DotLogix.UI.Controls {
         ///     Sets the reverse value for the second animation
         /// </summary>
         public double ReverseValue {
-            get { return (double)GetValue(ReverseValueProperty); }
-            set { SetValue(ReverseValueProperty, value); }
+            get => (double)GetValue(ReverseValueProperty);
+            set => SetValue(ReverseValueProperty, value);
         }
 
 
         /// <summary>
         ///     Returns the type of object to animate
         /// </summary>
-        public override Type TargetPropertyType {
-            get { return typeof(GridLength); }
-        }
+        public override Type TargetPropertyType => typeof(GridLength);
 
         /// <summary>
         ///     CLR Wrapper for the From depenendency property
         /// </summary>
         public GridLength From {
-            get { return (GridLength)GetValue(FromProperty); }
-            set { SetValue(FromProperty, value); }
+            get => (GridLength)GetValue(FromProperty);
+            set => SetValue(FromProperty, value);
         }
 
         /// <summary>
         ///     CLR Wrapper for the To property
         /// </summary>
         public GridLength To {
-            get { return (GridLength)GetValue(ToProperty); }
-            set { SetValue(ToProperty, value); }
+            get => (GridLength)GetValue(ToProperty);
+            set => SetValue(ToProperty, value);
         }
 
         /// <summary>

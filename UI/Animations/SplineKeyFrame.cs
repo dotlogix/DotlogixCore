@@ -61,8 +61,8 @@ namespace DotLogix.UI.Animations {
         ///     Defines modifier of the animation progress.
         /// </summary>
         public KeySpline KeySpline {
-            get { return (KeySpline)GetValue(KeySplineProperty); }
-            set { SetValue(KeySplineProperty, value ?? new KeySpline()); }
+            get => (KeySpline)GetValue(KeySplineProperty);
+            set => SetValue(KeySplineProperty, value ?? new KeySpline());
         }
         #endregion
     }

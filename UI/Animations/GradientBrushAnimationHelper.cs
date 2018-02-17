@@ -107,9 +107,7 @@ namespace DotLogix.UI.Animations {
 
         public abstract double GetSegmentLength(TValue from, TValue to);
 
-        public virtual bool IsAccumulable {
-            get { return true; }
-        }
+        public virtual bool IsAccumulable => true;
         #endregion IAnimationHelper
     }
 }

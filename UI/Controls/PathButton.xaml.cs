@@ -64,28 +64,28 @@ namespace DotLogix.UI.Controls {
         ;
 
         public Geometry Data {
-            get { return (Geometry)GetValue(DataProperty); }
-            set { SetValue(DataProperty, value); }
+            get => (Geometry)GetValue(DataProperty);
+            set => SetValue(DataProperty, value);
         }
 
         public Brush Fill {
-            get { return (Brush)GetValue(FillProperty); }
-            set { SetValue(FillProperty, value); }
+            get => (Brush)GetValue(FillProperty);
+            set => SetValue(FillProperty, value);
         }
 
         public Brush Stroke {
-            get { return (Brush)GetValue(StrokeProperty); }
-            set { SetValue(StrokeProperty, value); }
+            get => (Brush)GetValue(StrokeProperty);
+            set => SetValue(StrokeProperty, value);
         }
 
         public double StrokeThickness {
-            get { return (double)GetValue(StrokeThicknessProperty); }
-            set { SetValue(StrokeThicknessProperty, value); }
+            get => (double)GetValue(StrokeThicknessProperty);
+            set => SetValue(StrokeThicknessProperty, value);
         }
 
         public Stretch Stretch {
-            get { return (Stretch)GetValue(StretchProperty); }
-            set { SetValue(StretchProperty, value); }
+            get => (Stretch)GetValue(StretchProperty);
+            set => SetValue(StretchProperty, value);
         }
 
         public PathButton() {

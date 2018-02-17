@@ -35,8 +35,8 @@ namespace DotLogix.UI.Animations {
 
         #region IKeyFrameAnimation
         IList IKeyFrameAnimation.KeyFrames {
-            get { return KeyFrames; }
-            set { KeyFrames = (TKeyFrameCollection)value; }
+            get => KeyFrames;
+            set => KeyFrames = (TKeyFrameCollection)value;
         }
         #endregion
 
@@ -232,8 +232,8 @@ namespace DotLogix.UI.Animations {
         ///     replacing it entirely.
         /// </summary>
         public bool IsAdditive {
-            get { return (bool)GetValue(IsAdditiveProperty); }
-            set { SetValue(IsAdditiveProperty, value); }
+            get => (bool)GetValue(IsAdditiveProperty);
+            set => SetValue(IsAdditiveProperty, value);
         }
 
         /// <summary>
@@ -245,8 +245,8 @@ namespace DotLogix.UI.Animations {
         ///     This property works with the IsAdditive property and has no effect without it.
         /// </remarks>
         public bool IsCumulative {
-            get { return (bool)GetValue(IsCumulativeProperty); }
-            set { SetValue(IsCumulativeProperty, value); }
+            get => (bool)GetValue(IsCumulativeProperty);
+            set => SetValue(IsCumulativeProperty, value);
         }
         #endregion
 
@@ -451,9 +451,7 @@ namespace DotLogix.UI.Animations {
             return _emptyKeyFrames;
         }
 
-        private IList<KeyFrame<TValue>> KeyFrameList {
-            get { return _keyFrames; }
-        }
+        private IList<KeyFrame<TValue>> KeyFrameList => _keyFrames;
         #endregion
 
         #region Inner types

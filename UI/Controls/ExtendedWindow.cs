@@ -29,8 +29,8 @@ namespace DotLogix.UI.Controls {
                                                                                                                   )));
 
         public object AdditionalToolBarContent {
-            get { return GetValue(AdditionalToolBarContentProperty); }
-            set { SetValue(AdditionalToolBarContentProperty, value); }
+            get => GetValue(AdditionalToolBarContentProperty);
+            set => SetValue(AdditionalToolBarContentProperty, value);
         }
 
         public ExtendedWindow() {

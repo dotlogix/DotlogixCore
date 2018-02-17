@@ -1,14 +1,20 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  TaskExtensions.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Reflection.Delegates;
 using DotLogix.Core.Reflection.Fluent;
+#endregion
 
-namespace DotLogix.Core.Extensions
-{
+namespace DotLogix.Core.Extensions {
     public static class TaskExtensions {
         private static readonly ConcurrentDictionary<Type, GetterDelegate> TypeResultAccessors = new ConcurrentDictionary<Type, GetterDelegate>();
 
@@ -19,9 +25,8 @@ namespace DotLogix.Core.Extensions
             TypeResultAccessors.TryAdd(typeof(Task), null);
         }
 
-        public static Task<object> UnpackResultAsync(this Task task)
-        {
-            if (task is Task<object> objectTask)
+        public static Task<object> UnpackResultAsync(this Task task) {
+            if(task is Task<object> objectTask)
                 return objectTask;
 
             var tcs = new TaskCompletionSource<object>();
@@ -42,8 +47,7 @@ namespace DotLogix.Core.Extensions
             return accessor?.Invoke(task);
         }
 
-        public static Task<TBase> ConvertResult<TBase, TDerived>(this Task<TDerived> task) where TDerived : TBase
-        {
+        public static Task<TBase> ConvertResult<TBase, TDerived>(this Task<TDerived> task) where TDerived : TBase {
             var tcs = new TaskCompletionSource<TBase>();
 
             task.ContinueWith(t => tcs.SetResult(t.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -53,7 +57,7 @@ namespace DotLogix.Core.Extensions
             return tcs.Task;
         }
 
-        private static GetterDelegate CreateAcessor(Type taskType) { 
+        private static GetterDelegate CreateAcessor(Type taskType) {
             var propertyInfo = taskType.GetProperty("Result");
             return propertyInfo != null ? FluentIl.CreateGetter(propertyInfo) : null;
         }

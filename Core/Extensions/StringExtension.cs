@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  StringExtension.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -19,13 +19,11 @@ namespace DotLogix.Core.Extensions {
             return OccurancesOf(str.ToCharArray(), character, 0, str.Length, out _);
         }
 
-        public static int OccurancesOf(this string str, char character, int start, int count)
-        {
+        public static int OccurancesOf(this string str, char character, int start, int count) {
             return OccurancesOf(str.ToCharArray(), character, start, count, out _);
         }
 
-        public static int OccurancesOf(this char[] chars, char character)
-        {
+        public static int OccurancesOf(this char[] chars, char character) {
             return OccurancesOf(chars, character, 0, chars.Length, out _);
         }
 
@@ -37,8 +35,7 @@ namespace DotLogix.Core.Extensions {
             lastOccurence = -1;
 
             var occurances = 0;
-            for (var i = start; i < start+count; i++)
-            {
+            for(var i = start; i < (start + count); i++) {
                 if(chars[i] != character)
                     continue;
 
@@ -113,7 +110,6 @@ namespace DotLogix.Core.Extensions {
         }
 
         #region Base64
-
         public static string ToBase64String(this string plain, Encoding encoding = null) {
             var bytes = (encoding ?? Encoding.UTF8).GetBytes(plain);
             return Convert.ToBase64String(bytes);
@@ -123,20 +119,18 @@ namespace DotLogix.Core.Extensions {
             var bytes = Convert.FromBase64String(base64string);
             return (encoding ?? Encoding.UTF8).GetString(bytes);
         }
-
         #endregion
 
         #region SplitAndKeep
-
         public static IEnumerable<string> SplitAndKeep(this string value, params char[] delimiters) {
             return SplitAndKeep(value, int.MaxValue, StringSplitOptions.None, delimiters);
         }
+
         public static IEnumerable<string> SplitAndKeep(this string value, StringSplitOptions options, params char[] delimiters) {
             return SplitAndKeep(value, int.MaxValue, options, delimiters);
         }
 
-        public static IEnumerable<string> SplitAndKeep(this string value, int maxCount, params char[] delimiters)
-        {
+        public static IEnumerable<string> SplitAndKeep(this string value, int maxCount, params char[] delimiters) {
             return SplitAndKeep(value, maxCount, StringSplitOptions.None, delimiters);
         }
 
@@ -144,39 +138,35 @@ namespace DotLogix.Core.Extensions {
             int nextSplitAt;
             var startIndex = 0;
             var count = 1;
-            while(count < maxCount && (nextSplitAt = value.IndexOfAny(delimiters, startIndex)) != -1) {
+            while((count < maxCount) && ((nextSplitAt = value.IndexOfAny(delimiters, startIndex)) != -1)) {
                 var substring = value.Substring(startIndex, nextSplitAt - startIndex);
-                if(options != StringSplitOptions.RemoveEmptyEntries || string.IsNullOrEmpty(substring) == false)
+                if((options != StringSplitOptions.RemoveEmptyEntries) || (string.IsNullOrEmpty(substring) == false))
                     yield return substring;
                 yield return value[nextSplitAt].ToString();
-                startIndex = nextSplitAt+1;
+                startIndex = nextSplitAt + 1;
                 count++;
             }
             yield return value.Substring(startIndex);
         }
-
         #endregion
 
         #region Parse
-
-        public static object ParseTo(this string value, Type targetType)
-        {
-            if (TryParseTo(value, targetType, out var convertedValue) == false)
+        public static object ParseTo(this string value, Type targetType) {
+            if(TryParseTo(value, targetType, out var convertedValue) == false) {
                 throw new
                 NotSupportedException($"Conversion between {value.GetType()} and {targetType} is not supported");
+            }
             return convertedValue;
         }
 
-        public static bool TryParseTo(this string value, Type targetType, out object target)
-        {
+        public static bool TryParseTo(this string value, Type targetType, out object target) {
             target = null;
             var dataType = targetType.ToDataType();
-            if ((dataType.Flags & DataTypeFlags.Primitive) == 0)
+            if((dataType.Flags & DataTypeFlags.Primitive) == 0)
                 return false;
 
             bool result;
-            switch (dataType.Flags & DataTypeFlags.PrimitiveMask)
-            {
+            switch(dataType.Flags & DataTypeFlags.PrimitiveMask) {
                 case DataTypeFlags.Guid:
                     result = Guid.TryParse(value, out var guid);
                     target = guid;
@@ -259,17 +249,14 @@ namespace DotLogix.Core.Extensions {
             return result;
         }
 
-        public static TTarget ParseTo<TTarget>(this string value)
-        {
+        public static TTarget ParseTo<TTarget>(this string value) {
             var targetType = typeof(TTarget);
             return (TTarget)ParseTo(value, targetType);
         }
 
-        public static bool TryParseTo<TTarget>(this string value, out TTarget target)
-        {
+        public static bool TryParseTo<TTarget>(this string value, out TTarget target) {
             var targetType = typeof(TTarget);
-            if (TryParseTo(value, targetType, out var convertedValue))
-            {
+            if(TryParseTo(value, targetType, out var convertedValue)) {
                 target = (TTarget)convertedValue;
                 return true;
             }

@@ -58,9 +58,7 @@ namespace DotLogix.UI.Animations {
             return Math.Abs(to.Value - from.Value);
         }
 
-        bool IAnimationHelper<GridLength>.IsAccumulable {
-            get { return true; }
-        }
+        bool IAnimationHelper<GridLength>.IsAccumulable => true;
         #endregion IAnimationHelper
     }
 }

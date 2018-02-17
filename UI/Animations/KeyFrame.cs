@@ -60,8 +60,8 @@ namespace DotLogix.UI.Animations {
         ///     The value that associated animation should reach at KeyTime.
         /// </summary>
         public TValue Value {
-            get { return (TValue)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
+            get => (TValue)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
         }
 
         #region IKeyFrame
@@ -69,13 +69,13 @@ namespace DotLogix.UI.Animations {
         ///     The time at which associated animation value should be equal to the Value property.
         /// </summary>
         public KeyTime KeyTime {
-            get { return (KeyTime)GetValue(KeyTimeProperty); }
-            set { SetValue(KeyTimeProperty, value); }
+            get => (KeyTime)GetValue(KeyTimeProperty);
+            set => SetValue(KeyTimeProperty, value);
         }
 
         object IKeyFrame.Value {
-            get { return Value; }
-            set { Value = (TValue)value; }
+            get => Value;
+            set => Value = (TValue)value;
         }
         #endregion
         #endregion

@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  Cache.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  09.02.2018
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -16,21 +16,19 @@ using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Caching {
     public class Cache<TKey, TValue> : ICache<TKey, TValue> {
-        public event EventHandler<CacheItemsDiscardedEventArgs<TKey, TValue>> ItemsDiscarded;
-        private readonly Timer _cleanupTimer;
         private readonly ConcurrentDictionary<TKey, CacheItem<TKey, TValue>> _cacheItems = new ConcurrentDictionary<TKey, CacheItem<TKey, TValue>>();
+        private readonly Timer _cleanupTimer;
 
-
-        public void Dispose() {
-            _cleanupTimer.Dispose();
-        }
-
-        public Cache(int checkPolicyInterval) : this(TimeSpan.FromMilliseconds(checkPolicyInterval)){
-        }
+        public Cache(int checkPolicyInterval) : this(TimeSpan.FromMilliseconds(checkPolicyInterval)) { }
 
         public Cache(TimeSpan checkPolicyInterval) {
             CheckPolicyInterval = checkPolicyInterval;
             _cleanupTimer = new Timer(state => Cleanup(), null, CheckPolicyInterval, CheckPolicyInterval);
+        }
+
+
+        public void Dispose() {
+            _cleanupTimer.Dispose();
         }
 
         public TimeSpan CheckPolicyInterval { get; }
@@ -63,14 +61,14 @@ namespace DotLogix.Core.Caching {
 
         public bool TryPop(TKey key, out TValue value) {
             value = default(TValue);
-            if (_cacheItems.TryRemove(key, out var item) == false)
+            if(_cacheItems.TryRemove(key, out var item) == false)
                 return false;
             value = item.Value;
             return true;
         }
 
         public bool Discard(TKey key) {
-            if (_cacheItems.TryRemove(key, out var item) == false)
+            if(_cacheItems.TryRemove(key, out var item) == false)
                 return false;
 
             ItemsDiscarded?.Invoke(null, new CacheItemsDiscardedEventArgs<TKey, TValue>(item.ToSingleElementArray()));
@@ -78,13 +76,13 @@ namespace DotLogix.Core.Caching {
         }
 
         public void Cleanup() {
-            if (_cacheItems.IsEmpty)
+            if(_cacheItems.IsEmpty)
                 return;
 
             var utcNow = DateTime.UtcNow;
             var discardedItems = new List<CacheItem<TKey, TValue>>();
             foreach(var cacheItem in _cacheItems.Values) {
-                if(cacheItem.Policy == null || cacheItem.Policy.HasExpired(utcNow) == false)
+                if((cacheItem.Policy == null) || (cacheItem.Policy.HasExpired(utcNow) == false))
                     continue;
 
                 discardedItems.Add(cacheItem);
@@ -94,5 +92,7 @@ namespace DotLogix.Core.Caching {
             if(discardedItems.Count > 0)
                 ItemsDiscarded?.Invoke(null, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems));
         }
+
+        public event EventHandler<CacheItemsDiscardedEventArgs<TKey, TValue>> ItemsDiscarded;
     }
 }

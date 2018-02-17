@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodesTest.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
 using DotLogix.Core.Nodes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endregion
 
-namespace Test
-{
+namespace Test {
     [TestClass]
-    public class NodesTest
-    {
+    public class NodesTest {
         [TestMethod]
         public void ValueNodeTest() {
             var nodeValue = new NodeValue("TestNode", "1");
@@ -21,8 +24,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void MapNodeTest()
-        {
+        public void MapNodeTest() {
             var nodeMap = new NodeMap("TestNode");
             var valueNode = nodeMap.CreateChild<NodeValue>("TestValueNode");
             valueNode.Value = "1";
@@ -34,8 +36,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void ListNodeTest()
-        {
+        public void ListNodeTest() {
             var nodeList = new NodeList("TestNode");
             var valueNode = nodeList.CreateChild<NodeValue>();
             valueNode.Value = "1";
@@ -48,13 +49,12 @@ namespace Test
         }
 
         [TestMethod]
-        public void MapNodeNavigationTest()
-        {
+        public void MapNodeNavigationTest() {
             var nodeMap = new NodeMap("TestNode");
             var valueNode1 = nodeMap.CreateChild<NodeValue>("TestValueNode1");
             var valueNode2 = nodeMap.CreateChild<NodeValue>("TestValueNode2");
             var valueNode3 = nodeMap.CreateChild<NodeValue>("TestValueNode3");
-            
+
             Assert.AreEqual(valueNode1.Previous, null);
             Assert.AreEqual(valueNode1.Next, valueNode2);
 
@@ -85,8 +85,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void ListNodeNavigationTest()
-        {
+        public void ListNodeNavigationTest() {
             var nodeList = new NodeList("TestNode");
             var valueNode1 = nodeList.CreateChild<NodeValue>();
             var valueNode2 = nodeList.CreateChild<NodeValue>();
@@ -133,8 +132,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void NodeSelectTest()
-        {
+        public void NodeSelectTest() {
             var node1 = new NodeMap("1");
             var node11 = node1.CreateChild<NodeMap>("11");
             var node12 = node1.CreateChild<NodeList>("12");
@@ -165,11 +163,11 @@ namespace Test
             var testClassInstance = new TestClass {
                                                       Property1 = null,
                                                       Property2 = 1,
-                                                      Property3 = new TestNestedClass(){
-                                                                      Property1 = "TestString2",
-                                                                      Property2 = 2,
-                                                                      Property3 = new[] {1,2,3}
-                                                                  }
+                                                      Property3 = new TestNestedClass {
+                                                                                          Property1 = "TestString2",
+                                                                                          Property2 = 2,
+                                                                                          Property3 = new[] {1, 2, 3}
+                                                                                      }
                                                   };
 
             var node = Nodes.ToNode(testClassInstance);
@@ -208,8 +206,7 @@ namespace Test
             public TestNestedClass Property3 { get; set; }
         }
 
-        public class TestNestedClass
-        {
+        public class TestNestedClass {
             public string Property1 { get; set; }
             public int Property2 { get; set; }
             public int[] Property3 { get; set; }

@@ -32,9 +32,7 @@ namespace DotLogix.UI.Animations {
             return GetCurrentValueCore((TValue)defaultOriginValue, (TValue)defaultDestinationValue, animationClock);
         }
 
-        public sealed override Type TargetPropertyType {
-            get { return typeof(TValue); }
-        }
+        public sealed override Type TargetPropertyType => typeof(TValue);
         #endregion
     }
 }

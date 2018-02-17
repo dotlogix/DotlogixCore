@@ -59,9 +59,7 @@ namespace DotLogix.UI.Animations {
                    _helper.GetSegmentLength(from.BottomLeft, to.BottomLeft);
         }
 
-        bool IAnimationHelper<CornerRadius>.IsAccumulable {
-            get { return true; }
-        }
+        bool IAnimationHelper<CornerRadius>.IsAccumulable => true;
         #endregion IAnimationHelper
     }
 }

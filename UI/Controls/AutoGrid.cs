@@ -73,38 +73,38 @@ namespace DotLogix.UI.Controls {
                                                                                                     (default(double)));
 
         public double ItemPadding {
-            get { return (double)GetValue(ItemPaddingProperty); }
-            set { SetValue(ItemPaddingProperty, value); }
+            get => (double)GetValue(ItemPaddingProperty);
+            set => SetValue(ItemPaddingProperty, value);
         }
 
         public double MinItemWidth {
-            get { return (double)GetValue(MinItemWidthProperty); }
-            set { SetValue(MinItemWidthProperty, value); }
+            get => (double)GetValue(MinItemWidthProperty);
+            set => SetValue(MinItemWidthProperty, value);
         }
 
         public double MaxItemWidth {
-            get { return (double)GetValue(MaxItemWidthProperty); }
-            set { SetValue(MaxItemWidthProperty, value); }
+            get => (double)GetValue(MaxItemWidthProperty);
+            set => SetValue(MaxItemWidthProperty, value);
         }
 
         public double MinItemHeight {
-            get { return (double)GetValue(MinItemHeightProperty); }
-            set { SetValue(MinItemHeightProperty, value); }
+            get => (double)GetValue(MinItemHeightProperty);
+            set => SetValue(MinItemHeightProperty, value);
         }
 
         public double MaxItemHeight {
-            get { return (double)GetValue(MaxItemHeightProperty); }
-            set { SetValue(MaxItemHeightProperty, value); }
+            get => (double)GetValue(MaxItemHeightProperty);
+            set => SetValue(MaxItemHeightProperty, value);
         }
 
         public bool LimitToChildCount {
-            get { return (bool)GetValue(LimitToChildCountProperty); }
-            set { SetValue(LimitToChildCountProperty, value); }
+            get => (bool)GetValue(LimitToChildCountProperty);
+            set => SetValue(LimitToChildCountProperty, value);
         }
 
         public Orientation Orientation {
-            get { return (Orientation)GetValue(OrientationProperty); }
-            set { SetValue(OrientationProperty, value); }
+            get => (Orientation)GetValue(OrientationProperty);
+            set => SetValue(OrientationProperty, value);
         }
 
         protected override Size MeasureOverride(Size availableSize) {

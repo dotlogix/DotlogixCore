@@ -1,4 +1,14 @@
-﻿using DotLogix.Core.Reflection.Delegates;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  EqualityCheckProjection.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  06.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using DotLogix.Core.Reflection.Delegates;
+#endregion
 
 namespace DotLogix.Core.Reflection.Projections {
     public class EqualityCheckProjection : Projection {
@@ -11,7 +21,7 @@ namespace DotLogix.Core.Reflection.Projections {
         }
 
         public override void ProjectRightToLeft(object left, object right) {
-            if (ShouldProject(left, right, out _, out var rightValue))
+            if(ShouldProject(left, right, out _, out var rightValue))
                 LeftSetter.Invoke(left, rightValue);
         }
 

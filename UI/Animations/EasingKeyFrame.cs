@@ -59,8 +59,8 @@ namespace DotLogix.UI.Animations {
         ///     Defines modifier of the animation progress.
         /// </summary>
         public IEasingFunction EasingFunction {
-            get { return (IEasingFunction)GetValue(EasingFunctionProperty); }
-            set { SetValue(EasingFunctionProperty, value); }
+            get => (IEasingFunction)GetValue(EasingFunctionProperty);
+            set => SetValue(EasingFunctionProperty, value);
         }
         #endregion
     }

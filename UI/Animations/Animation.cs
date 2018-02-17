@@ -161,32 +161,32 @@ namespace DotLogix.UI.Animations {
         ///     Defines Animation starting value
         /// </summary>
         public TNullableValue From {
-            get { return (TNullableValue)GetValue(FromProperty); }
-            set { SetValue(FromProperty, value); }
+            get => (TNullableValue)GetValue(FromProperty);
+            set => SetValue(FromProperty, value);
         }
 
         /// <summary>
         ///     Defines Animation ending value
         /// </summary>
         public TNullableValue To {
-            get { return (TNullableValue)GetValue(ToProperty); }
-            set { SetValue(ToProperty, value); }
+            get => (TNullableValue)GetValue(ToProperty);
+            set => SetValue(ToProperty, value);
         }
 
         /// <summary>
         ///     Defines Animation step value
         /// </summary>
         public TNullableValue By {
-            get { return (TNullableValue)GetValue(ByProperty); }
-            set { SetValue(ByProperty, value); }
+            get => (TNullableValue)GetValue(ByProperty);
+            set => SetValue(ByProperty, value);
         }
 
         /// <summary>
         ///     Defines modifier of the animation progress.
         /// </summary>
         public IEasingFunction EasingFunction {
-            get { return (IEasingFunction)GetValue(EasingFunctionProperty); }
-            set { SetValue(EasingFunctionProperty, value); }
+            get => (IEasingFunction)GetValue(EasingFunctionProperty);
+            set => SetValue(EasingFunctionProperty, value);
         }
 
         /// <summary>
@@ -194,8 +194,8 @@ namespace DotLogix.UI.Animations {
         ///     replacing it entirely.
         /// </summary>
         public bool IsAdditive {
-            get { return (bool)GetValue(IsAdditiveProperty); }
-            set { SetValue(IsAdditiveProperty, value); }
+            get => (bool)GetValue(IsAdditiveProperty);
+            set => SetValue(IsAdditiveProperty, value);
         }
 
         /// <summary>
@@ -204,8 +204,8 @@ namespace DotLogix.UI.Animations {
         ///     and 2.0 to 3.0 over the third, etc.
         /// </summary>
         public bool IsCumulative {
-            get { return (bool)GetValue(IsCumulativeProperty); }
-            set { SetValue(IsCumulativeProperty, value); }
+            get => (bool)GetValue(IsCumulativeProperty);
+            set => SetValue(IsCumulativeProperty, value);
         }
         #endregion
 

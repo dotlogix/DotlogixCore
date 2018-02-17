@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  AsyncWebRequestRouter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.01.2018
-// LastEdited:  01.02.2018
+// Created:  13.02.2018
+// LastEdited:  17.02.2018
 // ==================================================
 
 #region
@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotLogix.Core.Collections;
 using DotLogix.Core.Diagnostics;
-using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Server.Routes;
@@ -77,9 +76,8 @@ namespace DotLogix.Core.Rest.Server.Http {
                 }
                 asyncHttpContext.PreventAutoSend = true;
                 serverEvent.Subscribe(new WebServiceEventSubscription(asyncHttpContext, route, this));
-            } else {
+            } else
                 await HandleAsync(asyncHttpContext, route);
-            }
         }
 
         internal async Task HandleAsync(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route) {
@@ -122,7 +120,6 @@ namespace DotLogix.Core.Rest.Server.Http {
         }
 
         private async Task ProcessRequest(IWebServiceRoute route, WebRequestResult result) {
-
             #region PreProcess
             if(_globalPreProcessors.Count > 0)
                 await ExecuteProcessorsAsync(result, _globalPreProcessors);
@@ -173,8 +170,7 @@ namespace DotLogix.Core.Rest.Server.Http {
         #endregion
 
         #region Events
-        public WebServiceEvent AddServerEvent(string name)
-        {
+        public WebServiceEvent AddServerEvent(string name) {
             if(_serverEvents.ContainsKey(name))
                 throw new InvalidOperationException("Event names should be unique");
             var webServiceEvent = new WebServiceEvent(name);

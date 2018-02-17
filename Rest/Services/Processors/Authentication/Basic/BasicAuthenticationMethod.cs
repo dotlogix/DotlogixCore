@@ -1,7 +1,17 @@
-﻿using System.Threading.Tasks;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  BasicAuthenticationMethod.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  17.02.2018
+// ==================================================
+
+#region
+using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Processors.Authentication.Base;
+#endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Authentication.Basic {
     public class BasicAuthenticationMethod : AuthenticationMethodBase {
@@ -11,6 +21,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication.Basic {
         public BasicAuthenticationMethod(ValidateUserAsyncCallback callbackAsync) : base("Basic", "[username]:[password] encoded in bas64") {
             _callbackAsync = callbackAsync;
         }
+
         public override Task AuthenticateAsync(WebRequestResult webRequestResult, string data) {
             var dataSplit = data.FromBase64String().Split(':');
             if(dataSplit.Length == 2)

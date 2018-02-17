@@ -20,14 +20,13 @@ namespace DotLogix.Core.Nodes.Io
         public JsonNodesFormatter Formatter { get; }
 
 
-        public override INodeWriter BeginMap(string name = null)
+        public override void BeginMap(string name = null)
         {
             if (StateMachine.GoToState(NodeIoState.InsideMap, NodeIoOpCodes.BeginMap, NodeIoOpCodes.BeginAny | NodeIoOpCodes.EndMap) == false)
                 throw new InvalidOperationException($"{NodeIoOpCodes.BeginMap} operation in state {StateMachine.CurrentState} is not allowed");
 
             GoToNewChild(name, '{');
             _ancestorStack.Push(NodeTypes.Map);
-            return this;
         }
 
         public void WriteBeginCollection(string name, bool appendName, char beginChar)
@@ -79,21 +78,19 @@ namespace DotLogix.Core.Nodes.Io
             _isFirstChild = false;
         }
 
-        public override INodeWriter EndMap()
+        public override void EndMap()
         {
             GoToParent(NodeIoOpCodes.EndMap, '}');
             _isFirstChild = false;
-            return this;
         }
 
-        public override INodeWriter BeginList(string name = null)
+        public override void BeginList(string name = null)
         {
             if (StateMachine.GoToState(NodeIoState.InsideList, NodeIoOpCodes.BeginList, NodeIoOpCodes.BeginAny | NodeIoOpCodes.EndList) == false)
                 throw new InvalidOperationException($"{NodeIoOpCodes.BeginList} operation in state {StateMachine.CurrentState} is not allowed");
 
             GoToNewChild(name, '[');
             _ancestorStack.Push(NodeTypes.List);
-            return this;
         }
 
         private void GoToNewChild(string name, char beginChar) {
@@ -123,14 +120,13 @@ namespace DotLogix.Core.Nodes.Io
             _isFirstChild = true;
         }
 
-        public override INodeWriter EndList()
+        public override void EndList()
         {
             GoToParent(NodeIoOpCodes.EndList, ']');
             _isFirstChild = false;
-            return this;
         }
 
-        public override INodeWriter WriteValue(object value, string name = null)
+        public override void WriteValue(object value, string name = null)
         {
             if (StateMachine.IsAllowedOperation(NodeIoOpCodes.WriteValue) == false)
                 throw new InvalidOperationException($"{NodeIoOpCodes.WriteValue} operation in state {StateMachine.CurrentState} is not allowed");
@@ -163,7 +159,6 @@ namespace DotLogix.Core.Nodes.Io
             }
             WriteValue(name, value, appendName, Formatter);
             _isFirstChild = false;
-            return this;
         }
 
 

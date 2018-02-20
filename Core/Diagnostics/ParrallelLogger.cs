@@ -26,7 +26,7 @@ namespace DotLogix.Core.Diagnostics {
 
         public object SyncRoot { get; }
         public bool Initialized { get; private set; }
-        public LogLevels CurrentLogLevel { get; set; }
+        public LogLevels CurrentLogLevel { get; set; } = LogLevels.Off;
 
         private ParrallelLogger() {
             SyncRoot = new object();

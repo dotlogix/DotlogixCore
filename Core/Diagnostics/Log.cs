@@ -46,10 +46,24 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        public static void Trace(Func<string> messageFunc)
+        {
+            if (Logger.IsLoggingDisabled(LogLevels.Trace))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Trace, messageFunc.Invoke(), 2);
+            Logger.Log(logMessage);
+        }
+
         public static void Debug(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Debug))
                 return;
             var logMessage = CreateLogMessage(LogLevels.Debug, message, 2);
+            Logger.Log(logMessage);
+        }
+        public static void Debug(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Debug))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Debug, messageFunc.Invoke(), 2);
             Logger.Log(logMessage);
         }
 
@@ -75,6 +89,12 @@ namespace DotLogix.Core.Diagnostics {
             var logMessage = CreateLogMessage(LogLevels.Info, message, 2);
             Logger.Log(logMessage);
         }
+        public static void Info(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Info))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Info, messageFunc.Invoke(), 2);
+            Logger.Log(logMessage);
+        }
 
         public static void Warn(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Warning))
@@ -82,11 +102,23 @@ namespace DotLogix.Core.Diagnostics {
             var logMessage = CreateLogMessage(LogLevels.Warning, message, 2);
             Logger.Log(logMessage);
         }
+        public static void Warn(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Warning))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Warning, messageFunc.Invoke(), 2);
+            Logger.Log(logMessage);
+        }
 
         public static void Error(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Error))
                 return;
             var logMessage = CreateLogMessage(LogLevels.Error, message, 2);
+            Logger.Log(logMessage);
+        }
+        public static void Error(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Error))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Error, messageFunc.Invoke(), 2);
             Logger.Log(logMessage);
         }
 
@@ -129,6 +161,13 @@ namespace DotLogix.Core.Diagnostics {
                 return;
 
             var logMessage = CreateLogMessage(LogLevels.Critical, message, 2);
+            Logger.Log(logMessage);
+        }
+        public static void Critical(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Critical))
+                return;
+
+            var logMessage = CreateLogMessage(LogLevels.Critical, messageFunc.Invoke(), 2);
             Logger.Log(logMessage);
         }
 

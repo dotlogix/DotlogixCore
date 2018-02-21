@@ -3,27 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{211D84B7-E3BA-4FD6-9885-BAE2A7FB6D04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{211D84B7-E3BA-4FD6-9885-BAE2A7FB6D04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{8FB58B46-4358-48C0-A65D-698DCE460BC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{8FB58B46-4358-48C0-A65D-698DCE460BC6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Architecture", "Architecture", "{2159F71A-7537-4373-9688-DE477EA4D277}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{FA6C8EE1-FB74-44DC-B841-0BABFEA6C7A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{FA6C8EE1-FB74-44DC-B841-0BABFEA6C7A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{876D895F-869C-49EE-AF20-9EBB2E0A26CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{876D895F-869C-49EE-AF20-9EBB2E0A26CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.EntityFramework", "Infrastructure.EntityFramework\Infrastructure.EntityFramework.csproj", "{76D07B37-3B32-4545-8C70-D012FFB05AA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.EntityFramework", "Infrastructure.EntityFramework\Infrastructure.EntityFramework.csproj", "{76D07B37-3B32-4545-8C70-D012FFB05AA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodes", "Nodes\Nodes.csproj", "{089B5D0D-B58F-4857-BA7C-3B39F3675EEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nodes", "Nodes\Nodes.csproj", "{089B5D0D-B58F-4857-BA7C-3B39F3675EEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rest", "Rest\Rest.csproj", "{7250B0EC-D301-4510-9B24-460E25F760D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rest", "Rest\Rest.csproj", "{7250B0EC-D301-4510-9B24-460E25F760D9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{45DF1B7C-CB26-4C7F-8954-44FC6CE7BDE6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{C60696DD-1023-4020-9BC6-580E56AD9BD3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{8FFD68DD-8B64-43F8-98C9-C638ECAE31E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsServices", "WindowsServices\WindowsServices.csproj", "{C03B019E-2021-4D97-9D7D-E43429EC3779}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,10 @@ Global
 		{8FFD68DD-8B64-43F8-98C9-C638ECAE31E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FFD68DD-8B64-43F8-98C9-C638ECAE31E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FFD68DD-8B64-43F8-98C9-C638ECAE31E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C03B019E-2021-4D97-9D7D-E43429EC3779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C03B019E-2021-4D97-9D7D-E43429EC3779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C03B019E-2021-4D97-9D7D-E43429EC3779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C03B019E-2021-4D97-9D7D-E43429EC3779}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

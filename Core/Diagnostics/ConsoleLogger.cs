@@ -44,7 +44,7 @@ namespace DotLogix.Core.Diagnostics {
                     Console.ForegroundColor = ConsoleColor.Gray;
                     break;
                 case LogLevels.Debug:
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     break;
                 case LogLevels.Info:
                     Console.ForegroundColor = ConsoleColor.White;

@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
@@ -31,7 +32,15 @@ namespace DotLogix.Core.Diagnostics {
             return Logger.AttachLogger(loggers);
         }
 
+        public static bool AttachLoggers(IEnumerable<ILogger> loggers)
+        {
+            return Logger.AttachLogger(loggers);
+        }
+
         public static bool DetachLoggers(params ILogger[] loggers) {
+            return Logger.DetachLogger(loggers);
+        }
+        public static bool DetachLoggers(IEnumerable<ILogger> loggers) {
             return Logger.DetachLogger(loggers);
         }
 

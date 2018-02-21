@@ -37,6 +37,9 @@ namespace DotLogix.Core.Diagnostics {
         public override bool Initialize() {
             if(_logFileWriter != null)
                 return true;
+            if(System.IO.Directory.Exists(Directory) == false)
+                System.IO.Directory.CreateDirectory(Directory);
+
             _logFileWriter = new StreamWriter(LogFile);
             return true;
         }

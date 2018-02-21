@@ -26,6 +26,12 @@ namespace DotLogix.Core.Diagnostics {
         }
 
         public override bool Initialize() {
+            if(Console.WindowWidth == _consoleWidth
+               && Console.WindowHeight == _consoleHeight
+               && Console.BufferHeight == _bufferHeight
+               && Console.BufferWidth == _consoleWidth)
+                return true;
+
             Console.SetWindowSize(_consoleWidth, _consoleHeight);
             Console.SetBufferSize(_consoleWidth, _bufferHeight);
             return true;

@@ -59,8 +59,13 @@ namespace DotLogix.Core.Diagnostics {
                 if(Initialized)
                     return false;
                 Initialized = true;
-                if(_currentReceivers.Any(logger => !logger.Initialize()))
-                    return false;
+
+                if (_loggersChanged)
+                {
+                    _currentReceivers = _receivers.ToArray();
+                    if(_currentReceivers.All(l => l.Initialize()) == false)
+                        return false;
+                }
             }
             _loggingThread.Start();
             return true;
@@ -71,7 +76,7 @@ namespace DotLogix.Core.Diagnostics {
                 if(Initialized == false)
                     return false;
                 Initialized = false;
-                if(_currentReceivers.Any(logger => !logger.Shutdown()))
+                if (_currentReceivers.All(l => l.Shutdown()) == false)
                     return false;
             }
             _receiverWait.Set();
@@ -117,33 +122,41 @@ namespace DotLogix.Core.Diagnostics {
             }
         }
 
-        public bool AttachLogger(params ILogger[] receiver) {
-            if((receiver == null) || (receiver.Length == 0))
+        public bool AttachLogger(IEnumerable<ILogger> loggers) {
+            if(loggers == null)
+                return true;
+
+            var loggerList = loggers.ToList();
+            if(loggerList.Count == 0)
                 return true;
 
             lock(SyncRoot) {
                 var count = _receivers.Count;
-                _receivers.UnionWith(receiver);
+                _receivers.UnionWith(loggerList);
                 if(count == _receivers.Count)
                     return false;
                 _loggersChanged = true;
                 _receiverWait.Set();
             }
-            return true;
+            return loggerList.All(l => l.Initialize());
         }
 
-        public bool DetachLogger(params ILogger[] receiver) {
-            if((receiver == null) || (receiver.Length == 0))
+        public bool DetachLogger(IEnumerable<ILogger> loggers) {
+            if (loggers == null)
                 return true;
 
-            lock(SyncRoot) {
+            var loggerList = loggers.ToList();
+            if (loggerList.Count == 0)
+                return true;
+
+            lock (SyncRoot) {
                 var count = _receivers.Count;
-                _receivers.ExceptWith(receiver);
+                _receivers.ExceptWith(loggerList);
                 if(count == _receivers.Count)
                     return false;
                 _loggersChanged = true;
             }
-            return true;
+            return loggerList.All(l => l.Shutdown());
         }
 
         public bool IsLoggingEnabled(LogLevels logLevel) {
@@ -152,10 +165,6 @@ namespace DotLogix.Core.Diagnostics {
 
         public bool IsLoggingDisabled(LogLevels logLevel) {
             return CurrentLogLevel > logLevel;
-        }
-
-        ~ParrallelLogger() {
-            Shutdown();
         }
     }
 }

@@ -37,7 +37,6 @@ namespace TestApp {
             }
             watch.Stop();
             Console.WriteLine("Own: "+watch.Elapsed);
-
             watch.Start();
             for (int i = 0; i < iterations; i++)
             {

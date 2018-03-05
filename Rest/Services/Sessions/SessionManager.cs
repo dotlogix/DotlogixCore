@@ -56,16 +56,4 @@ namespace DotLogix.Core.Rest.Services.Sessions {
             SessionsDiscarded?.Invoke(this, new SessionDiscardedEventArgs<TSession>(e.DiscardedItems.Select(i => i.Value).ToList()));
         }
     }
-
-    public class SessionCachePolicy : ICachePolicy {
-        private readonly ISession _session;
-
-        public SessionCachePolicy(ISession session) {
-            _session = session;
-        }
-
-        public bool HasExpired(DateTime timeStampUtc) {
-            return timeStampUtc > _session.ValidUntilUtc;
-        }
-    }
 }

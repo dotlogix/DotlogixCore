@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  SortedCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  05.03.2018
 // ==================================================
 
 #region
@@ -17,8 +17,14 @@ namespace DotLogix.Core.Collections {
     public class SortedCollection<T> : ICollection<T>, IReadOnlyCollection<T> {
         private readonly IComparer<T> _comparer;
         private readonly List<T> _itemList = new List<T>();
+        private readonly object _lock = new object();
 
-        public T this[int index] => _itemList[index];
+        public T this[int index] {
+            get {
+                lock(_lock)
+                    return _itemList[index];
+            }
+        }
 
         public SortedCollection() : this(Comparer<T>.Default) { }
 
@@ -38,7 +44,10 @@ namespace DotLogix.Core.Collections {
         }
 
         public IEnumerator<T> GetEnumerator() {
-            return _itemList.GetEnumerator();
+            List<T> list;
+            lock(_lock)
+                list = _itemList;
+            return list.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
@@ -48,36 +57,47 @@ namespace DotLogix.Core.Collections {
         public void Add(T item) {
             if(item == null)
                 throw new ArgumentNullException(nameof(item));
-            _itemList.InsertSorted(item, _comparer);
+            lock(_lock)
+                _itemList.InsertSorted(item, _comparer);
         }
 
         public void Clear() {
-            _itemList.Clear();
+            lock(_lock)
+                _itemList.Clear();
         }
 
         public bool Contains(T item) {
             if(item == null)
                 throw new ArgumentNullException(nameof(item));
-            return _itemList.BinarySearch(item, _comparer) >= 0;
+            lock(_lock)
+                return _itemList.BinarySearch(item, _comparer) >= 0;
         }
 
         public void CopyTo(T[] array, int arrayIndex) {
-            _itemList.CopyTo(array);
+            lock(_lock)
+                _itemList.CopyTo(array);
         }
 
         public bool Remove(T item) {
             if(item == null)
                 throw new ArgumentNullException(nameof(item));
-            var index = _itemList.BinarySearch(item);
-            if(index >= 0) {
-                _itemList.RemoveAt(index);
-                return true;
+            lock(_lock) {
+                var index = _itemList.BinarySearch(item);
+                if(index >= 0) {
+                    _itemList.RemoveAt(index);
+                    return true;
+                }
+                return false;
             }
-            return false;
         }
 
-        public int Count => _itemList.Count;
+        public int Count {
+            get {
+                lock(_lock)
+                    return _itemList.Count;
+            }
+        }
 
-        bool ICollection<T>.IsReadOnly => ((ICollection<T>)_itemList).IsReadOnly;
+        bool ICollection<T>.IsReadOnly => false;
     }
 }

@@ -124,10 +124,6 @@ namespace DotLogix.Core.Extensions {
             return true;
         }
 
-        public static object GetDefaultValue(this Type type) {
-            return type.IsValueType ? Activator.CreateInstance(type) : null;
-        }
-
         public static IEnumerable<Type> GetBaseTypes(this Type type, bool autoOpenGenericType = false,
                                                      bool genericOnly = false) {
             type = type.BaseType;
@@ -166,6 +162,10 @@ namespace DotLogix.Core.Extensions {
 
         public static DataType ToDataType(this Type type) {
             return DataTypeConverter.Instance.GetDataType(type);
+        }
+
+        public static object GetDefaultValue(this Type type) {
+            return type.IsValueType ? type.CreateDefaultCtor()?.Invoke() : null;
         }
 
         public static object Instantiate(this Type type) {

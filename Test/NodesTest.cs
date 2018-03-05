@@ -180,7 +180,7 @@ namespace Test {
             var property2 = nodeMap.GetChild<NodeValue>("Property2");
             var property3 = nodeMap.GetChild<NodeMap>("Property3");
             Assert.IsNotNull(property1);
-            Assert.AreEqual(NodeTypes.Empty, property1.NodeType);
+            Assert.AreEqual(NodeTypes.Empty, property1.Type);
             Assert.IsNotNull(property2);
             Assert.IsNotNull(property3);
 

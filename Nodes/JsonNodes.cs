@@ -9,7 +9,7 @@
 #region
 using System;
 using System.Text;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 #endregion
 
 namespace DotLogix.Core.Nodes {
@@ -19,7 +19,7 @@ namespace DotLogix.Core.Nodes {
         #region ToNode
         public static Node ToNode(string json) {
             var reader = new JsonNodeReader(json);
-            var writer = new NodeWriter(false);
+            var writer = new NodeWriter();
             reader.CopyTo(writer);
             return writer.Root;
         }
@@ -49,7 +49,7 @@ namespace DotLogix.Core.Nodes {
         private static string ToJsonInternal(object instance, Type instanceType, JsonNodesFormatter formatter) {
             var builder = new StringBuilder(StringBuilderCapacity);
             var nodeWriter = new JsonNodeWriter(builder, formatter);
-            Nodes.WriteToInternal(null, instance, instanceType, nodeWriter);
+            Nodes.WriteTo(null, instance, instanceType, nodeWriter);
             return builder.ToString();
         }
         #endregion

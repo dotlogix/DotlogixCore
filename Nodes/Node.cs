@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 #endregion
 
 namespace DotLogix.Core.Nodes {
@@ -24,7 +24,7 @@ namespace DotLogix.Core.Nodes {
         private static readonly char[] PathSeperators = {PathSeperator, '/'};
         private NodeCollection _ancestor;
         internal string InternalName;
-        public NodeTypes NodeType { get; internal set; }
+        public NodeTypes Type { get; internal set; }
 
         public string Path {
             get {
@@ -40,7 +40,7 @@ namespace DotLogix.Core.Nodes {
                 while(nodeStack.Count > 0) {
                     stringBuilder.Append(PathSeperator);
                     var currentNode = nodeStack.Pop();
-                    switch(currentNode.Ancestor.NodeType) {
+                    switch(currentNode.Ancestor.Type) {
                         case NodeTypes.List:
                             stringBuilder.Append(currentNode.Index);
                             break;
@@ -81,8 +81,8 @@ namespace DotLogix.Core.Nodes {
         public Node Next { get; internal set; }
         public bool HasNext => Next != null;
 
-        protected Node(NodeTypes nodeType) {
-            NodeType = nodeType;
+        protected Node(NodeTypes type) {
+            Type = type;
         }
 
         public void Rename(string newName) {

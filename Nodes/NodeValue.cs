@@ -23,7 +23,7 @@ namespace DotLogix.Core.Nodes {
         public object Value {
             get => _value;
             set {
-                NodeType = value == null ? NodeTypes.Empty : NodeTypes.Value;
+                Type = value == null ? NodeTypes.Empty : NodeTypes.Value;
                 _value = value;
                 _dataType = null;
             }

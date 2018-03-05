@@ -11,7 +11,7 @@ using System;
 using DotLogix.Core.Extensions;
 #endregion
 
-namespace DotLogix.Core.Nodes.Io {
+namespace DotLogix.Core.Nodes.Processor {
     public class JsonParsingException : Exception {
         public int Position { get; }
         public int Line { get; }

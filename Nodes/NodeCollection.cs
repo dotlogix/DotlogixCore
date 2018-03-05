@@ -18,7 +18,7 @@ namespace DotLogix.Core.Nodes {
         protected List<Node> NodeList { get; } = new List<Node>();
         public int ChildCount => NodeList.Count;
 
-        protected NodeCollection(NodeTypes nodeType) : base(nodeType) { }
+        protected NodeCollection(NodeTypes type) : base(type) { }
 
 
         public virtual void AddChild(Node node) {

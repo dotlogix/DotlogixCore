@@ -61,6 +61,10 @@
       <Project>{FFBC7956-3A25-41BC-9AF4-5678089E1781}</Project>
       <Name>Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Nodes\Nodes.csproj">
+      <Project>{089b5d0d-b58f-4857-ba7c-3b39f3675eea}</Project>
+      <Name>Nodes</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

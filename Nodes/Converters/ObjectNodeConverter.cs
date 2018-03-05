@@ -10,7 +10,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
 #endregion
@@ -77,7 +77,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public override void Write(object instance, string rootName, INodeWriter writer) {
             writer.BeginMap(rootName);
             foreach(var accessor in _accessorsToRead)
-                Nodes.WriteToInternal(accessor.Name, accessor.GetValue(instance), accessor.ValueType, writer);
+                Nodes.WriteTo(accessor.Name, accessor.GetValue(instance), accessor.ValueType, writer);
             writer.EndMap();
         }
 

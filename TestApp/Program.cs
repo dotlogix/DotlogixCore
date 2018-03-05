@@ -8,7 +8,10 @@
 
 #region
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Server.Routes;
@@ -24,47 +27,33 @@ using DotLogix.Core.Rest.Services.Processors;
 namespace TestApp {
     internal class Program {
         private static void Main(string[] args) {
-            //var server = new WebServiceHost("http://127.0.0.1:1337/");
-            //server.RegisterService<TestService>();
+            object value=null;
+            var type = typeof(object);
+            Stopwatch watch = new Stopwatch();
+            int iterations = 10_000;
+            watch.Start();
+            for(int i = 0; i < iterations; i++) {
+                value = type.GetDefaultValue();
+            }
+            watch.Stop();
+            Console.WriteLine("Own: "+watch.Elapsed);
 
-            //server.Start();
-            //while(Console.ReadLine() != "stop") {
-            //    server.TriggerServerEventAsync("TriggerAdd");
-            //}
-
-            //server.Stop();
-
-            var rout = new PatternWebServiceRoute(0, "<<test:g>>/<<id:n>>", HttpMethods.Get, new Auth(), 0);
+            watch.Start();
+            for (int i = 0; i < iterations; i++)
+            {
+                value = Activator.CreateInstance(type);
+            }
+            watch.Stop();
+            Console.WriteLine("Theirs: " + watch.Elapsed);
+            Console.WriteLine(value.ToString());
             Console.Read();
         }
     }
 
-    public class TestService : WebServiceBase {
-        public TestService() : base("calc/", "calc") { }
-
-        [WebServiceEvent("TriggerAdd")]
-        public event EventHandler TriggerAdd;
-
-        [HttpGet]
-        [Auth]
-        [DynamicRoute("add")]
-        public int Add(int a, int b, int c = 0) {
-            return a + b + c;
-        }
-    }
-
-    public class Auth : PreProcessorAttribute, IWebRequestProcessor {
-        public int Priority { get; }
-        public bool IgnoreHandled { get; }
-
-        public Task ProcessAsync(WebRequestResult webRequestResult) {
-            if((webRequestResult.Context.Request.QueryParameters.TryGetParameterValue("auth", out var obj) == false) || (Equals(obj, "lol") == false))
-                webRequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, "Fuck you"));
-            return Task.CompletedTask;
-        }
-
-        public override IWebRequestProcessor CreateProcessor() {
-            return this;
-        }
+    internal class TestObj {
+        public string Name { get; set; } = "Test";
+        public int Int { get; set; } = 2;
+        public bool Bool { get; set; } = true;
+        public byte[] ByteArray { get; set; } = {1,2,3,4,5};
     }
 }

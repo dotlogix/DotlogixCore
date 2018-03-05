@@ -8,7 +8,7 @@
 
 #region
 using System;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
 
@@ -17,7 +17,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public ValueNodeConverter(DataType dynamicType) : base(dynamicType) { }
 
         public override void Write(object instance, string rootName, INodeWriter writer) {
-            writer.WriteValue(instance, rootName);
+            writer.WriteValue(rootName, instance);
         }
 
         public override object ConvertToObject(Node node) {

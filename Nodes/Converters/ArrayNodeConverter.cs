@@ -10,7 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
 
@@ -25,7 +25,7 @@ namespace DotLogix.Core.Nodes.Converters {
 
             writer.BeginList(rootName);
             foreach(var value in values)
-                Nodes.WriteToInternal(null, value, _elementType, writer);
+                Nodes.WriteTo(null, value, _elementType, writer);
             writer.EndList();
         }
 

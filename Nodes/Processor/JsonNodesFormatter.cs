@@ -10,7 +10,7 @@
 using System;
 #endregion
 
-namespace DotLogix.Core.Nodes.Io {
+namespace DotLogix.Core.Nodes.Processor {
     public class JsonNodesFormatter {
         private static JsonNodesFormatter _defaultFormatter = new JsonNodesFormatter();
         public string EnumFormat { get; set; }

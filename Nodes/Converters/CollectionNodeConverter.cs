@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
 #endregion
@@ -43,7 +43,7 @@ namespace DotLogix.Core.Nodes.Converters {
                 throw new ArgumentException("Instance is not type of IEnumerable<T>");
             writer.BeginList(rootName);
             foreach(var value in values)
-                Nodes.WriteToInternal(null, value, _elementType, writer);
+                Nodes.WriteTo(null, value, _elementType, writer);
             writer.EndList();
         }
 

@@ -9,7 +9,7 @@
 #region
 using System;
 using System.Reflection;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
 #endregion
@@ -35,8 +35,8 @@ namespace DotLogix.Core.Nodes.Converters {
             var valueFieldValue = _valueField.GetValue(instance);
 
             writer.BeginMap(rootName);
-            Nodes.WriteToInternal(KeyNodeName, keyFieldValue, _keyField.ValueType, writer);
-            Nodes.WriteToInternal(ValueNodeName, valueFieldValue, _valueField.ValueType, writer);
+            Nodes.WriteTo(KeyNodeName, keyFieldValue, _keyField.ValueType, writer);
+            Nodes.WriteTo(ValueNodeName, valueFieldValue, _valueField.ValueType, writer);
             writer.EndMap();
         }
 

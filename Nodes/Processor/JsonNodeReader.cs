@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 #endregion
 
-namespace DotLogix.Core.Nodes.Io {
+namespace DotLogix.Core.Nodes.Processor {
     public class JsonNodeReader : NodeReaderBase {
         [Flags]
         public enum JsonCharacter {
@@ -34,7 +34,7 @@ namespace DotLogix.Core.Nodes.Io {
         }
 
         public override void CopyTo(INodeWriter nodeWriter) {
-            var stateStack = new Stack<NodeIoState>();
+            var stateStack = new Stack<NodeContainerType>();
             var json = _json;
             string name = null;
             var allowedCharacters = JsonCharacter.OpenObject | JsonCharacter.OpenList | JsonCharacter.String | JsonCharacter.Other | JsonCharacter.End;
@@ -53,12 +53,12 @@ namespace DotLogix.Core.Nodes.Io {
                         name = null;
 
                         allowedCharacters = JsonCharacter.String | JsonCharacter.CloseObject;
-                        stateStack.Push(NodeIoState.InsideMap);
+                        stateStack.Push(NodeContainerType.Map);
 
                         continue;
                     case JsonCharacter.CloseObject:
                     case JsonCharacter.CloseList:
-                        if(stateStack.Pop() == NodeIoState.InsideMap)
+                        if(stateStack.Pop() == NodeContainerType.Map)
                             nodeWriter.EndMap();
                         else
                             nodeWriter.EndList();
@@ -68,7 +68,7 @@ namespace DotLogix.Core.Nodes.Io {
                             continue;
                         }
 
-                        allowedCharacters = stateStack.Peek() == NodeIoState.InsideMap
+                        allowedCharacters = stateStack.Peek() == NodeContainerType.Map
                                                 ? JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject
                                                 : JsonCharacter.ValueDelimiter | JsonCharacter.CloseList;
                         continue;
@@ -77,19 +77,19 @@ namespace DotLogix.Core.Nodes.Io {
                         name = null;
 
                         allowedCharacters = JsonCharacter.OpenObject | JsonCharacter.OpenList | JsonCharacter.String | JsonCharacter.Other | JsonCharacter.CloseList;
-                        stateStack.Push(NodeIoState.InsideList);
+                        stateStack.Push(NodeContainerType.List);
                         continue;
                     case JsonCharacter.String:
                         i++;
                         var str = NextJsonString(json, ref i);
-                        if((stateStack.Peek() == NodeIoState.InsideMap) && (name == null)) {
+                        if((stateStack.Peek() == NodeContainerType.Map) && (name == null)) {
                             name = str;
                             allowedCharacters = JsonCharacter.ValueAssignment;
                             continue;
                         }
-                        nodeWriter.WriteValue(str, name);
+                        nodeWriter.WriteValue(name, str);
                         name = null;
-                        allowedCharacters = stateStack.Peek() == NodeIoState.InsideMap
+                        allowedCharacters = stateStack.Peek() == NodeContainerType.Map
                                                 ? JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject
                                                 : JsonCharacter.ValueDelimiter | JsonCharacter.CloseList;
                         continue;
@@ -97,15 +97,15 @@ namespace DotLogix.Core.Nodes.Io {
                         allowedCharacters = JsonCharacter.OpenObject | JsonCharacter.OpenList | JsonCharacter.String | JsonCharacter.Other;
                         continue;
                     case JsonCharacter.ValueDelimiter:
-                        allowedCharacters = stateStack.Peek() == NodeIoState.InsideMap
+                        allowedCharacters = stateStack.Peek() == NodeContainerType.Map
                                                 ? JsonCharacter.String
                                                 : JsonCharacter.OpenObject | JsonCharacter.OpenList | JsonCharacter.String | JsonCharacter.Other;
                         continue;
                     case JsonCharacter.Other:
                         var value = NextJsonValue(json, ref i);
-                        nodeWriter.WriteValue(value, name);
+                        nodeWriter.WriteValue(name, value);
                         name = null;
-                        allowedCharacters = stateStack.Peek() == NodeIoState.InsideMap
+                        allowedCharacters = stateStack.Peek() == NodeContainerType.Map
                                                 ? JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject
                                                 : JsonCharacter.ValueDelimiter | JsonCharacter.CloseList;
                         i--;
@@ -171,9 +171,8 @@ namespace DotLogix.Core.Nodes.Io {
                             throw new JsonParsingException(pos, json, $"The character {current} is not allowed in the current state. Maybe your string is not escaped correctly");
                         continue;
                     case '\"':
-                        var value = new string(json, pos, i - pos);
                         pos = i;
-                        return value;
+                        return JsonStrings.UnescapeJsonString(json, pos, i-pos);
                     case '\\':
                         escaped = true;
                         break;

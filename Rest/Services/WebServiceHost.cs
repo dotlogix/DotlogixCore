@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  WebServiceHost.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  05.03.2018
 // ==================================================
 
 #region
@@ -16,7 +16,6 @@ using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Attributes;
 using DotLogix.Core.Rest.Services.Attributes.Events;
 using DotLogix.Core.Rest.Services.Attributes.Routes;
-using DotLogix.Core.Rest.Services.Processors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
@@ -24,6 +23,9 @@ namespace DotLogix.Core.Rest.Services {
         private readonly AsyncWebRequestRouter _router;
         private int _currentRouteIndex;
         public IAsyncHttpServer Server { get; }
+        public WebRequestProcessorCollection GlobalPreProcessors => _router.GlobalPreProcessors;
+        public WebRequestProcessorCollection GlobalPostProcessors => _router.GlobalPostProcessors;
+        public WebServiceEventCollection ServerEvents => _router.ServerEvents;
 
         public WebServiceHost(ConcurrencyOptions concurrencyOptions = null) {
             _router = new AsyncWebRequestRouter();
@@ -52,21 +54,13 @@ namespace DotLogix.Core.Rest.Services {
             _router.DefaultResultWriter = writer;
         }
 
-        #region Processors
-        public void AddGlobalPreProcessor(IWebRequestProcessor preProcessor) {
-            _router.AddGlobalPreProcessor(preProcessor);
-        }
 
-        public void RemoveGlobalPreProcessor(IWebRequestProcessor preProcessor) {
-            _router.RemoveGlobalPreProcessor(preProcessor);
-        }
+        #region Events
+        public Task TriggerEventAsync(string name, WebServiceEventArgs eventArgs) {
+            if(_router.ServerEvents.TryGetValue(name, out var webServiceEvent) == false)
+                throw new ArgumentException($"Event {name} is not defined", nameof(name));
 
-        public void AddGlobalPostProcessor(IWebRequestProcessor postProcessor) {
-            _router.AddGlobalPostProcessor(postProcessor);
-        }
-
-        public void RemoveGlobalPostProcessor(IWebRequestProcessor postProcessor) {
-            _router.RemoveGlobalPostProcessor(postProcessor);
+            return webServiceEvent.TriggerAsync(this, eventArgs);
         }
         #endregion
 
@@ -98,7 +92,7 @@ namespace DotLogix.Core.Rest.Services {
                 foreach(var postProcessorAttribute in methodInfo.GetCustomAttributes<PostProcessorAttribute>())
                     serviceRoute.AddPostProcessor(postProcessorAttribute.CreateProcessor());
 
-                _router.AddServerRoute(serviceRoute);
+                _router.ServerRoutes.Add(serviceRoute);
                 count++;
             }
             if(count > 0)
@@ -108,15 +102,18 @@ namespace DotLogix.Core.Rest.Services {
             count = 0;
             var events = serviceType.GetEvents();
             foreach(var eventInfo in events) {
-                var eventAttribute = eventInfo.GetCustomAttribute<WebServiceEventAttribute>();
+                var eventAttribute = eventInfo.GetCustomAttribute<WebServiceEventAttributeBase>();
                 if(eventAttribute == null)
                     continue;
 
-                var serviceEvent = _router.GetOrAddServerEvent(eventAttribute.Name);
+                var serviceEvent = eventAttribute.CreateEvent();
 
-                async void TriggerEvent(object sender, EventArgs args) => await serviceEvent.TriggerEventAsync();
+                if(_router.ServerEvents.TryAdd(serviceEvent) == false)
+                    throw new InvalidOperationException($"An event with name {serviceEvent.Name} is already defined");
 
-                eventInfo.GetAddMethod().CreateDynamicInvoke().Invoke(serviceInstance, (EventHandler)TriggerEvent);
+                async void TriggerEvent(object sender, WebServiceEventArgs args) => await serviceEvent.TriggerAsync(sender, args);
+
+                eventInfo.GetAddMethod().CreateDynamicInvoke().Invoke(serviceInstance, (EventHandler<WebServiceEventArgs>)TriggerEvent);
                 count++;
             }
 
@@ -126,25 +123,6 @@ namespace DotLogix.Core.Rest.Services {
 
         public void RegisterService<TService>() where TService : class, IWebService, new() {
             RegisterService(new TService());
-        }
-        #endregion
-
-
-        #region Events
-        public WebServiceEvent AddServerEvent(string name) {
-            return _router.AddServerEvent(name);
-        }
-
-        public WebServiceEvent GetServerEvent(string name) {
-            return _router.GetServerEvent(name);
-        }
-
-        public WebServiceEvent GetOrAddServerEvent(string name) {
-            return _router.GetOrAddServerEvent(name);
-        }
-
-        public Task TriggerServerEventAsync(string name) {
-            return _router.TriggerServerEventAsync(name);
         }
         #endregion
     }

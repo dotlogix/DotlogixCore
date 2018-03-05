@@ -7,16 +7,17 @@
 // ==================================================
 
 #region
-using System;
+using System.Reflection;
+using DotLogix.Core.Extensions;
+using DotLogix.Core.Reflection.Dynamics;
+using DotLogix.Core.Rest.Server.Http;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Attributes.Events {
-    [AttributeUsage(AttributeTargets.Event)]
-    public class WebServiceEventAttribute : Attribute {
-        public string Name { get; }
-
-        public WebServiceEventAttribute(string name) {
-            Name = name;
+    public class WebServiceEventAttribute : WebServiceEventAttributeBase {
+        public WebServiceEventAttribute(string name) : base(name) { }
+        public override IWebServiceEvent CreateEvent() {
+            return new WebServiceEvent(Name);
         }
     }
 }

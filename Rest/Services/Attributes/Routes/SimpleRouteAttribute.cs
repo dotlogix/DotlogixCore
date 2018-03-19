@@ -15,7 +15,7 @@ using DotLogix.Core.Rest.Services.Processors.Base;
 
 namespace DotLogix.Core.Rest.Services.Attributes.Routes {
     public class SimpleRouteAttribute : RouteBaseAttribute {
-        public SimpleRouteAttribute(string pattern = "", RouteType routeType = RouteType.StartsWith) : base(pattern, routeType) { }
+        public SimpleRouteAttribute(string pattern = "", RouteType routeType = RouteType.StartsWith, int priority=0) : base(pattern, routeType, priority) { }
 
         protected override IWebRequestProcessor CreateProcessor(IWebService serviceInstance, DynamicInvoke dynamicInvoke) {
             return new WebRequestProcessor(serviceInstance, dynamicInvoke);

@@ -15,14 +15,14 @@ using DotLogix.Core.Rest.Services.Processors.Json;
 
 namespace DotLogix.Core.Rest.Services.Attributes.Routes {
     public class JsonRouteAttribute : RouteBaseAttribute {
-        public JsonRouteAttribute(string pattern = "", RouteType routeType = RouteType.StartsWith) : base(pattern, routeType) { }
+        public JsonRouteAttribute(string pattern = "", RouteType routeType = RouteType.StartsWith, int priority=0) : base(pattern, routeType, priority) { }
 
         protected override IWebRequestProcessor CreateProcessor(IWebService serviceInstance, DynamicInvoke dynamicInvoke) {
             return new JsonWebRequestProcessor(serviceInstance, dynamicInvoke);
         }
 
         protected override void RegisterInitialProcessors(IWebServiceRoute route) {
-            route.AddPreProcessor(ParseJsonBodyPreProcessor.Instance);
+            route.PreProcessors.Add(ParseJsonBodyPreProcessor.Instance);
             base.RegisterInitialProcessors(route);
         }
     }

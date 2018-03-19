@@ -49,6 +49,9 @@ namespace DotLogix.Core.Rest.Services.Sessions {
         public void RenewSession(TSession session) {
             session.Renew(DateTime.UtcNow + SessionTimeout);
         }
+        public void DiscardSession(Guid token) {
+            _activeSessions.Discard(token);
+        }
 
         public event EventHandler<SessionDiscardedEventArgs<TSession>> SessionsDiscarded;
 

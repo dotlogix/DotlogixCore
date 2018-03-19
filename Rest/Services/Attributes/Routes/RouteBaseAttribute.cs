@@ -17,7 +17,7 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
     public abstract class RouteBaseAttribute : RouteAttribute {
         public RouteType RouteType { get; }
 
-        protected RouteBaseAttribute(string pattern, RouteType routeType) : base(pattern) {
+        protected RouteBaseAttribute(string pattern, RouteType routeType, int priority=0) : base(pattern, priority) {
             RouteType = routeType;
         }
 

@@ -87,10 +87,10 @@ namespace DotLogix.Core.Rest.Services {
                     continue;
 
                 foreach(var preProcessorAttribute in methodInfo.GetCustomAttributes<PreProcessorAttribute>())
-                    serviceRoute.AddPreProcessor(preProcessorAttribute.CreateProcessor());
+                    serviceRoute.PreProcessors.Add(preProcessorAttribute.CreateProcessor());
 
                 foreach(var postProcessorAttribute in methodInfo.GetCustomAttributes<PostProcessorAttribute>())
-                    serviceRoute.AddPostProcessor(postProcessorAttribute.CreateProcessor());
+                    serviceRoute.PostProcessors.Add(postProcessorAttribute.CreateProcessor());
 
                 _router.ServerRoutes.Add(serviceRoute);
                 count++;

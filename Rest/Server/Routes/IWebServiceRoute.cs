@@ -14,8 +14,8 @@ using DotLogix.Core.Rest.Services.Processors;
 
 namespace DotLogix.Core.Rest.Server.Routes {
     public interface IWebServiceRoute {
-        IReadOnlyCollection<IWebRequestProcessor> PreProcessors { get; }
-        IReadOnlyCollection<IWebRequestProcessor> PostProcessors { get; }
+        WebRequestProcessorCollection PreProcessors { get; }
+        WebRequestProcessorCollection PostProcessors { get; }
         IWebRequestProcessor RequestProcessor { get; }
         IWebRequestResultWriter WebRequestResultWriter { get; }
 
@@ -23,10 +23,6 @@ namespace DotLogix.Core.Rest.Server.Routes {
         int RouteIndex { get; }
         int Priority { get; }
         HttpMethods AcceptedRequests { get; }
-        void AddPreProcessor(IWebRequestProcessor preProcessor);
-        void RemovePreProcessor(IWebRequestProcessor preProcessor);
-        void AddPostProcessor(IWebRequestProcessor postProcessor);
-        void RemovePostProcessor(IWebRequestProcessor postProcessor);
         RouteMatch Match(HttpMethods method, string path);
     }
 }

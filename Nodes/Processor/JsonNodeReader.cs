@@ -171,8 +171,9 @@ namespace DotLogix.Core.Nodes.Processor {
                             throw new JsonParsingException(pos, json, $"The character {current} is not allowed in the current state. Maybe your string is not escaped correctly");
                         continue;
                     case '\"':
+                        var str = JsonStrings.UnescapeJsonString(json, pos, i-1);
                         pos = i;
-                        return JsonStrings.UnescapeJsonString(json, pos, i-pos);
+                        return str;
                     case '\\':
                         escaped = true;
                         break;

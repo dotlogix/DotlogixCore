@@ -9,6 +9,8 @@
 #region
 using System;
 using System.Diagnostics;
+using System.Security;
+using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
@@ -22,37 +24,41 @@ using DotLogix.Core.Rest.Services.Attributes.Routes;
 using DotLogix.Core.Rest.Services.Base;
 using DotLogix.Core.Rest.Services.Exceptions;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Security;
 #endregion
 
 namespace TestApp {
     internal class Program {
         private static void Main(string[] args) {
-            object value=null;
-            var type = typeof(object);
-            Stopwatch watch = new Stopwatch();
-            int iterations = 10_000;
-            watch.Start();
-            for(int i = 0; i < iterations; i++) {
-                value = type.GetDefaultValue();
-            }
-            watch.Stop();
-            Console.WriteLine("Own: "+watch.Elapsed);
-            watch.Start();
-            for (int i = 0; i < iterations; i++)
-            {
-                value = Activator.CreateInstance(type);
-            }
-            watch.Stop();
-            Console.WriteLine("Theirs: " + watch.Elapsed);
-            Console.WriteLine(value.ToString());
+            var userGuid = Guid.NewGuid();
+            var tokenGuid = Guid.NewGuid();
+
+            var bytes = new byte[32];
+            Array.Copy(userGuid.ToByteArray(), 0, bytes,0, 16);
+            Array.Copy(tokenGuid.ToByteArray(), 0, bytes, 16, 16);
+            
+            var password = Encoding.UTF8.GetBytes("as#121293m");
+
+            var encrypted = Encryption.EncryptAes(bytes, password, 1);
+            var decrypted = Encryption.DecryptAes(encrypted, password);
+
+            var buffer = new byte[16];
+            Array.Copy(decrypted, 0, buffer, 0, 16);
+            var decryptedUser = new Guid(buffer);
+            Array.Copy(decrypted, 16, buffer, 0, 16);
+            var decryptedToken = new Guid(buffer);
+
+
+            Console.WriteLine($"Orig User: {userGuid}");
+            Console.WriteLine($"Orig Token: {tokenGuid}");
+
+            Console.WriteLine($"Payload: {Convert.ToBase64String(encrypted)}");
+
+            Console.WriteLine($"Dec User: {decryptedUser}");
+            Console.WriteLine($"Dec Token: {decryptedToken}");
+
+
             Console.Read();
         }
-    }
-
-    internal class TestObj {
-        public string Name { get; set; } = "Test";
-        public int Int { get; set; } = 2;
-        public bool Bool { get; set; } = true;
-        public byte[] ByteArray { get; set; } = {1,2,3,4,5};
     }
 }

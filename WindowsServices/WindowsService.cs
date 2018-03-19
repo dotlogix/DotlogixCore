@@ -12,12 +12,15 @@ using System.Collections.Generic;
 using System.Configuration.Install;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
+using DotLogix.Core.Collections;
 using DotLogix.Core.Diagnostics;
 #endregion
 
 namespace DotLogix.Core.WindowsServices {
+
     public class WindowsService {
         public ApplicationMode Mode { get; set; }
         public string ProgramDirectory { get; }
@@ -25,6 +28,7 @@ namespace DotLogix.Core.WindowsServices {
         public string LogDirectory { get; }
 
         public string ServiceName { get; }
+
 
         public WindowsService(string serviceName, string logDirectory) {
             ProgramExecutable = Assembly.GetEntryAssembly().Location;
@@ -34,8 +38,11 @@ namespace DotLogix.Core.WindowsServices {
             ServiceName = serviceName;
         }
 
-        protected virtual void OnStart(string[] args, EventLog eventLog) {
+        protected virtual void OnConfiguration(string[] args, EventLog eventLog) {
             InitializeLoggers(eventLog);
+        }
+
+        protected virtual void OnStart(string[] args) {
         }
 
         protected virtual void OnStop() {
@@ -62,10 +69,12 @@ namespace DotLogix.Core.WindowsServices {
         public void Run(string[] args) {
             switch(Mode) {
                 case ApplicationMode.UserInteractive:
+                    OnConfiguration(args, null);
                     UserInteractiveStartup(args);
                     break;
                 case ApplicationMode.Service:
                     var serviceBase = new ServiceWrapper(this, ServiceName);
+                    OnConfiguration(args, serviceBase.EventLog);
                     ServiceBase.Run(serviceBase);
                     break;
                 default:
@@ -106,13 +115,41 @@ namespace DotLogix.Core.WindowsServices {
             }
 
             try {
-                OnStart(args, null);
-                Console.WriteLine("Press Enter to exit");
-                Console.ReadLine();
+                OnStart(args);
+
+                var running = true;
+                do {
+                    var line = Console.ReadLine();
+                    if(line == null)
+                        continue;
+
+                    var split = line.Split(' ');
+                    var commandCount = split.Length - 1;
+                    var commandArgs = new string[commandCount];
+                    if(commandCount > 0) {
+                        Array.Copy(split, 1, commandArgs, 0, commandCount);
+                    }
+                    running = OnCommand(split[0], commandArgs);
+                } while(running);
+                
             } catch(Exception e) {
                 Log.Critical(e);
             }
             OnStop();
+        }
+
+        protected virtual bool OnCommand(string command, string[] args) {
+            switch(command) {
+                case "exit":
+                    return false;
+                case "clear":
+                    Console.Clear();
+                    return true;
+                default:
+                    Console.WriteLine("Possible commands:\n\texit\n\tclear\n\thelp");
+                    return true;
+
+            }
         }
 
         private bool InstallService() {
@@ -164,7 +201,7 @@ namespace DotLogix.Core.WindowsServices {
             }
 
             protected override void OnStart(string[] args) {
-                _app.OnStart(args, EventLog);
+                _app.OnStart(args);
                 base.OnStart(args);
             }
 

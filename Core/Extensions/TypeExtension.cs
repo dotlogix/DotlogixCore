@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
 #endregion
@@ -122,6 +123,13 @@ namespace DotLogix.Core.Extensions {
 
             genericTypeArguments = genericTargetType.GetGenericArguments();
             return true;
+        }
+
+        public static IEnumerable<PropertyInfo> GetPropertiesByInheritance(this Type type) {
+            var types = type.GetBaseTypes().ToList();
+            types.Reverse();
+            types.Add(type);
+            return types.SelectMany(t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)).ToArray();
         }
 
         public static IEnumerable<Type> GetBaseTypes(this Type type, bool autoOpenGenericType = false,

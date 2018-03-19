@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DotLogix.Core.Collections;
 using DotLogix.Core.Utils;
 #endregion
 
@@ -124,6 +125,37 @@ namespace DotLogix.Core.Extensions {
             }
             if(list.Count > 0)
                 yield return list;
+        }
+
+        public static Hierarchy<TKey, TValue> ToHierarchy<TKey, TValue>(this IEnumerable<TValue> items, Func<TValue, TKey> keySelector, Func<TValue, TKey> parentKeySelector) {
+            var root = new Hierarchy<TKey, TValue>(default(TKey));
+            var dict = new Dictionary<TKey, Hierarchy<TKey, TValue>>();
+            var grouped = items.GroupBy(parentKeySelector.Invoke).ToList();
+            while(grouped.Count > 0) {
+                var prevCount = grouped.Count;
+                for(int i = prevCount-1; i >= 0; i--) {
+                    var group = grouped[i];
+                    var groupKey = group.Key;
+                    Hierarchy<TKey, TValue> parent;
+                    if(Equals(groupKey, default(TKey))) {
+                        parent = root;
+                    }
+                    else if(dict.TryGetValue(groupKey, out parent) == false) {
+                        continue;
+                    }
+
+                    grouped.RemoveAt(i);
+
+                    foreach (var value in group) {
+                        var hierarchy = parent.Add(keySelector.Invoke(value), value);
+                        dict.Add(hierarchy.Key, hierarchy);
+                    }
+                }
+
+                if(grouped.Count == prevCount)
+                    throw new InvalidOperationException("Can not resolve the whole hierarchy, maxbe there are some cross dependencies");
+            }
+            return root;
         }
     }
 }

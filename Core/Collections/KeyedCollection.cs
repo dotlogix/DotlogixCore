@@ -41,17 +41,13 @@ namespace DotLogix.Core.Collections {
             _dictionary = new ConcurrentDictionary<TKey, TValue>(values.ToDictionary(keySelector,equalityComparer));
         }
 
-        public IEnumerator<TValue> GetEnumerator() {
-            return _dictionary.Values.GetEnumerator();
+        public void CopyTo(TValue[] array, int arrayIndex) {
+            _dictionary.Values.CopyTo(array, arrayIndex);
         }
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
-        }
+        public int Count => _dictionary.Count;
 
-        public bool TryAdd(TValue value) {
-            return _dictionary.TryAdd(_keySelector.Invoke(value), value);
-        }
+        public bool IsReadOnly => false;
 
         public void Clear() {
             _dictionary.Clear();
@@ -61,17 +57,13 @@ namespace DotLogix.Core.Collections {
             return _dictionary.ContainsKey(_keySelector.Invoke(value));
         }
 
+        public bool TryAdd(TValue value) {
+            return _dictionary.TryAdd(_keySelector.Invoke(value), value);
+        }
+
         public bool TryRemove(TValue value) {
             return _dictionary.TryRemove(_keySelector.Invoke(value), out _);
         }
-
-        public void CopyTo(TValue[] array, int arrayIndex) {
-            _dictionary.Values.CopyTo(array, arrayIndex);
-        }
-
-        public int Count => _dictionary.Count;
-
-        public bool IsReadOnly => false;
 
         public bool TryGetValue(TKey key, out TValue value) {
             return _dictionary.TryGetValue(key, out value);
@@ -92,6 +84,14 @@ namespace DotLogix.Core.Collections {
         }
         bool ICollection<TValue>.Remove(TValue value) {
             return TryRemove(value);
+        }
+
+        public IEnumerator<TValue> GetEnumerator() {
+            return _dictionary.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
         }
     }
 }

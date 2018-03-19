@@ -71,7 +71,7 @@ namespace DotLogix.Core.Caching {
             if(_cacheItems.TryRemove(key, out var item) == false)
                 return false;
 
-            ItemsDiscarded?.Invoke(null, new CacheItemsDiscardedEventArgs<TKey, TValue>(item.ToSingleElementArray()));
+            ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(item.ToSingleElementArray()));
             return true;
         }
 
@@ -90,7 +90,7 @@ namespace DotLogix.Core.Caching {
             }
 
             if(discardedItems.Count > 0)
-                ItemsDiscarded?.Invoke(null, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems));
+                ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems));
         }
 
         public event EventHandler<CacheItemsDiscardedEventArgs<TKey, TValue>> ItemsDiscarded;

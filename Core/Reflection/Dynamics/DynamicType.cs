@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
@@ -18,30 +19,41 @@ namespace DotLogix.Core.Reflection.Dynamics {
         private const BindingFlags AllBindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
                                                      BindingFlags.NonPublic;
 
-        private readonly Dictionary<string, DynamicAccessor> _accessors;
-        private readonly List<DynamicCtor> _constructors;
+        private readonly IReadOnlyDictionary<string, DynamicAccessor> _accessorsDict;
+        private readonly IReadOnlyDictionary<string, DynamicField> _fieldDict;
+        private readonly IReadOnlyDictionary<string, DynamicProperty> _propertiesDict;
+
+
         private readonly DynamicCtor _defaultCtor;
-        private readonly Dictionary<string, DynamicField> _fields;
-        private readonly List<DynamicInvoke> _methods;
-        private readonly Dictionary<string, DynamicProperty> _properties;
         public Type Type { get; }
         public string Name { get; }
-        public IEnumerable<DynamicCtor> Constructors => _constructors;
-        public IEnumerable<DynamicInvoke> Methods => _methods;
-        public IEnumerable<DynamicAccessor> Accessors => _accessors.Values;
-        public IEnumerable<DynamicProperty> Properties => _properties.Values;
-        public IEnumerable<DynamicField> Fields => _fields.Values;
+
+        public IReadOnlyList<DynamicCtor> Constructors { get; }
+
+        public IReadOnlyList<DynamicInvoke> Methods { get; }
+
+        public IReadOnlyList<DynamicAccessor> Accessors { get; }
+
+        public IReadOnlyList<DynamicProperty> Properties { get; }
+
+        public IReadOnlyList<DynamicField> Fields { get; }
+
         public bool HasDefaultConstructor => _defaultCtor != null;
 
         public DynamicType(Type type, MemberTypes includedMemberTypes = MemberTypes.All) {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             Name = type.Name;
 
-            _fields = CreateFields(type, includedMemberTypes);
-            _properties = CreateProperties(type, includedMemberTypes);
-            _accessors = CreateAccessors(_fields.Values, _properties.Values, includedMemberTypes);
-            _methods = CreateMethods(type, includedMemberTypes);
-            _constructors = CreateConstructors(type, out _defaultCtor, includedMemberTypes);
+            Fields = CreateFields(type, includedMemberTypes)?.ToList();
+            Properties = CreateProperties(type, includedMemberTypes)?.ToList();
+            Accessors = CreateAccessors(Fields, Properties, includedMemberTypes)?.ToList();
+            Methods = CreateMethods(type, includedMemberTypes)?.ToList();
+            Constructors = CreateConstructors(type, out _defaultCtor, includedMemberTypes);
+
+            _propertiesDict = Properties?.ToDictionary(p=>p.Name);
+            _fieldDict = Fields?.ToDictionary(f=>f.Name);
+            _accessorsDict = Accessors?.ToDictionary(a=>a.Name);
+
         }
 
         #region Object
@@ -54,19 +66,19 @@ namespace DotLogix.Core.Reflection.Dynamics {
         public DynamicProperty GetPropery(string propertyName) {
             if(propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
-            return _properties.TryGetValue(propertyName, out var property) ? property : null;
+            return _propertiesDict.TryGetValue(propertyName, out var property) ? property : null;
         }
 
         public DynamicField GetField(string fieldName) {
             if(fieldName == null)
                 throw new ArgumentNullException(nameof(fieldName));
-            return _fields.TryGetValue(fieldName, out var field) ? field : null;
+            return _fieldDict.TryGetValue(fieldName, out var field) ? field : null;
         }
 
         public DynamicAccessor GetAccessor(string accessorName) {
             if(accessorName == null)
                 throw new ArgumentNullException(nameof(accessorName));
-            return _accessors.TryGetValue(accessorName, out var accessor) ? accessor : null;
+            return _accessorsDict.TryGetValue(accessorName, out var accessor) ? accessor : null;
         }
 
         public IEnumerable<DynamicAccessor> GetAccessors(AccessorTypes types = AccessorTypes.Any,
@@ -76,13 +88,13 @@ namespace DotLogix.Core.Reflection.Dynamics {
                 case AccessorTypes.None:
                     return Enumerable.Empty<DynamicAccessor>();
                 case AccessorTypes.Property:
-                    accessors = _properties.Values;
+                    accessors = Properties;
                     break;
                 case AccessorTypes.Field:
-                    accessors = _fields.Values;
+                    accessors = Fields;
                     break;
                 case AccessorTypes.Any:
-                    accessors = _accessors.Values;
+                    accessors = Accessors;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(types), types, null);
@@ -106,12 +118,12 @@ namespace DotLogix.Core.Reflection.Dynamics {
                 throw new ArgumentNullException(nameof(methodName));
             if(parametersTypes == null)
                 throw new ArgumentNullException(nameof(parametersTypes));
-            return _methods.FirstOrDefault(m => (m.Name == methodName) &&
+            return Methods.FirstOrDefault(m => (m.Name == methodName) &&
                                                 TypeArrayEquals(m.ParameterTypes, parametersTypes));
         }
 
         public IEnumerable<DynamicInvoke> GetMethods(string methodName) {
-            return _methods.Where(m => m.Name == methodName);
+            return Methods.Where(m => m.Name == methodName);
         }
         #endregion
 
@@ -121,7 +133,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
                 throw new ArgumentNullException(nameof(parametersTypes));
             if(parametersTypes.Length == 0)
                 return _defaultCtor;
-            return _constructors.FirstOrDefault(c => TypeArrayEquals(c.ParameterTypes, parametersTypes));
+            return Constructors.FirstOrDefault(c => TypeArrayEquals(c.ParameterTypes, parametersTypes));
         }
 
         public DynamicCtor GetDefaultConstructor() {
@@ -147,44 +159,46 @@ namespace DotLogix.Core.Reflection.Dynamics {
             return ctors;
         }
 
-        private static List<DynamicInvoke> CreateMethods(Type type, MemberTypes includedMemberTypes) {
+        private static IEnumerable<DynamicInvoke> CreateMethods(Type type, MemberTypes includedMemberTypes) {
             if((includedMemberTypes & MemberTypes.Method) == 0)
-                return new List<DynamicInvoke>();
+                return null;
             var dynamicMethods = from method in type.GetMethods(AllBindingFlags)
                                  let dynamicMethod = method.CreateDynamicInvoke()
                                  where dynamicMethod != null
                                  select dynamicMethod;
-            return dynamicMethods.ToList();
+            return dynamicMethods;
         }
 
-        private static Dictionary<string, DynamicField> CreateFields(Type type, MemberTypes includedMemberTypes) {
+        private static IEnumerable<DynamicField> CreateFields(Type type, MemberTypes includedMemberTypes) {
             if((includedMemberTypes & MemberTypes.Field) == 0)
-                return new Dictionary<string, DynamicField>();
+                return Enumerable.Empty<DynamicField>();
             var dynamicFields = from field in type.GetFields(AllBindingFlags)
                                 let dynamicField = field.CreateDynamicField()
                                 where dynamicField != null
                                 select dynamicField;
-            return dynamicFields.ToDictionary(df => df.Name);
+            return dynamicFields;
         }
 
-        private static Dictionary<string, DynamicProperty>
-        CreateProperties(Type type, MemberTypes includedMemberTypes) {
+        private static IEnumerable<DynamicProperty> CreateProperties(Type type, MemberTypes includedMemberTypes) {
             if((includedMemberTypes & MemberTypes.Property) == 0)
-                return new Dictionary<string, DynamicProperty>();
-            var dynamicProperties = from field in type.GetProperties(AllBindingFlags)
-                                    let dynamicProperty = field.CreateDynamicProperty()
+                return null;
+            var dynamicProperties = from property in type.GetPropertiesByInheritance()
+                                    let dynamicProperty = property.CreateDynamicProperty()
                                     where dynamicProperty != null
                                     select dynamicProperty;
-            return dynamicProperties.ToDictionary(df => df.Name);
+            return dynamicProperties;
         }
 
-        private static Dictionary<string, DynamicAccessor> CreateAccessors(
+        private static IEnumerable<DynamicAccessor> CreateAccessors(
             IEnumerable<DynamicAccessor> dynamicFields, IEnumerable<DynamicAccessor> dynamicProperties,
             MemberTypes includedMemberTypes) {
             if(((includedMemberTypes & MemberTypes.Field) | MemberTypes.Property) == 0)
-                return new Dictionary<string, DynamicAccessor>();
-            var dynamicAccessors = dynamicFields.Concat(dynamicProperties);
-            return dynamicAccessors.ToDictionary(df => df.Name);
+                return null;
+
+            if(dynamicFields == null)
+                return dynamicProperties;
+
+            return dynamicProperties != null ? dynamicFields.Concat(dynamicProperties) : dynamicFields;
         }
 
         private static bool TypeArrayEquals(Type[] left, Type[] right) {

@@ -61,6 +61,15 @@ namespace DotLogix.Core.Collections {
             return _dictionary.TryAdd(_keySelector.Invoke(value), value);
         }
 
+        public TValue GetOrAdd(TValue value) {
+            return _dictionary.GetOrAdd(_keySelector.Invoke(value), value);
+        }
+
+        public void AddOrUpdate(TValue value)
+        {
+            _dictionary[_keySelector.Invoke(value)] =  value;
+        }
+
         public bool TryRemove(TValue value) {
             return _dictionary.TryRemove(_keySelector.Invoke(value), out _);
         }

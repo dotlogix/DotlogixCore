@@ -18,10 +18,40 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Extensions {
     public static class TypeExtension {
+        #region TypeCheck
+
         public static bool IsNullableType(this Type type) {
             return type.IsGenericType && !type.IsGenericTypeDefinition &&
                    (type.GetGenericTypeDefinition() == typeof(Nullable<>));
         }
+
+        public static bool IsEnumerable(this Type sourceType, out Type elementType) {
+            if(sourceType.IsArray) {
+                elementType = sourceType.GetElementType();
+                return true;
+            }
+
+            if(sourceType.IsAssignableToOpenGeneric(typeof(IEnumerable<>), out var genericTypeArguments)) {
+                elementType = genericTypeArguments[0];
+                return true;
+            }
+
+            if(sourceType.IsAssignableTo(typeof(IEnumerable))) {
+                elementType = typeof(object);
+                return true;
+            }
+
+            elementType = null;
+            return false;
+        }
+
+        public static bool IsEnumerable(this Type sourceType) {
+            return IsEnumerable(sourceType, out _);
+        }
+
+        #endregion
+
+        #region GetFriendlyName
 
         public static string GetFriendlyName(this Type type) {
             var friendlyName = type.Name;
@@ -54,36 +84,16 @@ namespace DotLogix.Core.Extensions {
             return friendlyName;
         }
 
+        #endregion
+
+        #region IsAssignableTo
+
         public static bool IsAssignableTo(this Type sourceType, Type targetType) {
             return targetType.IsAssignableFrom(sourceType);
         }
 
         public static bool IsAssignableTo<TTarget>(this Type sourceType) {
             return sourceType.IsAssignableTo(typeof(TTarget));
-        }
-
-        public static bool IsEnumerable(this Type sourceType) {
-            return IsEnumerable(sourceType, out _);
-        }
-
-        public static bool IsEnumerable(this Type sourceType, out Type elementType) {
-            if(sourceType.IsArray) {
-                elementType = sourceType.GetElementType();
-                return true;
-            }
-
-            if(sourceType.IsAssignableToOpenGeneric(typeof(IEnumerable<>), out var genericTypeArguments)) {
-                elementType = genericTypeArguments[0];
-                return true;
-            }
-
-            if(sourceType.IsAssignableTo(typeof(IEnumerable))) {
-                elementType = typeof(object);
-                return true;
-            }
-
-            elementType = null;
-            return false;
         }
 
         public static bool IsAssignableToOpenGeneric(this Type sourcetype, Type targetType) {
@@ -125,6 +135,8 @@ namespace DotLogix.Core.Extensions {
             return true;
         }
 
+        #endregion
+
         public static IEnumerable<PropertyInfo> GetPropertiesByInheritance(this Type type) {
             var types = type.GetBaseTypes().ToList();
             types.Reverse();
@@ -164,7 +176,7 @@ namespace DotLogix.Core.Extensions {
             return interfaces;
         }
 
-        public static Type OpenIfGenericType(Type type) {
+        public static Type OpenIfGenericType(this Type type) {
             return type.IsGenericType ? type.GetGenericTypeDefinition() : type;
         }
 
@@ -176,8 +188,66 @@ namespace DotLogix.Core.Extensions {
             return type.IsValueType ? type.CreateDefaultCtor()?.Invoke() : null;
         }
 
+        #region Instantiate
+
         public static object Instantiate(this Type type) {
             return type.CreateDefaultCtor()?.Invoke();
         }
+
+        public static object Instantiate(this Type type, params object[] parameters) {
+            var typeArray = ToTypeArray(parameters);
+            return type.CreateDynamicCtor(typeArray)?.Invoke(parameters);
+        }
+
+        public static object Instantiate(this Type genericType, params Type[] genericArguments)
+        {
+            if (genericType.IsGenericTypeDefinition == false)
+                throw new ArgumentException("Type has to be an open generic", nameof(genericType));
+            return genericType.MakeGenericType(genericArguments).Instantiate();
+        }
+
+        public static object Instantiate(this Type genericType, Type[] genericArguments, params object[] parameters)
+        {
+            if (genericType.IsGenericTypeDefinition == false)
+                throw new ArgumentException("Type has to be an open generic", nameof(genericType));
+            return genericType.MakeGenericType(genericArguments).Instantiate();
+        }
+        
+        public static TInstance Instantiate<TInstance>(this Type type)
+        {
+            return type.Instantiate() is TInstance instance ? instance : default(TInstance);
+        }
+
+        public static TInstance Instantiate<TInstance>(this Type type, params object[] parameters)
+        {
+            return type.Instantiate(parameters) is TInstance instance ? instance : default(TInstance);
+        }
+
+        public static TInstance Instantiate<TInstance>(this Type genericType, params Type[] genericArguments)
+        {
+            return genericType.Instantiate(genericArguments) is TInstance instance ? instance : default(TInstance);
+        }
+
+        public static TInstance Instantiate<TInstance>(this Type genericType, Type[] genericArguments, params object[] parameters)
+        {
+            return genericType.Instantiate(genericArguments, parameters) is TInstance instance ? instance : default(TInstance);
+        }
+
+        #endregion
+
+        #region ToTypeArray
+
+        private static Type[] ToTypeArray(this IReadOnlyList<object> objects) {
+            var typeArray = new Type[objects.Count];
+            for(int i = 0; i < objects.Count; i++)
+                typeArray[i] = objects[i].GetType();
+            return typeArray;
+        }
+
+        private static Type[] ToTypeArray(this IEnumerable<object> objects) {
+            return objects.Select(o => o.GetType()).ToArray();
+        }
+
+        #endregion
     }
 }

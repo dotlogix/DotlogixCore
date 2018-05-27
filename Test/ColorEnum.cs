@@ -13,9 +13,9 @@ using DotLogix.Core.Enumeration;
 namespace Test {
     [SupportsFlags]
     public sealed class ColorEnum : Enum<ColorEnum, ColorEnum.ColorEnumMember> {
-        public static ColorEnumMember Red = Instance.RegisterColor("Red", 1);
-        public static ColorEnumMember Blue = Instance.RegisterColor("Blue", 2);
-        public static ColorEnumMember Green = Instance.RegisterColor("Green", 4);
+        public static readonly ColorEnumMember Red = Instance.RegisterColor("Red", 1);
+        public static readonly ColorEnumMember Blue = Instance.RegisterColor("Blue", 2);
+        public static readonly ColorEnumMember Green = Instance.RegisterColor("Green", 4);
 
         public static ColorEnum Instance { get; } =
             Enums.Register<ColorEnum, ColorEnumMember>(new ColorEnum());

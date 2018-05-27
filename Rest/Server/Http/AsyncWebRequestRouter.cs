@@ -14,6 +14,7 @@ using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Server.Routes;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http {
@@ -29,19 +30,21 @@ namespace DotLogix.Core.Rest.Server.Http {
 
         public int RegisteredRoutesCount => ServerRoutes.Count;
 
-        public IWebRequestResultWriter DefaultResultWriter { get; set; } = WebRequestResultJsonWriter.Instance;
+        public IAsyncWebRequestResultWriter DefaultResultWriter { get; set; } = WebRequestResultJsonWriter.Instance;
 
         #region Processing
         async Task IAsyncHttpRequestHandler.HandleRequestAsync(IAsyncHttpContext asyncHttpContext) {
             if(TryGetRoute(asyncHttpContext, out var route) == false) {
-                await asyncHttpContext.Response.SendAsync(HttpStatusCodes.ClientError.NotFound);
+                asyncHttpContext.Response.StatusCode = HttpStatusCodes.ClientError.NotFound;
+                await asyncHttpContext.Response.CompleteAsync();
                 return;
             }
 
             if(asyncHttpContext.Request.HeaderParameters.TryGetParameterValue(EventSubscriptionParameterName, out var eventName)) {
                 if(ServerEvents.TryGetValue(eventName.ToString(), out var serverEvent) == false) {
                     await asyncHttpContext.Response.WriteToResponseStreamAsync("The event subscription could not be handled, because the event is not registered on the server");
-                    await asyncHttpContext.Response.SendAsync(HttpStatusCodes.ClientError.BadRequest);
+                    asyncHttpContext.Response.StatusCode = HttpStatusCodes.ClientError.BadRequest;
+                    await asyncHttpContext.Response.CompleteAsync();
                     return;
                 }
                 asyncHttpContext.PreventAutoSend = true;
@@ -55,13 +58,14 @@ namespace DotLogix.Core.Rest.Server.Http {
             WebServiceContext.SetLocalContext(webServiceContext);
 
             // start of processing
-            await ProcessRequest(route, webServiceContext.Result);
+            await ProcessRequest(route, webServiceContext.RequestResult);
             // end of processing
 
             WebServiceContext.SetLocalContext(null);
 
             var writer = route.WebRequestResultWriter ?? DefaultResultWriter;
-            await writer.WriteAsync(webServiceContext.Result);
+            if(asyncHttpContext.Response.IsSent == false)
+                await writer.WriteAsync(webServiceContext.RequestResult);
         }
 
         private bool TryGetRoute(IAsyncHttpContext asyncHttpContext, out IWebServiceRoute route) {
@@ -72,14 +76,26 @@ namespace DotLogix.Core.Rest.Server.Http {
 
             route = null;
             RouteMatch routeMatch = null;
+            int routePriority = int.MinValue;
+            int matchLength = int.MinValue;
             foreach(var serverRoute in ServerRoutes) {
+                if((serverRoute.AcceptedRequests & httpMethod) == 0) // route does not accept the type of the request
+                    continue;
+
+                if(serverRoute.Priority < routePriority) // another route has a higher priority
+                    continue;
+
                 var match = serverRoute.Match(httpMethod, path);
-                if(match.Success == false)
+                if(match.Success == false) // match is not successful
+                    continue;
+
+                if(match.Length < matchLength) // another route better matches the path
                     continue;
 
                 route = serverRoute;
                 routeMatch = match;
-                break;
+                routePriority = serverRoute.Priority;
+                matchLength = match.Length;
             }
 
             if(routeMatch == null)
@@ -122,7 +138,7 @@ namespace DotLogix.Core.Rest.Server.Http {
         }
 
         private static bool ShouldExecute(WebRequestResult result, IWebRequestProcessor requestProcessor) {
-            return (result.Handled == false) || requestProcessor.IgnoreHandled;
+            return (result.Handled == false) || requestProcessor.IgnoreHandled == false;
         }
         #endregion
     }

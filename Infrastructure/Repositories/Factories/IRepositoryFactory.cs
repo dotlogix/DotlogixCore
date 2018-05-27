@@ -12,6 +12,6 @@ using DotLogix.Architecture.Infrastructure.EntityContext;
 
 namespace DotLogix.Architecture.Infrastructure.Repositories.Factories {
     public interface IRepositoryFactory {
-        IRepository Create(IEntityContext entityContext);
+        IRepository Create(IEntitySetProvider entitySetProvider);
     }
 }

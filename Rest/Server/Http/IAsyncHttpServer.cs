@@ -8,6 +8,10 @@
 
 #region
 using System;
+using System.Collections.Concurrent;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http {

@@ -50,9 +50,7 @@ namespace DotLogix.Core.Extensions {
 
         public static bool TryConvertTo(this object value, Type targetType, out object target) {
             if(value == null) {
-                if(targetType.IsValueType)
-                    throw new ArgumentNullException(nameof(value), "Can not convert null to value type");
-                target = default(object);
+                target = targetType.GetDefaultValue();
                 return true;
             }
 

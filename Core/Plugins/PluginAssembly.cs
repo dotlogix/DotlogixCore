@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Plugins {
@@ -39,7 +40,7 @@ namespace DotLogix.Core.Plugins {
             if(count > 0) {
                 try {
                     for(var i = 0; i < count; i++)
-                        instances[i] = (T)Activator.CreateInstance(validType[i]);
+                        instances[i] = validType[i].Instantiate<T>();
                 } catch(Exception e) {
                     LastError = e;
                     Instances = null;

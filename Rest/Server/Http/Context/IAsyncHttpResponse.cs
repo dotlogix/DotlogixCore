@@ -18,18 +18,19 @@ using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 
 namespace DotLogix.Core.Rest.Server.Http.Context {
     public interface IAsyncHttpResponse {
+        TransferState TransferState { get; }
         bool IsSent { get; }
         ParameterCollection HeaderParameters { get; }
         MimeType ContentType { get; set; }
         long ContentLength64 { get; set; }
+        int ChunkSize { get; set; }
         Encoding ContentEncoding { get; set; }
         HttpStatusCode StatusCode { get; set; }
         MemoryStream OutputStream { get; }
         HttpListenerResponse OriginalResponse { get; }
         Task WriteToResponseStreamAsync(byte[] data, int offset, int count);
         Task WriteToResponseStreamAsync(string message);
-
-        Task SendAsync(HttpStatusCode statusCode = null, MimeType contentType = null,
-                       Encoding contentEncoding = null);
+        Task SendChunksAsync();
+        Task CompleteAsync();
     }
 }

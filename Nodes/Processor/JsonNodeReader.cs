@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
@@ -131,7 +132,7 @@ namespace DotLogix.Core.Nodes.Processor {
                     value = false;
                     return true;
                 default:
-                    if(double.TryParse(valueStr, out var number) == false) {
+                    if(double.TryParse(valueStr, NumberStyles.AllowDecimalPoint, NumberFormatInfo.InvariantInfo, out var number) == false) {
                         value = null;
                         return false;
                     }

@@ -49,7 +49,7 @@ namespace DotLogix.Core.Types {
         #endregion
 
         #region Mask
-        NumericMask = Byte | Short | UShort | Int | UInt | Long | ULong,
+        NumericMask = ULong | Long | UInt | Int | UShort | Short | Byte | Float | Double | Decimal,
         PrimitiveMask = Guid | Bool | Enum | TextMask | NumericMask | TimeMask | Object,
         TimeMask = DateTime | TimeSpan,
         TextMask = String | Char,

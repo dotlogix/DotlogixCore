@@ -16,6 +16,7 @@ using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Attributes;
 using DotLogix.Core.Rest.Services.Attributes.Events;
 using DotLogix.Core.Rest.Services.Attributes.Routes;
+using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
@@ -50,7 +51,7 @@ namespace DotLogix.Core.Rest.Services {
             Server.Stop();
         }
 
-        public void SetDefaultResultWriter(IWebRequestResultWriter writer) {
+        public void SetDefaultResultWriter(IAsyncWebRequestResultWriter writer) {
             _router.DefaultResultWriter = writer;
         }
 
@@ -91,6 +92,10 @@ namespace DotLogix.Core.Rest.Services {
 
                 foreach(var postProcessorAttribute in methodInfo.GetCustomAttributes<PostProcessorAttribute>())
                     serviceRoute.PostProcessors.Add(postProcessorAttribute.CreateProcessor());
+
+                var resultWriterAttribute = methodInfo.GetCustomAttribute<RouteResultWriterAttribute>();
+                if(resultWriterAttribute != null)
+                    serviceRoute.WebRequestResultWriter = resultWriterAttribute.CreateResultWriter();
 
                 _router.ServerRoutes.Add(serviceRoute);
                 count++;

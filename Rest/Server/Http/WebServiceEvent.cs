@@ -47,7 +47,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                 try {
                     await subscription.Router.HandleAsync(asyncHttpContext, subscription.Route);
                     if(response.IsSent == false)
-                        await response.SendAsync();
+                        await response.CompleteAsync();
                 } catch(Exception e) {
                     Log.Error(e);
                     await AsyncHttpServer.SendErrorMessageAsync(response, e);

@@ -11,11 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Configuration.Install;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
-using DotLogix.Core.Collections;
 using DotLogix.Core.Diagnostics;
 #endregion
 
@@ -23,7 +20,6 @@ namespace DotLogix.Core.WindowsServices {
 
     public class WindowsService {
         public ApplicationMode Mode { get; set; }
-        public string ProgramDirectory { get; }
         public string ProgramExecutable { get; }
         public string LogDirectory { get; }
 
@@ -32,8 +28,7 @@ namespace DotLogix.Core.WindowsServices {
 
         public WindowsService(string serviceName, string logDirectory) {
             ProgramExecutable = Assembly.GetEntryAssembly().Location;
-            ProgramDirectory = Path.GetDirectoryName(ProgramExecutable);
-            LogDirectory = logDirectory != null ? GetFullPath(logDirectory) : null;
+            LogDirectory = logDirectory;
             Mode = Environment.UserInteractive ? ApplicationMode.UserInteractive : ApplicationMode.Service;
             ServiceName = serviceName;
         }
@@ -171,25 +166,6 @@ namespace DotLogix.Core.WindowsServices {
                 Console.WriteLine(e);
                 return false;
             }
-        }
-
-        public string GetFullPath(params string[] path) {
-            var pathParts = new string[path.Length - 1];
-            Array.Copy(path, pathParts, 1);
-            pathParts[0] = ProgramDirectory;
-            return Path.Combine(pathParts);
-        }
-
-        public string GetFullPath(string path1) {
-            return Path.Combine(ProgramDirectory, path1);
-        }
-
-        public string GetFullPath(string path1, string path2) {
-            return Path.Combine(ProgramDirectory, path1, path2);
-        }
-
-        public string GetFullPath(string path1, string path2, string path3) {
-            return Path.Combine(ProgramDirectory, path1, path2, path3);
         }
 
         private class ServiceWrapper : ServiceBase {

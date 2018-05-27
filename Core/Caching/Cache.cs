@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using DotLogix.Core.Extensions;
 #endregion
@@ -90,6 +91,13 @@ namespace DotLogix.Core.Caching {
             }
 
             if(discardedItems.Count > 0)
+                ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems));
+        }
+
+        public void Clear() {
+            var discardedItems = _cacheItems.Values.ToList();
+            _cacheItems.Clear();
+            if (discardedItems.Count > 0)
                 ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems));
         }
 

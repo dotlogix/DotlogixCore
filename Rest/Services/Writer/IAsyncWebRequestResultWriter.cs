@@ -8,10 +8,11 @@
 
 #region
 using System.Threading.Tasks;
+using DotLogix.Core.Rest.Server.Http;
 #endregion
 
-namespace DotLogix.Core.Rest.Server.Http {
-    public interface IWebRequestResultWriter {
+namespace DotLogix.Core.Rest.Services.Writer {
+    public interface IAsyncWebRequestResultWriter {
         Task WriteAsync(WebRequestResult requestResult);
     }
 }

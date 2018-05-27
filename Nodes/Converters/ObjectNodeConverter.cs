@@ -94,7 +94,7 @@ namespace DotLogix.Core.Nodes.Converters {
             foreach(var accessor in _accessorsToWrite) {
                 var accessorNode = nodeMap.GetChild(accessor.Name);
                 if(accessorNode == null)
-                    throw new InvalidOperationException("Object can not be constructed with the given nodes");
+                    continue;
                 var accessorValue = Nodes.ToObject(accessorNode, accessor.ValueType);
                 accessor.SetValue(instance, accessorValue);
             }

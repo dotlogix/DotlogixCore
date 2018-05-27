@@ -47,7 +47,7 @@ namespace DotLogix.Core.Security {
         }
 
         public override int GetHashCode() {
-            return base.GetHashCode();
+            return ClearText.GetHashCode();
         }
 
         public void SetClearText(string clearText) {

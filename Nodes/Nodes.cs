@@ -25,6 +25,7 @@ namespace DotLogix.Core.Nodes {
 
         static Nodes() {
             NodeConverterFactories.Add(new ObjectNodeConverterFactory());
+            NodeConverterFactories.Add(new OptionalNodeConverterFactory());
             NodeConverterFactories.Add(new ListNodeConverterFactory());
             NodeConverterFactories.Add(new KeyValuePairNodeConverterFactory());
             NodeConverterFactories.Add(new ValueNodeConverterFactory());
@@ -129,14 +130,14 @@ namespace DotLogix.Core.Nodes {
 
         #region ToObject
         public static T ToObject<T>(Node node) {
-            if((node == null) || (node.Type == NodeTypes.Empty))
+            if(node == null)
                 return default(T);
 
             return (T)ToObject(node, typeof(T));
         }
 
         public static object ToObject(Node node, Type type) {
-            if((node == null) || (node.Type == NodeTypes.Empty))
+            if(node == null)
                 return type.GetDefaultValue();
             return TryCreateConverter(type, out var converter)
                 ? converter.ConvertToObject(node)
@@ -178,7 +179,8 @@ namespace DotLogix.Core.Nodes {
         private static bool TryCreateNodeConverter(Type instanceType, out INodeConverter converter) {
             var dataType = instanceType.ToDataType();
             var nodeType = GetNodeType(dataType);
-            foreach(var converterFactory in NodeConverterFactories) {
+            for(var i = NodeConverterFactories.Count-1; i >= 0; i--) {
+                var converterFactory = NodeConverterFactories[i];
                 if(converterFactory.TryCreateConverter(nodeType, dataType, out converter))
                     return true;
             }

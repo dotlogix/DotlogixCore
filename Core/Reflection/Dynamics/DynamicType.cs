@@ -144,6 +144,11 @@ namespace DotLogix.Core.Reflection.Dynamics {
         #region Helper
         private static List<DynamicCtor> CreateConstructors(Type type, out DynamicCtor defaultCtor,
                                                             MemberTypes includedMemberTypes) {
+            if((includedMemberTypes & MemberTypes.Constructor) == 0) {
+                defaultCtor = null;
+                return new List<DynamicCtor>();
+            }
+
             var dynamicCtors = from constructor in type.GetConstructors(AllBindingFlags)
                                let dynamicCtor = constructor.CreateDynamicCtor()
                                where dynamicCtor != null

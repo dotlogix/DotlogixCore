@@ -8,6 +8,7 @@
 
 #region
 using System;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
@@ -21,7 +22,10 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         public override object ConvertToObject(Node node) {
-            if(node is NodeValue nodeValue)
+            if (node.Type == NodeTypes.Empty)
+                return Type.GetDefaultValue();
+
+            if (node is NodeValue nodeValue)
                 return nodeValue.ConvertValue(Type);
             throw new ArgumentException("Node is not a NodeValue");
         }

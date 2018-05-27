@@ -14,7 +14,7 @@ using System.Linq;
 
 namespace DotLogix.Core.Reflection.Projections {
     public class TypeProjector {
-        protected List<IProjection> Projections;
+        public List<IProjection> Projections { get; }
 
         protected TypeProjector(Type left, Type right, IProjectionFactory factory = null) {
             if(left == null)

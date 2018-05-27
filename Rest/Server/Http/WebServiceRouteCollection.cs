@@ -1,8 +1,6 @@
-using DotLogix.Core.Collections;
+using System.Collections.Generic;
 using DotLogix.Core.Rest.Server.Routes;
 
 namespace DotLogix.Core.Rest.Server.Http {
-    public class WebServiceRouteCollection : SortedCollection<IWebServiceRoute> {
-        public WebServiceRouteCollection() : base(WebServiceRouteComparer.Instance) { }
-    }
+    public class WebServiceRouteCollection : List<IWebServiceRoute> { }
 }

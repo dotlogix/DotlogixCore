@@ -16,12 +16,40 @@ using DotLogix.Core.Utils;
 
 namespace DotLogix.Core.Extensions {
     public static class EnumerableExtensions {
-        public static DiffCollection<T> Diff<T>(this IEnumerable<T> left, IEnumerable<T> right, IEqualityComparer<T> comparer = null) {
-            return new DiffCollection<T>(left, right, comparer);
+        public static DiffEnumerable<T> Diff<T>(this IEnumerable<T> left, IEnumerable<T> right, IEqualityComparer<T> comparer = null) {
+            if(comparer == null)
+                comparer = EqualityComparer<T>.Default;
+
+            var leftOnly = new HashSet<T>(left, comparer);
+            var rightOnly = new HashSet<T>(right, comparer);
+            var intersect = new HashSet<T>(leftOnly, comparer);
+            
+            intersect.ExceptWith(intersect);
+
+            if(intersect.Count > 0) {
+                leftOnly.ExceptWith(intersect);
+                rightOnly.ExceptWith(intersect);
+            }
+
+            return new DiffEnumerable<T>(leftOnly, intersect, rightOnly);
         }
 
-        public static DiffCollection<T> Diff<T, TKey>(this IEnumerable<T> left, IEnumerable<T> right, Func<T, TKey> keySelector) where TKey : IComparable {
-            return new DiffCollection<T>(left, right, new SelectorEqualityComparer<T, TKey>(keySelector));
+        public static DiffEnumerable<T, T> Diff<T, TKey>(this IEnumerable<T> left, IEnumerable<T> right, Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
+            return left.Diff(keySelector, right, keySelector, comparer);
+        }
+
+        public static DiffEnumerable<TLeft, TRight> Diff<TLeft, TRight, TKey>(this IEnumerable<TLeft> left, Func<TLeft, TKey> leftKeySelector, IEnumerable<TRight> right, Func<TRight, TKey> rightKeySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable
+        {
+            var leftDictionary = left.ToDictionary(leftKeySelector);
+            var rightDictionary = right.ToDictionary(rightKeySelector);
+
+            var keyDiff = leftDictionary.Keys.Diff(rightDictionary.Keys, comparer);
+
+            var leftOnly = keyDiff.LeftOnly.Select(k => leftDictionary[k]).ToList();
+            var rightOnly = keyDiff.RightOnly.Select(k => rightDictionary[k]).ToList();
+            var intersection = keyDiff.Intersect.Select(k => new DiffEnumerable<TLeft, TRight>.DiffValue(leftDictionary[k], rightDictionary[k])).ToList();
+
+            return new DiffEnumerable<TLeft, TRight>(leftOnly, intersection, rightOnly);
         }
 
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, bool emptyIfNull = true) {
@@ -30,8 +58,21 @@ namespace DotLogix.Core.Extensions {
             return new HashSet<T>(enumerable);
         }
 
+        public static List<T> AsList<T>(this IEnumerable<T> enumerable) {
+            if(enumerable is List<T> list)
+                return list;
+
+            return new List<T>(enumerable);
+        }
+
+        public static T[] AsArray<T>(this IEnumerable<T> enumerable) {
+            if(enumerable is T[] array)
+                return array;
+            return enumerable.ToArray();
+        }
+
         public static T[] TakeLast<T>(this IEnumerable<T> enumerable, int count) {
-            return enumerable.ToList().TakeLast(count);
+            return enumerable.AsList().TakeLast(count);
         }
 
         public static IEnumerable<T> TakeRandom<T>(this IEnumerable<T> source, int count) {
@@ -47,7 +88,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable, Random random) {
-            var list = enumerable.ToList();
+            var list = enumerable.AsList();
             var i = list.Count;
             do {
                 var rand = random.Next(i);

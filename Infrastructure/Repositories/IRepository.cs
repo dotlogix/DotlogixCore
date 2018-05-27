@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
 #endregion
@@ -19,10 +20,12 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
 
     public interface IRepository<TEntity> : IRepository where TEntity : class, ISimpleEntity {
         #region Get
-        Task<TEntity> GetAsync(int id);
-        Task<TEntity> GetAsync(Guid guid);
-        Task<IEnumerable<TEntity>> GetAllAsync();
-        Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression);
+        Task<TEntity> GetAsync(int id, CancellationToken cancellationToken=default(CancellationToken));
+        Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default(CancellationToken));
+        Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default(CancellationToken));
         #endregion
 
         #region Add

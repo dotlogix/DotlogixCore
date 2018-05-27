@@ -180,6 +180,42 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, string message)
+        {
+            if (Logger.IsLoggingDisabled(logLevel))
+                return;
+
+            var logMessage = new LogMessage
+                             {
+                                 LogLevel = logLevel,
+                                 UtcTimeStamp = DateTime.UtcNow,
+                                 MethodName = methodName,
+                                 ClassName = className,
+                                 ThreadName = threadName ?? "Undefined",
+                                 Message = message
+                             };
+
+            Logger.Log(logMessage);
+        }
+
+        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, Func<string> messageFunc)
+        {
+            if (Logger.IsLoggingDisabled(logLevel))
+                return;
+
+            var logMessage = new LogMessage
+                             {
+                                 LogLevel = logLevel,
+                                 UtcTimeStamp = DateTime.UtcNow,
+                                 MethodName = methodName,
+                                 ClassName = className,
+                                 ThreadName = threadName ?? "Undefined",
+                                 Message = messageFunc.Invoke()
+                             };
+
+            Logger.Log(logMessage);
+        }
+
         private static LogMessage CreateLogMessage(LogLevels logLevel, string message, int framesToSkip) {
             var frame = new StackFrame(framesToSkip);
             var methodBase = frame.GetMethod();

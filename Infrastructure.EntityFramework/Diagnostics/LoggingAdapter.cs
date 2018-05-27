@@ -5,9 +5,9 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
     public class LoggingAdapter : ILogger {
-        public LogLevels MinLogLevel { get; }
+        public LogLevel MinLogLevel { get; }
 
-        public LoggingAdapter(LogLevels minLogLevel = LogLevels.Info) {
+        public LoggingAdapter(LogLevel minLogLevel = LogLevel.Information) {
             MinLogLevel = minLogLevel;
         }
 
@@ -18,52 +18,25 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
         /// <param name="exception">The exception related to this entry.</param>
         /// <param name="formatter">Function to create a <c>string</c> message of the <paramref name="state" /> and <paramref name="exception" />.</param>
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
-            if (eventId.Id == 10403 || this.IsEnabled(logLevel) == false)
+            var logLevels = ConvertLogLevel(logLevel);
+            if (eventId.Id == 10403 || Core.Diagnostics.Log.LogLevel > logLevels)
                 return;
 
-            if (formatter == null)
-                throw new ArgumentNullException(nameof(formatter));
+            if(formatter == null)
+                return;
+
             var message = formatter(state, exception);
             if (string.IsNullOrEmpty(message) && exception == null)
                 return;
 
-            switch(logLevel) {
-                case LogLevel.None:
-                case LogLevel.Trace:
-                    DotLogix.Core.Diagnostics.Log.Trace(message);
-                    break;
-                case LogLevel.Debug:
-                case LogLevel.Information:
-                    DotLogix.Core.Diagnostics.Log.Debug(message);
-                    break;
-                case LogLevel.Warning:
-                    DotLogix.Core.Diagnostics.Log.Warn(message);
-                    break;
-                case LogLevel.Error:
-                    if(exception != null)
-                        DotLogix.Core.Diagnostics.Log.Error(exception);
-                    else
-                        DotLogix.Core.Diagnostics.Log.Error(message);
-                    break;
-                case LogLevel.Critical:
-                    if (exception != null)
-                        DotLogix.Core.Diagnostics.Log.Critical(exception);
-                    else
-                        DotLogix.Core.Diagnostics.Log.Critical(message);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
-            }
+            if(exception != null)
+                message += "\n" + exception.StackTrace;
+
+            Core.Diagnostics.Log.Custom(logLevels, "EntityFramework Internal", nameof(LoggingAdapter), "EntityFramework", message);
         }
 
-        /// <summary>
-        /// Checks if the given <paramref name="logLevel" /> is enabled.
-        /// </summary>
-        /// <param name="logLevel">level to be checked.</param>
-        /// <returns><c>true</c> if enabled.</returns>
-        public bool IsEnabled(LogLevel logLevel) {
-            var logLevels = ConvertLogLevel(logLevel);
-            return logLevels >= MinLogLevel && logLevels >= DotLogix.Core.Diagnostics.Log.LogLevel;
+        bool ILogger.IsEnabled(LogLevel logLevel) {
+            return logLevel >= MinLogLevel;
         }
 
         private LogLevels ConvertLogLevel(LogLevel logLevel) {
@@ -72,9 +45,8 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
                 case LogLevel.Trace:
                     return LogLevels.Trace;
                 case LogLevel.Debug:
-                    return LogLevels.Debug;
                 case LogLevel.Information:
-                    return LogLevels.Info;
+                    return LogLevels.Debug;
                 case LogLevel.Warning:
                     return LogLevels.Warning;
                 case LogLevel.Error:

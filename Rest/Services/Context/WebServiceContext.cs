@@ -19,10 +19,14 @@ namespace DotLogix.Core.Rest.Services.Context {
         private static readonly AsyncLocal<WebServiceContext> AsyncCurrent = new AsyncLocal<WebServiceContext>();
         private readonly Dictionary<string, object> _contextVariables = new Dictionary<string, object>();
         public static WebServiceContext Current => AsyncCurrent.Value;
+        public static WebRequestResult CurrentRequestResult => Current.RequestResult;
 
-        public IAsyncHttpContext RequestContext { get; }
+
+        public IAsyncHttpContext HttpContext { get; }
+        public IAsyncHttpRequest HttpRequest => HttpContext.Request;
+        public IAsyncHttpResponse HttpResponse => HttpContext.Response;
         public Guid ContextId { get; } = Guid.NewGuid();
-        public WebRequestResult Result { get; }
+        public WebRequestResult RequestResult { get; }
 
         #region Indexer
         public object this[string key] {
@@ -31,9 +35,9 @@ namespace DotLogix.Core.Rest.Services.Context {
         }
         #endregion
 
-        internal WebServiceContext(IAsyncHttpContext requestContext) {
-            RequestContext = requestContext;
-            Result = new WebRequestResult(requestContext);
+        internal WebServiceContext(IAsyncHttpContext httpContext) {
+            HttpContext = httpContext;
+            RequestResult = new WebRequestResult(httpContext);
         }
 
         #region Set

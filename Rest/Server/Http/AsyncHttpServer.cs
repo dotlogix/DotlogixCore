@@ -87,9 +87,9 @@ namespace DotLogix.Core.Rest.Server.Http {
         public void Dispose() {
             if(IsDisposed)
                 return;
-            IsDisposed = true;
             Stop();
             _httpListener.Close();
+            IsDisposed = true;
         }
 
         private async void HandleRequestsAsync() {
@@ -106,7 +106,6 @@ namespace DotLogix.Core.Rest.Server.Http {
 #pragma warning disable 4014
                     var contextTask = _httpListener.GetContextAsync();
                     contextTask.ContinueWith(HandleRequestAsync, TaskContinuationOptions.OnlyOnRanToCompletion);
-                    contextTask.ContinueWith(t => _connectionSemaphore.Release());
 #pragma warning restore 4014
                 } catch(HttpListenerException e) {
                     if(IsRunning == false)
@@ -133,12 +132,13 @@ namespace DotLogix.Core.Rest.Server.Http {
             try {
                 await _requestHandler.HandleRequestAsync(httpContext);
                 if((response.IsSent == false) && (httpContext.PreventAutoSend == false))
-                    await response.SendAsync();
+                    await response.CompleteAsync();
             } catch(Exception e) {
                 Log.Error(e);
                 await OnError(response, e);
             } finally {
                 try {
+                    _connectionSemaphore.Release();
                     _requestSemaphore.Release();
                 } catch(Exception e) {
                     if(IsRunning)
@@ -157,11 +157,11 @@ namespace DotLogix.Core.Rest.Server.Http {
             CreateExceptionMessage(stringBuilder, exception, ref httpStatusCode);
 
             response.StatusCode = httpStatusCode;
-            response.ContentType = MimeTypes.PlainText;
+            response.ContentType = MimeTypes.Text.Plain;
             response.OutputStream.SetLength(0);
             try {
                 await response.WriteToResponseStreamAsync(stringBuilder.ToString());
-                await response.SendAsync();
+                await response.CompleteAsync();
             } catch(Exception e) {
                 Log.Error(e);
             }

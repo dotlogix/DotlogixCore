@@ -57,6 +57,17 @@ namespace DotLogix.Core.Extensions {
             return tcs.Task;
         }
 
+        public static Task<TResult> ConvertResult<TSource, TResult>(this Task<TSource> task, Func<TSource, TResult> selectorFunc)
+        {
+            var tcs = new TaskCompletionSource<TResult>();
+
+            task.ContinueWith(t => tcs.SetResult(selectorFunc.Invoke(t.Result)), TaskContinuationOptions.OnlyOnRanToCompletion);
+            // ReSharper disable once PossibleNullReferenceException
+            task.ContinueWith(t => tcs.SetException(t.Exception.InnerExceptions), TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith(t => tcs.SetCanceled(), TaskContinuationOptions.OnlyOnCanceled);
+            return tcs.Task;
+        }
+
         private static GetterDelegate CreateAcessor(Type taskType) {
             var propertyInfo = taskType.GetProperty("Result");
             return propertyInfo != null ? FluentIl.CreateGetter(propertyInfo) : null;

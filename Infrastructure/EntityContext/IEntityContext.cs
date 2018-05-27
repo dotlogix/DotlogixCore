@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
-    public interface IEntityContext : IDisposable {
+    public interface IEntityContext : IEntitySetProvider, IDisposable {
         Task CompleteAsync();
     }
 }

@@ -7,18 +7,11 @@
 // ==================================================
 
 #region
-using System;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
     public class JsonNodesFormatter {
         private static JsonNodesFormatter _defaultFormatter = new JsonNodesFormatter();
-        public string EnumFormat { get; set; }
-        public string GuidFormat { get; set; }
-        public string NumberFormat { get; set; }
-        public IFormatProvider NumberFormatProvider { get; set; }
-        public string DateTimeFormat { get; set; }
-        public IFormatProvider DateTimeFormatProvider { get; set; }
         public bool Ident { get; set; }
         public int IdentSize { get; set; }
 
@@ -27,12 +20,6 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         public JsonNodesFormatter(JsonNodesFormatter basedOn) {
-            EnumFormat = basedOn.EnumFormat;
-            GuidFormat = basedOn.GuidFormat;
-            NumberFormat = basedOn.NumberFormat;
-            NumberFormatProvider = basedOn.NumberFormatProvider;
-            DateTimeFormat = basedOn.DateTimeFormat;
-            DateTimeFormatProvider = basedOn.DateTimeFormatProvider;
             Ident = basedOn.Ident;
             IdentSize = basedOn.IdentSize;
         }

@@ -8,7 +8,7 @@
 
 #region
 using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Types;
@@ -132,26 +132,24 @@ namespace DotLogix.Core.Nodes.Processor {
             switch(flags) {
                 case DataTypeFlags.Guid:
                     _builder.Append('\"');
-                    _builder.Append(((Guid)value).ToString(_formatter.GuidFormat));
+                    _builder.Append(((Guid)value).ToString("D"));
                     _builder.Append('\"');
                     break;
                 case DataTypeFlags.Bool:
                     _builder.Append((bool)value ? "true" : "false");
                     break;
                 case DataTypeFlags.Enum:
-                    _builder.Append('\"');
-                    _builder.Append(((Enum)value).ToString(_formatter.EnumFormat));
-                    _builder.Append('\"');
+                    _builder.Append(((Enum)value).ToString("D"));
                     break;
                 case var _ when (flags & DataTypeFlags.NumericMask) != 0:
-                    _builder.Append(((IFormattable)value).ToString(_formatter.NumberFormat, _formatter.NumberFormatProvider));
+                    _builder.Append(((IFormattable)value).ToString("G", NumberFormatInfo.InvariantInfo));
                     break;
                 case var _ when (flags & DataTypeFlags.TextMask) != 0:
                     JsonStrings.AppendJsonString(_builder, (string)value, true);
                     break;
                 case var _ when (flags & DataTypeFlags.TimeMask) != 0:
                     _builder.Append('\"');
-                    _builder.Append(((IFormattable)value).ToString(_formatter.DateTimeFormat, _formatter.DateTimeFormatProvider));
+                    _builder.Append(((IFormattable)value).ToString("u", DateTimeFormatInfo.InvariantInfo));
                     _builder.Append('\"');
                     break;
                 default:

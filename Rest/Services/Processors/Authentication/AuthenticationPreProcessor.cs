@@ -44,12 +44,11 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
                 return Task.CompletedTask;
             }
 
-
             return authMethod.AuthenticateAsync(webRequestResult, authValue[1]);
         }
 
         public int Priority { get; }
-        public bool IgnoreHandled => false;
+        public bool IgnoreHandled => true;
 
         protected void SetUnauthorizedException(WebRequestResult webRequestResult, string message) {
             webRequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));

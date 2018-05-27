@@ -8,10 +8,9 @@
 
 #region
 using System;
-using System.Collections.Generic;
-using DotLogix.Core.Collections;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Routes {
@@ -33,7 +32,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
         public WebRequestProcessorCollection PreProcessors { get; }
 
         public IWebRequestProcessor RequestProcessor { get; }
-        public IWebRequestResultWriter WebRequestResultWriter { get; set; }
+        public IAsyncWebRequestResultWriter WebRequestResultWriter { get; set; }
         public HttpMethods AcceptedRequests { get; }
         public int RouteIndex { get; }
         public int Priority { get; }

@@ -14,7 +14,9 @@ using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Attributes;
+using DotLogix.Core.Rest.Services.Attributes.Descriptors;
 using DotLogix.Core.Rest.Services.Attributes.Events;
+using DotLogix.Core.Rest.Services.Attributes.ResultWriter;
 using DotLogix.Core.Rest.Services.Attributes.Routes;
 using DotLogix.Core.Rest.Services.Writer;
 #endregion
@@ -92,6 +94,9 @@ namespace DotLogix.Core.Rest.Services {
 
                 foreach(var postProcessorAttribute in methodInfo.GetCustomAttributes<PostProcessorAttribute>())
                     serviceRoute.PostProcessors.Add(postProcessorAttribute.CreateProcessor());
+
+                foreach (var descriptorAttribute in methodInfo.GetCustomAttributes<DescriptorAttribute>())
+                    serviceRoute.RequestProcessor.Descriptors.Add(descriptorAttribute.CreateDescriptor());
 
                 var resultWriterAttribute = methodInfo.GetCustomAttribute<RouteResultWriterAttribute>();
                 if(resultWriterAttribute != null)

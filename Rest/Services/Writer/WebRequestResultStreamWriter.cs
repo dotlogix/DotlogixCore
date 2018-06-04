@@ -44,7 +44,7 @@ namespace DotLogix.Core.Rest.Services.Writer {
             }
         }
 
-        protected async virtual Task<WebRequestStreamResult> GetStreamResult(WebRequestResult webRequestResult) {
+        protected virtual async Task<WebRequestStreamResult> GetStreamResult(WebRequestResult webRequestResult) {
             WebRequestStreamResult result;
             switch(webRequestResult.ReturnValue) {
                 case Stream stream:

@@ -14,26 +14,26 @@ using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
+using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Base {
-    public class WebRequestProcessor : IWebRequestProcessor {
+    public class WebRequestProcessor : WebRequestProcessorBase {
         public bool IsAsyncMethod { get; }
         public object Target { get; }
         public DynamicInvoke DynamicInvoke { get; }
 
-        public WebRequestProcessor(object target, DynamicInvoke dynamicInvoke, int priority = 0, bool ignoreHandled = true) {
+        public WebRequestProcessor(object target, DynamicInvoke dynamicInvoke, int priority = 0, bool ignoreHandled = true) : base(priority, ignoreHandled) {
             Target = target;
             DynamicInvoke = dynamicInvoke;
-            Priority = priority;
-            IgnoreHandled = ignoreHandled;
             IsAsyncMethod = dynamicInvoke.ReturnType.IsAssignableTo(typeof(Task));
+
+            Descriptors.Add(new MethodDescriptor(dynamicInvoke));
         }
 
-        public int Priority { get; }
-        public bool IgnoreHandled { get; }
-
-        public virtual async Task ProcessAsync(WebRequestResult webRequestResult) {
+        public override async Task ProcessAsync(WebServiceContext webServiceContext) {
+            var webRequestResult = webServiceContext.RequestResult;
             var parameters = CreateParameters(webRequestResult);
             if(webRequestResult.Handled)
                 return;

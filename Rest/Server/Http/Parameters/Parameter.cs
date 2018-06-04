@@ -45,8 +45,15 @@ namespace DotLogix.Core.Rest.Server.Http.Parameters {
             AddValues(parameter._values);
         }
 
-        public object GetValue() {
-            return HasValues ? _values[0] : null;
+        public object GetValue(object defaultValue = default(object)) {
+            return HasValues ? _values[0] : defaultValue;
+        }
+
+        public TValue GetValue<TValue>(TValue defaultValue = default(TValue)) {
+            if(HasValues)
+                return _values[0] is TValue value ? value : defaultValue;
+
+            return defaultValue;
         }
 
         public override string ToString() {

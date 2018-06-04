@@ -13,10 +13,16 @@ using System.Linq;
 
 namespace DotLogix.Core.Extensions {
     public static class DictionaryExtension {
+        /// <summary>
+        /// Reverses a dictionary so values will be the keys and the keys will be the values
+        /// </summary>
         public static Dictionary<TValue, TKey> ReverseDictionary<TKey, TValue>(this Dictionary<TKey, TValue> dict) {
             return dict.ToDictionary(k => k.Value, k => k.Key);
         }
 
+        /// <summary>
+        /// Reverses a key value pair so value will be the key and the key will be the value
+        /// </summary>
         public static KeyValuePair<TValue, TKey> Reverse<TKey, TValue>(this KeyValuePair<TKey, TValue> kvpair) {
             return new KeyValuePair<TValue, TKey>(kvpair.Value, kvpair.Key);
         }

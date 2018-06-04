@@ -16,6 +16,13 @@ using DotLogix.Core.Utils;
 
 namespace DotLogix.Core.Extensions {
     public static class EnumerableExtensions {
+        /// <summary>
+        /// Searches for differences of two enumerables using an equality comparer
+        /// </summary>
+        /// <param name="left">The first enumerable</param>
+        /// <param name="right">The second enumerable</param>
+        /// <param name="comparer">The comparer used to check equality</param>
+        /// <returns></returns>
         public static DiffEnumerable<T> Diff<T>(this IEnumerable<T> left, IEnumerable<T> right, IEqualityComparer<T> comparer = null) {
             if(comparer == null)
                 comparer = EqualityComparer<T>.Default;
@@ -34,10 +41,27 @@ namespace DotLogix.Core.Extensions {
             return new DiffEnumerable<T>(leftOnly, intersect, rightOnly);
         }
 
+        /// <summary>
+        /// Searches for differences of two enumerables using a common key and a comparer
+        /// </summary>
+        /// <param name="left">The first enumerable</param>
+        /// <param name="right">The second enumerable</param>
+        /// <param name="keySelector">The function to select the key to check equality</param>
+        /// <param name="comparer">The comparer used to check equality</param>
+        /// <returns></returns>
         public static DiffEnumerable<T, T> Diff<T, TKey>(this IEnumerable<T> left, IEnumerable<T> right, Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
             return left.Diff(keySelector, right, keySelector, comparer);
         }
 
+        /// <summary>
+        /// Searches for differences of two enumerables using a common key and a comparer
+        /// </summary>
+        /// <param name="left">The first enumerable</param>
+        /// <param name="leftKeySelector">The function to select the key to check equality</param>
+        /// <param name="right">The second enumerable</param>
+        /// <param name="rightKeySelector">The function to select the key to check equality</param>
+        /// <param name="comparer">The comparer used to check equality</param>
+        /// <returns></returns>
         public static DiffEnumerable<TLeft, TRight> Diff<TLeft, TRight, TKey>(this IEnumerable<TLeft> left, Func<TLeft, TKey> leftKeySelector, IEnumerable<TRight> right, Func<TRight, TKey> rightKeySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable
         {
             var leftDictionary = left.ToDictionary(leftKeySelector);
@@ -52,12 +76,21 @@ namespace DotLogix.Core.Extensions {
             return new DiffEnumerable<TLeft, TRight>(leftOnly, intersection, rightOnly);
         }
 
+        /// <summary>
+        /// Converts a enumerable to a hashset
+        /// </summary>
+        /// <param name="enumerable">The enumerable</param>
+        /// <param name="emptyIfNull">Method should return an empty hashset if the enumerable is null</param>
+        /// <returns></returns>
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, bool emptyIfNull = true) {
             if(enumerable == null)
                 return emptyIfNull ? new HashSet<T>() : null;
             return new HashSet<T>(enumerable);
         }
 
+        /// <summary>
+        /// Converts a enumerable to a list, but checks if it is already a list
+        /// </summary>
         public static List<T> AsList<T>(this IEnumerable<T> enumerable) {
             if(enumerable is List<T> list)
                 return list;
@@ -65,28 +98,46 @@ namespace DotLogix.Core.Extensions {
             return new List<T>(enumerable);
         }
 
+        /// <summary>
+        /// Converts a enumerable to an array, but checks if it is already an array
+        /// </summary>
         public static T[] AsArray<T>(this IEnumerable<T> enumerable) {
             if(enumerable is T[] array)
                 return array;
             return enumerable.ToArray();
         }
 
+        /// <summary>
+        /// Takes the last n elements of a enumerable.
+        /// </summary>
         public static T[] TakeLast<T>(this IEnumerable<T> enumerable, int count) {
             return enumerable.AsList().TakeLast(count);
         }
 
+        /// <summary>
+        /// Takes the n random elements of a enumerable.
+        /// </summary>
         public static IEnumerable<T> TakeRandom<T>(this IEnumerable<T> source, int count) {
             return source.Shuffle().Take(count);
         }
 
+        /// <summary>
+        /// Shuffles the elements in a enumerable
+        /// </summary>
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable) {
             return Shuffle(enumerable, new Random());
         }
 
+        /// <summary>
+        /// Shuffles the elements in a enumerable
+        /// </summary>
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable, int seed) {
             return Shuffle(enumerable, new Random(seed));
         }
 
+        /// <summary>
+        /// Shuffles the elements in a enumerable
+        /// </summary>
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable, Random random) {
             var list = enumerable.AsList();
             var i = list.Count;
@@ -98,7 +149,9 @@ namespace DotLogix.Core.Extensions {
             yield return list[0];
         }
 
-
+        /// <summary>
+        /// Returns the round robin mixed combination of a list of enumerables 
+        /// </summary>
         public static IEnumerable<T> Balance<T>(this IEnumerable<IEnumerable<T>> enumerables) {
             Queue<IEnumerator<T>> queue = null;
             try {
@@ -119,6 +172,9 @@ namespace DotLogix.Core.Extensions {
             }
         }
 
+        /// <summary>
+        /// Returns the combination of a list of enumerables 
+        /// </summary>
         public static IEnumerable<T> Concat<T>(this IEnumerable<IEnumerable<T>> enumerables) {
             foreach(var enumerable in enumerables) {
                 foreach(var value in enumerable)
@@ -126,6 +182,9 @@ namespace DotLogix.Core.Extensions {
             }
         }
 
+        /// <summary>
+        /// Returns the shuffled combination of a list of enumerables 
+        /// </summary>
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<IEnumerable<T>> enumerables) {
             var list = new List<T>();
             foreach(var enumerable in enumerables)
@@ -133,6 +192,13 @@ namespace DotLogix.Core.Extensions {
             return list.Shuffle();
         }
 
+        /// <summary>
+        /// Combines a list of enumerable using the given combination mode
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumerables"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public static IEnumerable<T> Combine<T>(this IEnumerable<IEnumerable<T>> enumerables, CombineMode mode) {
             switch(mode) {
                 case CombineMode.Sequential:
@@ -146,10 +212,23 @@ namespace DotLogix.Core.Extensions {
             }
         }
 
+        /// <summary>
+        /// Combines a list of enumerable using the given combination mode
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumerables"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public static IEnumerable<T> Combine<T>(CombineMode mode, params IEnumerable<T>[] enumerables) {
             return Combine(enumerables, mode);
         }
 
+        /// <summary>
+        /// Takes chunks of elements from a enumerable
+        /// </summary>
+        /// <param name="enumerable">The enumerable</param>
+        /// <param name="chunkSize">The size of the chunked parts</param>
+        /// <returns></returns>
         public static IEnumerable<List<T>> Chunk<T>(this IEnumerable<T> enumerable, int chunkSize) {
             var currentCount = 1;
             var list = new List<T>(chunkSize);
@@ -168,6 +247,15 @@ namespace DotLogix.Core.Extensions {
                 yield return list;
         }
 
+        /// <summary>
+        /// Creates a hierarchy of elements using a key to determ inheritance
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="items">The items</param>
+        /// <param name="keySelector">The function to get the key of the current element</param>
+        /// <param name="parentKeySelector">The function to get the key of the parent element</param>
+        /// <returns></returns>
         public static Hierarchy<TKey, TValue> ToHierarchy<TKey, TValue>(this IEnumerable<TValue> items, Func<TValue, TKey> keySelector, Func<TValue, TKey> parentKeySelector) {
             var root = new Hierarchy<TKey, TValue>(default(TKey));
             var dict = new Dictionary<TKey, Hierarchy<TKey, TValue>>();

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
-using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Writer;
 
-namespace DotLogix.Core.Rest.Services.Attributes.Routes {
+namespace DotLogix.Core.Rest.Services.Attributes.ResultWriter {
     [AttributeUsage(AttributeTargets.Method)]
     public abstract class RouteResultWriterAttribute : Attribute {
         public abstract IAsyncWebRequestResultWriter CreateResultWriter();

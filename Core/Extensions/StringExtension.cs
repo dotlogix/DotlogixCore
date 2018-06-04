@@ -15,22 +15,56 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Extensions {
     public static class StringExtension {
+        /// <summary>
+        /// Counts the occurances of a character in a string.
+        /// </summary>
+        /// <param name="str">The string</param>
+        /// <param name="character">The character to count</param>
         public static int OccurancesOf(this string str, char character) {
             return OccurancesOf(str.ToCharArray(), character, 0, str.Length, out _);
         }
 
+        /// <summary>
+        /// Counts the occurances of a character in a string.
+        /// </summary>
+        /// <param name="str">The string</param>
+        /// <param name="character">The character to count</param>
+        /// <param name="start">The start index in the array</param>
+        /// <param name="count">The maximum length to count</param>
         public static int OccurancesOf(this string str, char character, int start, int count) {
             return OccurancesOf(str.ToCharArray(), character, start, count, out _);
         }
 
+        /// <summary>
+        /// Counts the occurances of a character in a char array.
+        /// </summary>
+        /// <param name="chars">The char array</param>
+        /// <param name="character">The character to count</param>
         public static int OccurancesOf(this char[] chars, char character) {
             return OccurancesOf(chars, character, 0, chars.Length, out _);
         }
 
+        /// <summary>
+        /// Counts the occurances of a character in a char array.
+        /// </summary>
+        /// <param name="chars">The char array</param>
+        /// <param name="character">The character to count</param>
+        /// <param name="start">The start index in the array</param>
+        /// <param name="count">The maximum length to count</param>
+        /// <returns></returns>
         public static int OccurancesOf(this char[] chars, char character, int start, int count) {
             return OccurancesOf(chars, character, start, count, out _);
         }
 
+        /// <summary>
+        /// Counts the occurances of a character in a char array. Also outputs the position of the last occurance of the character
+        /// </summary>
+        /// <param name="chars">The char array</param>
+        /// <param name="character">The character to count</param>
+        /// <param name="start">The start index in the array</param>
+        /// <param name="count">The maximum length to count</param>
+        /// <param name="lastOccurence">The position of the last occurance of the character</param>
+        /// <returns></returns>
         public static int OccurancesOf(this char[] chars, char character, int start, int count, out int lastOccurence) {
             lastOccurence = -1;
 
@@ -45,14 +79,34 @@ namespace DotLogix.Core.Extensions {
             return occurances;
         }
 
+        /// <summary>
+        /// exchanges the value of source with another value if it is null, empty
+        /// </summary>
+        /// <param name="source">The string value</param>
+        /// <param name="exchangeValue">The value to exchange</param>
+        /// <returns></returns>
         public static string ExchangeIfDefaultOrEmpty(this string source, string exchangeValue = default(string)) {
             return string.IsNullOrEmpty(source) ? exchangeValue : source;
         }
 
+        /// <summary>
+        /// exchanges the value of source with another value if it is null, empty or only contains whitespaces
+        /// </summary>
+        /// <param name="source">The string value</param>
+        /// <param name="exchangeValue">The value to exchange</param>
+        /// <returns></returns>
         public static string ExchangeIfDefaultOrWhitespace(this string source, string exchangeValue = default(string)) {
             return string.IsNullOrWhiteSpace(source) ? exchangeValue : source;
         }
 
+        /// <summary>
+        /// Set the length of string to a specified length. If the string is longer than the string is cut in the middle, else it will be filled with the padding character
+        /// </summary>
+        /// <param name="value">The string value</param>
+        /// <param name="padding">The padding character</param>
+        /// <param name="length">The target length of the string</param>
+        /// <param name="padLeft">Determines if padding should be applied left or right</param>
+        /// <returns></returns>
         public static string SetLength(this string value, char padding, int length, bool padLeft = true) {
             if(value.Length == length)
                 return value;
@@ -110,11 +164,23 @@ namespace DotLogix.Core.Extensions {
         }
 
         #region Base64
+        /// <summary>
+        /// Converts a string to its base64 encoded version
+        /// </summary>
+        /// <param name="plain">The string to convert</param>
+        /// <param name="encoding">The encoding used to transform the string into bytes (default is UTF8)</param>
+        /// <returns></returns>
         public static string ToBase64String(this string plain, Encoding encoding = null) {
             var bytes = (encoding ?? Encoding.UTF8).GetBytes(plain);
             return Convert.ToBase64String(bytes);
         }
 
+        /// <summary>
+        /// Converts a string back of its base64 encoded version
+        /// </summary>
+        /// <param name="base64String">The base64 encoded string</param>
+        /// <param name="encoding">The encoding used to transform the string into bytes (default is UTF8)</param>
+        /// <returns></returns>
         public static string FromBase64String(this string base64String, Encoding encoding = null) {
             var bytes = Convert.FromBase64String(base64String);
             return (encoding ?? Encoding.UTF8).GetString(bytes);
@@ -122,18 +188,45 @@ namespace DotLogix.Core.Extensions {
         #endregion
 
         #region SplitAndKeep
+        /// <summary>
+        /// Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
+        /// </summary>
+        /// <param name="value">The string to split</param>
+        /// <param name="delimiters">The delimiters</param>
+        /// <returns></returns>
         public static IEnumerable<string> SplitAndKeep(this string value, params char[] delimiters) {
             return SplitAndKeep(value, int.MaxValue, StringSplitOptions.None, delimiters);
         }
 
+        /// <summary>
+        /// Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
+        /// </summary>
+        /// <param name="value">The string to split</param>
+        /// <param name="options">The options used for splitting</param>
+        /// <param name="delimiters">The delimiters</param>
+        /// <returns></returns>
         public static IEnumerable<string> SplitAndKeep(this string value, StringSplitOptions options, params char[] delimiters) {
             return SplitAndKeep(value, int.MaxValue, options, delimiters);
         }
 
+        /// <summary>
+        /// Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
+        /// </summary>
+        /// <param name="value">The string to split</param>
+        /// <param name="maxCount">The maxmimum count of splits</param>
+        /// <param name="delimiters">The delimiters</param>
         public static IEnumerable<string> SplitAndKeep(this string value, int maxCount, params char[] delimiters) {
             return SplitAndKeep(value, maxCount, StringSplitOptions.None, delimiters);
         }
 
+        /// <summary>
+        /// Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
+        /// </summary>
+        /// <param name="value">The string to split</param>
+        /// <param name="maxCount">The maxmimum count of splits</param>
+        /// <param name="options">The options used for splitting</param>
+        /// <param name="delimiters">The delimiters</param>
+        /// <returns></returns>
         public static IEnumerable<string> SplitAndKeep(this string value, int maxCount, StringSplitOptions options, params char[] delimiters) {
             int nextSplitAt;
             var startIndex = 0;
@@ -151,14 +244,26 @@ namespace DotLogix.Core.Extensions {
         #endregion
 
         #region Parse
+        /// <summary>
+        /// Convert a string to another type. Only works for the conversion of a string to primitives
+        /// </summary>
+        /// <param name="targetType">The target type</param>
+        /// <param name="value">The string representation of the type</param>
+        /// <returns>The result value if the conversion succeed</returns>
         public static object ParseTo(this string value, Type targetType) {
             if(TryParseTo(value, targetType, out var convertedValue) == false) {
-                throw new
-                NotSupportedException($"Conversion between {value.GetType()} and {targetType} is not supported");
+                throw new NotSupportedException($"Conversion between {value.GetType()} and {targetType} is not supported");
             }
             return convertedValue;
         }
 
+        /// <summary>
+        /// Trys to convert a string to another type. Only works for the conversion of a string to primitives
+        /// </summary>
+        /// <param name="targetType">The target type</param>
+        /// <param name="value">The string representation of the type</param>
+        /// <param name="target">The result value if the conversion succeed</param>
+        /// <returns></returns>
         public static bool TryParseTo(this string value, Type targetType, out object target) {
             target = null;
             var dataType = targetType.ToDataType();
@@ -180,8 +285,13 @@ namespace DotLogix.Core.Extensions {
                     target = c;
                     break;
                 case DataTypeFlags.Enum:
-                    target = Enum.Parse(targetType, value);
-                    result = true;
+                    try {
+                        target = Enum.Parse(targetType, value);
+                        result = true;
+                    } catch {
+                        target = null;
+                        result = false;
+                    }
                     break;
                 case DataTypeFlags.SByte:
                     result = sbyte.TryParse(value, out var sb);
@@ -249,11 +359,24 @@ namespace DotLogix.Core.Extensions {
             return result;
         }
 
+        /// <summary>
+        /// Convert a string to another type. Only works for the conversion of a string to primitives
+        /// </summary>
+        /// <typeparam name="TTarget">The target type</typeparam>
+        /// <param name="value">The string representation of the type</param>
+        /// <returns>The result value if the conversion succeed</returns>
         public static TTarget ParseTo<TTarget>(this string value) {
             var targetType = typeof(TTarget);
             return (TTarget)ParseTo(value, targetType);
         }
 
+        /// <summary>
+        /// Trys to convert a string to another type. Only works for the conversion of a string to primitives
+        /// </summary>
+        /// <typeparam name="TTarget">The target type</typeparam>
+        /// <param name="value">The string representation of the type</param>
+        /// <param name="target">The result value if the conversion succeed</param>
+        /// <returns></returns>
         public static bool TryParseTo<TTarget>(this string value, out TTarget target) {
             var targetType = typeof(TTarget);
             if(TryParseTo(value, targetType, out var convertedValue)) {
@@ -264,6 +387,13 @@ namespace DotLogix.Core.Extensions {
             return false;
         }
 
+        /// <summary>
+        /// Try to convert a string to the provided enum type
+        /// </summary>
+        /// <typeparam name="TEnum">The type of the enum</typeparam>
+        /// <param name="enumValue">The string representation of a enum value</param>
+        /// <param name="ignoreCase">Determines if the parsing should be case sensitive</param>
+        /// <returns>The parsed enum value</returns>
         public static TEnum ConvertToEnum<TEnum>(this string enumValue, bool ignoreCase = true) where TEnum : struct {
             if(enumValue == null)
                 throw new ArgumentNullException(nameof(enumValue));

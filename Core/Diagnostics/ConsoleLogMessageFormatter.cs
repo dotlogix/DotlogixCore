@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Linq;
 using DotLogix.Core.Extensions;
 #endregion
 
@@ -34,9 +35,9 @@ namespace DotLogix.Core.Diagnostics {
             var method = message.MethodName.SetLength(' ', 15);
             var thread = message.ThreadName.SetLength(' ', 15);
 
-            var messageLines = message.Message.WordWrap(ConsoleWidth - PaddingLength);
+            var messageLines = message.Message.WordWrap(ConsoleWidth - PaddingLength).ToList();
             var formatted = $"{timeStamp} | {logLevel} | {context} | {method} | {thread} | ";
-            if(messageLines.Length > 1)
+            if(messageLines.Count > 1)
                 formatted += string.Join(Padding, messageLines);
             else
                 formatted += messageLines[0];

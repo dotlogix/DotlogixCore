@@ -63,6 +63,13 @@ namespace DotLogix.Core.Extensions {
             if(value is string str && str.TryParseTo(targetType, out target))
                 return true;
 
+            if(targetType.IsEnum) {
+                try {
+                    target = Enum.ToObject(targetType, value);
+                    return true;
+                } catch { }
+            }
+
             var sourceTypeConverter = TypeDescriptor.GetConverter(sourceType);
 
             if(sourceTypeConverter.CanConvertTo(targetType)) {

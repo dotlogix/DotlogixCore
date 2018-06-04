@@ -9,12 +9,15 @@
 #region
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors {
     public interface IWebRequestProcessor {
+        WebRequestProcessorDescriptorCollection Descriptors { get; }
         int Priority { get; }
-        bool IgnoreHandled { get; }
-        Task ProcessAsync(WebRequestResult webRequestResult);
+        Task ProcessAsync(WebServiceContext webServiceContext);
+        bool ShouldExecute(WebServiceContext webServiceContext);
     }
 }

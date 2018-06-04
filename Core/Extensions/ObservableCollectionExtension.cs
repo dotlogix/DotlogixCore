@@ -12,6 +12,12 @@ using System.Collections.ObjectModel;
 
 namespace DotLogix.Core.Extensions {
     public static class ObservableCollectionExtension {
+        /// <summary>
+        /// Converts a observable collection to a read-only one
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <returns></returns>
         public static ReadOnlyObservableCollection<T> AsReadonly<T>(this ObservableCollection<T> collection) {
             return new ReadOnlyObservableCollection<T>(collection);
         }

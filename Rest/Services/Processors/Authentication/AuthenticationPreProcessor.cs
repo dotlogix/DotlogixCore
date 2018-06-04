@@ -13,42 +13,44 @@ using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
+using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
 using DotLogix.Core.Rest.Services.Processors.Authentication.Base;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Authentication {
-    public class AuthenticationPreProcessor : IWebRequestProcessor {
+    public class AuthenticationPreProcessor : WebRequestProcessorBase {
         private const string AuthorizationParameterName = "Authorization";
         private readonly IReadOnlyDictionary<string, IAuthenticationMethod> _authorizationMethods;
 
-        public AuthenticationPreProcessor(int priority, IEnumerable<IAuthenticationMethod> authMethods) {
-            Priority = priority;
+        public AuthenticationPreProcessor(int priority, IEnumerable<IAuthenticationMethod> authMethods) : base(priority) {
             _authorizationMethods = authMethods.ToDictionary(a => a.Name);
         }
 
         public AuthenticationPreProcessor(int priority, params IAuthenticationMethod[] authMethods) : this(priority, authMethods.AsEnumerable()) { }
 
-        public Task ProcessAsync(WebRequestResult webRequestResult) {
-            var request = webRequestResult.Context.Request;
+        public override Task ProcessAsync(WebServiceContext webServiceContext) {
+            var authenticationDescriptor = webServiceContext.Route.RequestProcessor.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
+            if(authenticationDescriptor != null && authenticationDescriptor.RequiresAuthentication == false)
+                return Task.CompletedTask;
+
+            var request = webServiceContext.HttpRequest;
+            var result = webServiceContext.RequestResult;
             var headerParameters = request.HeaderParameters;
 
             if((headerParameters.TryGetParameter(AuthorizationParameterName, out var authParameter) == false) || (authParameter.HasValues == false)) {
-                SetInvalidFormatException(webRequestResult);
+                SetInvalidFormatException(result);
                 return Task.CompletedTask;
             }
 
             var authValue = ((string)authParameter.Value).Split();
             if((authValue.Length != 2) || (_authorizationMethods.TryGetValue(authValue[0], out var authMethod) == false)) {
-                SetInvalidFormatException(webRequestResult);
+                SetInvalidFormatException(result);
                 return Task.CompletedTask;
             }
 
-            return authMethod.AuthenticateAsync(webRequestResult, authValue[1]);
+            return authMethod.AuthenticateAsync(result, authValue[1]);
         }
-
-        public int Priority { get; }
-        public bool IgnoreHandled => true;
 
         protected void SetUnauthorizedException(WebRequestResult webRequestResult, string message) {
             webRequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));

@@ -2,7 +2,7 @@
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Services.Writer;
 
-namespace DotLogix.Core.Rest.Services.Attributes.Routes {
+namespace DotLogix.Core.Rest.Services.Attributes.ResultWriter {
     public class DynamicRouteResultWriterAttribute : RouteResultWriterAttribute {
         public Type RequestResultWriterType { get; }
         public DynamicRouteResultWriterAttribute(Type requestResultWriterType) {

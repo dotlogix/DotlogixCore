@@ -72,8 +72,12 @@ namespace DotLogix.Core.Rest.Server.Http.Parameters {
             return _parametersDict.TryGetValue(name, out var existing) ? existing : null;
         }
 
-        public object GetParameterValue(string name) {
-            return GetParameter(name)?.Value;
+        public object GetParameterValue(string name, object defaultValue = default(object)) {
+            return TryGetParameter(name, out var parameter) ? parameter.GetValue(defaultValue) : defaultValue;
+        }
+
+        public TValue GetParameterValue<TValue>(string name, TValue defaultValue = default(TValue)) {
+            return TryGetParameter(name, out var parameter) ? parameter.GetValue(defaultValue) : defaultValue;
         }
 
         public object[] GetParameterValues(string name) {
@@ -87,11 +91,11 @@ namespace DotLogix.Core.Rest.Server.Http.Parameters {
         }
 
         public bool TryGetParameterValue(string name, out object value) {
-            if(_parametersDict.TryGetValue(name, out var parameter) == false) {
+            if(_parametersDict.TryGetValue(name, out var parameter) == false || parameter.HasValues == false) {
                 value = default(object);
                 return false;
             }
-            value = parameter.GetValue();
+            value = parameter.Value;
             return true;
         }
         #endregion

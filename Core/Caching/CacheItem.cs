@@ -7,6 +7,11 @@
 // ==================================================
 
 namespace DotLogix.Core.Caching {
+    /// <summary>
+    /// An item for a cache implementation
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     public class CacheItem<TKey, TValue> {
         public TKey Key { get; }
         public TValue Value { get; }

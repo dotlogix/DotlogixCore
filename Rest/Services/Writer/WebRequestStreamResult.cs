@@ -18,9 +18,4 @@ namespace DotLogix.Core.Rest.Services.Writer {
         public bool SendInChunks { get; }
         public TransportModes TransportMode { get; }
     }
-
-    public enum TransportModes {
-        Raw,
-        Base64
-    }
 }

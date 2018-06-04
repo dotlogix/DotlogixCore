@@ -11,6 +11,9 @@ using System;
 #endregion
 
 namespace DotLogix.Core.Caching {
+    /// <summary>
+    /// A cache policy where values are valid until a given timestamp
+    /// </summary>
     public class ValidUntilCachePolicy : ICachePolicy {
         private readonly DateTime _validUntilUtc;
 

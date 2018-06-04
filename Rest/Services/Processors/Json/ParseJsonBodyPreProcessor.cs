@@ -14,19 +14,18 @@ using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Mime;
 using DotLogix.Core.Rest.Server.Http.Parameters;
 using DotLogix.Core.Rest.Server.Http.State;
+using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Json {
-    public class ParseJsonBodyPreProcessor : IWebRequestProcessor {
+    public class ParseJsonBodyPreProcessor : WebRequestProcessorBase {
         public const string JsonDataParamName = "jsonData";
         public static IWebRequestProcessor Instance { get; } = new ParseJsonBodyPreProcessor();
-        private ParseJsonBodyPreProcessor() { }
-        public int Priority => int.MaxValue;
-        public bool IgnoreHandled => true;
+        private ParseJsonBodyPreProcessor() : base(int.MaxValue) { }
 
-        public async Task ProcessAsync(WebRequestResult webRequestResult) {
-            var request = webRequestResult.Context.Request;
+        public override async Task ProcessAsync(WebServiceContext webServiceContext) {
+            var request = webServiceContext.HttpRequest;
             if(request.ContentType.Code.Contains(MimeTypes.Application.Json.Code) == false)
                 return;
 
@@ -36,7 +35,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
                     var jsonData = JsonNodes.ToNode(json);
                     request.UserDefinedParameters.Add(new Parameter(JsonDataParamName, jsonData));
                 } catch (Exception e) {
-                    webRequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
+                    webServiceContext.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
                 }
             }
         }

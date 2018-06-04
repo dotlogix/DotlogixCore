@@ -11,6 +11,9 @@ using System;
 #endregion
 
 namespace DotLogix.Core.Caching {
+    /// <summary>
+    /// A common interface for cache policies
+    /// </summary>
     public interface ICachePolicy {
         bool HasExpired(DateTime timeStampUtc);
     }

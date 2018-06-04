@@ -54,11 +54,11 @@ namespace DotLogix.Core.Rest.Server.Http {
         }
 
         public async Task HandleAsync(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route) {
-            var webServiceContext = new WebServiceContext(asyncHttpContext);
+            var webServiceContext = new WebServiceContext(asyncHttpContext, route);
             WebServiceContext.SetLocalContext(webServiceContext);
 
             // start of processing
-            await ProcessRequest(route, webServiceContext.RequestResult);
+            await ProcessRequest(webServiceContext);
             // end of processing
 
             WebServiceContext.SetLocalContext(null);
@@ -105,40 +105,45 @@ namespace DotLogix.Core.Rest.Server.Http {
             return true;
         }
 
-        private async Task ProcessRequest(IWebServiceRoute route, WebRequestResult result) {
+        private async Task ProcessRequest(WebServiceContext webServiceContext) {
+            var route = webServiceContext.Route;
+
             #region PreProcess
-            if(GlobalPreProcessors.Count > 0)
-                await ExecuteProcessorsAsync(result, GlobalPreProcessors);
+            if (GlobalPreProcessors.Count > 0)
+                await ExecuteProcessorsAsync(webServiceContext, GlobalPreProcessors);
 
             if(route.PreProcessors.Count > 0)
-                await ExecuteProcessorsAsync(result, route.PreProcessors);
+                await ExecuteProcessorsAsync(webServiceContext, route.PreProcessors);
             #endregion
 
-            if(ShouldExecute(result, route.RequestProcessor))
-                await route.RequestProcessor.ProcessAsync(result);
+            if(route.RequestProcessor.ShouldExecute(webServiceContext))
+            {
+                var processingTask = route.RequestProcessor.ProcessAsync(webServiceContext);
+                if(processingTask != null && processingTask.IsCompleted == false)
+                    await processingTask;
+            }
 
             #region PostProcess
-            if(GlobalPostProcessors.Count > 0)
-                await ExecuteProcessorsAsync(result, GlobalPostProcessors);
+            if (GlobalPostProcessors.Count > 0)
+                await ExecuteProcessorsAsync(webServiceContext, GlobalPostProcessors);
 
             if(route.PostProcessors.Count > 0)
-                await ExecuteProcessorsAsync(result, route.PostProcessors);
+                await ExecuteProcessorsAsync(webServiceContext, route.PostProcessors);
             #endregion
         }
         #endregion
 
         #region Helper
-        private static async Task ExecuteProcessorsAsync(WebRequestResult result, IEnumerable<IWebRequestProcessor> requestProcessors) {
+        private static async Task ExecuteProcessorsAsync(WebServiceContext webServiceContext, IEnumerable<IWebRequestProcessor> requestProcessors) {
             foreach(var requestProcessor in requestProcessors) {
-                if(ShouldExecute(result, requestProcessor) == false)
+                if(requestProcessor.ShouldExecute(webServiceContext) == false)
                     continue;
 
-                await requestProcessor.ProcessAsync(result);
+                var processingTask = requestProcessor.ProcessAsync(webServiceContext);
+                if(processingTask == null || processingTask.IsCompleted)
+                    continue;
+                await processingTask;
             }
-        }
-
-        private static bool ShouldExecute(WebRequestResult result, IWebRequestProcessor requestProcessor) {
-            return (result.Handled == false) || requestProcessor.IgnoreHandled == false;
         }
         #endregion
     }

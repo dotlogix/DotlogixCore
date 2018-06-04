@@ -61,6 +61,16 @@ namespace DotLogix.Core.Collections {
                 _itemList.InsertSorted(item, _comparer);
         }
 
+        public void AddRange(IEnumerable<T> items) {
+            if(items == null)
+                throw new ArgumentNullException(nameof(items));
+            lock(_lock)
+            {
+                _itemList.AddRange(items);
+                _itemList.Sort(_comparer);
+            };
+        }
+
         public void Clear() {
             lock(_lock)
                 _itemList.Clear();

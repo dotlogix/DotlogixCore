@@ -111,7 +111,7 @@ namespace DotLogix.Core.Extensions {
         public static void ValidateTypesCompatibility<T1, T2>() {
             if(!AreTypesCompatible<T1, T2>()) {
                 throw new InvalidCastException("Types are incompatible for usage with NullableHelper. [ " +
-                                               typeof(T1).ReadableName() + " vs " + typeof(T2).ReadableName() + "]");
+                                               typeof(T1).GetFriendlyName() + " vs " + typeof(T2).GetFriendlyName() + "]");
             }
         }
 
@@ -122,7 +122,7 @@ namespace DotLogix.Core.Extensions {
         [Conditional("DEBUG")]
         public static void ValidateNullable<T>() {
             if(!IsNullable(typeof(T)))
-                throw new InvalidCastException("Nullable type required. [" + typeof(T).ReadableName() + "]");
+                throw new InvalidCastException("Nullable type required. [" + typeof(T).GetFriendlyName() + "]");
         }
 
         [Conditional("DEBUG")]
@@ -130,7 +130,7 @@ namespace DotLogix.Core.Extensions {
             if(value == null) {
                 if(IsNullable(type))
                     return;
-                throw new InvalidCastException("Attempt to assign null to non-nullable type [" + type.ReadableName() +
+                throw new InvalidCastException("Attempt to assign null to non-nullable type [" + type.GetFriendlyName() +
                                                "]. Use IsNull() to check value.");
             }
             ValidateTypesCompatibility(type, value.GetType());

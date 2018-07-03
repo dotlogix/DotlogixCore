@@ -6,8 +6,10 @@
 // LastEdited:  17.02.2018
 // ==================================================
 
+using System;
+
 namespace DotLogix.Core.Rest.Server.Http.Context {
-    public interface IAsyncHttpContext {
+    public interface IAsyncHttpContext : IDisposable {
         IAsyncHttpServer Server { get; }
         IAsyncHttpRequest Request { get; }
         IAsyncHttpResponse Response { get; }

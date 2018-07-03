@@ -46,7 +46,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                 var response = asyncHttpContext.Response;
                 try {
                     await subscription.Router.HandleAsync(asyncHttpContext, subscription.Route);
-                    if(response.IsSent == false)
+                    if(response.IsCompleted == false)
                         await response.CompleteAsync();
                 } catch(Exception e) {
                     Log.Error(e);

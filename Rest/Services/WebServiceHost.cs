@@ -30,12 +30,12 @@ namespace DotLogix.Core.Rest.Services {
         public WebRequestProcessorCollection GlobalPostProcessors => _router.GlobalPostProcessors;
         public WebServiceEventCollection ServerEvents => _router.ServerEvents;
 
-        public WebServiceHost(ConcurrencyOptions concurrencyOptions = null) {
+        public WebServiceHost(Configuration configuration = null) {
             _router = new AsyncWebRequestRouter();
-            Server = new AsyncHttpServer(_router, concurrencyOptions);
+            Server = new AsyncHttpServer(_router, configuration);
         }
 
-        public WebServiceHost(string urlPrefix, ConcurrencyOptions concurrencyOptions = null) : this(concurrencyOptions) {
+        public WebServiceHost(string urlPrefix, Configuration configuration = null) : this(configuration) {
             Server.AddServerPrefix(urlPrefix);
         }
 

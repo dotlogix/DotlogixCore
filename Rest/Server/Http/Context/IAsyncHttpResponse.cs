@@ -11,6 +11,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Mime;
 using DotLogix.Core.Rest.Server.Http.Parameters;
 using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
@@ -19,8 +20,8 @@ using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 namespace DotLogix.Core.Rest.Server.Http.Context {
     public interface IAsyncHttpResponse {
         TransferState TransferState { get; }
-        bool IsSent { get; }
-        ParameterCollection HeaderParameters { get; }
+        bool IsCompleted { get; }
+        NodeMap HeaderParameters { get; }
         MimeType ContentType { get; set; }
         long ContentLength64 { get; set; }
         int ChunkSize { get; set; }
@@ -30,7 +31,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         HttpListenerResponse OriginalResponse { get; }
         Task WriteToResponseStreamAsync(byte[] data, int offset, int count);
         Task WriteToResponseStreamAsync(string message);
-        Task SendChunksAsync();
+        Task CompleteChunksAsync();
         Task CompleteAsync();
     }
 }

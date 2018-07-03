@@ -26,14 +26,14 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
 
         public override async Task ProcessAsync(WebServiceContext webServiceContext) {
             var request = webServiceContext.HttpRequest;
-            if(request.ContentType.Code.Contains(MimeTypes.Application.Json.Code) == false)
+            if(request.ContentType != MimeTypes.Application.Json)
                 return;
 
             var json = await request.ReadStringFromRequestStreamAsync();
             if(json.Length > 1) {
                 try {
                     var jsonData = JsonNodes.ToNode(json);
-                    request.UserDefinedParameters.Add(new Parameter(JsonDataParamName, jsonData));
+                    request.UserDefinedParameters.AddChild(JsonDataParamName, jsonData);
                 } catch (Exception e) {
                     webServiceContext.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
                 }

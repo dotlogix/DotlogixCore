@@ -12,16 +12,17 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Mime;
 using DotLogix.Core.Rest.Server.Http.Parameters;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http.Context {
     public interface IAsyncHttpRequest {
-        ParameterCollection HeaderParameters { get; }
-        ParameterCollection QueryParameters { get; }
-        ParameterCollection UrlParameters { get; }
-        ParameterCollection UserDefinedParameters { get; }
+        NodeMap HeaderParameters { get; }
+        NodeMap QueryParameters { get; }
+        NodeMap UrlParameters { get; }
+        NodeMap UserDefinedParameters { get; }
         Uri Url { get; }
         HttpMethods HttpMethod { get; }
         MimeType ContentType { get; }
@@ -32,7 +33,5 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         Task<int> ReadDataFromRequestStreamAsync(byte[] data, int offset, int count);
         Task<byte[]> ReadDataFromRequestStreamAsync();
         Task<string> ReadStringFromRequestStreamAsync();
-        bool TryFindParameter(string name, ParameterSources sources, out Parameter parameter);
-        Parameter FindParameter(string name, ParameterSources sources);
     }
 }

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace DotLogix.Core.Rest.Server.Http {
     public interface IAsyncHttpServer : IDisposable {
-        ConcurrencyOptions ConcurrencyOptions { get; }
+        Configuration Configuration { get; }
         bool IsRunning { get; }
         void Start();
         void Stop();

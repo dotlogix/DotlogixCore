@@ -16,7 +16,7 @@ using DotLogix.Core.Rest.Server.Routes;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Context {
-    public class WebServiceContext {
+    public class WebServiceContext : IDisposable{
         private static readonly AsyncLocal<WebServiceContext> AsyncCurrent = new AsyncLocal<WebServiceContext>();
         private readonly Dictionary<string, object> _contextVariables = new Dictionary<string, object>();
         public static WebServiceContext Current => AsyncCurrent.Value;
@@ -37,10 +37,12 @@ namespace DotLogix.Core.Rest.Services.Context {
         }
         #endregion
 
-        internal WebServiceContext(IAsyncHttpContext httpContext, IWebServiceRoute route) {
+        public WebServiceContext(IAsyncHttpContext httpContext, IWebServiceRoute route) {
             HttpContext = httpContext;
             Route = route;
             RequestResult = new WebRequestResult(httpContext);
+
+            AsyncCurrent.Value = this;
         }
 
         #region Set
@@ -48,10 +50,6 @@ namespace DotLogix.Core.Rest.Services.Context {
             _contextVariables[key] = value;
         }
         #endregion
-
-        internal static void SetLocalContext(WebServiceContext context) {
-            AsyncCurrent.Value = context;
-        }
 
         #region Get
         public object GetVariable(string key) {
@@ -112,5 +110,9 @@ namespace DotLogix.Core.Rest.Services.Context {
             return value;
         }
         #endregion
+
+        public void Dispose() {
+            AsyncCurrent.Value = null;
+        }
     }
 }

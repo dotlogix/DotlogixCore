@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
@@ -38,12 +39,12 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
             var result = webServiceContext.RequestResult;
             var headerParameters = request.HeaderParameters;
 
-            if((headerParameters.TryGetParameter(AuthorizationParameterName, out var authParameter) == false) || (authParameter.HasValues == false)) {
+            if(headerParameters.TryGetChildValue(AuthorizationParameterName, out string authParameter) == false) {
                 SetInvalidFormatException(result);
                 return Task.CompletedTask;
             }
 
-            var authValue = ((string)authParameter.Value).Split();
+            var authValue = authParameter.Split();
             if((authValue.Length != 2) || (_authorizationMethods.TryGetValue(authValue[0], out var authMethod) == false)) {
                 SetInvalidFormatException(result);
                 return Task.CompletedTask;

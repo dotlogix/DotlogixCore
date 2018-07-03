@@ -12,52 +12,13 @@ using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http.Parameters {
-    public class Parameter {
-        private readonly List<object> _values = new List<object>();
+    public struct Parameter {
         public string Name { get; }
-        public bool HasValues => _values.Count > 0;
-        public bool IsMultiValue => _values.Count > 1;
-        public object[] Values => _values.ToArray();
-        public object Value => HasValues ? _values[0] : null;
-
-        public Parameter(string name) {
-            Name = name;
-        }
+        public IEnumerable<object> Values { get; }
 
         public Parameter(string name, IEnumerable<object> values) {
             Name = name;
-            AddValues(values);
-        }
-
-        public Parameter(string name, params object[] values) : this(name, values.AsEnumerable()) { }
-
-        public void AddValue(object value) {
-            if(_values.Contains(value) == false)
-                _values.Add(value);
-        }
-
-        public void AddValues(IEnumerable<object> values) {
-            foreach(var value in values)
-                AddValue(value);
-        }
-
-        public void Merge(Parameter parameter) {
-            AddValues(parameter._values);
-        }
-
-        public object GetValue(object defaultValue = default(object)) {
-            return HasValues ? _values[0] : defaultValue;
-        }
-
-        public TValue GetValue<TValue>(TValue defaultValue = default(TValue)) {
-            if(HasValues)
-                return _values[0] is TValue value ? value : defaultValue;
-
-            return defaultValue;
-        }
-
-        public override string ToString() {
-            return $"{Name} = {string.Join(";", Values)}";
+            Values = values;
         }
     }
 }

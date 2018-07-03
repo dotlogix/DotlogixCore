@@ -1,4 +1,5 @@
 using System;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Routes;
 
@@ -14,8 +15,8 @@ namespace DotLogix.Core.Rest.Server.Http {
             Context = asyncHttpContext;
             Route = route;
             Router = asyncWebRequestRouter;
-            if(Context.Request.HeaderParameters.TryGetParameterValue(AsyncWebRequestRouter.EventSubscriptionChannelParameterName, out var channel))
-                Channel = (string)channel;
+            if(Context.Request.HeaderParameters.TryGetChildValue(AsyncWebRequestRouter.EventSubscriptionChannelParameterName, out string channel))
+                Channel = channel;
         }
 
         public Guid Guid { get; }

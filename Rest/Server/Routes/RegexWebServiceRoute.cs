@@ -7,8 +7,10 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Parameters;
 using DotLogix.Core.Rest.Services.Processors;
@@ -30,7 +32,8 @@ namespace DotLogix.Core.Rest.Server.Routes {
             var match = Regex.Match(path);
             if(!match.Success)
                 return RouteMatch.Empty;
-            var parameters = names.Select(n => new Parameter(n, match.Groups[n].Value)).ToList();
+
+            var parameters = names.Select(name => new NodeValue(name, match.Groups[name].Value)).ToList();
             return new RouteMatch(true, match.Value, match.Length, parameters);
         }
     }

@@ -13,6 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Mime;
 using DotLogix.Core.Rest.Server.Http.Parameters;
 using DotLogix.Core.Rest.Server.Http.State;
@@ -21,24 +22,25 @@ using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 
 namespace DotLogix.Core.Rest.Server.Http.Context {
     public class AsyncHttpResponse : IAsyncHttpResponse {
+        private readonly IParameterParser _parameterParser;
         public const int DefaultChunkSize = 2_097_152; // 2MiB;
 
-        public AsyncHttpResponse(HttpListenerResponse originalResponse) {
+        private AsyncHttpResponse(HttpListenerResponse originalResponse, IParameterParser parameterParser) {
+            _parameterParser = parameterParser;
             OriginalResponse = originalResponse ?? throw new ArgumentNullException(nameof(originalResponse));
             ContentType = MimeTypes.Text.Plain;
             ContentLength64 = 0;
             ContentEncoding = Encoding.UTF8;
             StatusCode = HttpStatusCodes.Success.Ok;
             OutputStream = new MemoryStream();
-            HeaderParameters = new ParameterCollection();
+            HeaderParameters = parameterParser.Deserialize(originalResponse.Headers);
             ChunkSize = DefaultChunkSize;
-            InitializeParameters();
         }
 
         public TransferState TransferState { get; private set; }
-        public bool IsSent => TransferState != TransferState.None;
+        public bool IsCompleted => TransferState == TransferState.Completed;
 
-        public ParameterCollection HeaderParameters { get; }
+        public NodeMap HeaderParameters { get; }
 
         public MimeType ContentType { get; set; }
         public long ContentLength64 { get; set; }
@@ -57,7 +59,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
                 await writer.WriteAsync(message);
         }
 
-        public async Task SendChunksAsync()
+        public async Task CompleteChunksAsync()
         {
             if (TransferState == TransferState.Completed)
                 throw new InvalidOperationException("Sending is not possible if the transfer has been completed already");
@@ -81,7 +83,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
                 throw new InvalidOperationException("Sending is not possible if the transfer has been completed already");
 
             if(OriginalResponse.SendChunked) {
-                await SendChunksAsync();
+                await CompleteChunksAsync();
             } else {
                 if (TransferState == TransferState.None) {
                     EnsurePrepared();
@@ -98,22 +100,8 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
             TransferState = TransferState.Completed;
         }
 
-        private void InitializeParameters() {
-            var header = OriginalResponse.Headers;
-            for(var i = 0; i < header.Count; i++) {
-                var name = header.GetKey(i);
-                var values = header.GetValues(i);
-                HeaderParameters.Add(new Parameter(name, values.AsEnumerable()));
-            }
-        }
-
         private void PrepareHeaders() {
-            var header = new WebHeaderCollection();
-            foreach(var parameter in HeaderParameters) {
-                foreach(var value in parameter.Values)
-                    header.Add(parameter.Name, value.ToString());
-            }
-            OriginalResponse.Headers = header;
+            OriginalResponse.Headers = _parameterParser.Serialize<WebHeaderCollection>(HeaderParameters); ;
         }
 
         private void EnsurePrepared() {
@@ -127,6 +115,10 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
             OriginalResponse.ContentEncoding = ContentEncoding;
             if (OriginalResponse.SendChunked == false)
                 OriginalResponse.ContentLength64 = OutputStream.Length;
+        }
+
+        public static AsyncHttpResponse Create(HttpListenerResponse originalResponse, IParameterParser parameterParser) {
+            return new AsyncHttpResponse(originalResponse, parameterParser);
         }
     }
 }

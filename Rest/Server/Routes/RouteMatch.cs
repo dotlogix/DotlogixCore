@@ -8,6 +8,7 @@
 
 #region
 using System.Collections.Generic;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Parameters;
 #endregion
 
@@ -17,13 +18,13 @@ namespace DotLogix.Core.Rest.Server.Routes {
         public bool Success { get; }
         public string Match { get; }
         public int Length { get; }
-        public IEnumerable<Parameter> UrlParameters { get; }
+        public IEnumerable<Node> UrlParameters { get; }
 
-        public RouteMatch(bool success, string match, int length, IEnumerable<Parameter> values) {
+        public RouteMatch(bool success, string match, int length, IEnumerable<Node> parameters) {
             Success = success;
             Match = match;
             Length = length;
-            UrlParameters = values;
+            UrlParameters = parameters;
         }
     }
 }

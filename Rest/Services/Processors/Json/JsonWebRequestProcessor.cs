@@ -24,7 +24,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
         protected override bool TryGetParameterValue(IAsyncHttpRequest request, ParameterInfo methodParam, out object paramValue) {
             Node child = null;
 
-            if(request.UserDefinedParameters.TryGetParameterValue(JsonDataParamName, out var jsonBody) && jsonBody is Node node) {
+            if(request.UserDefinedParameters.TryGetChild(JsonDataParamName, out var node)) {
                 if(methodParam.IsDefined(typeof(JsonBodyAttribute)))
                     child = node;
                 else if(node is NodeMap nodeMap)

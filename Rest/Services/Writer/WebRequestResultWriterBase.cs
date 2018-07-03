@@ -11,7 +11,7 @@ namespace DotLogix.Core.Rest.Services.Writer {
     public class WebRequestResultWriterBase : IAsyncWebRequestResultWriter{
         public async Task WriteAsync(WebRequestResult requestResult) {
             var response = requestResult.Context.Response;
-            if (response.IsSent)
+            if (response.IsCompleted)
                 return;
 
             if (requestResult.Succeed)

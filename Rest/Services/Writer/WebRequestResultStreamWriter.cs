@@ -32,7 +32,7 @@ namespace DotLogix.Core.Rest.Services.Writer {
                     while ((read = await result.OutputStream.ReadAsync(buffer, 0, chunkSize)) > 0)
                     {
                         await asyncHttpResponse.WriteToResponseStreamAsync(buffer, 0, read);
-                        await asyncHttpResponse.SendChunksAsync();
+                        await asyncHttpResponse.CompleteChunksAsync();
                     }
                 }
                 else

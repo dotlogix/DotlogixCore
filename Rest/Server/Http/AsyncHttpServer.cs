@@ -29,17 +29,16 @@ namespace DotLogix.Core.Rest.Server.Http {
         private static readonly Dictionary<string, HttpMethods> ChachedMethods = Enum.GetValues(typeof(HttpMethods)).Cast<HttpMethods>().ToDictionary(m => m.ToString(), StringComparer.OrdinalIgnoreCase);
         private readonly HttpListener _httpListener = new HttpListener();
         private readonly IAsyncHttpRequestHandler _requestHandler;
-        private SemaphoreSlim _connectionSemaphore;
         private SemaphoreSlim _requestSemaphore;
         private CancellationTokenSource _serverShutdownSource;
         public bool IsDisposed { get; private set; }
 
-        public AsyncHttpServer(IAsyncHttpRequestHandler requestHandler, ConcurrencyOptions concurrencyOptions = null) {
-            ConcurrencyOptions = concurrencyOptions ?? ConcurrencyOptions.Default;
+        public AsyncHttpServer(IAsyncHttpRequestHandler requestHandler, Configuration configuration = null) {
+            Configuration = configuration ?? Configuration.Default;
             _requestHandler = requestHandler ?? throw new ArgumentNullException(nameof(requestHandler));
         }
 
-        public ConcurrencyOptions ConcurrencyOptions { get; }
+        public Configuration Configuration { get; }
         public bool IsRunning { get; private set; }
 
         public void Start() {
@@ -49,12 +48,10 @@ namespace DotLogix.Core.Rest.Server.Http {
                 return;
             IsRunning = true;
             _serverShutdownSource = new CancellationTokenSource();
-            _connectionSemaphore = new SemaphoreSlim(0, ConcurrencyOptions.Connections);
-            _requestSemaphore = new SemaphoreSlim(0, ConcurrencyOptions.Requests);
+            _requestSemaphore = new SemaphoreSlim(0, Configuration.MaxConcurrentRequests);
             _httpListener.Start();
 
-            _connectionSemaphore.Release(ConcurrencyOptions.Connections);
-            _requestSemaphore.Release(ConcurrencyOptions.Requests);
+            _requestSemaphore.Release(Configuration.MaxConcurrentRequests);
             HandleRequestsAsync();
         }
 
@@ -70,9 +67,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             _serverShutdownSource.Dispose();
             _serverShutdownSource = null;
 
-            _connectionSemaphore.Dispose();
             _requestSemaphore.Dispose();
-            _connectionSemaphore = null;
             _requestSemaphore = null;
         }
 
@@ -95,7 +90,7 @@ namespace DotLogix.Core.Rest.Server.Http {
         private async void HandleRequestsAsync() {
             while(IsRunning) {
                 try {
-                    await _connectionSemaphore.WaitAsync(_serverShutdownSource.Token);
+                    await _requestSemaphore.WaitAsync(_serverShutdownSource.Token);
                 } catch(OperationCanceledException e) {
                     if(IsRunning == false)
                         continue; // Supress cancellation because of server shutdown
@@ -103,10 +98,8 @@ namespace DotLogix.Core.Rest.Server.Http {
                 }
 
                 try {
-#pragma warning disable 4014
-                    var contextTask = _httpListener.GetContextAsync();
-                    contextTask.ContinueWith(HandleRequestAsync, TaskContinuationOptions.OnlyOnRanToCompletion);
-#pragma warning restore 4014
+                    var context = await _httpListener.GetContextAsync().ConfigureAwait(false);
+                    HandleRequestAsync(context).ConfigureAwait(false);
                 } catch(HttpListenerException e) {
                     if(IsRunning == false)
                         continue;
@@ -115,40 +108,55 @@ namespace DotLogix.Core.Rest.Server.Http {
             }
         }
 
-        private async Task HandleRequestAsync(Task<HttpListenerContext> context) {
+        private async Task HandleRequestAsync(HttpListenerContext originalContext) {
+            IAsyncHttpContext httpContext;
             try {
-                await _requestSemaphore.WaitAsync(_serverShutdownSource.Token);
-            } catch(OperationCanceledException e) {
-                if(IsRunning == false)
-                    return; // Supress cancellation because of server shutdown
-                Log.Error(e);
+                httpContext = CreateContext(originalContext);
+            } catch(Exception e) {
+                if (IsRunning)
+                    Log.Error(e);
+                return;
             }
 
-            var httpListenerContext = await context;
-            var request = new AsyncHttpRequest(httpListenerContext.Request);
-            var response = new AsyncHttpResponse(httpListenerContext.Response);
-            var httpContext = new AsyncHttpContext(this, request, response);
-
-            try {
+            var response = httpContext.Response;
+            try
+            {
                 await _requestHandler.HandleRequestAsync(httpContext);
-                if((response.IsSent == false) && (httpContext.PreventAutoSend == false))
+                if ((response.IsCompleted) && (httpContext.PreventAutoSend == false))
                     await response.CompleteAsync();
-            } catch(Exception e) {
+            }
+            catch (Exception e)
+            {
                 Log.Error(e);
-                await OnError(response, e);
-            } finally {
-                try {
-                    _connectionSemaphore.Release();
+                await SendErrorMessageAsync(response, e);
+            }
+            finally
+            {
+                httpContext?.Dispose();
+                try
+                {
                     _requestSemaphore.Release();
-                } catch(Exception e) {
-                    if(IsRunning)
+                }
+                catch (Exception e)
+                {
+                    if (IsRunning)
                         Log.Error(e);
                 }
             }
         }
 
-        private async Task OnError(IAsyncHttpResponse response, Exception exception) {
-            await SendErrorMessageAsync(response, exception);
+        private IAsyncHttpContext CreateContext(HttpListenerContext originalContext) {
+            var request = CreateRequest(originalContext);
+            var response = CreateResponse(originalContext);
+            return new AsyncHttpContext(this, request, response);
+        }
+
+        private AsyncHttpResponse CreateResponse(HttpListenerContext originalContext) {
+            return AsyncHttpResponse.Create(originalContext.Response, Configuration.ParameterParser ?? PrimitiveParameterParser.Instance);
+        }
+
+        private AsyncHttpRequest CreateRequest(HttpListenerContext originalContext) {
+            return AsyncHttpRequest.Create(originalContext.Request, Configuration.ParameterParser ?? PrimitiveParameterParser.Instance);
         }
 
         public static async Task SendErrorMessageAsync(IAsyncHttpResponse response, Exception exception) {

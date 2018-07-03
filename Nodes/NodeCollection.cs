@@ -35,6 +35,13 @@ namespace DotLogix.Core.Nodes {
             NodeList.Add(node);
         }
 
+        public virtual void AddChildren(IEnumerable<Node> nodes)
+        {
+            foreach(var node in nodes) {
+                AddChild(node);
+            }
+        }
+
         public IEnumerable<Node> Children() {
             return NodeList;
         }

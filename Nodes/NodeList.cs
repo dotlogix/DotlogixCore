@@ -8,11 +8,22 @@
 
 #region
 using System;
+using System.Collections.Generic;
+using DotLogix.Core.Utils.Patterns;
 #endregion
 
 namespace DotLogix.Core.Nodes {
     public class NodeList : NodeCollection {
-        public Node this[int index] => GetChild(index);
+        public Node this[int index] {
+            get => GetChild(index);
+            set {
+                if(value == null) {
+                    RemoveChild(index);
+                } else {
+                    ReplaceChild(index, value);
+                }
+            }
+        }
 
         public NodeList(string name) : this() {
             InternalName = name;
@@ -26,12 +37,6 @@ namespace DotLogix.Core.Nodes {
             base.AddChild(node);
         }
 
-        public virtual TNode CreateChild<TNode>() where TNode : Node, new() {
-            var node = new TNode();
-            AddChild(node);
-            return node;
-        }
-
         public Node GetChild(int index) {
             if((index < 0) || (index > NodeList.Count))
                 return null;
@@ -40,6 +45,15 @@ namespace DotLogix.Core.Nodes {
 
         public TNode GetChild<TNode>(int index) where TNode : Node {
             return GetChild(index) as TNode;
+        }
+
+        public bool TryGetChild(int index, out Node childNode) {
+            return (childNode = GetChild(index)) != null;
+        }
+
+        public bool TryGetChild<TNode>(int index, out TNode childNode) where TNode : Node
+        {
+            return (childNode = GetChild<TNode>(index)) != null;
         }
 
         public void InsertChild(int index, Node node) {
@@ -131,8 +145,20 @@ namespace DotLogix.Core.Nodes {
             throw new InvalidOperationException("Children in a node list can not have a name");
         }
 
-        protected override Node SelectNodeInternal(string pathToken) {
-            return int.TryParse(pathToken, out var index) ? GetChild(index) : null;
+        protected override void AddMatchingNodes(string pattern, List<Node> newResults) {
+            if(Range.TryParse(pattern, out var range)) {
+                var childCount = ChildCount;
+
+                var min = range.Min ?? 0;
+                var max = range.Max ?? childCount;
+
+                min = ((min % childCount) + childCount) % childCount;
+                max = ((max % childCount) + childCount) % childCount;
+
+                for (var i = min; i <= max; i++) {
+                    newResults.Add(GetChild(i));
+                }
+            }
         }
     }
 }

@@ -45,20 +45,69 @@ namespace DotLogix.Core.Nodes {
 
         public NodeValue() : base(NodeTypes.Empty) { }
 
-        public object ConvertValue(Type type) {
+        public object GetValue(Type type) {
             return Value.ConvertTo(type);
         }
 
-        public TValue ConvertValue<TValue>() {
+        public TValue GetValue<TValue>() {
             return Value.ConvertTo<TValue>();
         }
 
-        public bool TryConvertValue(Type type, out object value) {
+        public bool TryGetValue(Type type, out object value) {
             return Value.TryConvertTo(type, out value);
         }
 
-        public bool TryConvertValue<TValue>(out TValue value) {
+        public bool TryGetValue<TValue>(out TValue value) {
             return Value.TryConvertTo(out value);
+        }
+
+
+        public object ConvertValue(Type type) {
+            var newValue = Value.ConvertTo(type);
+            Value = newValue;
+            return newValue;
+        }
+
+        public TValue ConvertValue<TValue>()
+        {
+            var newValue = Value.ConvertTo<TValue>();
+            Value = newValue;
+            return newValue;
+        }
+
+        public bool TryConvertValue(Type type, out object value)
+        {
+            if(Value.TryConvertTo(type, out value) == false)
+                return false;
+
+            Value = value;
+            return true;
+        }
+
+        public bool TryConvertValue<TValue>(out TValue value)
+        {
+            if (Value.TryConvertTo(out value) == false)
+                return false;
+
+            Value = value;
+            return true;
+        }
+
+        public override string ToString() {
+            if(Type == NodeTypes.Empty)
+                return base.ToString();
+
+            if (HasAncestor)
+            {
+                switch (Ancestor.Type)
+                {
+                    case NodeTypes.List:
+                        return $"Node{Type} {{Index: {Index}, Value: {Value}, Path: {Path}}}";
+                    case NodeTypes.Map:
+                        return $"{Type} {{Name: {Name}, Value: {Value}, Path: {Path}}}";
+                }
+            }
+            return $"Node{Type} {{Value: {Value}, Path: {Path}}}";
         }
     }
 }

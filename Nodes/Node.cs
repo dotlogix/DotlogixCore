@@ -17,11 +17,14 @@ using DotLogix.Core.Nodes.Processor;
 
 namespace DotLogix.Core.Nodes {
     public abstract class Node {
-        private const char PathSeperator = '\\';
+        private const string PathSeperator = "\\";
         private const string RootCharacter = "~";
         private const string SelfCharacter = ".";
         private const string AncestorCharacter = "..";
-        private static readonly char[] PathSeperators = {PathSeperator, '/'};
+        private const string AnyCharacter = "*";
+        private static readonly char[] PathSeperators = {'\\', '/'};
+        private static readonly char[] OptionSeperators = {'|'};
+
         private NodeCollection _ancestor;
         internal string InternalName;
         public NodeTypes Type { get; internal set; }
@@ -62,7 +65,7 @@ namespace DotLogix.Core.Nodes {
 
         public int Index => (Ancestor as NodeList)?.IndexOfChild(this) ?? -1;
         public Node Root => Ancestor != null ? Ancestor.Root : this;
-        public bool IsRoot => HasAncestor == false;
+        public bool IsRoot => Ancestor == null;
 
         public NodeCollection Ancestor {
             get => _ancestor;
@@ -139,39 +142,120 @@ namespace DotLogix.Core.Nodes {
         }
 
         public virtual Node SelectNode(string path) {
-            if(path == null)
-                throw new ArgumentNullException(nameof(path));
-            var split = path.Split(PathSeperators, 2, StringSplitOptions.None);
-            Node currentNode;
-            switch(split[0]) {
-                case "":
-                case SelfCharacter:
-                    currentNode = this;
-                    break;
-                case RootCharacter:
-                    currentNode = Root;
-                    break;
-                case AncestorCharacter:
-                    currentNode = Ancestor;
-                    break;
-                default:
-                    currentNode = SelectNodeInternal(split[0]);
-                    break;
-            }
-
-            return split.Length == 1 ? currentNode : currentNode?.SelectNode(split[1]);
+            return SelectNodes(path).FirstOrDefault();
         }
 
-        protected virtual Node SelectNodeInternal(string pathToken) {
-            return null;
-        }
-
-        public TNode SelectNode<TNode>(string path) where TNode : Node {
+        public TNode SelectNode<TNode>(string path) where TNode : Node
+        {
             return SelectNode(path) as TNode;
         }
 
+        public virtual IEnumerable<Node> SelectNodes(string path)
+        {
+            return SelectNodes(path.Split(PathSeperators));
+        }
+
+        public IEnumerable<Node> SelectNodes(string[] pathParts) {
+            return SelectNodes(pathParts, 0, pathParts.Length);
+        }
+
+        public IEnumerable<Node> SelectNodes(string[] pathParts, int start, int count) {
+            if (pathParts == null)
+                throw new ArgumentNullException(nameof(pathParts));
+            if(start < 0 || start >= pathParts.Length)
+                throw new ArgumentOutOfRangeException(nameof(start));
+            if (count < 0 || start+count > pathParts.Length)
+                throw new ArgumentOutOfRangeException(nameof(start));
+
+            IEnumerable<Node> results = null;
+            for(int i = start; i < start+count; i++) {
+                var pathPart = pathParts[i];
+                var newResults = new List<Node>();
+                foreach (var currentNode in results ?? new []{this})
+                {
+                    switch (pathPart)
+                    {
+                        case "":
+                        case SelfCharacter:
+                            newResults.Add(currentNode);
+                            break;
+                        case RootCharacter:
+                            newResults.Add(currentNode.Root);
+                            break;
+                        case AncestorCharacter:
+                            if (currentNode.Ancestor == null)
+                                break;
+                            newResults.Add(currentNode.Ancestor);
+                            break;
+                        case AnyCharacter:
+                            switch (Type)
+                            {
+                                case NodeTypes.Empty:
+                                case NodeTypes.Value:
+                                    newResults.Add(currentNode);
+                                    break;
+                                case NodeTypes.List:
+                                case NodeTypes.Map:
+                                    newResults.AddRange(((NodeCollection)currentNode).Children());
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                            break;
+                        default:
+                            var options = pathPart.Split(OptionSeperators, StringSplitOptions.RemoveEmptyEntries);
+                            foreach(var option in options) {
+                                currentNode.AddMatchingNodes(option, newResults);
+                            }
+                            break;
+                    }
+                }
+                results = newResults;
+            }
+            return results ?? Enumerable.Empty<Node>();
+        }
+
+        public virtual IEnumerable<TNode> SelectNodes<TNode>(string path)
+        {
+            return SelectNodes(path).OfType<TNode>();
+        }
+
+        public IEnumerable<TNode> SelectNodes<TNode>(string[] pathParts) {
+            return SelectNodes(pathParts, 0, pathParts.Length).OfType<TNode>();
+        }
+
+        public IEnumerable<TNode> SelectNodes<TNode>(string[] pathParts, int start, int count) {
+            return SelectNodes(pathParts, start, count).OfType<TNode>();
+        }
+
+        protected virtual void AddMatchingNodes(string pattern, List<Node> newResults) {
+            
+        }
+
+        protected virtual string CalculatePath() {
+            if(IsRoot)
+                return RootCharacter;
+
+            switch(Ancestor.Type) {
+                case NodeTypes.List:
+                    return string.Concat(Ancestor.Path, PathSeperator, Index.ToString());
+                case NodeTypes.Map:
+                    return string.Concat(Ancestor.Path, PathSeperator, Name);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         public override string ToString() {
-            return JsonNodes.ToJson(this, new JsonNodesFormatter {Ident = true});
+            if(HasAncestor) {
+                switch(Ancestor.Type) {
+                    case NodeTypes.List:
+                        return $"Node{Type} {{Index: {Index}, Path: {Path}}}";
+                    case NodeTypes.Map:
+                        return $"{Type} {{Name: {Name}, Path: {Path}}}";
+                }
+            }
+            return $"Node{Type} {{Path: {Path}}}";
         }
     }
 }

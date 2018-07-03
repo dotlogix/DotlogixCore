@@ -9,22 +9,31 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Nodes {
     public class NodeMap : NodeCollection {
         private readonly Dictionary<string, Node> _nodeDict = new Dictionary<string, Node>(StringComparer.OrdinalIgnoreCase);
-        public Node this[string name] => GetChild(name);
+        public Node this[string name]
+        {
+            get => GetChild(name);
+            set
+            {
+                if (value == null)
+                {
+                    RemoveChild(name);
+                } else {
+                    value.Ancestor = this;
+                    value.InternalName = name;
+                    ReplaceChild(value);
+                }
+            }
+        }
         public NodeMap() : base(NodeTypes.Map) { }
 
         public NodeMap(string name) : this() {
             InternalName = name;
-        }
-
-        public virtual TNode CreateChild<TNode>(string name) where TNode : Node, new() {
-            var node = new TNode {InternalName = name};
-            AddChild(node);
-            return node;
         }
 
         public Node GetChild(string name) {
@@ -33,6 +42,16 @@ namespace DotLogix.Core.Nodes {
 
         public TNode GetChild<TNode>(string name) where TNode : Node {
             return GetChild(name) as TNode;
+        }
+
+        public bool TryGetChild(string name, out Node childNode)
+        {
+            return (childNode = GetChild(name)) != null;
+        }
+
+        public bool TryGetChild<TNode>(string name, out TNode childNode) where TNode : Node
+        {
+            return (childNode = GetChild<TNode>(name)) != null;
         }
 
         public bool RemoveChild(string name) {
@@ -67,6 +86,13 @@ namespace DotLogix.Core.Nodes {
             base.AddChild(node);
         }
 
+        public virtual void AddChild(string name, Node node) {
+            node.Ancestor = this;
+            node.InternalName = name;
+            _nodeDict.Add(node.Name, node);
+            base.AddChild(node);
+        }
+
         public override bool RemoveChild(Node node) {
             return base.RemoveChild(node) && _nodeDict.Remove(node.Name);
         }
@@ -93,8 +119,9 @@ namespace DotLogix.Core.Nodes {
             RenameChild(node, newName);
         }
 
-        protected override Node SelectNodeInternal(string pathToken) {
-            return GetChild(pathToken);
+        protected override void AddMatchingNodes(string pattern, List<Node> newResults) {
+            if(TryGetChild(pattern, out var child))
+                newResults.Add(child);
         }
     }
 }

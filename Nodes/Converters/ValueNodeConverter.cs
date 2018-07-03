@@ -26,7 +26,7 @@ namespace DotLogix.Core.Nodes.Converters {
                 return Type.GetDefaultValue();
 
             if (node is NodeValue nodeValue)
-                return nodeValue.ConvertValue(Type);
+                return nodeValue.GetValue(Type);
             throw new ArgumentException("Node is not a NodeValue");
         }
     }

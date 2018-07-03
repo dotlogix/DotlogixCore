@@ -13,8 +13,10 @@ using System.Collections.Generic;
 
 namespace DotLogix.Core {
     public struct Optional<TValue> {
+        public static Optional<TValue> Undefined => new Optional<TValue>();
         public bool IsDefined { get; }
         public bool IsDefault => IsDefined && Equals(Value, default(TValue));
+        public bool IsUndefinedOrDefault => IsDefined == false || Equals(Value, default(TValue));
         public TValue Value { get; }
 
         public Optional(TValue value) {
@@ -22,8 +24,13 @@ namespace DotLogix.Core {
             Value = value;
         }
 
-        public TValue GetValueOrDefault() {
-            return IsDefined ? Value : default(TValue);
+        public TValue GetValueOrDefault(TValue defaultValue = default(TValue)) {
+            return IsDefined ? Value : defaultValue;
+        }
+
+        public bool TryGetValue(out TValue defaultValue) {
+            defaultValue = Value;
+            return IsDefined;
         }
 
 

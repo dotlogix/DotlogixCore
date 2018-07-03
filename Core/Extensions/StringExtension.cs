@@ -406,5 +406,47 @@ namespace DotLogix.Core.Extensions {
             throw new InvalidCastException($"{enumValue} is not a valid value of enum {enumType.GetFriendlyName()}");
         }
         #endregion
+
+        #region SubStringUntil
+        public static string SubstringUntil(this string value, int start, int count, params char[] delimiters) {
+            var idx = value.IndexOfAny(delimiters, start, count);
+            if(idx == -1)
+                return start > 0 || (count > 0 && count < value.Length) ? value.Substring(start, count) : value;
+            return value.Substring(start, idx - start);
+        }
+
+        public static string SubstringUntil(this string value, params char[] delimiters)
+        {
+            var idx = value.IndexOfAny(delimiters);
+            if (idx == -1)
+                return value;
+            return value.Substring(0, idx);
+        }
+        #endregion
+
+        #region Join
+        public static StringBuilder AppendJoin<T>(this StringBuilder sb, string separator, IEnumerable<T> values)
+        {
+            if(values == null)
+                throw new ArgumentNullException(nameof(values));
+            if(separator == null)
+                separator = string.Empty;
+            using(var enumerator = values.GetEnumerator()) {
+                if(!enumerator.MoveNext())
+                    return sb;
+
+                if(enumerator.Current != null) {
+                    sb.Append(enumerator.Current);
+                }
+                while(enumerator.MoveNext()) {
+                    sb.Append(separator);
+                    if(enumerator.Current != null) {
+                        sb.Append(enumerator.Current);
+                    }
+                }
+                return sb;
+            }
+        }
+        #endregion
     }
 }

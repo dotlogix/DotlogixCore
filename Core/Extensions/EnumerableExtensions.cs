@@ -17,6 +17,24 @@ using DotLogix.Core.Utils;
 namespace DotLogix.Core.Extensions {
     public static class EnumerableExtensions {
         /// <summary>
+        /// Creates an enumerable of items using a selectorFunc
+        /// </summary>
+        /// <param name="initialValue">The initial value</param>
+        /// <param name="selectNextFunc">A function to select the next item</param>
+        /// <param name="hasNextFunc">A function to check if an additional value is available</param>
+        /// <param name="yieldInitial">A flag if the initial value should be yield or skipped</param>
+        /// <returns></returns>
+        public static IEnumerable<T> AggregateEnumerable<T>(this T initialValue, Func<T, T> selectNextFunc, Func<T, bool> hasNextFunc, bool yieldInitial = false) {
+            if(yieldInitial)
+                yield return initialValue;
+
+            while(hasNextFunc(initialValue)) {
+                yield return (initialValue = selectNextFunc(initialValue));
+            }
+        }
+
+
+        /// <summary>
         /// Searches for differences of two enumerables using an equality comparer
         /// </summary>
         /// <param name="left">The first enumerable</param>
@@ -207,6 +225,29 @@ namespace DotLogix.Core.Extensions {
                     return enumerables.Balance();
                 case CombineMode.Shuffled:
                     return enumerables.Shuffle();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
+            }
+        }
+
+        /// <summary>
+        /// Combines a list of enumerable using the given combination mode
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumerable"></param>
+        /// <param name="otherEnumerable"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> Combine<T>(this IEnumerable<T> enumerable, IEnumerable<T> otherEnumerable, CombineMode mode)
+        {
+            switch (mode)
+            {
+                case CombineMode.Sequential:
+                    return enumerable.Concat(otherEnumerable);
+                case CombineMode.RoundRobin:
+                    return Balance(new[] { enumerable, otherEnumerable });
+                case CombineMode.Shuffled:
+                    return Shuffle(new[] { enumerable, otherEnumerable });
                 default:
                     throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
             }

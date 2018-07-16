@@ -6,44 +6,67 @@ namespace DotLogix.Core.Nodes
 {
     public static class NodeExtensions {
         #region NodeMap
+
+        #region Create
+
         public static TNode CreateNode<TNode>(this NodeMap nodeMap, string name) where TNode : Node, new() {
-            var node = new TNode { InternalName = name };
-            nodeMap.AddChild(node);
+            var node = new TNode();
+            nodeMap.AddChild(name, node);
             return node;
         }
 
         public static NodeMap CreateMap(this NodeMap nodeMap, string name) {
-            var node = new NodeMap(name);
-            nodeMap.AddChild(node);
+            var node = new NodeMap();
+            nodeMap.AddChild(name, node);
             return node;
         }
 
         public static NodeList CreateList(this NodeMap nodeMap, string name)
         {
-            var node = new NodeList(name);
-            nodeMap.AddChild(node);
+            var node = new NodeList();
+            nodeMap.AddChild(name, node);
             return node;
         }
 
 
         public static NodeValue CreateValue(this NodeMap nodeMap, string name, object value = null) {
-            var node = new NodeValue(name, value);
-            nodeMap.AddChild(node);
+            var node = new NodeValue(value);
+            nodeMap.AddChild(name, node);
             return node;
         }
 
+        #endregion
+
+        #region Get
+
         public static object GetChildValue(this NodeMap nodeMap, string name) {
-            return nodeMap.GetChild<NodeValue>(name).Value;
+            return GetChildValue(nodeMap, name, default(object));
+        }
+
+        public static object GetChildValue(this NodeMap nodeMap, string name, object defaultValue) {
+            var nodeValue = nodeMap.GetChild<NodeValue>(name);
+            return nodeValue != null ? nodeValue.Value : defaultValue;
         }
 
         public static object GetChildValue(this NodeMap nodeMap, string name, Type type)
         {
-            return nodeMap.GetChild<NodeValue>(name).GetValue(type);
+            return GetChildValue(nodeMap, name, default(object));
         }
 
-        public static TValue GetChildValue<TValue>(this NodeMap nodeMap, string name) {
+        public static object GetChildValue(this NodeMap nodeMap, string name, Type type, object defaultValue)
+        {
             var nodeValue = nodeMap.GetChild<NodeValue>(name);
-            return nodeValue == null ? default(TValue) : nodeValue.GetValue<TValue>();
+            return nodeValue != null ? nodeValue.GetValue(type, defaultValue) : defaultValue;
+        }
+
+        public static TValue GetChildValue<TValue>(this NodeMap nodeMap, string name)
+        {
+            return GetChildValue(nodeMap, name, default(TValue));
+        }
+
+        public static TValue GetChildValue<TValue>(this NodeMap nodeMap, string name, TValue defaultValue) {
+            var nodeValue = nodeMap.GetChild<NodeValue>(name);
+            return nodeValue == null ? default : nodeValue.GetValue(defaultValue);
         }
 
         public static bool TryGetChildValue(this NodeMap nodeMap, string name, out object value)
@@ -73,65 +96,16 @@ namespace DotLogix.Core.Nodes
                 value = node.GetValue<TValue>();
                 return true;
             }
-            value = default(TValue);
+            value = default;
             return false;
         }
 
-        public static void MergeChild(this NodeMap nodeMap, string name, NodeValue nodeValue) {
-            if(nodeValue.HasAncestor)
-                throw new InvalidOperationException("This node already has a parent");
-
-            if(nodeMap.TryGetChild(name, out var existing)) {
-                switch(existing.Type) {
-                    case NodeTypes.Empty:
-                    case NodeTypes.Value:
-                    case NodeTypes.Map:
-                        nodeMap.RemoveChild(existing);
-
-                        var list = nodeMap.CreateList(name);
-                        list.AddChild(existing);
-                        list.AddChild(nodeValue);
-                        break;
-                    case NodeTypes.List:
-                        var existingList = (NodeList)existing;
-                        existingList.AddChild(nodeValue);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
-
-        public static void MergeChild(this NodeMap nodeMap, string name, NodeMap nodeValue)
-        {
-            if (nodeValue.HasAncestor)
-                throw new InvalidOperationException("This node already has a parent");
-
-            if (nodeMap.TryGetChild(name, out var existing))
-            {
-                switch (existing.Type)
-                {
-                    case NodeTypes.Empty:
-                    case NodeTypes.Value:
-                    case NodeTypes.Map:
-                        nodeMap.RemoveChild(existing);
-
-                        var list = nodeMap.CreateList(name);
-                        list.AddChild(existing);
-                        list.AddChild(nodeValue);
-                        break;
-                    case NodeTypes.List:
-                        var existingList = (NodeList)existing;
-                        existingList.AddChild(nodeValue);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
+        #endregion
         #endregion
 
         #region NodeList
+
+        #region Create
 
         public static TNode CreateNode<TNode>(this NodeList nodeList) where TNode : Node, new()
         {
@@ -162,20 +136,41 @@ namespace DotLogix.Core.Nodes
             return node;
         }
 
+        #endregion
+
+        #region Get
+
         public static object GetChildValue(this NodeList nodeList, int index)
         {
-            return nodeList.GetChild<NodeValue>(index).Value;
+            return GetChildValue(nodeList, index, default(object));
+        }
+
+        public static object GetChildValue(this NodeList nodeList, int index, object defaultValue)
+        {
+            var nodeValue = nodeList.GetChild<NodeValue>(index);
+            return nodeValue != null ? nodeValue.Value : defaultValue;
         }
 
         public static object GetChildValue(this NodeList nodeList, int index, Type type)
         {
-            return nodeList.GetChild<NodeValue>(index).GetValue(type);
+            return GetChildValue(nodeList, index, default(object));
+        }
+
+        public static object GetChildValue(this NodeList nodeList, int index, Type type, object defaultValue)
+        {
+            var nodeValue = nodeList.GetChild<NodeValue>(index);
+            return nodeValue != null ? nodeValue.GetValue(type, defaultValue) : defaultValue;
         }
 
         public static TValue GetChildValue<TValue>(this NodeList nodeList, int index)
         {
+            return GetChildValue(nodeList, index, default(TValue));
+        }
+
+        public static TValue GetChildValue<TValue>(this NodeList nodeList, int index, TValue defaultValue)
+        {
             var nodeValue = nodeList.GetChild<NodeValue>(index);
-            return nodeValue == null ? default(TValue) : nodeValue.GetValue<TValue>();
+            return nodeValue == null ? default : nodeValue.GetValue(defaultValue);
         }
 
         public static bool TryGetChildValue(this NodeList nodeList, int index, out object value)
@@ -207,9 +202,12 @@ namespace DotLogix.Core.Nodes
                 value = node.GetValue<TValue>();
                 return true;
             }
-            value = default(TValue);
+            value = default;
             return false;
         }
+
+        #endregion
+
         #endregion
     }
 }

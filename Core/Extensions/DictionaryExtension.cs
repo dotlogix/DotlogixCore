@@ -26,5 +26,33 @@ namespace DotLogix.Core.Extensions {
         public static KeyValuePair<TValue, TKey> Reverse<TKey, TValue>(this KeyValuePair<TKey, TValue> kvpair) {
             return new KeyValuePair<TValue, TKey>(kvpair.Value, kvpair.Key);
         }
+
+        /// <summary>
+        /// Find the the key of an item in the dictionary
+        /// </summary>
+        public static TKey GetKey<TKey, TValue>(this Dictionary<TKey, TValue> dict, TValue value)
+        {
+            if (TryGetKey(dict, value, out var key))
+                return key;
+            throw new KeyNotFoundException();
+        }
+
+        /// <summary>
+        /// Tries to find the the key of an item in the dictionary
+        /// </summary>
+        public static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dict, TValue value, out TKey key)
+        {
+            using (var enumerator = dict.Where(p => Equals(p.Value, value)).GetEnumerator())
+            {
+                if (enumerator.MoveNext())
+                {
+                    key = enumerator.Current.Key;
+                    return true;
+                }
+            }
+
+            key = default(TKey);
+            return false;
+        }
     }
 }

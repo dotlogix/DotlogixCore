@@ -112,8 +112,11 @@ namespace DotLogix.Core.Rest.Server.Http {
             if(routeMatch == null)
                 return false;
 
-            if(routeMatch.UrlParameters != null)
-                asyncHttpRequest.UrlParameters.AddChildren(routeMatch.UrlParameters);
+            if (routeMatch.UrlParameters == null)
+                return true;
+
+            foreach (var parameter in routeMatch.UrlParameters)
+                asyncHttpRequest.UrlParameters.CreateValue(parameter.Key, parameter.Value);
 
             return true;
         }

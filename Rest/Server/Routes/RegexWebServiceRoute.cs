@@ -33,7 +33,21 @@ namespace DotLogix.Core.Rest.Server.Routes {
             if(!match.Success)
                 return RouteMatch.Empty;
 
-            var parameters = names.Select(name => new NodeValue(name, match.Groups[name].Value)).ToList();
+            var parameters = new Dictionary<string, Node>();
+            foreach (var name in names)
+            {
+                var group = match.Groups[name];
+                if (group.Captures.Count > 1) {
+                    var nodeList = new NodeList();
+                    foreach (Capture capture in group.Captures)
+                        nodeList.CreateValue(capture.Value);
+                    parameters.Add(name, nodeList);
+                } else {
+                    parameters.Add(name, new NodeValue(group.Value));
+                }
+
+            }
+
             return new RouteMatch(true, match.Value, match.Length, parameters);
         }
     }

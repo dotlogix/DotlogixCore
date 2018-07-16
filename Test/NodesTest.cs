@@ -17,7 +17,7 @@ namespace Test {
     public class NodesTest {
         [TestMethod]
         public void ValueNodeTest() {
-            var nodeValue = new NodeValue("TestNode", "1");
+            var nodeValue = new NodeValue("1");
 
             Assert.AreEqual("1", nodeValue.Value);
             Assert.AreEqual("1", nodeValue.GetValue<string>());
@@ -26,7 +26,7 @@ namespace Test {
 
         [TestMethod]
         public void MapNodeTest() {
-            var nodeMap = new NodeMap("TestNode");
+            var nodeMap = new NodeMap();
             var valueNode = nodeMap.CreateValue("TestValueNode", "1");
 
             var receivedNode = nodeMap.GetChild<NodeValue>("TestValueNode");
@@ -37,7 +37,7 @@ namespace Test {
 
         [TestMethod]
         public void ListNodeTest() {
-            var nodeList = new NodeList("TestNode");
+            var nodeList = new NodeList();
             var valueNode = nodeList.CreateValue("1");
 
             var receivedNode = nodeList.GetChild<NodeValue>(0);
@@ -49,7 +49,7 @@ namespace Test {
 
         [TestMethod]
         public void MapNodeNavigationTest() {
-            var nodeMap = new NodeMap("TestNode");
+            var nodeMap = new NodeMap();
             var valueNode1 = nodeMap.CreateValue("TestValueNode1");
             var valueNode2 = nodeMap.CreateValue("TestValueNode2");
             var valueNode3 = nodeMap.CreateValue("TestValueNode3");
@@ -74,8 +74,8 @@ namespace Test {
             Assert.AreEqual(valueNode1.Next, valueNode3);
             Assert.AreEqual(valueNode3.Previous, valueNode1);
 
-            var valueNode3Replace = new NodeValue("TestValueNode3", 10);
-            nodeMap.ReplaceChild(valueNode3Replace);
+            var valueNode3Replace = new NodeValue(10);
+            nodeMap.ReplaceChild("TestValueNode3", valueNode3Replace);
 
             Assert.AreEqual(valueNode3Replace, valueNode1.Next);
             Assert.AreEqual(valueNode1, valueNode3Replace.Previous);
@@ -85,7 +85,7 @@ namespace Test {
 
         [TestMethod]
         public void ListNodeNavigationTest() {
-            var nodeList = new NodeList("TestNode");
+            var nodeList = new NodeList();
             var valueNode1 = nodeList.CreateValue();
             var valueNode2 = nodeList.CreateValue();
             var valueNode3 = nodeList.CreateValue();
@@ -132,7 +132,7 @@ namespace Test {
 
         [TestMethod]
         public void NodeSelectTest() {
-            var node1 = new NodeMap("1");
+            var node1 = new NodeMap();
             var node11 = node1.CreateMap("11");
             var node12 = node1.CreateList("12");
 

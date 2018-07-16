@@ -131,7 +131,7 @@ namespace DotLogix.Core.Nodes {
         #region ToObject
         public static T ToObject<T>(Node node) {
             if(node == null)
-                return default(T);
+                return default;
 
             return (T)ToObject(node, typeof(T));
         }

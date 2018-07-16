@@ -8,6 +8,9 @@
 
 #region
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Types;
 #endregion
@@ -17,97 +20,110 @@ namespace DotLogix.Core.Nodes {
         private DataType _dataType;
 
         private object _value;
+        public override NodeTypes Type => Value == null ? NodeTypes.Empty : NodeTypes.Value;
 
         public DataType DataType => _dataType ?? (_dataType = Value.GetDataType());
 
-        public object Value {
+        public object Value
+        {
             get => _value;
             set {
-                Type = value == null ? NodeTypes.Empty : NodeTypes.Value;
                 _value = value;
                 _dataType = null;
             }
         }
 
-
-        internal NodeValue(string name, object value, DataType dataType) : this(name, value) {
+        public NodeValue(object value, DataType dataType = null)
+        {
+            _value = value;
             _dataType = dataType;
         }
 
-        public NodeValue(string name, object value) : this(value) {
-            Name = name;
-            Value = value;
+        #region GetValue
+
+        public object GetValue(Type targetType)
+        {
+            return GetValue(targetType, default);
         }
 
-        public NodeValue(object value) : this() {
-            Value = value;
+        public object GetValue(Type targetType, object defaultValue)
+        {
+            return Value.TryConvertTo(targetType, out var value) ? value : defaultValue;
         }
 
-        public NodeValue() : base(NodeTypes.Empty) { }
-
-        public object GetValue(Type type) {
-            return Value.ConvertTo(type);
+        public TValue GetValue<TValue>()
+        {
+            return GetValue(default(TValue));
         }
 
-        public TValue GetValue<TValue>() {
-            return Value.ConvertTo<TValue>();
+        public TValue GetValue<TValue>(TValue defaultValue)
+        {
+            return Value.TryConvertTo<TValue>(out var value) ? value : defaultValue;
         }
 
-        public bool TryGetValue(Type type, out object value) {
-            return Value.TryConvertTo(type, out value);
-        }
-
-        public bool TryGetValue<TValue>(out TValue value) {
+        public bool TryGetValue<TValue>(out TValue value)
+        {
             return Value.TryConvertTo(out value);
         }
 
+        public bool TryGetValue(Type targetType, out object value)
+        {
+            return Value.TryConvertTo(targetType, out value);
+        }
 
-        public object ConvertValue(Type type) {
-            var newValue = Value.ConvertTo(type);
-            Value = newValue;
-            return newValue;
+        #endregion
+
+        #region ConvertValue
+
+        public object ConvertValue(Type targetType)
+        {
+            return ConvertValue(targetType, default);
+        }
+
+        public object ConvertValue(Type targetType, object defaultValue)
+        {
+            return Value = GetValue(targetType, defaultValue);
         }
 
         public TValue ConvertValue<TValue>()
         {
-            var newValue = Value.ConvertTo<TValue>();
-            Value = newValue;
-            return newValue;
+            return ConvertValue(default(TValue));
         }
 
-        public bool TryConvertValue(Type type, out object value)
+        public TValue ConvertValue<TValue>(TValue defaultValue)
         {
-            if(Value.TryConvertTo(type, out value) == false)
-                return false;
+            var value = GetValue(defaultValue);
+            Value = value;
+            return value;
+        }
 
+        public bool TryConvertValue(Type targetType, out object value)
+        {
+            if (TryGetValue(targetType, out value) == false) return false;
             Value = value;
             return true;
+
         }
 
         public bool TryConvertValue<TValue>(out TValue value)
         {
-            if (Value.TryConvertTo(out value) == false)
-                return false;
-
+            if (TryGetValue(out value) == false) return false;
             Value = value;
             return true;
+
         }
 
-        public override string ToString() {
-            if(Type == NodeTypes.Empty)
-                return base.ToString();
+        #endregion
 
-            if (HasAncestor)
-            {
-                switch (Ancestor.Type)
-                {
-                    case NodeTypes.List:
-                        return $"Node{Type} {{Index: {Index}, Value: {Value}, Path: {Path}}}";
-                    case NodeTypes.Map:
-                        return $"{Type} {{Name: {Name}, Value: {Value}, Path: {Path}}}";
-                }
-            }
-            return $"Node{Type} {{Value: {Value}, Path: {Path}}}";
+        #region Helper
+
+        protected override ICollection<string> GetFormattingMembers()
+        {
+            var c = base.GetFormattingMembers();
+            c.Add($"Value: {Value?.ToString() ?? "null"}");
+            return c;
         }
+
+        #endregion
     }
 }

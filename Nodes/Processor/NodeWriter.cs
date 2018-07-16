@@ -2,20 +2,20 @@
 
 namespace DotLogix.Core.Nodes.Processor {
     public class NodeWriter : NodeWriterBase {
-        protected NodeCollection CurrentNodeCollection;
+        protected NodeContainer CurrentNodeCollection;
         public Node Root { get; private set; }
 
         public override void BeginMap(string name) {
             CheckName(name);
 
-            var map = new NodeMap(name);
-            PushContainer(NodeContainerType.Map);
+            var map = new NodeMap();
             if(Root == null) 
                 Root = map;
             else
-                CurrentNodeCollection.AddChild(map);
+                AddChild(name, map);
 
             CurrentNodeCollection = map;
+            PushContainer(NodeContainerType.Map);
         }
 
         public override void EndMap() {
@@ -26,14 +26,14 @@ namespace DotLogix.Core.Nodes.Processor {
         public override void BeginList(string name) {
             CheckName(name);
 
-            var list = new NodeList(name);
-            PushContainer(NodeContainerType.List);
+            var list = new NodeList();
             if(Root == null)
                 Root = list;
             else
-                CurrentNodeCollection.AddChild(list);
+                AddChild(name, list);
 
             CurrentNodeCollection = list;
+            PushContainer(NodeContainerType.List);
         }
 
         public override void EndList() {
@@ -44,11 +44,11 @@ namespace DotLogix.Core.Nodes.Processor {
         public override void WriteValue(string name, object value) {
             CheckName(name);
 
-            var val = new NodeValue(name, value);
+            var val = new NodeValue(value);
             if(Root == null)
                 Root = val;
             else
-                CurrentNodeCollection.AddChild(val);
+                AddChild(name, val);
         }
 
         private void CheckName(string name) {
@@ -64,6 +64,21 @@ namespace DotLogix.Core.Nodes.Processor {
                 case NodeContainerType.None:
                     if(Root != null)
                         throw new InvalidOperationException("Can not begin a map because there is not container to add the node");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void AddChild(string name, Node node)
+        {
+            switch (CurrentContainer)
+            {
+                case NodeContainerType.List:
+                    ((NodeList) CurrentNodeCollection).AddChild(node);
+                    break;
+                case NodeContainerType.Map:
+                    ((NodeMap) CurrentNodeCollection).AddChild(name, node);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

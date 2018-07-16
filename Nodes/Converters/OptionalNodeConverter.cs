@@ -15,7 +15,7 @@ namespace DotLogix.Core.Nodes.Converters
 
         public override object ConvertToObject(Node node) {
             if(node.Type == NodeTypes.Empty)
-                return new Optional<TValue>(default(TValue));
+                return new Optional<TValue>(default);
 
             var value = Nodes.ToObject<TValue>(node);
             return new Optional<TValue>(value);

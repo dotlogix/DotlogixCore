@@ -8,6 +8,7 @@
     <Authors>DotLogix</Authors>
     <AssemblyName>DotLogix.Application</AssemblyName>
     <RootNamespace>DotLogix.Architecture.Application</RootNamespace>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

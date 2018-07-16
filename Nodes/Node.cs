@@ -1,147 +1,159 @@
-﻿// ==================================================
-// Copyright 2018(C) , DotLogix
-// File:  Node.cs
-// Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  17.02.2018
-// ==================================================
-
-#region
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes.Processor;
-#endregion
 
-namespace DotLogix.Core.Nodes {
-    public abstract class Node {
-        private const string PathSeperator = "\\";
-        private const string RootCharacter = "~";
-        private const string SelfCharacter = ".";
-        private const string AncestorCharacter = "..";
-        private const string AnyCharacter = "*";
-        private static readonly char[] PathSeperators = {'\\', '/'};
-        private static readonly char[] OptionSeperators = {'|'};
+namespace DotLogix.Core.Nodes
+{
 
-        private NodeCollection _ancestor;
-        internal string InternalName;
-        public NodeTypes Type { get; internal set; }
+    public abstract class Node
+    {
+        protected const string PathSeperator = "\\";
+        protected const string RootCharacter = "~";
+        protected const string SelfCharacter = ".";
+        protected const string AncestorCharacter = "..";
+        protected const string AnyCharacter = "*";
+        protected static readonly char[] PathSeperators = { '\\', '/' };
+        protected static readonly char[] OptionSeperators = { '|' };
 
-        public string Path {
-            get {
-                if(IsRoot)
-                    return PathSeperator.ToString();
+        #region Root
 
-                var nodeStack = new Stack<Node>();
-                nodeStack.Push(this);
-                foreach(var ancestor in Ancestors())
-                    nodeStack.Push(ancestor);
-                nodeStack.Pop(); // Skip the first element on stack, because it is the root element
-                var stringBuilder = new StringBuilder(RootCharacter);
-                while(nodeStack.Count > 0) {
-                    stringBuilder.Append(PathSeperator);
-                    var currentNode = nodeStack.Pop();
-                    switch(currentNode.Ancestor.Type) {
-                        case NodeTypes.List:
-                            stringBuilder.Append(currentNode.Index);
-                            break;
-                        case NodeTypes.Map:
-                            stringBuilder.Append(currentNode.Name);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-                return stringBuilder.ToString();
+        public Node Root
+        {
+            get
+            {
+                NodeContainer ancestor;
+                var current = this;
+                while ((ancestor = current.Ancestor) != null)
+                    current = ancestor;
+                return current;
             }
         }
-
-        public string Name {
-            get => InternalName;
-            set => Rename(value);
-        }
-
-        public int Index => (Ancestor as NodeList)?.IndexOfChild(this) ?? -1;
-        public Node Root => Ancestor != null ? Ancestor.Root : this;
         public bool IsRoot => Ancestor == null;
 
-        public NodeCollection Ancestor {
-            get => _ancestor;
-            internal set {
-                if(value == _ancestor)
-                    return;
-                if((value != null) && (_ancestor != null))
-                    throw new InvalidOperationException("This node already has a parent");
-                _ancestor = value;
-            }
-        }
+        #endregion
 
+        #region Ancestor
+
+        public NodeContainer Ancestor { get; private set; }
         public bool HasAncestor => Ancestor != null;
-        public Node Previous { get; internal set; }
+
+        #endregion
+
+        #region Previous
+
+        public Node Previous { get; private set; }
         public bool HasPrevious => Previous != null;
-        public Node Next { get; internal set; }
+
+        #endregion
+
+        #region Next
+
+        public Node Next { get; private set; }
         public bool HasNext => Next != null;
 
-        protected Node(NodeTypes type) {
-            Type = type;
-        }
+        #endregion
 
-        public void Rename(string newName) {
-            if(InternalName == newName)
-                return;
-            Ancestor?.RenameChild(this, newName);
-            InternalName = newName;
-        }
+        #region Misc
 
-        public IEnumerable<Node> Siblings(CombineMode mode = CombineMode.Sequential) {
-            return EnumerableExtensions.Combine(mode, SiblingsBefore(), SiblingsAfter());
-        }
+        public abstract NodeTypes Type { get; }
+        public string Path => CalculatePath();
+        public string Name { get; internal set; }
+        public int Index => (Ancestor is NodeList list) ? list.IndexOfChild(this) : -1;
 
-        public IEnumerable<Node> SiblingsBefore() {
+        private string CalculatePath()
+        {
+            var pathParts = new Stack<string>();
             var currentNode = this;
-            while((currentNode = currentNode.Previous) != null)
-                yield return currentNode;
+            NodeContainer ancestor;
+            while ((ancestor = currentNode.Ancestor) != null)
+            {
+                switch (ancestor.Type)
+                {
+                    case NodeTypes.Map:
+                        pathParts.Push(currentNode.Name);
+                        break;
+                    case NodeTypes.List:
+                        pathParts.Push(((NodeList)ancestor).IndexOfChild(currentNode).ToString());
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                currentNode = ancestor;
+            }
+
+            pathParts.Push(RootCharacter);
+            return string.Join(PathSeperator, pathParts);
         }
 
-        public IEnumerable<Node> SiblingsAfter() {
-            var currentNode = this;
-            while((currentNode = currentNode.Next) != null)
-                yield return currentNode;
+        #endregion
+
+        #region Siblings
+
+        public IEnumerable<Node> SiblingsBefore()
+        {
+            return Enumerate(this, n => n.Previous);
         }
 
-        public IEnumerable<TNode> Siblings<TNode>(CombineMode mode = CombineMode.Sequential) where TNode : Node {
-            return Siblings(mode).OfType<TNode>();
+        public IEnumerable<Node> SiblingsAfter()
+        {
+            return Enumerate(this, n => n.Next);
+
         }
 
-        public IEnumerable<TNode> SiblingsBefore<TNode>() where TNode : Node {
+        public IEnumerable<Node> Siblings(CombineMode combineMode = CombineMode.RoundRobin, bool preferPrevious = true)
+        {
+            return preferPrevious
+                ? SiblingsBefore().Combine(SiblingsAfter(), combineMode)
+                : SiblingsAfter().Combine(SiblingsBefore(), combineMode);
+        }
+
+        public IEnumerable<TNode> SiblingsBefore<TNode>() where TNode : Node
+        {
             return SiblingsBefore().OfType<TNode>();
         }
 
-        public IEnumerable<TNode> SiblingsAfter<TNode>() where TNode : Node {
-            return SiblingsAfter().OfType<TNode>();
+        public IEnumerable<TNode> SiblingsAfter<TNode>() where TNode : Node
+        {
+            return SiblingsAfter().OfType<TNode>();}
+        public IEnumerable<TNode> Siblings<TNode>(CombineMode combineMode = CombineMode.RoundRobin, bool preferPrevious = true) where TNode : Node { return Siblings(combineMode, preferPrevious).OfType<TNode>(); }
+
+        public Node NearestSibling(bool preferPrevious = true)
+        {
+            if (preferPrevious)
+                return Previous ?? Next;
+            return Next ?? Previous;
         }
 
-        public TNode NearestSibling<TNode>() where TNode : Node {
-            return Siblings(CombineMode.RoundRobin).OfType<TNode>().FirstOrDefault();
+        public TNode NearestSibling<TNode>(bool preferPrevious = true) where TNode : Node
+        {
+            return Siblings(CombineMode.RoundRobin, preferPrevious).OfType<TNode>().FirstOrDefault();
+        }
+        #endregion
+        
+        #region Ancestors
+
+        public IEnumerable<Node> Ancestors()
+        {
+            return Enumerate(this, n => n.Ancestor);
         }
 
-        public IEnumerable<Node> Ancestors() {
-            var currentNode = this;
-            while((currentNode = currentNode.Ancestor) != null)
-                yield return currentNode;
-        }
-
-        public IEnumerable<TNode> Ancestors<TNode>() where TNode : Node {
+        public IEnumerable<TNode> Ancestors<TNode>() where TNode : Node
+        {
             return Ancestors().OfType<TNode>();
         }
 
-        public TNode NearestAncestor<TNode>() where TNode : Node {
+        public TNode NearestAncestor<TNode>() where TNode : Node
+        {
             return Ancestors<TNode>().FirstOrDefault();
         }
+        #endregion
 
-        public virtual Node SelectNode(string path) {
+        #region SelectNodes
+
+        public virtual Node SelectNode(string path)
+        {
             return SelectNodes(path).FirstOrDefault();
         }
 
@@ -155,23 +167,26 @@ namespace DotLogix.Core.Nodes {
             return SelectNodes(path.Split(PathSeperators));
         }
 
-        public IEnumerable<Node> SelectNodes(string[] pathParts) {
+        public IEnumerable<Node> SelectNodes(string[] pathParts)
+        {
             return SelectNodes(pathParts, 0, pathParts.Length);
         }
 
-        public IEnumerable<Node> SelectNodes(string[] pathParts, int start, int count) {
+        public IEnumerable<Node> SelectNodes(string[] pathParts, int start, int count)
+        {
             if (pathParts == null)
                 throw new ArgumentNullException(nameof(pathParts));
-            if(start < 0 || start >= pathParts.Length)
+            if (start < 0 || start >= pathParts.Length)
                 throw new ArgumentOutOfRangeException(nameof(start));
-            if (count < 0 || start+count > pathParts.Length)
+            if (count < 0 || start + count > pathParts.Length)
                 throw new ArgumentOutOfRangeException(nameof(start));
 
             IEnumerable<Node> results = null;
-            for(int i = start; i < start+count; i++) {
+            for (int i = start; i < start + count; i++)
+            {
                 var pathPart = pathParts[i];
                 var newResults = new List<Node>();
-                foreach (var currentNode in results ?? new []{this})
+                foreach (var currentNode in results ?? new[] { this })
                 {
                     switch (pathPart)
                     {
@@ -188,15 +203,15 @@ namespace DotLogix.Core.Nodes {
                             newResults.Add(currentNode.Ancestor);
                             break;
                         case AnyCharacter:
-                            switch (Type)
+                            switch (currentNode.Type)
                             {
                                 case NodeTypes.Empty:
                                 case NodeTypes.Value:
                                     newResults.Add(currentNode);
                                     break;
-                                case NodeTypes.List:
                                 case NodeTypes.Map:
-                                    newResults.AddRange(((NodeCollection)currentNode).Children());
+                                case NodeTypes.List:
+                                    newResults.AddRange(((NodeContainer)currentNode).Children());
                                     break;
                                 default:
                                     throw new ArgumentOutOfRangeException();
@@ -204,7 +219,8 @@ namespace DotLogix.Core.Nodes {
                             break;
                         default:
                             var options = pathPart.Split(OptionSeperators, StringSplitOptions.RemoveEmptyEntries);
-                            foreach(var option in options) {
+                            foreach (var option in options)
+                            {
                                 currentNode.AddMatchingNodes(option, newResults);
                             }
                             break;
@@ -220,42 +236,85 @@ namespace DotLogix.Core.Nodes {
             return SelectNodes(path).OfType<TNode>();
         }
 
-        public IEnumerable<TNode> SelectNodes<TNode>(string[] pathParts) {
+        public IEnumerable<TNode> SelectNodes<TNode>(string[] pathParts)
+        {
             return SelectNodes(pathParts, 0, pathParts.Length).OfType<TNode>();
         }
 
-        public IEnumerable<TNode> SelectNodes<TNode>(string[] pathParts, int start, int count) {
+        public IEnumerable<TNode> SelectNodes<TNode>(string[] pathParts, int start, int count)
+        {
             return SelectNodes(pathParts, start, count).OfType<TNode>();
         }
 
-        protected virtual void AddMatchingNodes(string pattern, List<Node> newResults) {
-            
+        protected virtual void AddMatchingNodes(string pattern, List<Node> newResults) { }
+
+        #endregion
+
+        #region Enumerate
+
+        private static IEnumerable<Node> Enumerate(Node currentNode, Func<Node, Node> selectNextFunc)
+        {
+            while ((currentNode = selectNextFunc(currentNode)) != null)
+                yield return currentNode;
         }
 
-        protected virtual string CalculatePath() {
-            if(IsRoot)
-                return RootCharacter;
+        #endregion
 
-            switch(Ancestor.Type) {
-                case NodeTypes.List:
-                    return string.Concat(Ancestor.Path, PathSeperator, Index.ToString());
-                case NodeTypes.Map:
-                    return string.Concat(Ancestor.Path, PathSeperator, Name);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+        #region Helper
+        protected static void SyncNode(Node node, NodeContainer ancestor, Node prev, Node next, string name = null)
+        {
+            node.Ancestor = ancestor;
+            node.Name = name;
+            SyncNode(node, next);
+            SyncNode(prev, node);
         }
 
-        public override string ToString() {
-            if(HasAncestor) {
-                switch(Ancestor.Type) {
-                    case NodeTypes.List:
-                        return $"Node{Type} {{Index: {Index}, Path: {Path}}}";
+        protected static void SyncNode(Node prev, Node next)
+        {
+            if (prev != null)
+                prev.Next = next;
+
+            if (next != null)
+                next.Previous = prev;
+        }
+
+        protected static void ClearNode(Node node)
+        {
+            node.Previous = null;
+            node.Next = null;
+            node.Ancestor = null;
+            node.Name = null;
+        }
+        #endregion
+
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder(GetType().Name);
+            sb.Append(" {");
+            sb.AppendJoin(", ", GetFormattingMembers());
+            sb.Append("}");
+            return sb.ToString();
+        }
+
+        protected virtual ICollection<string> GetFormattingMembers()
+        {
+            var list = new List<string>();
+            if (Ancestor == null) {
+                list.Add("Root");
+            } else {
+                switch (Ancestor.Type) {
                     case NodeTypes.Map:
-                        return $"{Type} {{Name: {Name}, Path: {Path}}}";
+                        list.Add($"Name: {Name}");
+                        break;
+                    case NodeTypes.List:
+                        list.Add($"Index: {((NodeList)Ancestor).IndexOfChild(this)}");
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
-            return $"Node{Type} {{Path: {Path}}}";
+            return list;
         }
     }
 }

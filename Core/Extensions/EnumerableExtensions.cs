@@ -24,12 +24,32 @@ namespace DotLogix.Core.Extensions {
         /// <param name="hasNextFunc">A function to check if an additional value is available</param>
         /// <param name="yieldInitial">A flag if the initial value should be yield or skipped</param>
         /// <returns></returns>
-        public static IEnumerable<T> AggregateEnumerable<T>(this T initialValue, Func<T, T> selectNextFunc, Func<T, bool> hasNextFunc, bool yieldInitial = false) {
+        public static IEnumerable<T> Enumerate<T>(this T initialValue, Func<T, T> selectNextFunc, Func<T, bool> hasNextFunc, bool yieldInitial = false) {
             if(yieldInitial)
                 yield return initialValue;
-
             while(hasNextFunc(initialValue)) {
                 yield return (initialValue = selectNextFunc(initialValue));
+            }
+        }
+
+        /// <summary>
+        /// Creates an enumerable of items using a selectorFunc
+        /// </summary>
+        /// <param name="initialValue">The initial value</param>
+        /// <param name="selectNextFunc">A function to select the next item</param>
+        /// <param name="conditionFunc">A function to check if the current value should be yield</param>
+        /// <param name="yieldInitial">A flag if the initial value should be yield or skipped</param>
+        /// <returns></returns>
+        public static IEnumerable<T> EnumerateUntil<T>(this T initialValue, Func<T, T> selectNextFunc, Func<T, bool> conditionFunc, bool yieldInitial = false)
+        {
+            if (yieldInitial)
+                yield return initialValue;
+
+            initialValue = selectNextFunc(initialValue);
+            while (conditionFunc(initialValue))
+            {
+                yield return initialValue;
+                initialValue = selectNextFunc(initialValue);
             }
         }
 
@@ -161,8 +181,8 @@ namespace DotLogix.Core.Extensions {
             var i = list.Count;
             do {
                 var rand = random.Next(i);
-                yield return list[--i];
                 list.Swap(rand, i);
+                yield return list[--i];
             } while(i > 1);
             yield return list[0];
         }

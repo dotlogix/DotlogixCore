@@ -1,4 +1,13 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ChangeTracker.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -8,10 +17,11 @@ using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Tracking.Entries;
 using DotLogix.Core.Tracking.Manager;
 using DotLogix.Core.Tracking.Snapshots;
+#endregion
 
 namespace DotLogix.Core.Tracking {
     public class ChangeTracker : IChangeTracker {
-        protected readonly Dictionary<Type, IChangeTrackingEntryManager> EntryManagers=new Dictionary<Type, IChangeTrackingEntryManager>();
+        protected readonly Dictionary<Type, IChangeTrackingEntryManager> EntryManagers = new Dictionary<Type, IChangeTrackingEntryManager>();
 
         public IEnumerable<IChangeTrackingEntry> Entries => EntryManagers.Values.SelectMany(em => em.Entries);
 
@@ -33,7 +43,7 @@ namespace DotLogix.Core.Tracking {
 
         public void Detach(object target) {
             var type = target.GetType();
-            if (EntryManagers.TryGetValue(type, out var entryManager) && entryManager.TryGetEntry(target, out var entry))
+            if(EntryManagers.TryGetValue(type, out var entryManager) && entryManager.TryGetEntry(target, out var entry))
                 entryManager.Remove(entry);
         }
 
@@ -75,7 +85,7 @@ namespace DotLogix.Core.Tracking {
                 keyAccessor = dynamicProp;
             }
 
-            if(keyAccessor==null)
+            if(keyAccessor == null)
                 throw new InvalidOperationException("You have to select a key for change tracking");
 
             var snapshotFactory = CreateSnapshotFactory(type, trackedAccessors);

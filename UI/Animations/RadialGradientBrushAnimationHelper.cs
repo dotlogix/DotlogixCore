@@ -1,9 +1,19 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  RadialGradientBrushAnimationHelper.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System.Diagnostics;
 using System.Windows.Media;
+#endregion
 
 namespace DotLogix.UI.Animations {
     public class RadialGradientBrushAnimationHelper : GradientBrushAnimationHelper<RadialGradientBrush> {
-        private static readonly PointAnimationHelper _pointHelper = SingletonOf<PointAnimationHelper>.Instance;
+        private static readonly PointAnimationHelper PointHelper = SingletonOf<PointAnimationHelper>.Instance;
 
         protected override RadialGradientBrush Create() {
             return new RadialGradientBrush();
@@ -33,8 +43,8 @@ namespace DotLogix.UI.Animations {
                 return target;
 
             var brush = base.AddValues(value1, value2);
-            brush.Center = _pointHelper.AddValues(value1.Center, value2.Center);
-            brush.GradientOrigin = _pointHelper.AddValues(value1.GradientOrigin, value2.GradientOrigin);
+            brush.Center = PointHelper.AddValues(value1.Center, value2.Center);
+            brush.GradientOrigin = PointHelper.AddValues(value1.GradientOrigin, value2.GradientOrigin);
             brush.RadiusX = DoubleHelper.AddValues(value1.RadiusX, value2.RadiusX);
             brush.RadiusY = DoubleHelper.AddValues(value1.RadiusY, value2.RadiusY);
             return brush;
@@ -47,8 +57,8 @@ namespace DotLogix.UI.Animations {
                 return target;
             }
             var brush = base.SubtractValue(value1, value2);
-            brush.Center = _pointHelper.SubtractValue(value1.Center, value2.Center);
-            brush.GradientOrigin = _pointHelper.SubtractValue(value1.GradientOrigin, value2.GradientOrigin);
+            brush.Center = PointHelper.SubtractValue(value1.Center, value2.Center);
+            brush.GradientOrigin = PointHelper.SubtractValue(value1.GradientOrigin, value2.GradientOrigin);
             brush.RadiusX = DoubleHelper.SubtractValue(value1.RadiusX, value2.RadiusX);
             brush.RadiusY = DoubleHelper.SubtractValue(value1.RadiusY, value2.RadiusY);
             return brush;
@@ -56,8 +66,8 @@ namespace DotLogix.UI.Animations {
 
         public override RadialGradientBrush ScaleValue(RadialGradientBrush value, double factor) {
             var brush = base.ScaleValue(value, factor);
-            brush.Center = _pointHelper.ScaleValue(value.Center, factor);
-            brush.GradientOrigin = _pointHelper.ScaleValue(value.GradientOrigin, factor);
+            brush.Center = PointHelper.ScaleValue(value.Center, factor);
+            brush.GradientOrigin = PointHelper.ScaleValue(value.GradientOrigin, factor);
             brush.RadiusX = DoubleHelper.ScaleValue(value.RadiusX, factor);
             brush.RadiusY = DoubleHelper.ScaleValue(value.RadiusY, factor);
             return brush;
@@ -71,8 +81,8 @@ namespace DotLogix.UI.Animations {
                 return ScaleValue(to, progress);
             }
             var brush = base.InterpolateValue(from, to, progress);
-            brush.Center = _pointHelper.InterpolateValue(from.Center, to.Center, progress);
-            brush.GradientOrigin = _pointHelper.InterpolateValue(from.GradientOrigin, to.GradientOrigin, progress);
+            brush.Center = PointHelper.InterpolateValue(from.Center, to.Center, progress);
+            brush.GradientOrigin = PointHelper.InterpolateValue(from.GradientOrigin, to.GradientOrigin, progress);
             brush.RadiusX = DoubleHelper.InterpolateValue(from.RadiusX, to.RadiusX, progress);
             brush.RadiusY = DoubleHelper.InterpolateValue(from.RadiusY, to.RadiusY, progress);
             return brush;

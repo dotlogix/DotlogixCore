@@ -1,12 +1,20 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  FlagsEnumTest.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using DotLogix.Core.Enumeration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ColorFlags = DotLogix.Core.Enumeration.EnumFlags<Test.ColorEnum, Test.ColorEnum.ColorEnumMember>;
-namespace Test
-{
+#endregion
+
+namespace Test {
     [TestClass]
-    public class FlagsEnumTest
-    {
+    public class FlagsEnumTest {
         [TestMethod]
         public void Converters() {
             var blue = ColorEnum.Blue;
@@ -20,8 +28,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void EqualityTest()
-        {
+        public void EqualityTest() {
             var blueRed = new ColorFlags(ColorEnum.Instance, ColorEnum.Blue, ColorEnum.Red);
             var redBlue = new ColorFlags(ColorEnum.Instance, ColorEnum.Red, ColorEnum.Blue);
 
@@ -39,8 +46,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void NotTest()
-        {
+        public void NotTest() {
             var all = new ColorFlags(ColorEnum.Instance, ColorEnum.Instance.Members);
             var none = new ColorFlags(ColorEnum.Instance);
             var green = new ColorFlags(ColorEnum.Instance, ColorEnum.Green);
@@ -51,8 +57,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void AndTest()
-        {
+        public void AndTest() {
             var all = new ColorFlags(ColorEnum.Instance, ColorEnum.Instance.Members);
             var none = new ColorFlags(ColorEnum.Instance);
 
@@ -66,8 +71,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void XOrTest()
-        {
+        public void XOrTest() {
             var all = new ColorFlags(ColorEnum.Instance, ColorEnum.Instance.Members);
             var none = new ColorFlags(ColorEnum.Instance);
 

@@ -1,8 +1,18 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ProjectionFactory.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using DotLogix.Core.Reflection.Delegates;
 using DotLogix.Core.Reflection.Dynamics;
+#endregion
 
 namespace DotLogix.Core.Reflection.Projections {
     public class ProjectionFactory : IProjectionFactory {
@@ -11,15 +21,13 @@ namespace DotLogix.Core.Reflection.Projections {
 
         protected ProjectionFactory() { }
 
-        public virtual IEnumerable<IProjection> CreateProjections(Type left, Type right)
-        {
+        public virtual IEnumerable<IProjection> CreateProjections(Type left, Type right) {
             var dynamicLeft = left.CreateDynamicType(MemberTypes.Property);
             var dynamicRight = right.CreateDynamicType(MemberTypes.Property);
 
-            foreach (var leftProperty in dynamicLeft.Properties)
-            {
+            foreach(var leftProperty in dynamicLeft.Properties) {
                 var rightProperty = dynamicRight.GetPropery(leftProperty.Name);
-                if (rightProperty == null)
+                if(rightProperty == null)
                     continue;
 
                 var leftGetter = leftProperty.Getter.GetterDelegate;
@@ -35,6 +43,5 @@ namespace DotLogix.Core.Reflection.Projections {
                                                        SetterDelegate leftSetter, SetterDelegate rightSetter) {
             return new Projection(leftGetter, rightGetter, leftSetter, rightSetter);
         }
-
     }
 }

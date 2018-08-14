@@ -1,15 +1,14 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  DataTypeConverter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  09.09.2017
-// LastEdited:  09.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using DotLogix.Core.Extensions;
 #endregion
 
@@ -33,9 +32,9 @@ namespace DotLogix.Core.Types {
 
         private DataType CreateDataType(Type type) {
             DataType dataType;
-            if(type.IsEnumerable(out var elementType)) {
+            if(type.IsEnumerable(out var elementType))
                 dataType = new DataType(DataTypeFlags.Collection, type, elementType: elementType);
-            } else {
+            else {
                 var underlyingType = Nullable.GetUnderlyingType(type);
                 if(underlyingType == null) {
                     var flags = type.IsEnum
@@ -52,8 +51,8 @@ namespace DotLogix.Core.Types {
 
         private static ConcurrentDictionary<Type, DataType> CreatePrimitiveTypes() {
             var primitives = new ConcurrentDictionary<Type, DataType>();
-            void AddPrimitiveType(Type type, DataTypeFlags flags)
-            {
+
+            void AddPrimitiveType(Type type, DataTypeFlags flags) {
                 primitives.TryAdd(type, new DataType(flags, type));
             }
 

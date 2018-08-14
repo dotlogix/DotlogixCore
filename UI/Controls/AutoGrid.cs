@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  AutoGrid.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -14,92 +14,39 @@ using System.Windows.Controls;
 
 namespace DotLogix.UI.Controls {
     public class AutoGrid : Panel {
-        public static readonly DependencyProperty MinItemWidthProperty = DependencyProperty.Register(
-                                                                                                     "MinItemWidth",
-                                                                                                     typeof(double),
-                                                                                                     typeof(AutoGrid),
-                                                                                                     new
-                                                                                                     PropertyMetadata
-                                                                                                     (1d));
+        public static readonly DependencyProperty ItemGapXProperty = DependencyProperty.Register(
+                                                                                                 "ItemGapX", typeof(double), typeof(AutoGrid), new PropertyMetadata(default(double)));
 
-        public static readonly DependencyProperty MaxItemWidthProperty = DependencyProperty.Register(
-                                                                                                     "MaxItemWidth",
-                                                                                                     typeof(double),
-                                                                                                     typeof(AutoGrid),
-                                                                                                     new
-                                                                                                     PropertyMetadata
-                                                                                                     (double.MaxValue));
+        public static readonly DependencyProperty ItemGapYProperty = DependencyProperty.Register(
+                                                                                                 "ItemGapY", typeof(double), typeof(AutoGrid), new PropertyMetadata(default(double)));
 
-        public static readonly DependencyProperty MinItemHeightProperty = DependencyProperty.Register(
-                                                                                                      "MinItemHeight",
-                                                                                                      typeof(double),
-                                                                                                      typeof(AutoGrid),
-                                                                                                      new
-                                                                                                      PropertyMetadata
-                                                                                                      (1d));
+        public static readonly DependencyProperty TargetWidthProperty = DependencyProperty.Register(
+                                                                                                    "TargetWidth", typeof(double), typeof(AutoGrid), new PropertyMetadata(default(double)));
 
-        public static readonly DependencyProperty MaxItemHeightProperty = DependencyProperty.Register(
-                                                                                                      "MaxItemHeight",
-                                                                                                      typeof(double),
-                                                                                                      typeof(AutoGrid),
-                                                                                                      new
-                                                                                                      PropertyMetadata
-                                                                                                      (double.MaxValue))
-        ;
+        public static readonly DependencyProperty TargetHeightProperty = DependencyProperty.Register(
+                                                                                                     "TargetHeight", typeof(double), typeof(AutoGrid), new PropertyMetadata(default(double)));
 
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(
-                                                                                                    "Orientation",
-                                                                                                    typeof(Orientation),
-                                                                                                    typeof(AutoGrid),
-                                                                                                    new PropertyMetadata
-                                                                                                    (Orientation.
-                                                                                                     Horizontal));
+                                                                                                    "Orientation", typeof(Orientation), typeof(AutoGrid), new PropertyMetadata(default(Orientation)));
 
-        public static readonly DependencyProperty LimitToChildCountProperty = DependencyProperty.Register(
-                                                                                                          "LimitToChildCount",
-                                                                                                          typeof(bool),
-                                                                                                          typeof(
-                                                                                                              AutoGrid),
-                                                                                                          new
-                                                                                                          PropertyMetadata
-                                                                                                          (default(bool
-                                                                                                           )));
-
-        public static readonly DependencyProperty ItemPaddingProperty = DependencyProperty.Register(
-                                                                                                    "ItemPadding",
-                                                                                                    typeof(double),
-                                                                                                    typeof(AutoGrid),
-                                                                                                    new PropertyMetadata
-                                                                                                    (default(double)));
-
-        public double ItemPadding {
-            get { return (double)GetValue(ItemPaddingProperty); }
-            set { SetValue(ItemPaddingProperty, value); }
+        public double ItemGapX {
+            get { return (double)GetValue(ItemGapXProperty); }
+            set { SetValue(ItemGapXProperty, value); }
         }
 
-        public double MinItemWidth {
-            get { return (double)GetValue(MinItemWidthProperty); }
-            set { SetValue(MinItemWidthProperty, value); }
+        public double ItemGapY {
+            get { return (double)GetValue(ItemGapYProperty); }
+            set { SetValue(ItemGapYProperty, value); }
         }
 
-        public double MaxItemWidth {
-            get { return (double)GetValue(MaxItemWidthProperty); }
-            set { SetValue(MaxItemWidthProperty, value); }
+        public double TargetWidth {
+            get { return (double)GetValue(TargetWidthProperty); }
+            set { SetValue(TargetWidthProperty, value); }
         }
 
-        public double MinItemHeight {
-            get { return (double)GetValue(MinItemHeightProperty); }
-            set { SetValue(MinItemHeightProperty, value); }
-        }
-
-        public double MaxItemHeight {
-            get { return (double)GetValue(MaxItemHeightProperty); }
-            set { SetValue(MaxItemHeightProperty, value); }
-        }
-
-        public bool LimitToChildCount {
-            get { return (bool)GetValue(LimitToChildCountProperty); }
-            set { SetValue(LimitToChildCountProperty, value); }
+        public double TargetHeight {
+            get { return (double)GetValue(TargetHeightProperty); }
+            set { SetValue(TargetHeightProperty, value); }
         }
 
         public Orientation Orientation {
@@ -108,10 +55,9 @@ namespace DotLogix.UI.Controls {
         }
 
         protected override Size MeasureOverride(Size availableSize) {
-            GetSize(availableSize, out Size itemSize, out Size realSize);
-            foreach(UIElement child in Children) {
+            GetSize(availableSize, out var itemSize, out var realSize);
+            foreach(UIElement child in Children)
                 child.Measure(itemSize);
-            }
             return realSize;
         }
 
@@ -123,61 +69,54 @@ namespace DotLogix.UI.Controls {
                 return;
             }
 
-            var padding = ItemPadding;
-            var minItemHeight = MinItemHeight;
-            var minItemWidth = MinItemWidth;
-            var maxItemWidth = MaxItemWidth;
-            var maxItemHeight = MaxItemHeight;
-            var paddedMinItemWidth = minItemWidth + padding;
-            var paddedMinItemHeight = minItemHeight + padding;
+            var paddingX = ItemGapX;
+            var paddingY = ItemGapY;
+            var targetItemHeight = TargetHeight;
+            var targetItemWidth = TargetWidth;
+            var paddedTargetWidth = targetItemWidth + paddingX;
+            var paddedTargetHeight = targetItemHeight + paddingY;
+
             realSize = availableSize;
             if(Orientation == Orientation.Horizontal) {
                 if(double.IsNaN(availableSize.Width) || double.IsInfinity(availableSize.Width)) {
-                    realSize.Width = (paddedMinItemWidth * childCount) - padding;
-                    realSize.Height = minItemHeight;
-                    itemSize = new Size(minItemWidth, Math.Min(maxItemHeight, realSize.Height));
+                    realSize.Width = (paddedTargetWidth * childCount) - paddingX;
+                    realSize.Height = targetItemHeight;
+                    itemSize = new Size(targetItemWidth, Math.Min(targetItemHeight, realSize.Height));
                 } else {
-                    var childsPerRow = (int)((realSize.Width + padding) / paddedMinItemWidth);
-                    if(LimitToChildCount && (childsPerRow > childCount))
-                        childsPerRow = childCount;
+                    var childsPerRow = Math.Max((int)((realSize.Width + paddingX) / paddedTargetWidth), 1);
                     var requiredRows = Math.Ceiling(childCount / (double)childsPerRow);
-                    realSize.Height = (paddedMinItemHeight * requiredRows) - padding;
-                    itemSize =
-                    new Size(
-                             Math.Min(maxItemWidth,
-                                      (availableSize.Width - (padding * (childsPerRow - 1))) / childsPerRow),
-                             MinItemHeight);
+                    realSize.Height = (paddedTargetHeight * requiredRows) - paddingY;
+                    itemSize = new Size((availableSize.Width - (paddingX * (childsPerRow - 1))) / childsPerRow, targetItemHeight);
                 }
             } else {
                 if(double.IsNaN(availableSize.Height) || double.IsInfinity(availableSize.Height)) {
-                    realSize.Width = minItemWidth;
-                    realSize.Height = (paddedMinItemHeight * childCount) - padding;
-                    itemSize = new Size(Math.Min(maxItemWidth, availableSize.Width), minItemHeight);
+                    realSize.Width = targetItemWidth;
+                    realSize.Height = (paddedTargetHeight * childCount) - paddingY;
+                    itemSize = new Size(Math.Min(targetItemWidth, availableSize.Width), targetItemHeight);
                 } else {
-                    var childsPerColumn = (int)((realSize.Height + padding) / paddedMinItemHeight);
-                    if(LimitToChildCount && (childsPerColumn > childCount))
-                        childsPerColumn = childCount;
+                    var childsPerColumn = Math.Max((int)((realSize.Height + paddingY) / paddedTargetHeight), 1);
                     var requiredColumns = Math.Ceiling(childCount / (double)childsPerColumn);
-                    realSize.Width = (paddedMinItemWidth * requiredColumns) - padding;
-                    itemSize = new Size(MinItemWidth,
-                                        Math.Min(MaxItemHeight,
-                                                 (availableSize.Height - (padding * (childsPerColumn - 1))) /
-                                                 childsPerColumn));
+                    realSize.Width = (paddedTargetWidth * requiredColumns) - paddingX;
+                    itemSize = new Size(targetItemWidth, (availableSize.Height - (paddingY * (childsPerColumn - 1))) / childsPerColumn);
                 }
             }
         }
 
+
         protected override Size ArrangeOverride(Size finalSize) {
-            GetSize(finalSize, out Size itemSize, out Size realSize);
-            var padding = ItemPadding;
-            var paddedItemWidth = itemSize.Width + padding;
-            var paddedItemHeight = itemSize.Height + padding;
+            GetSize(finalSize, out var itemSize, out var realSize);
+            var paddingX = ItemGapX;
+            var paddingY = ItemGapY;
+            var targetItemHeight = itemSize.Height;
+            var targetItemWidth = itemSize.Width;
+            var paddedTargetWidth = targetItemWidth + paddingX;
+            var paddedTargetHeight = targetItemHeight + paddingY;
             if(Orientation == Orientation.Horizontal) {
                 var itemsPerRow = (int)Math.Round(realSize.Width / itemSize.Width);
                 for(var i = 0; i < Children.Count; i++) {
                     var x = i % itemsPerRow;
                     var y = i / itemsPerRow;
-                    var pos = new Point(x * paddedItemWidth, y * paddedItemHeight);
+                    var pos = new Point(x * paddedTargetWidth, y * paddedTargetHeight);
                     Children[i].Arrange(new Rect(pos, itemSize));
                 }
             } else {
@@ -185,7 +124,7 @@ namespace DotLogix.UI.Controls {
                 for(var i = 0; i < Children.Count; i++) {
                     var x = i / itemsPerColumn;
                     var y = i % itemsPerColumn;
-                    var pos = new Point(x * paddedItemWidth, y * paddedItemHeight);
+                    var pos = new Point(x * paddedTargetWidth, y * paddedTargetHeight);
                     Children[i].Arrange(new Rect(pos, itemSize));
                 }
             }

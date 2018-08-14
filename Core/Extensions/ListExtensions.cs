@@ -1,59 +1,26 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ListExtensions.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Collections.Generic;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Extensions {
-    public class SelectorComparer<T, TKey> : IComparer<T> where TKey : IComparable
-    {
-        private readonly Func<T, TKey> _comparableSelector;
-
-        public SelectorComparer(Func<T, TKey> comparableSelector)
-        {
-            this._comparableSelector = comparableSelector;
-        }
-
-        public int Compare(T x, T y)
-        {
-            return _comparableSelector.Invoke(y).CompareTo(_comparableSelector.Invoke(x));
-        }
-    }
-
-    public class SelectorEqualityComparer<T, TKey> : IEqualityComparer<T> where TKey : IComparable
-    {
-        private readonly Func<T, TKey> _comparableSelector;
-
-        public SelectorEqualityComparer(Func<T, TKey> comparableSelector)
-        {
-            this._comparableSelector = comparableSelector;
-        }
-
-        public int Compare(T x, T y)
-        {
-            return _comparableSelector(x).CompareTo(_comparableSelector(y));
-        }
-
-        public bool Equals(T x, T y) {
-            
-            return Equals(_comparableSelector(x), _comparableSelector(y));
-        }
-
-        public int GetHashCode(T x) {
-            return _comparableSelector(x).GetHashCode();
-        }
-    }
-
     public static class ListExtensions {
-        
-
+        /// <summary>
+        ///     Takes the last n elements of a list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">The list</param>
+        /// <param name="count">The maximum elemnts to take</param>
+        /// <returns></returns>
         public static T[] TakeLast<T>(this IList<T> list, int count) {
             if(count < 0)
                 throw new ArgumentException("Count has to be greater or equal zero", nameof(count));
@@ -62,12 +29,19 @@ namespace DotLogix.Core.Extensions {
             count = Math.Min(count, listCount);
             var elements = new T[count];
             var startIndex = listCount - count;
-            for(var i = 0; i < count; i++) {
+            for(var i = 0; i < count; i++)
                 elements[i] = list[startIndex + i];
-            }
             return elements;
         }
 
+        /// <summary>
+        ///     Swaps two values of a list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">The list</param>
+        /// <param name="index1">The index of the first element</param>
+        /// <param name="index2">The index of the second element</param>
+        /// <returns></returns>
         public static IList<T> Swap<T>(this IList<T> list, int index1, int index2) {
             var temp = list[index1];
             list[index1] = list[index2];
@@ -75,52 +49,61 @@ namespace DotLogix.Core.Extensions {
             return list;
         }
 
-        public static void InsertSorted<T>(this List<T> list, T item) where T : IComparable<T>
-        {
-            if (list.Count == 0)
-            {
+        /// <summary>
+        ///     Inserts a value in a sorted order. Only works in lists where the values are sorted already
+        /// </summary>
+        /// <param name="list">The list</param>
+        /// <param name="item">The item to insert</param>
+        public static void InsertSorted<T>(this List<T> list, T item) where T : IComparable<T> {
+            if(list.Count == 0) {
                 list.Add(item);
                 return;
             }
-            if (list[list.Count - 1].CompareTo(item) <= 0)
-            {
+            if(list[list.Count - 1].CompareTo(item) <= 0) {
                 list.Add(item);
                 return;
             }
-            if (list[0].CompareTo(item) >= 0)
-            {
+            if(list[0].CompareTo(item) >= 0) {
                 list.Insert(0, item);
                 return;
             }
-            int index = list.BinarySearch(item);
-            if (index < 0)
+            var index = list.BinarySearch(item);
+            if(index < 0)
                 index = ~index;
             list.Insert(index, item);
         }
 
+        /// <summary>
+        ///     Inserts a value in a sorted order. Only works in lists where the values are sorted already
+        /// </summary>
+        /// <param name="list">The list</param>
+        /// <param name="item">The item to insert</param>
+        /// <param name="comparableSelector">The fucntion to select the key for sorting</param>
         public static void InsertSorted<T, TKey>(this List<T> list, T item, Func<T, TKey> comparableSelector) where TKey : IComparable {
             InsertSorted(list, item, new SelectorComparer<T, TKey>(comparableSelector));
         }
 
-        public static void InsertSorted<T>(this List<T> list, T item, IComparer<T> comparer)
-        {
-            if (list.Count == 0)
-            {
+        /// <summary>
+        ///     Inserts a value in a sorted order. Only works in lists where the values are sorted already
+        /// </summary>
+        /// <param name="list">The list</param>
+        /// <param name="item">The item to insert</param>
+        /// <param name="comparer">The comparer used for sorting</param>
+        public static void InsertSorted<T>(this List<T> list, T item, IComparer<T> comparer) {
+            if(list.Count == 0) {
                 list.Add(item);
                 return;
             }
-            if (comparer.Compare(list[list.Count - 1], item) <= 0)
-            {
+            if(comparer.Compare(list[list.Count - 1], item) <= 0) {
                 list.Add(item);
                 return;
             }
-            if (comparer.Compare(list[0], item) >= 0)
-            {
+            if(comparer.Compare(list[0], item) >= 0) {
                 list.Insert(0, item);
                 return;
             }
-            int index = list.BinarySearch(item);
-            if (index < 0)
+            var index = list.BinarySearch(item);
+            if(index < 0)
                 index = ~index;
             list.Insert(index, item);
         }

@@ -1,102 +1,187 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  NodeMap.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  18.10.2017
-// LastEdited:  18.10.2017
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes {
-    public class NodeMap : NodeCollection {
-        private readonly Dictionary<string, Node> _nodeDict = new Dictionary<string, Node>(StringComparer.OrdinalIgnoreCase);
-        public Node this[string name] => GetChild(name);
-        public NodeMap() : base(NodeTypes.Map) { }
+    public class NodeMap : NodeContainer {
+        private readonly Dictionary<string, Node> _nodeMap = new Dictionary<string, Node>(StringComparer.OrdinalIgnoreCase);
 
-        public NodeMap(string name) : this() {
-            InternalName = name;
+        private Node _last;
+
+        public override NodeTypes Type => NodeTypes.Map;
+
+        public override int ChildCount => _nodeMap.Count;
+
+        public Node this[string name] {
+            get => _nodeMap[name];
+            set => AddOrReplaceChild(name, value);
         }
 
-        public virtual TNode CreateChild<TNode>(string name) where TNode : Node, new() {
-            var node = new TNode {InternalName = name};
-            AddChild(node);
-            return node;
+        #region Clear
+        public void Clear() {
+            foreach(var node in _nodeMap.Values)
+                ClearNode(node);
+            _nodeMap.Clear();
+        }
+        #endregion
+
+        #region Children
+        public override IEnumerable<Node> Children() {
+            return _nodeMap.Values;
+        }
+        #endregion
+
+        protected override void AddMatchingNodes(string pattern, List<Node> newResults) {
+            if(_nodeMap.TryGetValue(pattern, out var node))
+                newResults.Add(node);
         }
 
+        #region GetChild
         public Node GetChild(string name) {
-            return _nodeDict.TryGetValue(name, out var node) ? node : null;
+            if(name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            return _nodeMap.TryGetValue(name, out var node) ? node : null;
         }
 
         public TNode GetChild<TNode>(string name) where TNode : Node {
-            return GetChild(name) as TNode;
+            if(name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            return _nodeMap.TryGetValue(name, out var node) ? node as TNode : null;
         }
 
-        public bool RemoveChild(string name) {
-            var node = GetChild(name);
-            return (node != null) && RemoveChild(node);
+        public bool TryGetChild(string name, out Node childNode) {
+            if(name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            return _nodeMap.TryGetValue(name, out childNode);
         }
 
-        public Node PopChild(string name) {
-            var node = GetChild(name);
-            if(node == null)
-                return null;
+        public bool TryGetChild<TNode>(string name, out TNode childNode) {
+            if(name == null)
+                throw new ArgumentNullException(nameof(name));
 
-            RemoveChild(name);
-            return node;
+            if(_nodeMap.TryGetValue(name, out var node) && node is TNode typedNode) {
+                childNode = typedNode;
+                return true;
+            }
+
+            childNode = default;
+            return false;
+        }
+        #endregion
+
+        #region AddChild
+        public void AddChild(string name, Node childNode) {
+            if(name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            if(childNode == null)
+                throw new ArgumentNullException(nameof(childNode));
+
+            if(childNode.Ancestor != null)
+                throw new ArgumentException("Node already has an ancestor", nameof(childNode));
+
+            SyncNode(childNode, this, _last, null, name);
+            _last = childNode;
+            _nodeMap.Add(name, childNode);
         }
 
-        public TNode PopChild<TNode>(string name) where TNode : Node {
-            var node = GetChild(name) as TNode;
-            if(node == null)
-                return null;
 
-            RemoveChild(name);
-            return node;
+        public void AddChildren(IEnumerable<KeyValuePair<string, Node>> childProperties) {
+            foreach(var childProperty in childProperties)
+                AddChild(childProperty.Key, childProperty.Value);
+        }
+        #endregion
+
+        #region RemoveChild
+        public void RemoveChild(string name) {
+            var child = _nodeMap[name];
+
+            if(child == _last)
+                _last = child.Previous;
+
+            _nodeMap.Remove(name);
+
+            SyncNode(child.Previous, child.Next);
+            ClearNode(child);
         }
 
-        public void ReplaceChild(Node node) {
-            var oldNode = GetChild(node.Name);
-            ReplaceChild(oldNode, node);
+        public bool RemoveChild(Node childNode) {
+            if(childNode == null)
+                throw new ArgumentNullException(nameof(childNode));
+
+            if(_nodeMap.TryGetKey(childNode, out var name) == false)
+                return false;
+
+            if(childNode == _last)
+                _last = childNode.Previous;
+
+            _nodeMap.Remove(name);
+
+            SyncNode(childNode.Previous, childNode.Next);
+            ClearNode(childNode);
+            return true;
+        }
+        #endregion
+
+        #region ReplaceChild
+        public void AddOrReplaceChild(string name, Node childNode) {
+            if(name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            if(_nodeMap.TryGetValue(name, out var prevChild))
+                ReplaceChild(name, prevChild, childNode);
+            else
+                AddChild(name, childNode);
         }
 
-        public override void AddChild(Node node) {
-            _nodeDict.Add(node.Name, node);
-            base.AddChild(node);
+        public void ReplaceChild(string name, Node childNode) {
+            if(name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            if(_nodeMap.TryGetValue(name, out var prevChild))
+                ReplaceChild(name, prevChild, childNode);
+            else
+                throw new KeyNotFoundException("A node with this name does not exist");
         }
 
-        public override bool RemoveChild(Node node) {
-            return base.RemoveChild(node) && _nodeDict.Remove(node.Name);
+        public void ReplaceChild(string name, Node prevChild, Node childNode) {
+            if(childNode == null)
+                throw new ArgumentNullException(nameof(childNode));
+
+            if(childNode.Ancestor != null)
+                throw new ArgumentException("Node already has an ancestor", nameof(childNode));
+
+            if(prevChild == _last)
+                _last = childNode;
+
+            _nodeMap[name] = childNode;
+            SyncNode(childNode, this, prevChild.Previous, prevChild.Next, name);
+            ClearNode(prevChild);
+        }
+        #endregion
+
+        #region Properties
+        public IEnumerable<KeyValuePair<string, TNode>> Properties<TNode>() where TNode : Node {
+            return _nodeMap.Where(n => n.Value is TNode).Select(n => new KeyValuePair<string, TNode>(n.Key, (TNode)n.Value));
         }
 
-        public override void RenameChild(Node node, string newName) {
-            if(node == null)
-                throw new ArgumentNullException(nameof(node));
-            if(node.Ancestor != this)
-                throw new InvalidOperationException("This node is not a child of this collection");
-
-            _nodeDict.Remove(node.Name);
-            _nodeDict.Add(newName, node);
-            base.RenameChild(node, newName);
+        public IEnumerable<KeyValuePair<string, Node>> Properties() {
+            return _nodeMap;
         }
-
-        public override void ReplaceChild(Node oldNode, Node newNode) {
-            base.ReplaceChild(oldNode, newNode);
-            _nodeDict.Remove(oldNode.Name);
-            _nodeDict.Add(newNode.Name, newNode);
-        }
-
-        public void RenameChild(string oldName, string newName) {
-            var node = GetChild(oldName);
-            RenameChild(node, newName);
-        }
-
-        protected override Node SelectNodeInternal(string pathToken)
-        {
-            return GetChild(pathToken);
-        }
+        #endregion
     }
 }

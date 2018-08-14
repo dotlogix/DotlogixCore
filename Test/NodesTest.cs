@@ -1,60 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodesTest.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endregion
 
-namespace Test
-{
+namespace Test {
     [TestClass]
-    public class NodesTest
-    {
+    public class NodesTest {
         [TestMethod]
         public void ValueNodeTest() {
-            var nodeValue = new NodeValue("TestNode", "1");
+            var nodeValue = new NodeValue("1");
 
             Assert.AreEqual("1", nodeValue.Value);
-            Assert.AreEqual("1", nodeValue.ConvertValue<string>());
-            Assert.AreEqual(1, nodeValue.ConvertValue<int>());
+            Assert.AreEqual("1", nodeValue.GetValue<string>());
+            Assert.AreEqual(1, nodeValue.GetValue<int>());
         }
 
         [TestMethod]
-        public void MapNodeTest()
-        {
-            var nodeMap = new NodeMap("TestNode");
-            var valueNode = nodeMap.CreateChild<NodeValue>("TestValueNode");
-            valueNode.Value = "1";
+        public void MapNodeTest() {
+            var nodeMap = new NodeMap();
+            var valueNode = nodeMap.CreateValue("TestValueNode", "1");
 
             var receivedNode = nodeMap.GetChild<NodeValue>("TestValueNode");
             Assert.AreEqual(valueNode, receivedNode);
-            Assert.AreEqual("1", receivedNode.ConvertValue<string>());
-            Assert.AreEqual(1, receivedNode.ConvertValue<int>());
+            Assert.AreEqual("1", receivedNode.GetValue<string>());
+            Assert.AreEqual(1, receivedNode.GetValue<int>());
         }
 
         [TestMethod]
-        public void ListNodeTest()
-        {
-            var nodeList = new NodeList("TestNode");
-            var valueNode = nodeList.CreateChild<NodeValue>();
-            valueNode.Value = "1";
+        public void ListNodeTest() {
+            var nodeList = new NodeList();
+            var valueNode = nodeList.CreateValue("1");
 
             var receivedNode = nodeList.GetChild<NodeValue>(0);
 
             Assert.AreEqual(valueNode, receivedNode);
-            Assert.AreEqual("1", receivedNode.ConvertValue<string>());
-            Assert.AreEqual(1, receivedNode.ConvertValue<int>());
+            Assert.AreEqual("1", receivedNode.GetValue<string>());
+            Assert.AreEqual(1, receivedNode.GetValue<int>());
         }
 
         [TestMethod]
-        public void MapNodeNavigationTest()
-        {
-            var nodeMap = new NodeMap("TestNode");
-            var valueNode1 = nodeMap.CreateChild<NodeValue>("TestValueNode1");
-            var valueNode2 = nodeMap.CreateChild<NodeValue>("TestValueNode2");
-            var valueNode3 = nodeMap.CreateChild<NodeValue>("TestValueNode3");
-            
+        public void MapNodeNavigationTest() {
+            var nodeMap = new NodeMap();
+            var valueNode1 = nodeMap.CreateValue("TestValueNode1");
+            var valueNode2 = nodeMap.CreateValue("TestValueNode2");
+            var valueNode3 = nodeMap.CreateValue("TestValueNode3");
+
             Assert.AreEqual(valueNode1.Previous, null);
             Assert.AreEqual(valueNode1.Next, valueNode2);
 
@@ -67,7 +66,7 @@ namespace Test
             nodeMap.RemoveChild("TestValueNode3");
             Assert.AreEqual(null, valueNode2.Next);
             Assert.AreEqual(null, valueNode3.Ancestor);
-            valueNode3 = nodeMap.CreateChild<NodeValue>("TestValueNode3");
+            valueNode3 = nodeMap.CreateValue("TestValueNode3");
 
             Assert.AreEqual(valueNode2.Next, valueNode3);
 
@@ -75,8 +74,8 @@ namespace Test
             Assert.AreEqual(valueNode1.Next, valueNode3);
             Assert.AreEqual(valueNode3.Previous, valueNode1);
 
-            var valueNode3Replace = new NodeValue("TestValueNode3", 10);
-            nodeMap.ReplaceChild(valueNode3Replace);
+            var valueNode3Replace = new NodeValue(10);
+            nodeMap.ReplaceChild("TestValueNode3", valueNode3Replace);
 
             Assert.AreEqual(valueNode3Replace, valueNode1.Next);
             Assert.AreEqual(valueNode1, valueNode3Replace.Previous);
@@ -85,12 +84,11 @@ namespace Test
         }
 
         [TestMethod]
-        public void ListNodeNavigationTest()
-        {
-            var nodeList = new NodeList("TestNode");
-            var valueNode1 = nodeList.CreateChild<NodeValue>();
-            var valueNode2 = nodeList.CreateChild<NodeValue>();
-            var valueNode3 = nodeList.CreateChild<NodeValue>();
+        public void ListNodeNavigationTest() {
+            var nodeList = new NodeList();
+            var valueNode1 = nodeList.CreateValue();
+            var valueNode2 = nodeList.CreateValue();
+            var valueNode3 = nodeList.CreateValue();
 
             Assert.AreEqual(null, valueNode1.Previous);
             Assert.AreEqual(valueNode2, valueNode1.Next);
@@ -104,7 +102,7 @@ namespace Test
             nodeList.RemoveChild(2);
             Assert.AreEqual(null, valueNode2.Next);
             Assert.AreEqual(null, valueNode3.Ancestor);
-            valueNode3 = nodeList.CreateChild<NodeValue>();
+            valueNode3 = nodeList.CreateValue();
 
             Assert.AreEqual(valueNode3, valueNode2.Next);
 
@@ -133,17 +131,16 @@ namespace Test
         }
 
         [TestMethod]
-        public void NodeSelectTest()
-        {
-            var node1 = new NodeMap("1");
-            var node11 = node1.CreateChild<NodeMap>("11");
-            var node12 = node1.CreateChild<NodeList>("12");
+        public void NodeSelectTest() {
+            var node1 = new NodeMap();
+            var node11 = node1.CreateMap("11");
+            var node12 = node1.CreateList("12");
 
-            var node111 = node11.CreateChild<NodeValue>("111");
-            var node112 = node11.CreateChild<NodeValue>("112");
+            var node111 = node11.CreateValue("111");
+            var node112 = node11.CreateValue("112");
 
-            var node121 = node12.CreateChild<NodeValue>();
-            var node122 = node12.CreateChild<NodeValue>();
+            var node121 = node12.CreateValue();
+            var node122 = node12.CreateValue();
 
             Assert.AreEqual(node11, node1.SelectNode<NodeMap>("11"));
             Assert.AreEqual(node12, node1.SelectNode<NodeList>("12"));
@@ -153,6 +150,23 @@ namespace Test
 
             Assert.AreEqual(node121, node1.SelectNode<NodeValue>("12/0"));
             Assert.AreEqual(node122, node1.SelectNode<NodeValue>("12/1"));
+
+            Assert.AreEqual(node122, node1.SelectNode<NodeValue>("12/-1"));
+
+            var nodes = node1.SelectNodes<NodeValue>("12/*").ToList();
+            Assert.AreEqual(2, nodes.Count);
+            Assert.AreEqual(node121, nodes[0]);
+            Assert.AreEqual(node122, nodes[1]);
+
+            nodes = node1.SelectNodes<NodeValue>("12/0..1").ToList();
+            Assert.AreEqual(2, nodes.Count);
+            Assert.AreEqual(node121, nodes[0]);
+            Assert.AreEqual(node122, nodes[1]);
+
+            nodes = node1.SelectNodes<NodeValue>("12/..1").ToList();
+            Assert.AreEqual(2, nodes.Count);
+            Assert.AreEqual(node121, nodes[0]);
+            Assert.AreEqual(node122, nodes[1]);
 
             Assert.AreEqual(node1, node11.SelectNode<NodeMap>("~"));
             Assert.AreEqual(node12, node11.SelectNode<NodeList>("~/12"));
@@ -165,11 +179,11 @@ namespace Test
             var testClassInstance = new TestClass {
                                                       Property1 = null,
                                                       Property2 = 1,
-                                                      Property3 = new TestNestedClass(){
-                                                                      Property1 = "TestString2",
-                                                                      Property2 = 2,
-                                                                      Property3 = new[] {1,2,3}
-                                                                  }
+                                                      Property3 = new TestNestedClass {
+                                                                                          Property1 = "TestString2",
+                                                                                          Property2 = 2,
+                                                                                          Property3 = new[] {1, 2, 3}
+                                                                                      }
                                                   };
 
             var node = Nodes.ToNode(testClassInstance);
@@ -182,7 +196,7 @@ namespace Test
             var property2 = nodeMap.GetChild<NodeValue>("Property2");
             var property3 = nodeMap.GetChild<NodeMap>("Property3");
             Assert.IsNotNull(property1);
-            Assert.AreEqual(NodeTypes.Empty, property1.NodeType);
+            Assert.AreEqual(NodeTypes.Empty, property1.Type);
             Assert.IsNotNull(property2);
             Assert.IsNotNull(property3);
 
@@ -208,8 +222,7 @@ namespace Test
             public TestNestedClass Property3 { get; set; }
         }
 
-        public class TestNestedClass
-        {
+        public class TestNestedClass {
             public string Property1 { get; set; }
             public int Property2 { get; set; }
             public int[] Property3 { get; set; }

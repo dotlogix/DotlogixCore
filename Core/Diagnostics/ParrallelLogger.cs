@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ParrallelLogger.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  21.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -26,7 +26,7 @@ namespace DotLogix.Core.Diagnostics {
 
         public object SyncRoot { get; }
         public bool Initialized { get; private set; }
-        public LogLevels CurrentLogLevel { get; set; }
+        public LogLevels CurrentLogLevel { get; set; } = LogLevels.Off;
 
         private ParrallelLogger() {
             SyncRoot = new object();
@@ -59,8 +59,12 @@ namespace DotLogix.Core.Diagnostics {
                 if(Initialized)
                     return false;
                 Initialized = true;
-                if(_currentReceivers.Any(logger => !logger.Initialize()))
-                    return false;
+
+                if(_loggersChanged) {
+                    _currentReceivers = _receivers.ToArray();
+                    if(_currentReceivers.All(l => l.Initialize()) == false)
+                        return false;
+                }
             }
             _loggingThread.Start();
             return true;
@@ -71,7 +75,7 @@ namespace DotLogix.Core.Diagnostics {
                 if(Initialized == false)
                     return false;
                 Initialized = false;
-                if(_currentReceivers.Any(logger => !logger.Shutdown()))
+                if(_currentReceivers.All(l => l.Shutdown()) == false)
                     return false;
             }
             _receiverWait.Set();
@@ -80,9 +84,8 @@ namespace DotLogix.Core.Diagnostics {
 
             while(_queuedMessages.Count > 0) {
                 var queuedMessage = _queuedMessages.Dequeue();
-                foreach(var currentReceiver in _receivers) {
+                foreach(var currentReceiver in _receivers)
                     currentReceiver.Log(queuedMessage);
-                }
             }
             return true;
         }
@@ -113,39 +116,46 @@ namespace DotLogix.Core.Diagnostics {
                         continue;
                 }
 
-                foreach(var currentReceiver in _currentReceivers) {
+                foreach(var currentReceiver in _currentReceivers)
                     currentReceiver.Log(currentMessage);
-                }
             }
         }
 
-        public bool AttachLogger(params ILogger[] receiver) {
-            if((receiver == null) || (receiver.Length == 0))
+        public bool AttachLogger(IEnumerable<ILogger> loggers) {
+            if(loggers == null)
+                return true;
+
+            var loggerList = loggers.ToList();
+            if(loggerList.Count == 0)
                 return true;
 
             lock(SyncRoot) {
                 var count = _receivers.Count;
-                _receivers.UnionWith(receiver);
+                _receivers.UnionWith(loggerList);
                 if(count == _receivers.Count)
                     return false;
                 _loggersChanged = true;
                 _receiverWait.Set();
             }
-            return true;
+            return loggerList.All(l => l.Initialize());
         }
 
-        public bool DetachLogger(params ILogger[] receiver) {
-            if((receiver == null) || (receiver.Length == 0))
+        public bool DetachLogger(IEnumerable<ILogger> loggers) {
+            if(loggers == null)
+                return true;
+
+            var loggerList = loggers.ToList();
+            if(loggerList.Count == 0)
                 return true;
 
             lock(SyncRoot) {
                 var count = _receivers.Count;
-                _receivers.ExceptWith(receiver);
+                _receivers.ExceptWith(loggerList);
                 if(count == _receivers.Count)
                     return false;
                 _loggersChanged = true;
             }
-            return true;
+            return loggerList.All(l => l.Shutdown());
         }
 
         public bool IsLoggingEnabled(LogLevels logLevel) {
@@ -154,10 +164,6 @@ namespace DotLogix.Core.Diagnostics {
 
         public bool IsLoggingDisabled(LogLevels logLevel) {
             return CurrentLogLevel > logLevel;
-        }
-
-        ~ParrallelLogger() {
-            Shutdown();
         }
     }
 }

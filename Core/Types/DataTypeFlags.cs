@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
-// File:  Flags.cs
+// Copyright 2018(C) , DotLogix
+// File:  DataTypeFlags.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  09.09.2017
-// LastEdited:  09.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -49,11 +49,11 @@ namespace DotLogix.Core.Types {
         #endregion
 
         #region Mask
-        NumericMask = Byte | Short | UShort | Int | UInt | Long | ULong,
+        NumericMask = ULong | Long | UInt | Int | UShort | Short | Byte | Float | Double | Decimal,
         PrimitiveMask = Guid | Bool | Enum | TextMask | NumericMask | TimeMask | Object,
         TimeMask = DateTime | TimeSpan,
         TextMask = String | Char,
-        CategoryMask = Primitive | Complex | Collection, 
+        CategoryMask = Primitive | Complex | Collection,
         #endregion
     }
 }

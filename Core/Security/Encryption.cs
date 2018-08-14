@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  Encryption.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -44,9 +44,8 @@ namespace DotLogix.Core.Security {
             var lastIndex = dataLength - 1;
 
             var obfuscatedBytes = new byte[dataLength];
-            for(var i = 0; i < lastIndex; i++) {
+            for(var i = 0; i < lastIndex; i++)
                 obfuscatedBytes[i] = (byte)(clearBytes[i] ^ clearBytes[i + 1]);
-            }
             obfuscatedBytes[lastIndex] = (byte)(clearBytes[lastIndex] ^ obfuscatedBytes[0]);
             return obfuscatedBytes;
         }
@@ -62,9 +61,8 @@ namespace DotLogix.Core.Security {
 
             var clearBytes = new byte[dataLength];
             clearBytes[lastIndex] = (byte)(obfuscatedBytes[lastIndex] ^ obfuscatedBytes[0]);
-            for(var i = lastIndex - 1; i >= 0; i--) {
+            for(var i = lastIndex - 1; i >= 0; i--)
                 clearBytes[i] ^= (byte)(obfuscatedBytes[i] ^ clearBytes[i + 1]);
-            }
             return clearBytes;
         }
 

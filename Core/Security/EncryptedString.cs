@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  EncryptedString.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -47,7 +47,7 @@ namespace DotLogix.Core.Security {
         }
 
         public override int GetHashCode() {
-            return base.GetHashCode();
+            return ClearText.GetHashCode();
         }
 
         public void SetClearText(string clearText) {
@@ -98,9 +98,8 @@ namespace DotLogix.Core.Security {
         public SecureString ToSecureString() {
             unsafe {
                 var plain = ToClearText();
-                fixed(char* array = plain) {
+                fixed(char* array = plain)
                     return new SecureString(array, plain.Length);
-                }
             }
         }
 

@@ -1,16 +1,16 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ArrayNodeConverter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  30.08.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
 
@@ -20,19 +20,17 @@ namespace DotLogix.Core.Nodes.Converters {
         public ArrayNodeConverter(DataType type) : base(type) { }
 
         public override void Write(object instance, string rootName, INodeWriter writer) {
-            var values = instance as IEnumerable<T>;
-            if(values == null)
+            if(!(instance is IEnumerable<T> values))
                 throw new ArgumentException("Instance is not type of IEnumerable<T>");
 
             writer.BeginList(rootName);
             foreach(var value in values)
-                Nodes.WriteToInternal(null, value, _elementType, writer);
+                Nodes.WriteTo(null, value, _elementType, writer);
             writer.EndList();
         }
 
         public override object ConvertToObject(Node node) {
-            var nodeList = node as NodeList;
-            if(nodeList == null)
+            if(!(node is NodeList nodeList))
                 throw new ArgumentException("Node is not a NodeList");
 
             var children = nodeList.Children().ToArray();

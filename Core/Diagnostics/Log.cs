@@ -1,16 +1,16 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  Log.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  21.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using DotLogix.Core.Extensions;
 #endregion
@@ -32,7 +32,15 @@ namespace DotLogix.Core.Diagnostics {
             return Logger.AttachLogger(loggers);
         }
 
+        public static bool AttachLoggers(IEnumerable<ILogger> loggers) {
+            return Logger.AttachLogger(loggers);
+        }
+
         public static bool DetachLoggers(params ILogger[] loggers) {
+            return Logger.DetachLogger(loggers);
+        }
+
+        public static bool DetachLoggers(IEnumerable<ILogger> loggers) {
             return Logger.DetachLogger(loggers);
         }
 
@@ -47,10 +55,24 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        public static void Trace(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Trace))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Trace, messageFunc.Invoke(), 2);
+            Logger.Log(logMessage);
+        }
+
         public static void Debug(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Debug))
                 return;
             var logMessage = CreateLogMessage(LogLevels.Debug, message, 2);
+            Logger.Log(logMessage);
+        }
+
+        public static void Debug(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Debug))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Debug, messageFunc.Invoke(), 2);
             Logger.Log(logMessage);
         }
 
@@ -77,10 +99,24 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        public static void Info(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Info))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Info, messageFunc.Invoke(), 2);
+            Logger.Log(logMessage);
+        }
+
         public static void Warn(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Warning))
                 return;
             var logMessage = CreateLogMessage(LogLevels.Warning, message, 2);
+            Logger.Log(logMessage);
+        }
+
+        public static void Warn(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Warning))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Warning, messageFunc.Invoke(), 2);
             Logger.Log(logMessage);
         }
 
@@ -91,19 +127,22 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        public static void Error(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Error))
+                return;
+            var logMessage = CreateLogMessage(LogLevels.Error, messageFunc.Invoke(), 2);
+            Logger.Log(logMessage);
+        }
+
         public static void Error(Exception exception) {
             if(Logger.IsLoggingDisabled(LogLevels.Error))
                 return;
 
-            if (exception is AggregateException ae)
-            {
+            if(exception is AggregateException ae) {
                 foreach(var inner in ae.InnerExceptions)
                     Error(inner);
-            }
-            else if (exception.InnerException != null)
-            {
+            } else if(exception.InnerException != null)
                 Error(exception.InnerException);
-            }
 
 
             var message = exception.Message + "\n" + exception.StackTrace;
@@ -116,15 +155,11 @@ namespace DotLogix.Core.Diagnostics {
             if(Logger.IsLoggingDisabled(LogLevels.Critical))
                 return;
 
-            if (exception is AggregateException ae)
-            {
+            if(exception is AggregateException ae) {
                 foreach(var inner in ae.InnerExceptions)
                     Critical(inner);
-            }
-            else if (exception.InnerException != null)
-            {
+            } else if(exception.InnerException != null)
                 Critical(exception.InnerException);
-            }
 
             var message = exception.Message + "\n" + exception.StackTrace;
 
@@ -138,6 +173,46 @@ namespace DotLogix.Core.Diagnostics {
                 return;
 
             var logMessage = CreateLogMessage(LogLevels.Critical, message, 2);
+            Logger.Log(logMessage);
+        }
+
+        public static void Critical(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Critical))
+                return;
+
+            var logMessage = CreateLogMessage(LogLevels.Critical, messageFunc.Invoke(), 2);
+            Logger.Log(logMessage);
+        }
+
+        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, string message) {
+            if(Logger.IsLoggingDisabled(logLevel))
+                return;
+
+            var logMessage = new LogMessage {
+                                                LogLevel = logLevel,
+                                                UtcTimeStamp = DateTime.UtcNow,
+                                                MethodName = methodName,
+                                                ClassName = className,
+                                                ThreadName = threadName ?? "Undefined",
+                                                Message = message
+                                            };
+
+            Logger.Log(logMessage);
+        }
+
+        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(logLevel))
+                return;
+
+            var logMessage = new LogMessage {
+                                                LogLevel = logLevel,
+                                                UtcTimeStamp = DateTime.UtcNow,
+                                                MethodName = methodName,
+                                                ClassName = className,
+                                                ThreadName = threadName ?? "Undefined",
+                                                Message = messageFunc.Invoke()
+                                            };
+
             Logger.Log(logMessage);
         }
 

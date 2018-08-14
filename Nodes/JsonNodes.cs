@@ -1,30 +1,40 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  JsonNodes.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System;
 using System.Text;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
+#endregion
 
 namespace DotLogix.Core.Nodes {
     public static class JsonNodes {
-        private const int StringBuilderCapacity=256;
+        private const int StringBuilderCapacity = 256;
 
         #region ToNode
+        public static TNode ToNode<TNode>(string json) where TNode : Node {
+            return (TNode)ToNode(json);
+        }
+
         public static Node ToNode(string json) {
             var reader = new JsonNodeReader(json);
-            var writer = new NodeWriter(false);
-            writer.CopyFrom(reader);
+            var writer = new NodeWriter();
+            reader.CopyTo(writer);
             return writer.Root;
         }
         #endregion
 
         #region ToJson
-        public static string ToJson<TInstance>(TInstance instance, JsonNodesFormatter formatter = null) {
-            return ToJsonInternal(instance, typeof(TInstance), formatter);
-        }
-
-        public static string ToJson(Node node, JsonNodesFormatter formatter = null) {
+        public static string ToJson(this Node node, JsonNodesFormatter formatter = null) {
             var builder = new StringBuilder(StringBuilderCapacity);
             var nodeReader = new NodeReader(node);
             var nodeWriter = new JsonNodeWriter(builder, formatter);
-            nodeWriter.CopyFrom(nodeReader);
+            nodeReader.CopyTo(nodeWriter);
             return builder.ToString();
         }
 
@@ -39,7 +49,7 @@ namespace DotLogix.Core.Nodes {
         private static string ToJsonInternal(object instance, Type instanceType, JsonNodesFormatter formatter) {
             var builder = new StringBuilder(StringBuilderCapacity);
             var nodeWriter = new JsonNodeWriter(builder, formatter);
-            Nodes.WriteToInternal(null, instance, instanceType, nodeWriter);
+            Nodes.WriteTo(null, instance, instanceType, nodeWriter);
             return builder.ToString();
         }
         #endregion

@@ -1,19 +1,20 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  Nodes.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  05.11.2017
-// LastEdited:  05.11.2017
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Converters;
 using DotLogix.Core.Nodes.Factories;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
 
@@ -25,6 +26,7 @@ namespace DotLogix.Core.Nodes {
 
         static Nodes() {
             NodeConverterFactories.Add(new ObjectNodeConverterFactory());
+            NodeConverterFactories.Add(new OptionalNodeConverterFactory());
             NodeConverterFactories.Add(new ListNodeConverterFactory());
             NodeConverterFactories.Add(new KeyValuePairNodeConverterFactory());
             NodeConverterFactories.Add(new ValueNodeConverterFactory());
@@ -56,76 +58,70 @@ namespace DotLogix.Core.Nodes {
 
 
         #region WriteTo
-        public static void WriteTo<TInstance>(TInstance instance, INodeWriter writer) {
-            WriteToInternal(null, instance, typeof(TInstance), writer);
-        }
-
         public static void WriteTo(object instance, INodeWriter writer) {
-            WriteToInternal(null, instance, instance?.GetType(), writer);
+            WriteTo(null, instance, instance?.GetType(), writer);
         }
 
         public static void WriteTo(object instance, Type instanceType, INodeWriter writer) {
-            WriteToInternal(null, instance, instanceType, writer);
+            WriteTo(null, instance, instanceType, writer);
         }
 
-        internal static void WriteToInternal(string name, object instance, Type instanceType, INodeWriter writer) {
+        public static void WriteTo(string name, object instance, INodeWriter writer) {
+            WriteTo(name, instance, instance?.GetType(), writer);
+        }
+
+        public static void WriteTo(string name, object instance, Type instanceType, INodeWriter writer) {
             if(instance == null) {
-                writer.WriteValue(null, name);
+                writer.WriteValue(name, null);
                 return;
             }
 
             if(instanceType == null)
                 throw new ArgumentNullException(nameof(instanceType));
 
-            var converter = CreateConverter(instanceType);
-            if (converter == null) {
-                writer.WriteValue(null, name);
-                return;
-            }
-
-            converter.Write(instance, name, writer);
+            if(TryCreateConverter(instanceType, out var converter))
+                converter.Write(instance, name, writer);
+            else
+                writer.WriteValue(name, null);
         }
         #endregion
 
         #region ToNode
-        public static Node ToNode<TInstance>(TInstance instance) {
-            return ToNodeInternal(instance, typeof(TInstance));
-        }
-
-
         public static Node ToNode(object instance) {
-            return ToNodeInternal(instance, instance?.GetType());
+            return ToNode(null, instance, instance?.GetType());
         }
 
         public static Node ToNode(object instance, Type instanceType) {
-            return ToNodeInternal(instance, instanceType);
+            return ToNode(null, instance, instanceType);
         }
 
-        private static Node ToNodeInternal(object instance, Type instanceType) {
+        public static Node ToNode(string name, object instance) {
+            return ToNode(name, instance, instance?.GetType());
+        }
+
+        public static Node ToNode(string name, object instance, Type instanceType) {
+            if(instance is Node node)
+                return node;
             var nodeWriter = new NodeWriter();
-            WriteToInternal(null, instance, instanceType, nodeWriter);
+            WriteTo(name, instance, instanceType, nodeWriter);
             return nodeWriter.Root;
         }
         #endregion
 
         #region ToObject
-        public static T ToObject<T>(Node node) {
-            if((node == null) || (node.NodeType == NodeTypes.Empty))
-                return default(T);
+        public static T ToObject<T>(this Node node) {
+            if(node == null)
+                return default;
 
             return (T)ToObject(node, typeof(T));
         }
 
-        public static object ToObject(Node node, Type type) {
-            if((node == null) || (node.NodeType == NodeTypes.Empty))
+        public static object ToObject(this Node node, Type type) {
+            if(node == null)
                 return type.GetDefaultValue();
-            var converter = CreateConverter(type);
-            if (converter == null)
-            {
-                return type.GetDefaultValue();
-            }
-
-            return converter.ConvertToObject(node);
+            return TryCreateConverter(type, out var converter)
+                       ? converter.ConvertToObject(node)
+                       : type.GetDefaultValue();
         }
         #endregion
 
@@ -147,21 +143,35 @@ namespace DotLogix.Core.Nodes {
         }
 
 
-        public static INodeConverter CreateConverter(Type instanceType) {
-            var converter = CachedNodeConverters.GetOrAdd(instanceType, CreateNodeConverter);
-            //if(converter == null)
-            //    throw new InvalidOperationException($"Converter for type {instanceType.GetFriendlyName()} can not be found");
-            return converter;
+        public static bool TryCreateConverter(Type instanceType, out INodeConverter converter) {
+            if(CachedNodeConverters.TryGetValue(instanceType, out converter))
+                return true;
+
+            if(TryCreateNodeConverter(instanceType, out converter)) {
+                converter = CachedNodeConverters.GetOrAdd(instanceType, converter);
+                return true;
+            }
+
+            converter = null;
+            return false;
         }
 
-        private static INodeConverter CreateNodeConverter(Type instanceType) {
+        private static bool TryCreateNodeConverter(Type instanceType, out INodeConverter converter) {
+            var converterAttribute = instanceType.GetCustomAttribute<NodeConverterAttribute>();
+            if(converterAttribute != null) {
+                converter = converterAttribute.CreateNodeConverter();
+                return true;
+            }
+
             var dataType = instanceType.ToDataType();
             var nodeType = GetNodeType(dataType);
-            foreach(var converterFactory in NodeConverterFactories) {
-                if(converterFactory.TryCreateConverter(nodeType, dataType, out var converter))
-                    return converter;
+            for(var i = NodeConverterFactories.Count - 1; i >= 0; i--) {
+                var converterFactory = NodeConverterFactories[i];
+                if(converterFactory.TryCreateConverter(nodeType, dataType, out converter))
+                    return true;
             }
-            return null;
+            converter = null;
+            return false;
         }
         #endregion
     }

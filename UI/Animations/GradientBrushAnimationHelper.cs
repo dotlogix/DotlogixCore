@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  GradientBrushAnimationHelper.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -107,9 +107,7 @@ namespace DotLogix.UI.Animations {
 
         public abstract double GetSegmentLength(TValue from, TValue to);
 
-        public virtual bool IsAccumulable {
-            get { return true; }
-        }
+        public virtual bool IsAccumulable => true;
         #endregion IAnimationHelper
     }
 }

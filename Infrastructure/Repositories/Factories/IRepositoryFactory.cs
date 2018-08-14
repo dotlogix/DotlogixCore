@@ -1,12 +1,17 @@
-﻿using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.EntityContext;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  IRepositoryFactory.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
 
-namespace DotLogix.Architecture.Infrastructure.Repositories.Factories
-{
+#region
+using DotLogix.Architecture.Infrastructure.EntityContext;
+#endregion
+
+namespace DotLogix.Architecture.Infrastructure.Repositories.Factories {
     public interface IRepositoryFactory {
-        IRepository Create(IEntityContext entityContext);
+        IRepository Create(IEntitySetProvider entitySetProvider);
     }
 }

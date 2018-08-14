@@ -2,13 +2,13 @@
 // Copyright 2018(C) , DotLogix
 // File:  RouteMatch.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  29.01.2018
-// LastEdited:  31.01.2018
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System.Collections.Generic;
-using DotLogix.Core.Rest.Server.Http.Parameters;
+using DotLogix.Core.Nodes;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Routes {
@@ -17,13 +17,13 @@ namespace DotLogix.Core.Rest.Server.Routes {
         public bool Success { get; }
         public string Match { get; }
         public int Length { get; }
-        public IEnumerable<Parameter> UrlParameters { get; }
+        public IDictionary<string, Node> UrlParameters { get; }
 
-        public RouteMatch(bool success, string match, int length, IEnumerable<Parameter> values) {
+        public RouteMatch(bool success, string match, int length, IDictionary<string, Node> parameters) {
             Success = success;
             Match = match;
             Length = length;
-            UrlParameters = values;
+            UrlParameters = parameters;
         }
     }
 }

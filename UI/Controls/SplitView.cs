@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  SplitView.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -87,8 +87,8 @@ namespace DotLogix.UI.Controls {
         ///     by the SplitViewCompactPaneThemeLength resource).
         /// </returns>
         public double CompactPaneLength {
-            get { return (double)GetValue(CompactPaneLengthProperty); }
-            set { SetValue(CompactPaneLengthProperty, value); }
+            get => (double)GetValue(CompactPaneLengthProperty);
+            set => SetValue(CompactPaneLengthProperty, value);
         }
 
         /// <summary>
@@ -106,8 +106,8 @@ namespace DotLogix.UI.Controls {
         /// </summary>
         /// <returns>The contents of the main panel of a <see cref="SplitView" />. The default is null.</returns>
         public UIElement Content {
-            get { return (UIElement)GetValue(ContentProperty); }
-            set { SetValue(ContentProperty, value); }
+            get => (UIElement)GetValue(ContentProperty);
+            set => SetValue(ContentProperty, value);
         }
 
         /// <summary>
@@ -127,8 +127,8 @@ namespace DotLogix.UI.Controls {
         ///     shown. The default is <see cref="SplitViewDisplayMode.Overlay" />.
         /// </returns>
         public SplitViewDisplayMode DisplayMode {
-            get { return (SplitViewDisplayMode)GetValue(DisplayModeProperty); }
-            set { SetValue(DisplayModeProperty, value); }
+            get => (SplitViewDisplayMode)GetValue(DisplayModeProperty);
+            set => SetValue(DisplayModeProperty, value);
         }
 
         /// <summary>
@@ -146,8 +146,8 @@ namespace DotLogix.UI.Controls {
         /// </summary>
         /// <returns>true if the pane is expanded to its full width; otherwise, false. The default is true.</returns>
         public bool IsPaneOpen {
-            get { return (bool)GetValue(IsPaneOpenProperty); }
-            set { SetValue(IsPaneOpenProperty, value); }
+            get => (bool)GetValue(IsPaneOpenProperty);
+            set => SetValue(IsPaneOpenProperty, value);
         }
 
         /// <summary>
@@ -168,8 +168,8 @@ namespace DotLogix.UI.Controls {
         ///     pixel (DIP).
         /// </returns>
         public double OpenPaneLength {
-            get { return (double)GetValue(OpenPaneLengthProperty); }
-            set { SetValue(OpenPaneLengthProperty, value); }
+            get => (double)GetValue(OpenPaneLengthProperty);
+            set => SetValue(OpenPaneLengthProperty, value);
         }
 
         /// <summary>
@@ -187,8 +187,8 @@ namespace DotLogix.UI.Controls {
         /// </summary>
         /// <returns>The contents of the pane of a <see cref="SplitView" />. The default is null.</returns>
         public UIElement Pane {
-            get { return (UIElement)GetValue(PaneProperty); }
-            set { SetValue(PaneProperty, value); }
+            get => (UIElement)GetValue(PaneProperty);
+            set => SetValue(PaneProperty, value);
         }
 
         /// <summary>
@@ -205,8 +205,8 @@ namespace DotLogix.UI.Controls {
         /// </summary>
         /// <returns>The Brush to apply to the background of the <see cref="Pane" /> area of the control.</returns>
         public Brush PaneBackground {
-            get { return (Brush)GetValue(PaneBackgroundProperty); }
-            set { SetValue(PaneBackgroundProperty, value); }
+            get => (Brush)GetValue(PaneBackgroundProperty);
+            set => SetValue(PaneBackgroundProperty, value);
         }
 
 
@@ -224,8 +224,8 @@ namespace DotLogix.UI.Controls {
         ;
 
         public Brush PaneSplitLineBrush {
-            get { return (Brush)GetValue(PaneSplitLineBrushProperty); }
-            set { SetValue(PaneSplitLineBrushProperty, value); }
+            get => (Brush)GetValue(PaneSplitLineBrushProperty);
+            set => SetValue(PaneSplitLineBrushProperty, value);
         }
 
         /// <summary>
@@ -246,8 +246,8 @@ namespace DotLogix.UI.Controls {
         ///     <see cref="SplitView" />. The default is <see cref="SplitViewPanePlacement.Left" />.
         /// </returns>
         public SplitViewPanePlacement PanePlacement {
-            get { return (SplitViewPanePlacement)GetValue(PanePlacementProperty); }
-            set { SetValue(PanePlacementProperty, value); }
+            get => (SplitViewPanePlacement)GetValue(PanePlacementProperty);
+            set => SetValue(PanePlacementProperty, value);
         }
 
         /// <summary>
@@ -266,8 +266,8 @@ namespace DotLogix.UI.Controls {
         /// </summary>
         /// <returns>An object that provides calculated values for templates.</returns>
         public SplitViewTemplateSettings TemplateSettings {
-            get { return (SplitViewTemplateSettings)GetValue(TemplateSettingsProperty); }
-            private set { SetValue(TemplateSettingsProperty, value); }
+            get => (SplitViewTemplateSettings)GetValue(TemplateSettingsProperty);
+            private set => SetValue(TemplateSettingsProperty, value);
         }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace DotLogix.UI.Controls {
                 _paneClipRectangle.Rect = new Rect(0, 0, OpenPaneLength, ActualHeight);
 
             string state;
-            if(IsPaneOpen)
+            if(IsPaneOpen) {
                 switch(DisplayMode) {
                     case SplitViewDisplayMode.Overlay:
                         state = $"OpenOverlay{PanePlacement}";
@@ -310,7 +310,7 @@ namespace DotLogix.UI.Controls {
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-            else
+            } else {
                 switch(DisplayMode) {
                     case SplitViewDisplayMode.Overlay:
                     case SplitViewDisplayMode.Inline:
@@ -323,6 +323,7 @@ namespace DotLogix.UI.Controls {
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
 
             VisualStateManager.GoToState(this, state, animated);
         }
@@ -332,11 +333,12 @@ namespace DotLogix.UI.Controls {
             var newValue = (bool)e.NewValue;
             var oldValue = (bool)e.OldValue;
 
-            if((sender != null) && (newValue != oldValue))
+            if((sender != null) && (newValue != oldValue)) {
                 if(newValue)
                     sender.OnStateChanged();
                 else
                     sender.OnIsPaneOpenChanged();
+            }
         }
 
         protected virtual void OnIsPaneOpenChanged() {
@@ -344,7 +346,7 @@ namespace DotLogix.UI.Controls {
             if(PaneClosing != null) {
                 var args = new SplitViewPaneClosingEventArgs();
                 foreach(var tmp in PaneClosing.GetInvocationList().
-                Cast<EventHandler<SplitViewPaneClosingEventArgs>>()) {
+                                               Cast<EventHandler<SplitViewPaneClosingEventArgs>>()) {
                     tmp(this, args);
                     if(args.Cancel) {
                         cancel = true;
@@ -356,9 +358,8 @@ namespace DotLogix.UI.Controls {
                 OnStateChanged();
 
                 PaneClosed?.Invoke(this, EventArgs.Empty);
-            } else {
+            } else
                 IsPaneOpen = false;
-            }
         }
         #endregion
     }

@@ -1,17 +1,25 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ChangeTrackingEntry.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Generic;
 using DotLogix.Core.Tracking.Manager;
 using DotLogix.Core.Tracking.Snapshots;
+#endregion
 
 namespace DotLogix.Core.Tracking.Entries {
     public class ChangeTrackingEntry : IChangeTrackingEntry {
-        private bool _forceModified;
-        private readonly ISnapshot _snapshot;
         private readonly IChangeTrackingEntryManager _entryManager;
+        private readonly ISnapshot _snapshot;
 
-        public IReadOnlyDictionary<string, object> OldValues => _snapshot.OldValues;
-        public IReadOnlyDictionary<string, object> CurrentValues => _snapshot.CurrentValues;
-        public IReadOnlyDictionary<string, object> ChangedValues => _forceModified ? _snapshot.CurrentValues : _snapshot.ChangedValues;
+        private TrackedState _currentState;
+        private bool _forceModified;
 
         public ChangeTrackingEntry(object key, IChangeTrackingEntryManager entryManager, ISnapshot snapshot, TrackedState initialState = TrackedState.Detached) {
             _entryManager = entryManager;
@@ -19,6 +27,10 @@ namespace DotLogix.Core.Tracking.Entries {
             _snapshot = snapshot;
             _currentState = initialState;
         }
+
+        public IReadOnlyDictionary<string, object> OldValues => _snapshot.OldValues;
+        public IReadOnlyDictionary<string, object> CurrentValues => _snapshot.CurrentValues;
+        public IReadOnlyDictionary<string, object> ChangedValues => _forceModified ? _snapshot.CurrentValues : _snapshot.ChangedValues;
 
         public object Key { get; }
         public object Target => _snapshot.Target;
@@ -44,8 +56,6 @@ namespace DotLogix.Core.Tracking.Entries {
             }
         }
 
-        private TrackedState _currentState;
-
         public void MarkAsAdded() {
             if(_currentState == TrackedState.Detached)
                 Attach();
@@ -53,8 +63,7 @@ namespace DotLogix.Core.Tracking.Entries {
             _forceModified = false;
         }
 
-        public void MarkAsDeleted()
-        {
+        public void MarkAsDeleted() {
             switch(_currentState) {
                 case TrackedState.Detached:
                     Attach();
@@ -68,9 +77,8 @@ namespace DotLogix.Core.Tracking.Entries {
             _forceModified = false;
         }
 
-        public void MarkAsModified()
-        {
-            if (_currentState == TrackedState.Detached)
+        public void MarkAsModified() {
+            if(_currentState == TrackedState.Detached)
                 Attach();
 
             _currentState = TrackedState.Modified;
@@ -89,8 +97,7 @@ namespace DotLogix.Core.Tracking.Entries {
             _forceModified = false;
         }
 
-        public void RevertChanges()
-        {
+        public void RevertChanges() {
             _snapshot.RevertChanges();
             if(_currentState == TrackedState.Modified)
                 _currentState = TrackedState.Unchanged;

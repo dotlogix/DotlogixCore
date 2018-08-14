@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  CheckButton.xaml.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -18,6 +18,9 @@ namespace DotLogix.UI.Controls {
     ///     Interaktionslogik für CheckButton.xaml
     /// </summary>
     public partial class CheckButton {
+        public static readonly DependencyProperty CheckAreaThicknessProperty = DependencyProperty.Register(
+                                                                                                           "CheckAreaThickness", typeof(double), typeof(CheckButton), new PropertyMetadata(16D));
+
         public static RoutedEvent CheckedEvent = EventManager.RegisterRoutedEvent("Checked", RoutingStrategy.Bubble,
                                                                                   typeof(RoutedEventHandler),
                                                                                   typeof(CheckButton));
@@ -25,6 +28,10 @@ namespace DotLogix.UI.Controls {
         public static RoutedEvent UncheckedEvent = EventManager.RegisterRoutedEvent("Unchecked", RoutingStrategy.Bubble,
                                                                                     typeof(RoutedEventHandler),
                                                                                     typeof(CheckButton));
+
+        public static RoutedEvent CheckStateChangedEvent = EventManager.RegisterRoutedEvent("CheckStateChanged", RoutingStrategy.Bubble,
+                                                                                            typeof(RoutedEventHandler),
+                                                                                            typeof(CheckButton));
 
         public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
                                                                                                   "IsChecked",
@@ -66,39 +73,54 @@ namespace DotLogix.UI.Controls {
                                                                                                        (Brushes.
                                                                                                         DarkGray));
 
+        public double CheckAreaThickness {
+            get => (double)GetValue(CheckAreaThicknessProperty);
+            set => SetValue(CheckAreaThicknessProperty, value);
+        }
+
         public bool IsChecked {
-            get { return (bool)GetValue(IsCheckedProperty); }
-            set { SetValue(IsCheckedProperty, value); }
+            get => (bool)GetValue(IsCheckedProperty);
+            set => SetValue(IsCheckedProperty, value);
         }
 
         public string Text {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
         }
 
         public Brush CheckedBrush {
-            get { return (Brush)GetValue(CheckedBrushProperty); }
-            set { SetValue(CheckedBrushProperty, value); }
+            get => (Brush)GetValue(CheckedBrushProperty);
+            set => SetValue(CheckedBrushProperty, value);
         }
 
         public Brush UncheckedBrush {
-            get { return (Brush)GetValue(UncheckedBrushProperty); }
-            set { SetValue(UncheckedBrushProperty, value); }
+            get => (Brush)GetValue(UncheckedBrushProperty);
+            set => SetValue(UncheckedBrushProperty, value);
         }
 
         public CheckButton() {
             InitializeComponent();
             IsCheckedProperty.AddChangedHandler(this, OnTrigger);
-            ChkButton.DataContext = this;
         }
 
         public event RoutedEventHandler Unchecked {
-            add { AddHandler(UncheckedEvent, value); }
-            remove { RemoveHandler(UncheckedEvent, value); }
+            add => AddHandler(UncheckedEvent, value);
+            remove => RemoveHandler(UncheckedEvent, value);
+        }
+
+        public event RoutedEventHandler Checked {
+            add => AddHandler(CheckedEvent, value);
+            remove => RemoveHandler(CheckedEvent, value);
+        }
+
+        public event RoutedEventHandler CheckStateChanged {
+            add => AddHandler(CheckStateChangedEvent, value);
+            remove => RemoveHandler(CheckStateChangedEvent, value);
         }
 
         private void OnTrigger(object sender, EventArgs e) {
-            RaiseEvent(new RoutedEventArgs(UncheckedEvent));
+            RaiseEvent(IsChecked ? new RoutedEventArgs(CheckedEvent) : new RoutedEventArgs(UncheckedEvent));
+            RaiseEvent(new RoutedEventArgs(CheckStateChangedEvent));
         }
 
         private void CheckButton_OnClick(object sender, RoutedEventArgs e) {

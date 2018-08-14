@@ -2,12 +2,16 @@
 // Copyright 2018(C) , DotLogix
 // File:  IAsyncHttpContext.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  29.01.2018
-// LastEdited:  31.01.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
+#region
+using System;
+#endregion
+
 namespace DotLogix.Core.Rest.Server.Http.Context {
-    public interface IAsyncHttpContext {
+    public interface IAsyncHttpContext : IDisposable {
         IAsyncHttpServer Server { get; }
         IAsyncHttpRequest Request { get; }
         IAsyncHttpResponse Response { get; }

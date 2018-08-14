@@ -1,5 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NestedUnitOfWorkContext.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Repositories;
+#endregion
 
 namespace DotLogix.Architecture.Domain.UoW {
     public class NestedUnitOfWorkContext : IUnitOfWorkContext {

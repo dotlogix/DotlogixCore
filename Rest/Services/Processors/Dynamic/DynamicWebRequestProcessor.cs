@@ -2,14 +2,14 @@
 // Copyright 2018(C) , DotLogix
 // File:  DynamicWebRequestProcessor.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.01.2018
-// LastEdited:  31.01.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System.Reflection;
 using System.Text;
-using DotLogix.Core.Extensions;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
@@ -43,10 +43,13 @@ namespace DotLogix.Core.Rest.Services.Processors.Dynamic {
         }
 
         protected virtual bool TryGetParameterValue(IAsyncHttpRequest request, ParameterInfo methodParam, out object paramValue) {
-            if(request.TryFindParameter(methodParam.Name, ParameterSources.Any, out var parameter)) {
-                if(parameter.HasValues && parameter.Value.TryConvertTo(methodParam.ParameterType, out paramValue))
-                    return true;
-            }
+            var name = methodParam.Name;
+            var type = methodParam.ParameterType;
+            if(request.UserDefinedParameters.TryGetChildValue(name, type, out paramValue) ||
+               request.QueryParameters.TryGetChildValue(name, type, out paramValue) ||
+               request.UrlParameters.TryGetChildValue(name, type, out paramValue) ||
+               request.HeaderParameters.TryGetChildValue(name, type, out paramValue))
+                return true;
 
             if(methodParam.IsOptional) {
                 paramValue = methodParam.DefaultValue;
@@ -82,7 +85,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Dynamic {
             builder.AppendLine("Given Parameters:");
             AppendParameterValues(builder, request);
 
-            return new RestException(HttpStatusCodes.BadRequest, builder.ToString());
+            return new RestException(HttpStatusCodes.ClientError.BadRequest, builder.ToString());
         }
     }
 }

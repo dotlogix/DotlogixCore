@@ -1,5 +1,15 @@
-﻿using System.Windows;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  SplineKeyFrame.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System.Windows;
 using System.Windows.Media.Animation;
+#endregion
 
 namespace DotLogix.UI.Animations {
     /// <summary>
@@ -51,8 +61,8 @@ namespace DotLogix.UI.Animations {
         ///     Defines modifier of the animation progress.
         /// </summary>
         public KeySpline KeySpline {
-            get { return (KeySpline)GetValue(KeySplineProperty); }
-            set { SetValue(KeySplineProperty, value ?? new KeySpline()); }
+            get => (KeySpline)GetValue(KeySplineProperty);
+            set => SetValue(KeySplineProperty, value ?? new KeySpline());
         }
         #endregion
     }

@@ -1,9 +1,19 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  UnitOfWorkContext.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Repositories;
 using DotLogix.Architecture.Infrastructure.Repositories.Provider;
+#endregion
 
 namespace DotLogix.Architecture.Domain.UoW {
     public class UnitOfWorkContext : IUnitOfWorkContext {

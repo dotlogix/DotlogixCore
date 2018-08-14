@@ -2,64 +2,47 @@
 // Copyright 2018(C) , DotLogix
 // File:  AsyncWebRequestRouter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.01.2018
-// LastEdited:  01.02.2018
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotLogix.Core.Collections;
-using DotLogix.Core.Diagnostics;
-using DotLogix.Core.Extensions;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Server.Routes;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http {
     public class AsyncWebRequestRouter : IAsyncHttpRequestHandler {
-        public const string EventSubscriptionParameterName = "$eventSubscription";
+        public const string EventSubscriptionParameterName = "$event";
+        public const string EventSubscriptionChannelParameterName = "$eventChannel";
 
-        public static readonly IComparer<IWebRequestProcessor> ProcessorPriorityComparer = new SelectorComparer<IWebRequestProcessor, int>(p => p.Priority);
-        public static readonly IComparer<IWebServiceRoute> ServerRoutePriorityComparer = new SelectorComparer<IWebServiceRoute, int>(p => p.Priority);
-        private readonly SortedCollection<IWebRequestProcessor> _globalPostProcessors = new SortedCollection<IWebRequestProcessor>(ProcessorPriorityComparer);
-
-        private readonly SortedCollection<IWebRequestProcessor> _globalPreProcessors = new SortedCollection<IWebRequestProcessor>(ProcessorPriorityComparer);
-        private readonly Dictionary<string, WebServiceEvent> _serverEvents = new Dictionary<string, WebServiceEvent>();
-        private readonly SortedCollection<IWebServiceRoute> _serverRoutes = new SortedCollection<IWebServiceRoute>(ServerRoutePriorityComparer);
+        public WebRequestProcessorCollection GlobalPreProcessors { get; } = new WebRequestProcessorCollection();
+        public WebRequestProcessorCollection GlobalPostProcessors { get; } = new WebRequestProcessorCollection();
+        public WebServiceRouteCollection ServerRoutes { get; } = new WebServiceRouteCollection();
+        public WebServiceEventCollection ServerEvents { get; } = new WebServiceEventCollection();
 
 
-        public int RegisteredRoutesCount => _serverRoutes.Count;
+        public int RegisteredRoutesCount => ServerRoutes.Count;
 
-        public IWebRequestResultWriter DefaultResultWriter { get; set; } = WebRequestResultJsonWriter.Instance;
+        public IAsyncWebRequestResultWriter DefaultResultWriter { get; set; } = WebRequestResultJsonWriter.Instance;
 
-        #region Subscription
-        private class WebServiceEventSubscription : IWebServiceEventSubscription {
-            private readonly IAsyncHttpContext _asyncHttpContext;
-            private readonly IWebServiceRoute _route;
+        #region Helper
+        private static async Task ExecuteProcessorsAsync(WebServiceContext webServiceContext, IEnumerable<IWebRequestProcessor> requestProcessors) {
+            foreach(var requestProcessor in requestProcessors) {
+                if(requestProcessor.ShouldExecute(webServiceContext) == false)
+                    continue;
 
-            private readonly AsyncWebRequestRouter _router;
-
-            public WebServiceEventSubscription(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route, AsyncWebRequestRouter router) {
-                _asyncHttpContext = asyncHttpContext;
-                _route = route;
-                _router = router;
-            }
-
-            public async Task TriggerAsync() {
-                var response = _asyncHttpContext.Response;
-                try {
-                    await _router.HandleAsync(_asyncHttpContext, _route);
-                    if(response.IsSent == false)
-                        await response.SendAsync();
-                } catch(Exception e) {
-                    Log.Error(e);
-                    await AsyncHttpServer.SendErrorMessageAsync(response, e);
-                }
+                var processingTask = requestProcessor.ProcessAsync(webServiceContext);
+                if((processingTask == null) || (processingTask.Status == TaskStatus.RanToCompletion))
+                    continue;
+                await processingTask;
             }
         }
         #endregion
@@ -67,35 +50,33 @@ namespace DotLogix.Core.Rest.Server.Http {
         #region Processing
         async Task IAsyncHttpRequestHandler.HandleRequestAsync(IAsyncHttpContext asyncHttpContext) {
             if(TryGetRoute(asyncHttpContext, out var route) == false) {
-                await asyncHttpContext.Response.SendAsync(HttpStatusCodes.NotFound);
+                asyncHttpContext.Response.StatusCode = HttpStatusCodes.ClientError.NotFound;
+                await asyncHttpContext.Response.CompleteAsync();
                 return;
             }
-
-            if(asyncHttpContext.Request.HeaderParameters.TryGetParameterValue(EventSubscriptionParameterName, out var eventName)) {
-                if(_serverEvents.TryGetValue(eventName.ToString(), out var serverEvent) == false) {
+            if(asyncHttpContext.Request.HeaderParameters.TryGetChildValue(EventSubscriptionParameterName, out string eventName)) {
+                if(ServerEvents.TryGetValue(eventName, out var serverEvent) == false) {
                     await asyncHttpContext.Response.WriteToResponseStreamAsync("The event subscription could not be handled, because the event is not registered on the server");
-                    await asyncHttpContext.Response.SendAsync(HttpStatusCodes.BadRequest);
+                    asyncHttpContext.Response.StatusCode = HttpStatusCodes.ClientError.BadRequest;
+                    await asyncHttpContext.Response.CompleteAsync();
                     return;
                 }
                 asyncHttpContext.PreventAutoSend = true;
-                serverEvent.Subscribe(new WebServiceEventSubscription(asyncHttpContext, route, this));
-            } else {
+                serverEvent.Subscribe(asyncHttpContext, route, this);
+            } else
                 await HandleAsync(asyncHttpContext, route);
-            }
         }
 
-        internal async Task HandleAsync(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route) {
-            var webServiceContext = new WebServiceContext(asyncHttpContext);
-            WebServiceContext.SetLocalContext(webServiceContext);
+        public async Task HandleAsync(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route) {
+            using(var webServiceContext = new WebServiceContext(asyncHttpContext, route)) {
+                // start of processing
+                await ProcessRequest(webServiceContext);
+                // end of processing
 
-            // start of processing
-            var result = await ProcessRequest(asyncHttpContext, route);
-            // end of processing
-
-            WebServiceContext.SetLocalContext(null);
-
-            var writer = route.WebRequestResultWriter ?? DefaultResultWriter;
-            await writer.WriteAsync(result);
+                var writer = route.WebRequestResultWriter ?? DefaultResultWriter;
+                if(asyncHttpContext.Response.IsCompleted == false)
+                    await writer.WriteAsync(webServiceContext.RequestResult);
+            }
         }
 
         private bool TryGetRoute(IAsyncHttpContext asyncHttpContext, out IWebServiceRoute route) {
@@ -106,148 +87,65 @@ namespace DotLogix.Core.Rest.Server.Http {
 
             route = null;
             RouteMatch routeMatch = null;
-            foreach(var serverRoute in _serverRoutes) {
+            var routePriority = int.MinValue;
+            var matchLength = int.MinValue;
+            foreach(var serverRoute in ServerRoutes) {
+                if((serverRoute.AcceptedRequests & httpMethod) == 0) // route does not accept the type of the request
+                    continue;
+
+                if(serverRoute.Priority < routePriority) // another route has a higher priority
+                    continue;
+
                 var match = serverRoute.Match(httpMethod, path);
-                if(match.Success == false)
+                if(match.Success == false) // match is not successful
+                    continue;
+
+                if(match.Length < matchLength) // another route better matches the path
                     continue;
 
                 route = serverRoute;
                 routeMatch = match;
-                break;
+                routePriority = serverRoute.Priority;
+                matchLength = match.Length;
             }
 
             if(routeMatch == null)
                 return false;
 
-            asyncHttpRequest.UrlParameters.AddRange(routeMatch.UrlParameters);
+            if(routeMatch.UrlParameters == null)
+                return true;
+
+            foreach(var parameter in routeMatch.UrlParameters)
+                asyncHttpRequest.UrlParameters.AddChild(parameter.Key, parameter.Value);
+
             return true;
         }
 
-        private async Task<WebRequestResult> ProcessRequest(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route) {
-            var result = new WebRequestResult(asyncHttpContext);
+        private async Task ProcessRequest(WebServiceContext webServiceContext) {
+            var route = webServiceContext.Route;
 
             #region PreProcess
-            if(_globalPreProcessors.Count > 0)
-                await ExecuteProcessorsAsync(result, _globalPreProcessors);
+            if(GlobalPreProcessors.Count > 0)
+                await ExecuteProcessorsAsync(webServiceContext, GlobalPreProcessors);
 
             if(route.PreProcessors.Count > 0)
-                await ExecuteProcessorsAsync(result, route.PreProcessors);
+                await ExecuteProcessorsAsync(webServiceContext, route.PreProcessors);
             #endregion
 
-            if(ShouldExecute(result, route.RequestProcessor))
-                await route.RequestProcessor.ProcessAsync(result);
+            if(route.RequestProcessor.ShouldExecute(webServiceContext)) {
+                var processingTask = route.RequestProcessor.ProcessAsync(webServiceContext);
+                if((processingTask != null) && (processingTask.Status != TaskStatus.RanToCompletion))
+                    await processingTask;
+            }
 
             #region PostProcess
-            if(_globalPostProcessors.Count > 0)
-                await ExecuteProcessorsAsync(result, _globalPostProcessors);
+            if(GlobalPostProcessors.Count > 0)
+                await ExecuteProcessorsAsync(webServiceContext, GlobalPostProcessors);
 
             if(route.PostProcessors.Count > 0)
-                await ExecuteProcessorsAsync(result, route.PostProcessors);
+                await ExecuteProcessorsAsync(webServiceContext, route.PostProcessors);
             #endregion
-
-            return result;
         }
         #endregion
-
-        #region Processors
-        public void AddGlobalPreProcessor(IWebRequestProcessor preProcessor) {
-            _globalPreProcessors.Add(preProcessor);
-        }
-
-        public void RemoveGlobalPreProcessor(IWebRequestProcessor preProcessor) {
-            _globalPreProcessors.Remove(preProcessor);
-        }
-
-        public void AddGlobalPostProcessor(IWebRequestProcessor postProcessor) {
-            _globalPostProcessors.Add(postProcessor);
-        }
-
-        public void RemoveGlobalPostProcessor(IWebRequestProcessor postProcessor) {
-            _globalPostProcessors.Remove(postProcessor);
-        }
-        #endregion
-
-        #region Routes
-        public void AddServerRoute(IWebServiceRoute route) {
-            _serverRoutes.Add(route);
-        }
-
-        public void RemoveServerRoute(IWebServiceRoute route) {
-            _serverRoutes.Remove(route);
-        }
-        #endregion
-
-        #region Events
-        public WebServiceEvent AddServerEvent(string name)
-        {
-            if(_serverEvents.ContainsKey(name))
-                throw new InvalidOperationException("Event names should be unique");
-            var webServiceEvent = new WebServiceEvent(name);
-            _serverEvents.Add(name, webServiceEvent);
-            return webServiceEvent;
-        }
-
-        public WebServiceEvent GetServerEvent(string name) {
-            return _serverEvents.TryGetValue(name, out var serverEvent) ? serverEvent : null;
-        }
-
-        public WebServiceEvent GetOrAddServerEvent(string name) {
-            if(_serverEvents.TryGetValue(name, out var serverEvent))
-                return serverEvent;
-
-            var webServiceEvent = new WebServiceEvent(name);
-            _serverEvents.Add(name, webServiceEvent);
-            return webServiceEvent;
-        }
-
-        public Task TriggerServerEventAsync(string name) {
-            return _serverEvents.TryGetValue(name, out var serverEvent) ? serverEvent.TriggerEventAsync() : Task.CompletedTask;
-        }
-        #endregion
-
-        #region Helper
-        private static async Task ExecuteProcessorsAsync(WebRequestResult result, IEnumerable<IWebRequestProcessor> requestProcessors) {
-            foreach(var requestProcessor in requestProcessors) {
-                if(ShouldExecute(result, requestProcessor) == false)
-                    continue;
-
-                await requestProcessor.ProcessAsync(result);
-            }
-        }
-
-        private static bool ShouldExecute(WebRequestResult result, IWebRequestProcessor requestProcessor) {
-            return (result.Handled == false) || requestProcessor.IgnoreHandled;
-        }
-        #endregion
-    }
-
-    public interface IWebServiceEventSubscription {
-        Task TriggerAsync();
-    }
-
-
-    public class WebServiceEvent {
-        private readonly object _eventLock = new object();
-        private readonly List<IWebServiceEventSubscription> _subscriptions = new List<IWebServiceEventSubscription>();
-        public string Name { get; }
-
-        public WebServiceEvent(string name) {
-            Name = name;
-        }
-
-        public void Subscribe(IWebServiceEventSubscription subscription) {
-            lock(_eventLock)
-                _subscriptions.Add(subscription);
-        }
-
-        public async Task TriggerEventAsync() {
-            IWebServiceEventSubscription[] actions;
-            lock(_eventLock) {
-                actions = _subscriptions.ToArray();
-                _subscriptions.Clear();
-            }
-            foreach(var eventSubscription in actions)
-                await eventSubscription.TriggerAsync();
-        }
     }
 }

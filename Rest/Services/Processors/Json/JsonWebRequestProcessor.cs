@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  JsonWebRequestProcessor.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.01.2018
-// LastEdited:  31.01.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -22,8 +22,13 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
 
         protected override bool TryGetParameterValue(IAsyncHttpRequest request, ParameterInfo methodParam, out object paramValue) {
             Node child = null;
-            if(request.UserDefinedParameters.GetParameterValue(JsonDataParamName) is NodeMap jsonData)
-                child = jsonData.GetChild(methodParam.Name);
+
+            if(request.UserDefinedParameters.TryGetChild(JsonDataParamName, out var node)) {
+                if(methodParam.IsDefined(typeof(JsonBodyAttribute)))
+                    child = node;
+                else if(node is NodeMap nodeMap)
+                    child = nodeMap.GetChild(methodParam.Name);
+            }
             if(child == null)
                 return base.TryGetParameterValue(request, methodParam, out paramValue);
             paramValue = Nodes.Nodes.ToObject(child, methodParam.ParameterType);

@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  HttpStatusCode.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  29.01.2018
-// LastEdited:  31.01.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -22,6 +22,12 @@ namespace DotLogix.Core.Rest.Server.Http.State {
 
         protected bool Equals(HttpStatusCode other) {
             return Code == other.Code;
+        }
+
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString() {
+            return $"{Code} {Description}";
         }
 
         public override bool Equals(object obj) {

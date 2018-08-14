@@ -1,11 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using DotLogix.Core.Tracking.Entries;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  IChangeTracker.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
 
-namespace DotLogix.Core.Tracking
-{
+#region
+using System.Collections.Generic;
+using DotLogix.Core.Tracking.Entries;
+#endregion
+
+namespace DotLogix.Core.Tracking {
     public interface IChangeTracker {
         IEnumerable<IChangeTrackingEntry> Entries { get; }
         void MarkAsAdded(object target);

@@ -1,19 +1,31 @@
-﻿using System.Collections.Generic;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ChangeTrackingEntryManager.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System.Collections.Generic;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Tracking.Entries;
 using DotLogix.Core.Tracking.Snapshots;
+#endregion
 
 namespace DotLogix.Core.Tracking.Manager {
     public class ChangeTrackingEntryManager : IChangeTrackingEntryManager {
-        private readonly Dictionary<object, IChangeTrackingEntry> _entryDict=new Dictionary<object, IChangeTrackingEntry>();
-        private readonly ISnapshotFactory _snapshotFactory;
+        private readonly Dictionary<object, IChangeTrackingEntry> _entryDict = new Dictionary<object, IChangeTrackingEntry>();
         private readonly DynamicAccessor _keyAccessors;
+        private readonly ISnapshotFactory _snapshotFactory;
 
         public ChangeTrackingEntryManager(ISnapshotFactory snapshotFactory, DynamicAccessor keyAccessors) {
-            this._snapshotFactory = snapshotFactory;
-            this._keyAccessors = keyAccessors;
+            _snapshotFactory = snapshotFactory;
+            _keyAccessors = keyAccessors;
         }
+
         public IEnumerable<IChangeTrackingEntry> Entries => _entryDict.Values;
+
         public IChangeTrackingEntry GetEntry(object key) {
             return TryGetEntry(key, out var entry) ? entry : null;
         }

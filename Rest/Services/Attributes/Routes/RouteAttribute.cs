@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  RouteAttribute.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.01.2018
-// LastEdited:  31.01.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -23,15 +23,16 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
         public string Pattern { get; }
         public int Priority { get; set; }
 
-        protected RouteAttribute(string pattern) {
+        protected RouteAttribute(string pattern, int priority = 0) {
+            Priority = priority;
             Pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
         }
 
-        public IWebServiceRoute BuildRoute(IWebService webService, DynamicInvoke dynamicInvoke, string pattern) {
+        public IWebServiceRoute BuildRoute(IWebService webService, int routeIndex, DynamicInvoke dynamicInvoke, string pattern) {
             var requestProcessor = CreateProcessor(webService, dynamicInvoke);
             var acceptedMethods = GetAcceptedHttpMethods(dynamicInvoke);
 
-            var route = CreateRoute(pattern, acceptedMethods, requestProcessor);
+            var route = CreateRoute(routeIndex, pattern, acceptedMethods, requestProcessor);
             RegisterInitialProcessors(route);
             return route;
         }
@@ -41,7 +42,7 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
         }
 
         protected abstract IWebRequestProcessor CreateProcessor(IWebService serviceInstance, DynamicInvoke dynamicInvoke);
-        protected abstract IWebServiceRoute CreateRoute(string pattern, HttpMethods acceptedMethods, IWebRequestProcessor requestProcessor);
+        protected abstract IWebServiceRoute CreateRoute(int routeIndex, string pattern, HttpMethods acceptedMethods, IWebRequestProcessor requestProcessor);
         protected virtual void RegisterInitialProcessors(IWebServiceRoute route) { }
     }
 }

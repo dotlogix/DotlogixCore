@@ -1,57 +1,106 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodeValue.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
+using System.Collections.Generic;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Types;
+#endregion
 
 namespace DotLogix.Core.Nodes {
     public class NodeValue : Node {
         private DataType _dataType;
 
-        public DataType DataType => _dataType ?? (_dataType = Value.GetDataType());
-
         private object _value;
+        public override NodeTypes Type => Value == null ? NodeTypes.Empty : NodeTypes.Value;
+
+        public DataType DataType => _dataType ?? (_dataType = Value.GetDataType());
 
         public object Value {
             get => _value;
             set {
-                NodeType = value == null ? NodeTypes.Empty : NodeTypes.Value;
                 _value = value;
                 _dataType = null;
             }
         }
 
-        
-        internal NodeValue(string name, object value, DataType dataType) : this(name, value) {
+        public NodeValue(object value, DataType dataType = null) {
+            _value = value;
             _dataType = dataType;
         }
 
-        public NodeValue(string name, object value) : this(value) {
-            Name = name;
-            Value = value;
+        #region Helper
+        protected override ICollection<string> GetFormattingMembers() {
+            var c = base.GetFormattingMembers();
+            c.Add($"Value: {Value?.ToString() ?? "null"}");
+            return c;
         }
-        public NodeValue(object value) : this() {
-            Value = value;
-        }
+        #endregion
 
-        public NodeValue() : base(NodeTypes.Empty) { }
-
-        public object ConvertValue(Type type)
-        {
-            return Value.ConvertTo(type);
+        #region GetValue
+        public object GetValue(Type targetType) {
+            return GetValue(targetType, default);
         }
 
-        public TValue ConvertValue<TValue>()
-        {
-            return Value.ConvertTo<TValue>();
+        public object GetValue(Type targetType, object defaultValue) {
+            return Value.TryConvertTo(targetType, out var value) ? value : defaultValue;
         }
 
-        public bool TryConvertValue(Type type, out object value)
-        {
-            return Value.TryConvertTo(type, out value);
+        public TValue GetValue<TValue>() {
+            return GetValue(default(TValue));
         }
 
-        public bool TryConvertValue<TValue>(out TValue value)
-        {
+        public TValue GetValue<TValue>(TValue defaultValue) {
+            return Value.TryConvertTo<TValue>(out var value) ? value : defaultValue;
+        }
+
+        public bool TryGetValue<TValue>(out TValue value) {
             return Value.TryConvertTo(out value);
         }
+
+        public bool TryGetValue(Type targetType, out object value) {
+            return Value.TryConvertTo(targetType, out value);
+        }
+        #endregion
+
+        #region ConvertValue
+        public object ConvertValue(Type targetType) {
+            return ConvertValue(targetType, default);
+        }
+
+        public object ConvertValue(Type targetType, object defaultValue) {
+            return Value = GetValue(targetType, defaultValue);
+        }
+
+        public TValue ConvertValue<TValue>() {
+            return ConvertValue(default(TValue));
+        }
+
+        public TValue ConvertValue<TValue>(TValue defaultValue) {
+            var value = GetValue(defaultValue);
+            Value = value;
+            return value;
+        }
+
+        public bool TryConvertValue(Type targetType, out object value) {
+            if(TryGetValue(targetType, out value) == false)
+                return false;
+            Value = value;
+            return true;
+        }
+
+        public bool TryConvertValue<TValue>(out TValue value) {
+            if(TryGetValue(out value) == false)
+                return false;
+            Value = value;
+            return true;
+        }
+        #endregion
     }
 }

@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  FileLogger.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  21.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -37,6 +37,9 @@ namespace DotLogix.Core.Diagnostics {
         public override bool Initialize() {
             if(_logFileWriter != null)
                 return true;
+            if(System.IO.Directory.Exists(Directory) == false)
+                System.IO.Directory.CreateDirectory(Directory);
+
             _logFileWriter = new StreamWriter(LogFile);
             return true;
         }

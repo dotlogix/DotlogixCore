@@ -1,15 +1,21 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  EnumTest.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using DotLogix.Core.Enumeration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endregion
 
-namespace Test
-{
+namespace Test {
     [TestClass]
-    public class EnumTest
-    {
+    public class EnumTest {
         [TestMethod]
-        public void EqualityTest()
-        {
+        public void EqualityTest() {
             Assert.AreNotEqual(ColorEnum.Red, ColorEnum.Blue);
         }
 
@@ -26,7 +32,5 @@ namespace Test
 
             Assert.AreEqual("ColorEnum.Red", redColor.ToString());
         }
-
-        
     }
 }

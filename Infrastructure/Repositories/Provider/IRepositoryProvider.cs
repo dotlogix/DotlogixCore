@@ -1,7 +1,17 @@
-﻿using DotLogix.Architecture.Infrastructure.EntityContext;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  IRepositoryProvider.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using DotLogix.Architecture.Infrastructure.EntityContext;
+#endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories.Provider {
     public interface IRepositoryProvider {
-        TRepoInterface Create<TRepoInterface>(IEntityContext entityContext) where TRepoInterface : IRepository;
+        TRepoInterface Create<TRepoInterface>(IEntitySetProvider entitySetProvider) where TRepoInterface : IRepository;
     }
 }

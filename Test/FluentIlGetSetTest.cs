@@ -1,30 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  FluentIlGetSetTest.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using DotLogix.Core.Reflection.Fluent;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endregion
 
-namespace Test
-{
-
+namespace Test {
     [TestClass]
-    public class FluentIlGetSetTest
-    {
-        public class FluentIlTestClass
-        {
-            public const string ConstField = "TestString";
-            public string Field = "TestString";
-            public readonly string ReadOnlyField = "TestString";
-            public static string StaticField = "TestString";
-            public static readonly string StaticReadOnlyField = "TestString";
-            public string Property { get; set; } = "TestString";
-            public string ReadOnlyProperty { get; } = "TestString";
-            public static string StaticProperty { get; set; } = "TestString";
-            public static string StaticReadOnlyProperty { get; } = "TestString";
-        }
-
+    public class FluentIlGetSetTest {
         [TestMethod]
         public void DynamicGetterSetterFieldTest() {
             var testType = typeof(FluentIlTestClass);
@@ -75,8 +64,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void DynamicGetterSetterPropertyTest()
-        {
+        public void DynamicGetterSetterPropertyTest() {
             var testType = typeof(FluentIlTestClass);
             var testInstance = new FluentIlTestClass();
 
@@ -116,6 +104,18 @@ namespace Test
 
             Assert.AreEqual(testInstance.Property, "OtherTestString");
             Assert.AreEqual(FluentIlTestClass.StaticProperty, "OtherTestString");
+        }
+
+        public class FluentIlTestClass {
+            public const string ConstField = "TestString";
+            public static string StaticField = "TestString";
+            public static readonly string StaticReadOnlyField = "TestString";
+            public readonly string ReadOnlyField = "TestString";
+            public string Field = "TestString";
+            public string Property { get; set; } = "TestString";
+            public string ReadOnlyProperty { get; } = "TestString";
+            public static string StaticProperty { get; set; } = "TestString";
+            public static string StaticReadOnlyProperty { get; } = "TestString";
         }
     }
 }

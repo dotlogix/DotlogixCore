@@ -1,22 +1,28 @@
-﻿using DotLogix.Architecture.Domain.Context.Factories;
-using DotLogix.Architecture.Domain.UoW;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  ApplicationContextFactory.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
 
-namespace DotLogix.Architecture.Application.Context.Factories
-{
-    public class ApplicationContextFactory : IApplicationContextFactory
-    {
+#region
+using DotLogix.Architecture.Domain.Context.Factories;
+using DotLogix.Architecture.Domain.UoW;
+#endregion
+
+namespace DotLogix.Architecture.Application.Context.Factories {
+    public class ApplicationContextFactory : IApplicationContextFactory {
         private readonly IDomainContextFactory _domainContextFactory;
         private readonly IUnitOfWorkFactory _unitOfWorkFactory;
 
-        public ApplicationContextFactory(IDomainContextFactory domainContextFactory, IUnitOfWorkFactory unitOfWorkFactory)
-        {
-            this._domainContextFactory = domainContextFactory;
-            this._unitOfWorkFactory = unitOfWorkFactory;
+        public ApplicationContextFactory(IDomainContextFactory domainContextFactory, IUnitOfWorkFactory unitOfWorkFactory) {
+            _domainContextFactory = domainContextFactory;
+            _unitOfWorkFactory = unitOfWorkFactory;
         }
 
-        public IApplicationContext Create()
-        {
-            return (IApplicationContext)new ApplicationContext(this._domainContextFactory.Create(), this._unitOfWorkFactory.Create());
+        public IApplicationContext Create() {
+            return new ApplicationContext(_domainContextFactory.Create(), _unitOfWorkFactory.Create());
         }
     }
 }

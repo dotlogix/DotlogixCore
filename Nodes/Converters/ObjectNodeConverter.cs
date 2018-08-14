@@ -1,16 +1,16 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ObjectNodeConverter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  30.08.2017
-// LastEdited:  18.10.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Linq;
 using System.Reflection;
-using DotLogix.Core.Nodes.Io;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
 #endregion
@@ -47,9 +47,10 @@ namespace DotLogix.Core.Nodes.Converters {
                 }
             }
 
-            if(_ctor == null)
+            if(_ctor == null) {
                 throw new
                 InvalidOperationException($"Can not find any usable constructor for type {dynamicType.Type.FullName}");
+            }
         }
 
         private static MemberTypes GetAccessorMemberTypes(AccessorTypes accessorTypes) {
@@ -76,25 +77,24 @@ namespace DotLogix.Core.Nodes.Converters {
         public override void Write(object instance, string rootName, INodeWriter writer) {
             writer.BeginMap(rootName);
             foreach(var accessor in _accessorsToRead)
-                Nodes.WriteToInternal(accessor.Name, accessor.GetValue(instance), accessor.ValueType, writer);
+                Nodes.WriteTo(accessor.Name, accessor.GetValue(instance), accessor.ValueType, writer);
             writer.EndMap();
         }
 
         public override object ConvertToObject(Node node) {
-            var nodeMap = node as NodeMap;
-            if(nodeMap == null)
+            if(!(node is NodeMap nodeMap))
                 throw new ArgumentException("Node is not a NodeMap");
 
             object instance;
-            if (_isDefaultCtor)
+            if(_isDefaultCtor)
                 instance = _ctor.Invoke();
-            else if(TryConstructWith(_ctor, nodeMap, out instance))
+            else if(TryConstructWith(_ctor, nodeMap, out instance) == false)
                 throw new InvalidOperationException("Object can not be constructed with the given nodes");
 
             foreach(var accessor in _accessorsToWrite) {
                 var accessorNode = nodeMap.GetChild(accessor.Name);
                 if(accessorNode == null)
-                    throw new InvalidOperationException("Object can not be constructed with the given nodes");
+                    continue;
                 var accessorValue = Nodes.ToObject(accessorNode, accessor.ValueType);
                 accessor.SetValue(instance, accessorValue);
             }

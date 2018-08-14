@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ValueNodeConverterFactory.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.08.2017
-// LastEdited:  09.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region

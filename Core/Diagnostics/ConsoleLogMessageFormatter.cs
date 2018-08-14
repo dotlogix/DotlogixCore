@@ -1,23 +1,24 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ConsoleLogMessageFormatter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
+using System.Linq;
 using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
     public class ConsoleLogMessageFormatter : ILogMessageFormatter {
-        private static readonly string padding =
+        private static readonly string Padding =
         $"\n{new string(' ', 8)} | {new string(' ', 8)} | {new string(' ', 15)} | {new string(' ', 15)} | {new string(' ', 15)} | "
         ;
 
-        private static readonly int paddingLength = 76;
+        private static readonly int PaddingLength = 76;
 
         public int ConsoleWidth { get; }
 
@@ -34,10 +35,10 @@ namespace DotLogix.Core.Diagnostics {
             var method = message.MethodName.SetLength(' ', 15);
             var thread = message.ThreadName.SetLength(' ', 15);
 
-            var messageLines = message.Message.WordWrap(ConsoleWidth - paddingLength);
+            var messageLines = message.Message.WordWrap(ConsoleWidth - PaddingLength).ToList();
             var formatted = $"{timeStamp} | {logLevel} | {context} | {method} | {thread} | ";
-            if(messageLines.Length > 1)
-                formatted += string.Join(padding, messageLines);
+            if(messageLines.Count > 1)
+                formatted += string.Join(Padding, messageLines);
             else
                 formatted += messageLines[0];
 

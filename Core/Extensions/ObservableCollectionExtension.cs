@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  ObservableCollectionExtension.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.09.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -12,6 +12,12 @@ using System.Collections.ObjectModel;
 
 namespace DotLogix.Core.Extensions {
     public static class ObservableCollectionExtension {
+        /// <summary>
+        ///     Converts a observable collection to a read-only one
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <returns></returns>
         public static ReadOnlyObservableCollection<T> AsReadonly<T>(this ObservableCollection<T> collection) {
             return new ReadOnlyObservableCollection<T>(collection);
         }

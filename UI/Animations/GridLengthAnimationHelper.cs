@@ -1,5 +1,15 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  GridLengthAnimationHelper.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System;
 using System.Windows;
+#endregion
 
 namespace DotLogix.UI.Animations {
     public sealed class GridLengthAnimationHelper : IAnimationHelper<GridLength> {
@@ -48,9 +58,7 @@ namespace DotLogix.UI.Animations {
             return Math.Abs(to.Value - from.Value);
         }
 
-        bool IAnimationHelper<GridLength>.IsAccumulable {
-            get { return true; }
-        }
+        bool IAnimationHelper<GridLength>.IsAccumulable => true;
         #endregion IAnimationHelper
     }
 }

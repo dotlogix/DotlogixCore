@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  AccessorTypesExtension.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
 
-namespace DotLogix.Core.Reflection.Dynamics
-{
-    public static class AccessorTypesExtension
-    {
-        public static MemberTypes GetMemberTypes(this AccessorTypes accessorTypes)
-        {
+#region
+using System;
+using System.Reflection;
+#endregion
+
+namespace DotLogix.Core.Reflection.Dynamics {
+    public static class AccessorTypesExtension {
+        public static MemberTypes GetMemberTypes(this AccessorTypes accessorTypes) {
             MemberTypes memberTypes;
-            switch (accessorTypes)
-            {
+            switch(accessorTypes) {
                 case AccessorTypes.None:
                     memberTypes = 0;
                     break;

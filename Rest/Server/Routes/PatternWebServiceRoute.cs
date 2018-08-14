@@ -1,19 +1,28 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  PatternWebServiceRoute.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System;
 using System.Text;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Processors;
-using DotLogix.Core.Utils;
 using DotLogix.Core.Utils.Patterns;
+#endregion
 
 namespace DotLogix.Core.Rest.Server.Routes {
     public class PatternWebServiceRoute : RegexWebServiceRoute {
-        public PatternWebServiceRoute(string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor, int priority) : base(ConvertToRegex(pattern), acceptedRequests, requestProcessor, priority) { }
+        public PatternWebServiceRoute(int routeIndex, string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor, int priority) : base(routeIndex, ConvertToRegex(pattern), acceptedRequests, requestProcessor, priority) { }
 
         private static string ConvertToRegex(string pattern) {
             var builder = new StringBuilder();
 
             var i = 0;
-            var patternStart = 0;
+            int patternStart;
 
             while((patternStart = pattern.IndexOf("<<", i, StringComparison.Ordinal)) != -1) {
                 if(patternStart > i)
@@ -36,20 +45,26 @@ namespace DotLogix.Core.Rest.Server.Routes {
         }
 
         private static string Parse(string s) {
-            var parts = s.Split(new[]{'|'},3);
+            var parts = s.Split(new[] {'|'}, 3);
             var name = parts[0];
             string typeStr;
-            if (parts.Length > 1 && string.IsNullOrEmpty(parts[1]) == false)
-                typeStr = parts[1];
-            else
-                typeStr="any";
+            string variantStr;
+            if((parts.Length > 1) && (string.IsNullOrEmpty(parts[1]) == false)) {
+                var typeSplit = parts[1].Split(new[] {':'}, 2);
+                typeStr = typeSplit[0];
+                variantStr = typeSplit.Length > 1 ? typeSplit[1] : null;
+            } else {
+                typeStr = "any";
+                variantStr = null;
+            }
+
             var args = parts.Length > 2 ? parts[2].Split('|') : new string[0];
 
             if(PatternParser.Default.TryGetPattern(typeStr, out var patternType) == false)
                 throw new ArgumentException("Pattern with type " + typeStr + " is not registered in default pattern parser");
 
-            var pattern = patternType.GetRegexPattern(args);
-            return $"(?<{name}>{pattern})";
+            var pattern = patternType.GetRegexPattern(variantStr, args);
+            return pattern == null ? s : $"(?<{name}>{pattern})";
         }
     }
 }

@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  Animation.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -57,44 +57,44 @@ namespace DotLogix.UI.Animations {
             var to = AnimationHelper.GetZeroValue();
             var originValue = AnimationHelper.GetZeroValue();
 
-            const string DefaultOriginValueName = "defaultOriginValue";
-            const string DefaultDestinationValueName = "defaultDestinationValue";
+            const string defaultOriginValueName = "defaultOriginValue";
+            const string defaultDestinationValueName = "defaultDestinationValue";
 
             switch(_lane) {
                 case Lane.Default:
-                    ValidateValue(defaultOriginValue, DefaultOriginValueName);
-                    ValidateValue(defaultDestinationValue, DefaultDestinationValueName);
+                    ValidateValue(defaultOriginValue, defaultOriginValueName);
+                    ValidateValue(defaultDestinationValue, defaultDestinationValueName);
                     from = defaultOriginValue;
                     to = defaultDestinationValue;
 
                     break;
 
                 case Lane.FromOnly:
-                    ValidateValue(defaultDestinationValue, DefaultDestinationValueName);
+                    ValidateValue(defaultDestinationValue, defaultDestinationValueName);
                     from = _cache[0];
                     to = defaultDestinationValue;
                     break;
 
                 case Lane.ToOnly:
-                    ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                    ValidateValue(defaultOriginValue, defaultOriginValueName);
                     from = defaultOriginValue;
                     to = _cache[0];
                     break;
 
                 case Lane.ByOnly:
-                    ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                    ValidateValue(defaultOriginValue, defaultOriginValueName);
                     to = _cache[0];
                     if(AnimationHelper.IsAccumulable)
                         originValue = defaultOriginValue;
                     break;
 
                 case Lane.FromTo:
-                    ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                    ValidateValue(defaultOriginValue, defaultOriginValueName);
                     from = _cache[0];
                     to = _cache[1];
 
                     if(IsAdditive && AnimationHelper.IsAccumulable) {
-                        ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                        ValidateValue(defaultOriginValue, defaultOriginValueName);
                         originValue = defaultOriginValue;
                     }
                     break;
@@ -105,7 +105,7 @@ namespace DotLogix.UI.Animations {
                     to = AnimationHelper.AddValues(_cache[0], _cache[1]);
 
                     if(IsAdditive && AnimationHelper.IsAccumulable) {
-                        ValidateValue(defaultOriginValue, DefaultOriginValueName);
+                        ValidateValue(defaultOriginValue, defaultOriginValueName);
                         originValue = defaultOriginValue;
                     }
                     break;
@@ -161,32 +161,32 @@ namespace DotLogix.UI.Animations {
         ///     Defines Animation starting value
         /// </summary>
         public TNullableValue From {
-            get { return (TNullableValue)GetValue(FromProperty); }
-            set { SetValue(FromProperty, value); }
+            get => (TNullableValue)GetValue(FromProperty);
+            set => SetValue(FromProperty, value);
         }
 
         /// <summary>
         ///     Defines Animation ending value
         /// </summary>
         public TNullableValue To {
-            get { return (TNullableValue)GetValue(ToProperty); }
-            set { SetValue(ToProperty, value); }
+            get => (TNullableValue)GetValue(ToProperty);
+            set => SetValue(ToProperty, value);
         }
 
         /// <summary>
         ///     Defines Animation step value
         /// </summary>
         public TNullableValue By {
-            get { return (TNullableValue)GetValue(ByProperty); }
-            set { SetValue(ByProperty, value); }
+            get => (TNullableValue)GetValue(ByProperty);
+            set => SetValue(ByProperty, value);
         }
 
         /// <summary>
         ///     Defines modifier of the animation progress.
         /// </summary>
         public IEasingFunction EasingFunction {
-            get { return (IEasingFunction)GetValue(EasingFunctionProperty); }
-            set { SetValue(EasingFunctionProperty, value); }
+            get => (IEasingFunction)GetValue(EasingFunctionProperty);
+            set => SetValue(EasingFunctionProperty, value);
         }
 
         /// <summary>
@@ -194,8 +194,8 @@ namespace DotLogix.UI.Animations {
         ///     replacing it entirely.
         /// </summary>
         public bool IsAdditive {
-            get { return (bool)GetValue(IsAdditiveProperty); }
-            set { SetValue(IsAdditiveProperty, value); }
+            get => (bool)GetValue(IsAdditiveProperty);
+            set => SetValue(IsAdditiveProperty, value);
         }
 
         /// <summary>
@@ -204,8 +204,8 @@ namespace DotLogix.UI.Animations {
         ///     and 2.0 to 3.0 over the third, etc.
         /// </summary>
         public bool IsCumulative {
-            get { return (bool)GetValue(IsCumulativeProperty); }
-            set { SetValue(IsCumulativeProperty, value); }
+            get => (bool)GetValue(IsCumulativeProperty);
+            set => SetValue(IsCumulativeProperty, value);
         }
         #endregion
 

@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  NodeConverterFactoryBase.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.08.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -16,7 +16,7 @@ using DotLogix.Core.Types;
 namespace DotLogix.Core.Nodes.Factories {
     public abstract class NodeConverterFactoryBase : INodeConverterFactory {
         public INodeConverter CreateConverter(NodeTypes nodeType, DataType dataType) {
-            if (TryCreateConverter(nodeType, dataType, out var converter))
+            if(TryCreateConverter(nodeType, dataType, out var converter))
                 return converter;
 
             throw new InvalidOperationException($"Can not create converter for type {dataType.Type.GetFriendlyName()}");

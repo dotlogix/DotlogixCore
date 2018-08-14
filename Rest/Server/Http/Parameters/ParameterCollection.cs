@@ -2,98 +2,120 @@
 // Copyright 2018(C) , DotLogix
 // File:  ParameterCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  07.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http.Parameters {
-    public class ParameterCollection : IEnumerable<Parameter> {
-        private readonly Dictionary<string, Parameter> _parametersDict = new Dictionary<string, Parameter>(StringComparer.OrdinalIgnoreCase);
-        public Parameter this[string name] => GetParameter(name);
-        public bool HasValues => _parametersDict.Count > 0;
+    public class ParameterCollection {
+        private readonly Dictionary<string, List<object>> _entries = new Dictionary<string, List<object>>();
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
+        public int Count => _entries.Count;
+
+        public IEnumerable<KeyValuePair<string, IEnumerable<object>>> Entries {
+            get { return _entries.Select(e => new KeyValuePair<string, IEnumerable<object>>(e.Key, e.Value)); }
         }
 
-        public IEnumerator<Parameter> GetEnumerator() {
-            return _parametersDict.Values.GetEnumerator();
+        public object GetValue(string name) {
+            return TryGetValue(name, out var value) ? value : null;
         }
 
-        public void Add(Parameter parameter, bool mergeIfExists = true) {
-            if(parameter == null)
-                return;
-            if(_parametersDict.TryGetValue(parameter.Name, out var existing)) {
-                if(mergeIfExists)
-                    existing.Merge(parameter);
-                else
-                    throw new InvalidOperationException($"Parameter {existing.Name} does already exist");
-            } else
-                _parametersDict.Add(parameter.Name, parameter);
+        public IEnumerable<object> GetValues(string name) {
+            return TryGetValues(name, out var values) ? values : null;
         }
 
-        public void Set(Parameter parameter, bool mergeIfExists = true) {
-            if(parameter == null)
-                return;
-            if(mergeIfExists && _parametersDict.TryGetValue(parameter.Name, out var existing)) {
-                existing.Merge(parameter);
-                return;
+        public bool TryGetValue(string name, out object value) {
+            if(_entries.TryGetValue(name, out var list) && (list.Count > 0)) {
+                value = list[0];
+                return true;
             }
-            _parametersDict[parameter.Name] = parameter;
+
+            value = null;
+            return false;
         }
 
-        public void AddRange(IEnumerable<Parameter> parameters, bool mergeIfExists = true) {
-            if(parameters == null)
-                return;
-            foreach(var parameter in parameters)
-                Add(parameter, mergeIfExists);
-        }
-
-        public void AppendString(StringBuilder builder) {
-            foreach(var httpParameter in _parametersDict.Values)
-                builder.AppendLine(httpParameter.ToString());
-        }
-
-        public override string ToString() {
-            var builder = new StringBuilder();
-            AppendString(builder);
-            return builder.ToString();
-        }
-
-        #region Parameter
-        public Parameter GetParameter(string name) {
-            return _parametersDict.TryGetValue(name, out var existing) ? existing : null;
-        }
-
-        public object GetParameterValue(string name) {
-            return GetParameter(name)?.Value;
-        }
-
-        public object[] GetParameterValues(string name) {
-            return GetParameter(name)?.Values;
-        }
-        #endregion
-
-        #region TryParameter
-        public bool TryGetParameter(string name, out Parameter parameter) {
-            return _parametersDict.TryGetValue(name, out parameter);
-        }
-
-        public bool TryGetParameterValue(string name, out object value) {
-            if(_parametersDict.TryGetValue(name, out var parameter) == false) {
-                value = default(object);
-                return false;
+        public bool TryGetValues(string name, out IEnumerable<object> values) {
+            if(_entries.TryGetValue(name, out var list)) {
+                values = list;
+                return true;
             }
-            value = parameter.GetValue();
-            return true;
+
+            values = null;
+            return false;
         }
-        #endregion
+
+        public TValue GetValue<TValue>(string name) {
+            return TryGetValue(name, out TValue value) ? value : default(TValue);
+        }
+
+        public IEnumerable<TValue> GetValues<TValue>(string name) {
+            return TryGetValues(name, out IEnumerable<TValue> values) ? values : null;
+        }
+
+        public bool TryGetValue<TValue>(string name, out TValue value) {
+            if(_entries.TryGetValue(name, out var list) && (list.Count > 0))
+                return list[0].TryConvertTo(out value);
+
+            value = default(TValue);
+            return false;
+        }
+
+        public bool TryGetValues<TValue>(string name, out IEnumerable<TValue> values) {
+            if(_entries.TryGetValue(name, out var list)) {
+                values = list.Select(value => value.TryConvertTo<TValue>(out var cvalue) ? cvalue : default(TValue)).ToList();
+                return true;
+            }
+
+            values = null;
+            return false;
+        }
+
+        public void SetValue(string name, object value, bool merge = false) {
+            if(_entries.TryGetValue(name, out var existing) == false) {
+                existing = new List<object>();
+                _entries.Add(name, existing);
+            } else if(merge == false)
+                existing.Clear();
+
+            existing.Add(value);
+        }
+
+
+        public void SetValues(string name, IEnumerable<object> values, bool merge = false) {
+            if(_entries.TryGetValue(name, out var existing) == false) {
+                existing = new List<object>();
+                _entries.Add(name, existing);
+            } else if(merge == false)
+                existing.Clear();
+
+            existing.AddRange(values);
+        }
+
+        public bool RemoveValue(string name, object value) {
+            return _entries.TryGetValue(name, out var existing) && existing.Remove(value);
+        }
+
+        public bool RemoveValues(string name) {
+            return _entries.Remove(name);
+        }
+
+        public bool ContainsValue(string name, object value) {
+            return _entries.TryGetValue(name, out var existing) && existing.Contains(value);
+        }
+
+        public void Merge(ParameterCollection parameters) {
+            foreach(var entry in parameters._entries)
+                SetValues(entry.Key, entry.Value, true);
+        }
+
+        public void Clear() {
+            _entries.Clear();
+        }
     }
 }

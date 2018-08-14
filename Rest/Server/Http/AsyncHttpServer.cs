@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  AsyncHttpServer.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  29.01.2018
-// LastEdited:  31.01.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -29,17 +29,16 @@ namespace DotLogix.Core.Rest.Server.Http {
         private static readonly Dictionary<string, HttpMethods> ChachedMethods = Enum.GetValues(typeof(HttpMethods)).Cast<HttpMethods>().ToDictionary(m => m.ToString(), StringComparer.OrdinalIgnoreCase);
         private readonly HttpListener _httpListener = new HttpListener();
         private readonly IAsyncHttpRequestHandler _requestHandler;
-        private SemaphoreSlim _connectionSemaphore;
         private SemaphoreSlim _requestSemaphore;
         private CancellationTokenSource _serverShutdownSource;
         public bool IsDisposed { get; private set; }
 
-        public AsyncHttpServer(IAsyncHttpRequestHandler requestHandler, ConcurrencyOptions concurrencyOptions = null) {
-            ConcurrencyOptions = concurrencyOptions ?? ConcurrencyOptions.Default;
+        public AsyncHttpServer(IAsyncHttpRequestHandler requestHandler, Configuration configuration = null) {
+            Configuration = configuration ?? Configuration.Default;
             _requestHandler = requestHandler ?? throw new ArgumentNullException(nameof(requestHandler));
         }
 
-        public ConcurrencyOptions ConcurrencyOptions { get; }
+        public Configuration Configuration { get; }
         public bool IsRunning { get; private set; }
 
         public void Start() {
@@ -49,12 +48,10 @@ namespace DotLogix.Core.Rest.Server.Http {
                 return;
             IsRunning = true;
             _serverShutdownSource = new CancellationTokenSource();
-            _connectionSemaphore = new SemaphoreSlim(0, ConcurrencyOptions.Connections);
-            _requestSemaphore = new SemaphoreSlim(0, ConcurrencyOptions.Requests);
+            _requestSemaphore = new SemaphoreSlim(0, Configuration.MaxConcurrentRequests);
             _httpListener.Start();
 
-            _connectionSemaphore.Release(ConcurrencyOptions.Connections);
-            _requestSemaphore.Release(ConcurrencyOptions.Requests);
+            _requestSemaphore.Release(Configuration.MaxConcurrentRequests);
             HandleRequestsAsync();
         }
 
@@ -70,9 +67,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             _serverShutdownSource.Dispose();
             _serverShutdownSource = null;
 
-            _connectionSemaphore.Dispose();
             _requestSemaphore.Dispose();
-            _connectionSemaphore = null;
             _requestSemaphore = null;
         }
 
@@ -87,15 +82,15 @@ namespace DotLogix.Core.Rest.Server.Http {
         public void Dispose() {
             if(IsDisposed)
                 return;
-            IsDisposed = true;
             Stop();
             _httpListener.Close();
+            IsDisposed = true;
         }
 
         private async void HandleRequestsAsync() {
             while(IsRunning) {
                 try {
-                    await _connectionSemaphore.WaitAsync(_serverShutdownSource.Token);
+                    await _requestSemaphore.WaitAsync(_serverShutdownSource.Token);
                 } catch(OperationCanceledException e) {
                     if(IsRunning == false)
                         continue; // Supress cancellation because of server shutdown
@@ -103,11 +98,8 @@ namespace DotLogix.Core.Rest.Server.Http {
                 }
 
                 try {
-#pragma warning disable 4014
-                    var contextTask = _httpListener.GetContextAsync();
-                    contextTask.ContinueWith(HandleRequestAsync, TaskContinuationOptions.OnlyOnRanToCompletion);
-                    contextTask.ContinueWith(t => _connectionSemaphore.Release());
-#pragma warning restore 4014
+                    var context = await _httpListener.GetContextAsync().ConfigureAwait(false);
+                    HandleRequestAsync(context).ConfigureAwait(false);
                 } catch(HttpListenerException e) {
                     if(IsRunning == false)
                         continue;
@@ -116,29 +108,26 @@ namespace DotLogix.Core.Rest.Server.Http {
             }
         }
 
-        private async Task HandleRequestAsync(Task<HttpListenerContext> context) {
+        private async Task HandleRequestAsync(HttpListenerContext originalContext) {
+            IAsyncHttpContext httpContext;
             try {
-                await _requestSemaphore.WaitAsync(_serverShutdownSource.Token);
-            } catch(OperationCanceledException e) {
-                if(IsRunning == false)
-                    return; // Supress cancellation because of server shutdown
-                Log.Error(e);
+                httpContext = CreateContext(originalContext);
+            } catch(Exception e) {
+                if(IsRunning)
+                    Log.Error(e);
+                return;
             }
 
-            var httpListenerContext = await context;
-            var request = new AsyncHttpRequest(httpListenerContext.Request);
-            var response = new AsyncHttpResponse(httpListenerContext.Response);
-            var httpContext = new AsyncHttpContext(this, request, response);
-
+            var response = httpContext.Response;
             try {
                 await _requestHandler.HandleRequestAsync(httpContext);
-                if(response.IsSent == false && httpContext.PreventAutoSend == false) {
-                    await response.SendAsync();
-                }
+                if((response.IsCompleted == false) && (httpContext.PreventAutoSend == false))
+                    await response.CompleteAsync();
             } catch(Exception e) {
                 Log.Error(e);
-                await OnError(response, e);
+                await SendErrorMessageAsync(response, e);
             } finally {
+                httpContext.Dispose();
                 try {
                     _requestSemaphore.Release();
                 } catch(Exception e) {
@@ -148,21 +137,31 @@ namespace DotLogix.Core.Rest.Server.Http {
             }
         }
 
-        private async Task OnError(IAsyncHttpResponse response, Exception exception) {
-            await SendErrorMessageAsync(response, exception);
+        private IAsyncHttpContext CreateContext(HttpListenerContext originalContext) {
+            var request = CreateRequest(originalContext);
+            var response = CreateResponse(originalContext);
+            return new AsyncHttpContext(this, request, response);
+        }
+
+        private AsyncHttpResponse CreateResponse(HttpListenerContext originalContext) {
+            return AsyncHttpResponse.Create(originalContext.Response, Configuration.ParameterParser ?? PrimitiveParameterParser.Instance);
+        }
+
+        private AsyncHttpRequest CreateRequest(HttpListenerContext originalContext) {
+            return AsyncHttpRequest.Create(originalContext.Request, Configuration.ParameterParser ?? PrimitiveParameterParser.Instance);
         }
 
         public static async Task SendErrorMessageAsync(IAsyncHttpResponse response, Exception exception) {
             var stringBuilder = new StringBuilder();
-            var httpStatusCode = HttpStatusCodes.InternalServerError;
+            var httpStatusCode = HttpStatusCodes.ServerError.InternalServerError;
             CreateExceptionMessage(stringBuilder, exception, ref httpStatusCode);
 
             response.StatusCode = httpStatusCode;
-            response.ContentType = MimeTypes.PlainText;
+            response.ContentType = MimeTypes.Text.Plain;
             response.OutputStream.SetLength(0);
             try {
                 await response.WriteToResponseStreamAsync(stringBuilder.ToString());
-                await response.SendAsync();
+                await response.CompleteAsync();
             } catch(Exception e) {
                 Log.Error(e);
             }

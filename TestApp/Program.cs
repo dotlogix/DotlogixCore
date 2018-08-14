@@ -1,71 +1,105 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  Program.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Dynamic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Server.Http.State;
-using DotLogix.Core.Rest.Server.Routes;
-using DotLogix.Core.Rest.Services;
-using DotLogix.Core.Rest.Services.Attributes;
-using DotLogix.Core.Rest.Services.Attributes.Events;
-using DotLogix.Core.Rest.Services.Attributes.Http;
-using DotLogix.Core.Rest.Services.Attributes.Routes;
-using DotLogix.Core.Rest.Services.Base;
-using DotLogix.Core.Rest.Services.Exceptions;
-using DotLogix.Core.Rest.Services.Processors;
-using DotLogix.Core.Tracking;
-using DotLogix.Core.Tracking.Entries;
+using DotLogix.Core.Extensions;
+using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Reflection.Dynamics;
+#endregion
 
-namespace TestApp
-{
-    class Program
-    {
-        static void Main(string[] args) {
-            //var server = new WebServiceHost("http://127.0.0.1:1337/");
-            //server.RegisterService<TestService>();
+namespace TestApp {
+    //public class DynamicConvertable : DynamicObject {
+    //    public object Value { get; }
 
-            //server.Start();
-            //while(Console.ReadLine() != "stop") {
-            //    server.TriggerServerEventAsync("TriggerAdd");
-            //}
+    //    public DynamicConvertable(object value) {
+    //        Value = value;
+    //    }
 
-            //server.Stop();
+    //    public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result) {
+    //        if(Value == null) {
+    //            result = null;
+    //            return false;
+    //        }
 
-            var rout = new PatternWebServiceRoute("<<test:g>>/<<id:n>>", HttpMethods.Get, new Auth(), 0);
+    //        var type = Value.GetType();
+    //        var method = type.GetMethod(binder.Name, args.ToTypeArray());
+    //        if(method == null) {
+    //            result = null;
+    //            return false;
+    //        }
+
+    //        result = method.CreateDynamicInvoke().Invoke(Value, args);
+    //        return true;
+    //    }
+
+    //    public override bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object result) {
+    //        var binary = Expression.MakeBinary(binder.Operation, Expression.Constant(Value), Expression.Constant(arg));
+    //        var lambda = Expression.Lambda(binary);
+
+    //        try {
+    //            result = lambda.Compile().DynamicInvoke();
+    //            return true;
+    //        } catch {
+    //            result = null;
+    //            return false;
+    //        }
+    //    }
+
+    //    public override bool TryUnaryOperation(UnaryOperationBinder binder, out object result) {
+    //        var binary = Expression.MakeUnary(binder.Operation, Expression.Constant(Value), binder.ReturnType);
+    //        var lambda = Expression.Lambda(binary);
+
+    //        try
+    //        {
+    //            result = lambda.Compile().DynamicInvoke();
+    //            return true;
+    //        }
+    //        catch
+    //        {
+    //            result = null;
+    //            return false;
+    //        }
+    //    }
+
+    //    public override bool TryConvert(ConvertBinder binder, out object result) {
+    //        return Value.TryConvertTo(binder.ReturnType, out result);
+    //    }
+
+    //    public override string ToString() {
+    //        return Value?.ToString();
+    //    }
+    //}
+
+    
+
+    internal class Program {
+        public class Person {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+        }
+
+        private static async Task Main(string[] args) {
+            var json = "{\"name\":\"Alex\",\"id\":1,\"guid\":\"605f282d-f216-4588-bede-512753ffc0cb\"}";
+            var node = JsonNodes.ToNode<NodeMap>(json);
+
+            var dynNode = DynamicNode.From(node);
+            dynNode.Child = DynamicNode.Map();
+
+            Console.WriteLine(JsonNodes.ToJson(dynNode.Node, JsonNodesFormatter.Idented));
+
             Console.Read();
-
-
-        }
-    }
-
-    public class TestService : WebServiceBase {
-        [WebServiceEvent("TriggerAdd")]
-        public event EventHandler TriggerAdd;
-
-        public TestService() : base("calc/", "calc") { }
-
-        [HttpGet]
-        [Auth]
-        [DynamicRoute("add")]
-        public int Add(int a, int b, int c=0) {
-            return a + b + c;
-        }
-    }
-
-    public class Auth : PreProcessorAttribute, IWebRequestProcessor
-    {
-        public override IWebRequestProcessor CreateProcessor() {
-            return this;
         }
 
-        public int Priority { get; }
-        public bool IgnoreHandled { get; }
-        public Task ProcessAsync(WebRequestResult webRequestResult) {
-            if(webRequestResult.Context.Request.QueryParameters.TryGetParameterValue("auth", out var obj) == false || Equals(obj, "lol") == false) {
-                webRequestResult.SetException(new RestException(HttpStatusCodes.Unauthorized, "Fuck you"));
-            }
-            return Task.CompletedTask;
-        }
     }
 }

@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  AnimationUsingKeyFrames.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -35,8 +35,8 @@ namespace DotLogix.UI.Animations {
 
         #region IKeyFrameAnimation
         IList IKeyFrameAnimation.KeyFrames {
-            get { return KeyFrames; }
-            set { KeyFrames = (TKeyFrameCollection)value; }
+            get => KeyFrames;
+            set => KeyFrames = (TKeyFrameCollection)value;
         }
         #endregion
 
@@ -59,7 +59,7 @@ namespace DotLogix.UI.Animations {
         #region IAddChild
         void IAddChild.AddChild(object child) {
             if(child == null)
-                throw new ArgumentNullException("child");
+                throw new ArgumentNullException(nameof(child));
             WritePreamble();
             AddChild(child);
             WritePostscript();
@@ -67,7 +67,7 @@ namespace DotLogix.UI.Animations {
 
         void IAddChild.AddText(string childText) {
             if(childText == null)
-                throw new ArgumentNullException("childText");
+                throw new ArgumentNullException(nameof(childText));
             AddText(childText);
         }
 
@@ -76,8 +76,7 @@ namespace DotLogix.UI.Animations {
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         protected virtual void AddChild(object child) {
-            var keyFrame = child as KeyFrame<TValue>;
-            if(keyFrame == null)
+            if(!(child is KeyFrame<TValue> keyFrame))
                 throw new ArgumentException("Child should be of type KeyFrame<" + typeof(TValue).Name + ">");
             KeyFrames.Add(keyFrame);
         }
@@ -173,13 +172,11 @@ namespace DotLogix.UI.Animations {
             TValue currValue;
             if(currKeyFrameRefIdx == keyFrameCount)
             // After the last key frame - take last frame value
-            {
                 currValue = GetResolvedKeyFrame(keyFrameCount - 1).Value;
-            } else if(currTime == _keyFrameRefs[currKeyFrameRefIdx].ResolvedTime)
+            else if(currTime == _keyFrameRefs[currKeyFrameRefIdx].ResolvedTime)
             // Exactly on a key frame. 
-            {
                 currValue = GetResolvedKeyFrame(currKeyFrameRefIdx).Value;
-            } else if(currKeyFrameRefIdx == 0) {
+            else if(currKeyFrameRefIdx == 0) {
                 // before first frame - special case
                 var baseValue = IsAdditive && AnimationHelper.IsAccumulable
                                     ? AnimationHelper.GetZeroValue()
@@ -199,12 +196,13 @@ namespace DotLogix.UI.Animations {
             if(AnimationHelper.IsAccumulable) {
                 if(IsCumulative) {
                     var currentRepeat = animationClock.CurrentIteration.GetValueOrDefault() - 1;
-                    if(currentRepeat > 0)
+                    if(currentRepeat > 0) {
                         currValue =
                         AnimationHelper.AddValues(currValue,
                                                   AnimationHelper.
                                                   ScaleValue(GetResolvedKeyFrame(keyFrameCount - 1).Value,
                                                              currentRepeat));
+                    }
                 }
                 if(IsAdditive)
                     return AnimationHelper.AddValues(defaultOriginValue, currValue);
@@ -216,14 +214,12 @@ namespace DotLogix.UI.Animations {
             var keyFrameCount = _keyFrameRefs.Length;
             var currKeyFrameRefIdx = 0;
             // Skip all frames before the time. 
-            while((currKeyFrameRefIdx < keyFrameCount) && (currTime > _keyFrameRefs[currKeyFrameRefIdx].ResolvedTime)) {
+            while((currKeyFrameRefIdx < keyFrameCount) && (currTime > _keyFrameRefs[currKeyFrameRefIdx].ResolvedTime))
                 currKeyFrameRefIdx++;
-            }
             // select last one from multiple frames with same key time. 
             while((currKeyFrameRefIdx < (keyFrameCount - 1)) &&
-                  (currTime == _keyFrameRefs[currKeyFrameRefIdx + 1].ResolvedTime)) {
+                  (currTime == _keyFrameRefs[currKeyFrameRefIdx + 1].ResolvedTime))
                 currKeyFrameRefIdx++;
-            }
             return currKeyFrameRefIdx;
         }
         #endregion
@@ -235,8 +231,8 @@ namespace DotLogix.UI.Animations {
         ///     replacing it entirely.
         /// </summary>
         public bool IsAdditive {
-            get { return (bool)GetValue(IsAdditiveProperty); }
-            set { SetValue(IsAdditiveProperty, value); }
+            get => (bool)GetValue(IsAdditiveProperty);
+            set => SetValue(IsAdditiveProperty, value);
         }
 
         /// <summary>
@@ -248,25 +244,26 @@ namespace DotLogix.UI.Animations {
         ///     This property works with the IsAdditive property and has no effect without it.
         /// </remarks>
         public bool IsCumulative {
-            get { return (bool)GetValue(IsCumulativeProperty); }
-            set { SetValue(IsCumulativeProperty, value); }
+            get => (bool)GetValue(IsCumulativeProperty);
+            set => SetValue(IsCumulativeProperty, value);
         }
         #endregion
 
         public TKeyFrameCollection KeyFrames {
             get {
                 ReadPreamble();
-                if(_keyFrames == null)
+                if(_keyFrames == null) {
                     if(IsFrozen)
                         _keyFrames = GetEmptyKeyFrames();
                     else
                         KeyFrames = new TKeyFrameCollection();
+                }
 
                 return _keyFrames;
             }
             set {
                 if(value == null)
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 WritePreamble();
                 if(_keyFrames == value)
                     return;
@@ -306,9 +303,8 @@ namespace DotLogix.UI.Animations {
             var keyFrameCount = KeyFrameList.Count;
             _keyFrameRefs = new KeyFrameRef[keyFrameCount];
             // Initialize the OriginalIndex.
-            for(var idx = 0; idx < keyFrameCount; idx++) {
+            for(var idx = 0; idx < keyFrameCount; idx++)
                 _keyFrameRefs[idx].OriginalIndex = idx;
-            }
 
             var uniformRangeList = new List<KeyFrameRange>();
             // Resolve Percent and Time key frames. Collect Uniform blocks, check if paced key frames exists
@@ -454,9 +450,7 @@ namespace DotLogix.UI.Animations {
             return _emptyKeyFrames;
         }
 
-        private IList<KeyFrame<TValue>> KeyFrameList {
-            get { return _keyFrames; }
-        }
+        private IList<KeyFrame<TValue>> KeyFrameList => _keyFrames;
         #endregion
 
         #region Inner types

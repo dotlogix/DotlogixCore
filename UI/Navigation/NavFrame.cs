@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2016(C) , DotLogix
+// Copyright 2018(C) , DotLogix
 // File:  NavFrame.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  23.06.2017
-// LastEdited:  06.09.2017
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -27,7 +27,7 @@ namespace DotLogix.UI.Navigation {
         private NavService _navService;
 
         public NavService NavService {
-            get { return _navService; }
+            get => _navService;
             set {
                 if(!Equals(_navService.NavFrame, this))
                     throw new InvalidOperationException("The navframe of the navigation service is not valid");
@@ -37,8 +37,8 @@ namespace DotLogix.UI.Navigation {
         }
 
         public NavPage Page {
-            get { return (NavPage)GetValue(PageProperty); }
-            internal set { SetValue(PageProperty, value); }
+            get => (NavPage)GetValue(PageProperty);
+            internal set => SetValue(PageProperty, value);
         }
 
         public NavFrame() {

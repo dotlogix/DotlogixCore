@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>DotLogix.Config</AssemblyName>
+    <RootNamespace>DotLogix.Core.Config</RootNamespace>
+	<Company>DotLogix</Company>
+    <Product>DotLogix Core</Product>
+    <PackageId>DotLogix.Core</PackageId>
+    <Authors>DotLogix</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DotLogix.Core">
+      <HintPath>..\..\assemblies\Debug\DotLogix.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DotLogix.Nodes">
+      <HintPath>..\..\assemblies\Debug\DotLogix.Nodes.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
+  </Target>
+
+</Project>

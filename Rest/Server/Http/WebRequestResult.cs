@@ -2,21 +2,23 @@
 // Copyright 2018(C) , DotLogix
 // File:  WebRequestResult.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  31.01.2018
-// LastEdited:  31.01.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using DotLogix.Core.Rest.Server.Http.Context;
+using DotLogix.Core.Rest.Server.Http.State;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http {
     public class WebRequestResult {
-        public bool Succeed => (Result != null) || (Exception == null);
+        public bool Succeed => (ReturnValue != null) || (Exception == null);
         public bool Handled { get; private set; }
         public IAsyncHttpContext Context { get; }
-        public object Result { get; private set; }
+        public HttpStatusCode CustomStatusCode { get; set; }
+        public object ReturnValue { get; private set; }
         public Exception Exception { get; private set; }
 
         public WebRequestResult(IAsyncHttpContext context) {
@@ -38,7 +40,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                 return false;
 
             Handled = true;
-            Result = result;
+            ReturnValue = result;
             return true;
         }
 

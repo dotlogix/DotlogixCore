@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  ParrallelLogger.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  21.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -60,8 +60,7 @@ namespace DotLogix.Core.Diagnostics {
                     return false;
                 Initialized = true;
 
-                if (_loggersChanged)
-                {
+                if(_loggersChanged) {
                     _currentReceivers = _receivers.ToArray();
                     if(_currentReceivers.All(l => l.Initialize()) == false)
                         return false;
@@ -76,7 +75,7 @@ namespace DotLogix.Core.Diagnostics {
                 if(Initialized == false)
                     return false;
                 Initialized = false;
-                if (_currentReceivers.All(l => l.Shutdown()) == false)
+                if(_currentReceivers.All(l => l.Shutdown()) == false)
                     return false;
             }
             _receiverWait.Set();
@@ -142,14 +141,14 @@ namespace DotLogix.Core.Diagnostics {
         }
 
         public bool DetachLogger(IEnumerable<ILogger> loggers) {
-            if (loggers == null)
+            if(loggers == null)
                 return true;
 
             var loggerList = loggers.ToList();
-            if (loggerList.Count == 0)
+            if(loggerList.Count == 0)
                 return true;
 
-            lock (SyncRoot) {
+            lock(SyncRoot) {
                 var count = _receivers.Count;
                 _receivers.ExceptWith(loggerList);
                 if(count == _receivers.Count)

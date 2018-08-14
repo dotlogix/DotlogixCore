@@ -3,7 +3,7 @@
 // File:  AuthenticationPreProcessor.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -32,7 +32,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
 
         public override Task ProcessAsync(WebServiceContext webServiceContext) {
             var authenticationDescriptor = webServiceContext.Route.RequestProcessor.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
-            if(authenticationDescriptor != null && authenticationDescriptor.RequiresAuthentication == false)
+            if((authenticationDescriptor != null) && (authenticationDescriptor.RequiresAuthentication == false))
                 return Task.CompletedTask;
 
             var request = webServiceContext.HttpRequest;

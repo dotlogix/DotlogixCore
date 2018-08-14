@@ -1,4 +1,14 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  JsonStrings.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  03.03.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System.Text;
+#endregion
 
 namespace DotLogix.Core.Nodes.Processor {
     public class JsonStrings {
@@ -10,8 +20,7 @@ namespace DotLogix.Core.Nodes.Processor {
             var sb = new StringBuilder();
             var safeCharactersStart = -1;
             var safeCharactersCount = 0;
-            if(removeQuotes)
-            {
+            if(removeQuotes) {
                 startIndex++;
                 endIndex--;
             }
@@ -64,7 +73,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 sb.Append(current);
             }
 
-            var length = endIndex-startIndex;
+            var length = endIndex - startIndex;
             if(safeCharactersCount == length)
                 return new string(json, startIndex, length);
 
@@ -147,7 +156,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
         private static char FromCharAsUnicode(char[] buffer, int startIndex) {
             var chr = HexToInt(buffer[startIndex]);
-            for(var i = startIndex+1; i < startIndex+4; i++)
+            for(var i = startIndex + 1; i < (startIndex + 4); i++)
                 chr = (chr << 4) + HexToInt(buffer[i]);
             return (char)chr;
         }

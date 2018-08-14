@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  ConsoleLogger.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  21.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -26,10 +26,10 @@ namespace DotLogix.Core.Diagnostics {
         }
 
         public override bool Initialize() {
-            if(Console.WindowWidth == _consoleWidth
-               && Console.WindowHeight == _consoleHeight
-               && Console.BufferHeight == _bufferHeight
-               && Console.BufferWidth == _consoleWidth)
+            if((Console.WindowWidth == _consoleWidth)
+               && (Console.WindowHeight == _consoleHeight)
+               && (Console.BufferHeight == _bufferHeight)
+               && (Console.BufferWidth == _consoleWidth))
                 return true;
 
             Console.SetWindowSize(_consoleWidth, _consoleHeight);

@@ -1,7 +1,17 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  LoggingAdapter.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  13.03.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
 using DotLogix.Core.Diagnostics;
 using Microsoft.Extensions.Logging;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
+#endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
     public class LoggingAdapter : ILogger {
@@ -16,17 +26,20 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
         /// <param name="eventId">Id of the event.</param>
         /// <param name="state">The entry to be written. Can be also an object.</param>
         /// <param name="exception">The exception related to this entry.</param>
-        /// <param name="formatter">Function to create a <c>string</c> message of the <paramref name="state" /> and <paramref name="exception" />.</param>
+        /// <param name="formatter">
+        ///     Function to create a <c>string</c> message of the <paramref name="state" /> and
+        ///     <paramref name="exception" />.
+        /// </param>
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
             var logLevels = ConvertLogLevel(logLevel);
-            if (eventId.Id == 10403 || Core.Diagnostics.Log.LogLevel > logLevels)
+            if((eventId.Id == 10403) || (Core.Diagnostics.Log.LogLevel > logLevels))
                 return;
 
             if(formatter == null)
                 return;
 
             var message = formatter(state, exception);
-            if (string.IsNullOrEmpty(message) && exception == null)
+            if(string.IsNullOrEmpty(message) && (exception == null))
                 return;
 
             if(exception != null)
@@ -37,6 +50,13 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
 
         bool ILogger.IsEnabled(LogLevel logLevel) {
             return logLevel >= MinLogLevel;
+        }
+
+        /// <summary>Begins a logical operation scope.</summary>
+        /// <param name="state">The identifier for the scope.</param>
+        /// <returns>An IDisposable that ends the logical operation scope on dispose.</returns>
+        public IDisposable BeginScope<TState>(TState state) {
+            return null;
         }
 
         private LogLevels ConvertLogLevel(LogLevel logLevel) {
@@ -56,13 +76,6 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
                 default:
                     throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
             }
-        }
-
-        /// <summary>Begins a logical operation scope.</summary>
-        /// <param name="state">The identifier for the scope.</param>
-        /// <returns>An IDisposable that ends the logical operation scope on dispose.</returns>
-        public IDisposable BeginScope<TState>(TState state) {
-            return null;
         }
     }
 }

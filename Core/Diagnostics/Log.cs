@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  Log.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  21.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -32,14 +32,14 @@ namespace DotLogix.Core.Diagnostics {
             return Logger.AttachLogger(loggers);
         }
 
-        public static bool AttachLoggers(IEnumerable<ILogger> loggers)
-        {
+        public static bool AttachLoggers(IEnumerable<ILogger> loggers) {
             return Logger.AttachLogger(loggers);
         }
 
         public static bool DetachLoggers(params ILogger[] loggers) {
             return Logger.DetachLogger(loggers);
         }
+
         public static bool DetachLoggers(IEnumerable<ILogger> loggers) {
             return Logger.DetachLogger(loggers);
         }
@@ -55,9 +55,8 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
-        public static void Trace(Func<string> messageFunc)
-        {
-            if (Logger.IsLoggingDisabled(LogLevels.Trace))
+        public static void Trace(Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(LogLevels.Trace))
                 return;
             var logMessage = CreateLogMessage(LogLevels.Trace, messageFunc.Invoke(), 2);
             Logger.Log(logMessage);
@@ -69,6 +68,7 @@ namespace DotLogix.Core.Diagnostics {
             var logMessage = CreateLogMessage(LogLevels.Debug, message, 2);
             Logger.Log(logMessage);
         }
+
         public static void Debug(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Debug))
                 return;
@@ -98,6 +98,7 @@ namespace DotLogix.Core.Diagnostics {
             var logMessage = CreateLogMessage(LogLevels.Info, message, 2);
             Logger.Log(logMessage);
         }
+
         public static void Info(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Info))
                 return;
@@ -111,6 +112,7 @@ namespace DotLogix.Core.Diagnostics {
             var logMessage = CreateLogMessage(LogLevels.Warning, message, 2);
             Logger.Log(logMessage);
         }
+
         public static void Warn(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Warning))
                 return;
@@ -124,6 +126,7 @@ namespace DotLogix.Core.Diagnostics {
             var logMessage = CreateLogMessage(LogLevels.Error, message, 2);
             Logger.Log(logMessage);
         }
+
         public static void Error(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Error))
                 return;
@@ -172,6 +175,7 @@ namespace DotLogix.Core.Diagnostics {
             var logMessage = CreateLogMessage(LogLevels.Critical, message, 2);
             Logger.Log(logMessage);
         }
+
         public static void Critical(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Critical))
                 return;
@@ -180,38 +184,34 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
-        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, string message)
-        {
-            if (Logger.IsLoggingDisabled(logLevel))
+        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, string message) {
+            if(Logger.IsLoggingDisabled(logLevel))
                 return;
 
-            var logMessage = new LogMessage
-                             {
-                                 LogLevel = logLevel,
-                                 UtcTimeStamp = DateTime.UtcNow,
-                                 MethodName = methodName,
-                                 ClassName = className,
-                                 ThreadName = threadName ?? "Undefined",
-                                 Message = message
-                             };
+            var logMessage = new LogMessage {
+                                                LogLevel = logLevel,
+                                                UtcTimeStamp = DateTime.UtcNow,
+                                                MethodName = methodName,
+                                                ClassName = className,
+                                                ThreadName = threadName ?? "Undefined",
+                                                Message = message
+                                            };
 
             Logger.Log(logMessage);
         }
 
-        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, Func<string> messageFunc)
-        {
-            if (Logger.IsLoggingDisabled(logLevel))
+        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, Func<string> messageFunc) {
+            if(Logger.IsLoggingDisabled(logLevel))
                 return;
 
-            var logMessage = new LogMessage
-                             {
-                                 LogLevel = logLevel,
-                                 UtcTimeStamp = DateTime.UtcNow,
-                                 MethodName = methodName,
-                                 ClassName = className,
-                                 ThreadName = threadName ?? "Undefined",
-                                 Message = messageFunc.Invoke()
-                             };
+            var logMessage = new LogMessage {
+                                                LogLevel = logLevel,
+                                                UtcTimeStamp = DateTime.UtcNow,
+                                                MethodName = methodName,
+                                                ClassName = className,
+                                                ThreadName = threadName ?? "Undefined",
+                                                Message = messageFunc.Invoke()
+                                            };
 
             Logger.Log(logMessage);
         }

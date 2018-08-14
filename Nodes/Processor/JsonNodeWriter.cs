@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  JsonNodeWriter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  17.02.2018
+// Created:  03.03.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -17,11 +17,15 @@ using DotLogix.Core.Types;
 namespace DotLogix.Core.Nodes.Processor {
     public class JsonNodeWriter : NodeWriterBase {
         private readonly StringBuilder _builder;
-        private int Ident => ContainerCount * _formatter.IdentSize;
-        private bool _isFirstChild = true;
 
         private readonly JsonNodesFormatter _formatter;
-        
+        private bool _isFirstChild = true;
+
+        public JsonNodeWriter(StringBuilder builder, JsonNodesFormatter formatter = null) {
+            _builder = builder;
+            _formatter = formatter ?? JsonNodesFormatter.Default;
+        }
+
 
         public override void BeginMap(string name) {
             CheckName(name, out var appendName);
@@ -32,7 +36,7 @@ namespace DotLogix.Core.Nodes.Processor {
             if(_formatter.Ident)
                 WriteIdent();
 
-            if (appendName)
+            if(appendName)
                 AppendName(name);
 
             _builder.Append('{');
@@ -45,7 +49,7 @@ namespace DotLogix.Core.Nodes.Processor {
             PopExpectedContainer(NodeContainerType.Map);
             _isFirstChild = false;
 
-            if (_formatter.Ident)
+            if(_formatter.Ident)
                 WriteIdent();
 
             _builder.Append('}');
@@ -54,13 +58,13 @@ namespace DotLogix.Core.Nodes.Processor {
         public override void BeginList(string name) {
             CheckName(name, out var appendName);
 
-            if (_isFirstChild == false)
+            if(_isFirstChild == false)
                 _builder.Append(',');
 
-            if (_formatter.Ident)
+            if(_formatter.Ident)
                 WriteIdent();
 
-            if (appendName)
+            if(appendName)
                 AppendName(name);
 
             _builder.Append('[');
@@ -73,7 +77,7 @@ namespace DotLogix.Core.Nodes.Processor {
             PopExpectedContainer(NodeContainerType.List);
             _isFirstChild = false;
 
-            if (_formatter.Ident)
+            if(_formatter.Ident)
                 WriteIdent();
 
             _builder.Append(']');
@@ -82,29 +86,24 @@ namespace DotLogix.Core.Nodes.Processor {
         public override void WriteValue(string name, object value) {
             CheckName(name, out var appendName);
 
-            if (_isFirstChild == false)
+            if(_isFirstChild == false)
                 _builder.Append(',');
 
-            if (_formatter.Ident)
+            if(_formatter.Ident)
                 WriteIdent();
 
-            if (appendName)
+            if(appendName)
                 AppendName(name);
 
             AppendValueString(value);
             _isFirstChild = false;
         }
 
-        public JsonNodeWriter(StringBuilder builder, JsonNodesFormatter formatter = null) {
-            _builder = builder;
-            _formatter = formatter ?? JsonNodesFormatter.CreateNewDefault();
-        }
-
         private void WriteIdent() {
             _builder.AppendLine();
 
-            var identCount = Ident;
-            if (identCount > 0)
+            var identCount = ContainerCount * _formatter.IdentSize;
+            if(identCount > 0)
                 _builder.Append(' ', identCount);
         }
 
@@ -157,17 +156,15 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
-        private void CheckName(string name, out bool appendName)
-        {
-            switch (CurrentContainer)
-            {
+        private void CheckName(string name, out bool appendName) {
+            switch(CurrentContainer) {
                 case NodeContainerType.Map:
-                    if (name == null)
+                    if(name == null)
                         throw new ArgumentNullException(nameof(name), $"Name can not be null in the current container {CurrentContainer}");
                     appendName = true;
                     break;
                 case NodeContainerType.List:
-                    if (name != null)
+                    if(name != null)
                         throw new ArgumentException(nameof(name), $"Name can not have a value in the current container {CurrentContainer}");
                     appendName = false;
                     break;

@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  ICachePolicy.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -12,7 +12,7 @@ using System;
 
 namespace DotLogix.Core.Caching {
     /// <summary>
-    /// A common interface for cache policies
+    ///     A common interface for cache policies
     /// </summary>
     public interface ICachePolicy {
         bool HasExpired(DateTime timeStampUtc);

@@ -2,17 +2,15 @@
 // Copyright 2018(C) , DotLogix
 // File:  RegexWebServiceRoute.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Server.Http.Parameters;
 using DotLogix.Core.Rest.Services.Processors;
 #endregion
 
@@ -34,18 +32,15 @@ namespace DotLogix.Core.Rest.Server.Routes {
                 return RouteMatch.Empty;
 
             var parameters = new Dictionary<string, Node>();
-            foreach (var name in names)
-            {
+            foreach(var name in names) {
                 var group = match.Groups[name];
-                if (group.Captures.Count > 1) {
+                if(group.Captures.Count > 1) {
                     var nodeList = new NodeList();
-                    foreach (Capture capture in group.Captures)
+                    foreach(Capture capture in group.Captures)
                         nodeList.CreateValue(capture.Value);
                     parameters.Add(name, nodeList);
-                } else {
+                } else
                     parameters.Add(name, new NodeValue(group.Value));
-                }
-
             }
 
             return new RouteMatch(true, match.Value, match.Length, parameters);

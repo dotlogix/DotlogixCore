@@ -3,7 +3,7 @@
 // File:  CheckButton.xaml.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  24.03.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -30,8 +30,8 @@ namespace DotLogix.UI.Controls {
                                                                                     typeof(CheckButton));
 
         public static RoutedEvent CheckStateChangedEvent = EventManager.RegisterRoutedEvent("CheckStateChanged", RoutingStrategy.Bubble,
-                                                                                    typeof(RoutedEventHandler),
-                                                                                    typeof(CheckButton));
+                                                                                            typeof(RoutedEventHandler),
+                                                                                            typeof(CheckButton));
 
         public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
                                                                                                   "IsChecked",

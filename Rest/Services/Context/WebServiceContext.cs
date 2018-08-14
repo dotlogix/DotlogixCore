@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  WebServiceContext.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -16,7 +16,7 @@ using DotLogix.Core.Rest.Server.Routes;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Context {
-    public class WebServiceContext : IDisposable{
+    public class WebServiceContext : IDisposable {
         private static readonly AsyncLocal<WebServiceContext> AsyncCurrent = new AsyncLocal<WebServiceContext>();
         private readonly Dictionary<string, object> _contextVariables = new Dictionary<string, object>();
         public static WebServiceContext Current => AsyncCurrent.Value;
@@ -43,6 +43,10 @@ namespace DotLogix.Core.Rest.Services.Context {
             RequestResult = new WebRequestResult(httpContext);
 
             AsyncCurrent.Value = this;
+        }
+
+        public void Dispose() {
+            AsyncCurrent.Value = null;
         }
 
         #region Set
@@ -110,9 +114,5 @@ namespace DotLogix.Core.Rest.Services.Context {
             return value;
         }
         #endregion
-
-        public void Dispose() {
-            AsyncCurrent.Value = null;
-        }
     }
 }

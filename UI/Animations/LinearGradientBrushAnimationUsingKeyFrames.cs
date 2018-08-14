@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  LinearGradientBrushAnimationUsingKeyFrames.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region

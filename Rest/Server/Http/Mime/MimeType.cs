@@ -2,23 +2,24 @@
 // Copyright 2018(C) , DotLogix
 // File:  MimeType.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 #endregion
 
+#region
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
-using DotLogix.Core.Extensions;
+#endregion
 
 namespace DotLogix.Core.Rest.Server.Http.Mime {
     public class MimeType {
         public string Code { get; }
-        public bool HasAttributes => Attributes != null && Attributes.Count > 0;
+        public bool HasAttributes => (Attributes != null) && (Attributes.Count > 0);
         public IDictionary<string, Optional<string>> Attributes { get; }
 
         public MimeType(string code, IDictionary<string, Optional<string>> attributes = null) {
@@ -95,9 +96,9 @@ namespace DotLogix.Core.Rest.Server.Http.Mime {
                 throw new ArgumentException("The provided value is not a valid mime type", nameof(value));
             IDictionary<string, Optional<string>> attributes = null;
             if(parts.Length > 1) {
-                attributes = new Dictionary<string, Optional<string>>(parts.Length-1);
+                attributes = new Dictionary<string, Optional<string>>(parts.Length - 1);
                 for(var i = 1; i < parts.Length; i++) {
-                    var keyValue = parts[i].Split(new[]{'='}, 2);
+                    var keyValue = parts[i].Split(new[] {'='}, 2);
                     var attrName = keyValue[0].Trim(' ');
                     var attrValue = keyValue.Length > 1 ? keyValue[1].Trim(' ') : Optional<string>.Undefined;
                     attributes[attrName] = attrValue;

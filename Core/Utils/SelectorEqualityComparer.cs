@@ -1,0 +1,34 @@
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  SelectorEqualityComparer.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  31.07.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
+using System.Collections.Generic;
+#endregion
+
+namespace DotLogix.Core.Utils {
+    public class SelectorEqualityComparer<T, TKey> : IEqualityComparer<T> where TKey : IComparable {
+        private readonly Func<T, TKey> _comparableSelector;
+
+        public SelectorEqualityComparer(Func<T, TKey> comparableSelector) {
+            _comparableSelector = comparableSelector;
+        }
+
+        public bool Equals(T x, T y) {
+            return Equals(_comparableSelector(x), _comparableSelector(y));
+        }
+
+        public int GetHashCode(T x) {
+            return _comparableSelector(x).GetHashCode();
+        }
+
+        public int Compare(T x, T y) {
+            return _comparableSelector(x).CompareTo(_comparableSelector(y));
+        }
+    }
+}

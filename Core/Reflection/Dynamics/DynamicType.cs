@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  DynamicType.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -20,11 +20,11 @@ namespace DotLogix.Core.Reflection.Dynamics {
                                                      BindingFlags.NonPublic;
 
         private readonly IReadOnlyDictionary<string, DynamicAccessor> _accessorsDict;
-        private readonly IReadOnlyDictionary<string, DynamicField> _fieldDict;
-        private readonly IReadOnlyDictionary<string, DynamicProperty> _propertiesDict;
 
 
         private readonly DynamicCtor _defaultCtor;
+        private readonly IReadOnlyDictionary<string, DynamicField> _fieldDict;
+        private readonly IReadOnlyDictionary<string, DynamicProperty> _propertiesDict;
         public Type Type { get; }
         public string Name { get; }
 
@@ -50,10 +50,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
             Methods = CreateMethods(type, includedMemberTypes)?.ToList();
             Constructors = CreateConstructors(type, out _defaultCtor, includedMemberTypes);
 
-            _propertiesDict = Properties?.ToDictionary(p=>p.Name);
-            _fieldDict = Fields?.ToDictionary(f=>f.Name);
-            _accessorsDict = Accessors?.ToDictionary(a=>a.Name);
-
+            _propertiesDict = Properties?.ToDictionary(p => p.Name);
+            _fieldDict = Fields?.ToDictionary(f => f.Name);
+            _accessorsDict = Accessors?.ToDictionary(a => a.Name);
         }
 
         #region Object
@@ -119,7 +118,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
             if(parametersTypes == null)
                 throw new ArgumentNullException(nameof(parametersTypes));
             return Methods.FirstOrDefault(m => (m.Name == methodName) &&
-                                                TypeArrayEquals(m.ParameterTypes, parametersTypes));
+                                               TypeArrayEquals(m.ParameterTypes, parametersTypes));
         }
 
         public IEnumerable<DynamicInvoke> GetMethods(string methodName) {
@@ -133,6 +132,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
                 throw new ArgumentNullException(nameof(parametersTypes));
             if(parametersTypes.Length == 0)
                 return _defaultCtor;
+
             return Constructors.FirstOrDefault(c => TypeArrayEquals(c.ParameterTypes, parametersTypes));
         }
 

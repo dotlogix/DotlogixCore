@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  TaskExtensions.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -26,7 +26,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Takes a task and return its result as object. If the task does not have a value then null is returned
+        ///     Takes a task and return its result as object. If the task does not have a value then null is returned
         /// </summary>
         /// <param name="task">The task</param>
         /// <returns></returns>
@@ -44,21 +44,21 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Takes a completed task and return its result as object. If the task does not have a value then null is returned.
+        ///     Takes a completed task and return its result as object. If the task does not have a value then null is returned.
         /// </summary>
         /// <param name="task">The task</param>
         /// <returns></returns>
         public static object UnpackResult(this Task task) {
             if(task.IsCompleted == false)
                 throw new InvalidOperationException("Task has to be completed to unpack the result");
-
+            
             var taskType = task.GetType();
             var accessor = TypeResultAccessors.GetOrAdd(taskType, CreateAcessor);
             return accessor?.Invoke(task);
         }
 
         /// <summary>
-        /// Converts the result of a task to a base type
+        ///     Converts the result of a task to a base type
         /// </summary>
         /// <typeparam name="TBase">The target type</typeparam>
         /// <typeparam name="TDerived">The current type</typeparam>
@@ -75,15 +75,14 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Converts the result of a task using a selector function
+        ///     Converts the result of a task using a selector function
         /// </summary>
         /// <typeparam name="TResult">The target type</typeparam>
         /// <typeparam name="TSource">The current type</typeparam>
         /// <param name="selectorFunc">The fucntion used to convert the result</param>
         /// <param name="task">The task</param>
         /// <returns></returns>
-        public static Task<TResult> ConvertResult<TSource, TResult>(this Task<TSource> task, Func<TSource, TResult> selectorFunc)
-        {
+        public static Task<TResult> ConvertResult<TSource, TResult>(this Task<TSource> task, Func<TSource, TResult> selectorFunc) {
             var tcs = new TaskCompletionSource<TResult>();
 
             task.ContinueWith(t => tcs.SetResult(selectorFunc.Invoke(t.Result)), TaskContinuationOptions.OnlyOnRanToCompletion);

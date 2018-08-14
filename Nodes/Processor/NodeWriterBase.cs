@@ -1,5 +1,15 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodeWriterBase.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  03.03.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Generic;
+#endregion
 
 namespace DotLogix.Core.Nodes.Processor {
     public abstract class NodeWriterBase : INodeWriter {
@@ -56,7 +66,6 @@ namespace DotLogix.Core.Nodes.Processor {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
         }
 
         protected void PushContainer(NodeContainerType containerType) {

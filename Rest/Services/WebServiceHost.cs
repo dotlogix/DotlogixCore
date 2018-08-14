@@ -3,7 +3,7 @@
 // File:  WebServiceHost.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  05.03.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -95,7 +95,7 @@ namespace DotLogix.Core.Rest.Services {
                 foreach(var postProcessorAttribute in methodInfo.GetCustomAttributes<PostProcessorAttribute>())
                     serviceRoute.PostProcessors.Add(postProcessorAttribute.CreateProcessor());
 
-                foreach (var descriptorAttribute in methodInfo.GetCustomAttributes<DescriptorAttribute>())
+                foreach(var descriptorAttribute in methodInfo.GetCustomAttributes<DescriptorAttribute>())
                     serviceRoute.RequestProcessor.Descriptors.Add(descriptorAttribute.CreateDescriptor());
 
                 var resultWriterAttribute = methodInfo.GetCustomAttribute<RouteResultWriterAttribute>();

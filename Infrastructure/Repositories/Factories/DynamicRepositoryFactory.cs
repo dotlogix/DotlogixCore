@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  DynamicRepositoryFactory.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -33,7 +33,7 @@ namespace DotLogix.Architecture.Infrastructure.Repositories.Factories {
             if(repoType.IsAssignableTo(typeof(IRepository)) == false)
                 throw new ArgumentException($"Type {repoType} is not assignable to type {nameof(IRepository)}", nameof(repoType));
 
-            var repoCtor = repoType.GetConstructor(new[] {typeof(IEntitySetProvider) });
+            var repoCtor = repoType.GetConstructor(new[] {typeof(IEntitySetProvider)});
             if(repoCtor == null)
                 throw new ArgumentException($"Type {repoType} doesnt have a valid constructor [.ctor({typeof(IEntitySetProvider).Name})]", nameof(repoType));
             var dynamicCtor = repoCtor.CreateDynamicCtor();

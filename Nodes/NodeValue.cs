@@ -2,15 +2,13 @@
 // Copyright 2018(C) , DotLogix
 // File:  NodeValue.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  17.02.2018
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Types;
 #endregion
@@ -24,8 +22,7 @@ namespace DotLogix.Core.Nodes {
 
         public DataType DataType => _dataType ?? (_dataType = Value.GetDataType());
 
-        public object Value
-        {
+        public object Value {
             get => _value;
             set {
                 _value = value;
@@ -33,97 +30,77 @@ namespace DotLogix.Core.Nodes {
             }
         }
 
-        public NodeValue(object value, DataType dataType = null)
-        {
+        public NodeValue(object value, DataType dataType = null) {
             _value = value;
             _dataType = dataType;
         }
 
-        #region GetValue
+        #region Helper
+        protected override ICollection<string> GetFormattingMembers() {
+            var c = base.GetFormattingMembers();
+            c.Add($"Value: {Value?.ToString() ?? "null"}");
+            return c;
+        }
+        #endregion
 
-        public object GetValue(Type targetType)
-        {
+        #region GetValue
+        public object GetValue(Type targetType) {
             return GetValue(targetType, default);
         }
 
-        public object GetValue(Type targetType, object defaultValue)
-        {
+        public object GetValue(Type targetType, object defaultValue) {
             return Value.TryConvertTo(targetType, out var value) ? value : defaultValue;
         }
 
-        public TValue GetValue<TValue>()
-        {
+        public TValue GetValue<TValue>() {
             return GetValue(default(TValue));
         }
 
-        public TValue GetValue<TValue>(TValue defaultValue)
-        {
+        public TValue GetValue<TValue>(TValue defaultValue) {
             return Value.TryConvertTo<TValue>(out var value) ? value : defaultValue;
         }
 
-        public bool TryGetValue<TValue>(out TValue value)
-        {
+        public bool TryGetValue<TValue>(out TValue value) {
             return Value.TryConvertTo(out value);
         }
 
-        public bool TryGetValue(Type targetType, out object value)
-        {
+        public bool TryGetValue(Type targetType, out object value) {
             return Value.TryConvertTo(targetType, out value);
         }
-
         #endregion
 
         #region ConvertValue
-
-        public object ConvertValue(Type targetType)
-        {
+        public object ConvertValue(Type targetType) {
             return ConvertValue(targetType, default);
         }
 
-        public object ConvertValue(Type targetType, object defaultValue)
-        {
+        public object ConvertValue(Type targetType, object defaultValue) {
             return Value = GetValue(targetType, defaultValue);
         }
 
-        public TValue ConvertValue<TValue>()
-        {
+        public TValue ConvertValue<TValue>() {
             return ConvertValue(default(TValue));
         }
 
-        public TValue ConvertValue<TValue>(TValue defaultValue)
-        {
+        public TValue ConvertValue<TValue>(TValue defaultValue) {
             var value = GetValue(defaultValue);
             Value = value;
             return value;
         }
 
-        public bool TryConvertValue(Type targetType, out object value)
-        {
-            if (TryGetValue(targetType, out value) == false) return false;
+        public bool TryConvertValue(Type targetType, out object value) {
+            if(TryGetValue(targetType, out value) == false)
+                return false;
             Value = value;
             return true;
-
         }
 
-        public bool TryConvertValue<TValue>(out TValue value)
-        {
-            if (TryGetValue(out value) == false) return false;
+        public bool TryConvertValue<TValue>(out TValue value) {
+            if(TryGetValue(out value) == false)
+                return false;
             Value = value;
             return true;
-
         }
-
-        #endregion
-
-        #region Helper
-
-        protected override ICollection<string> GetFormattingMembers()
-        {
-            var c = base.GetFormattingMembers();
-            c.Add($"Value: {Value?.ToString() ?? "null"}");
-            return c;
-        }
-
         #endregion
     }
 }

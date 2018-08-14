@@ -2,14 +2,15 @@
 // Copyright 2018(C) , DotLogix
 // File:  Nodes.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  17.02.2018
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Converters;
 using DotLogix.Core.Nodes.Factories;
@@ -57,10 +58,6 @@ namespace DotLogix.Core.Nodes {
 
 
         #region WriteTo
-        public static void WriteTo<TInstance>(TInstance instance, INodeWriter writer) {
-            WriteTo(null, instance, typeof(TInstance), writer);
-        }
-
         public static void WriteTo(object instance, INodeWriter writer) {
             WriteTo(null, instance, instance?.GetType(), writer);
         }
@@ -69,13 +66,7 @@ namespace DotLogix.Core.Nodes {
             WriteTo(null, instance, instanceType, writer);
         }
 
-        public static void WriteTo<TInstance>(string name, TInstance instance, INodeWriter writer)
-        {
-            WriteTo(name, instance, typeof(TInstance), writer);
-        }
-
-        public static void WriteTo(string name, object instance, INodeWriter writer)
-        {
+        public static void WriteTo(string name, object instance, INodeWriter writer) {
             WriteTo(name, instance, instance?.GetType(), writer);
         }
 
@@ -96,11 +87,6 @@ namespace DotLogix.Core.Nodes {
         #endregion
 
         #region ToNode
-        public static Node ToNode<TInstance>(TInstance instance) {
-            return ToNode(null, instance, typeof(TInstance));
-        }
-
-
         public static Node ToNode(object instance) {
             return ToNode(null, instance, instance?.GetType());
         }
@@ -109,19 +95,13 @@ namespace DotLogix.Core.Nodes {
             return ToNode(null, instance, instanceType);
         }
 
-        public static Node ToNode<TInstance>(string name, TInstance instance)
-        {
-            return ToNode(name, instance, typeof(TInstance));
-        }
-
-
-        public static Node ToNode(string name, object instance)
-        {
+        public static Node ToNode(string name, object instance) {
             return ToNode(name, instance, instance?.GetType());
         }
 
-        public static Node ToNode(string name, object instance, Type instanceType)
-        {
+        public static Node ToNode(string name, object instance, Type instanceType) {
+            if(instance is Node node)
+                return node;
             var nodeWriter = new NodeWriter();
             WriteTo(name, instance, instanceType, nodeWriter);
             return nodeWriter.Root;
@@ -129,19 +109,19 @@ namespace DotLogix.Core.Nodes {
         #endregion
 
         #region ToObject
-        public static T ToObject<T>(Node node) {
+        public static T ToObject<T>(this Node node) {
             if(node == null)
                 return default;
 
             return (T)ToObject(node, typeof(T));
         }
 
-        public static object ToObject(Node node, Type type) {
+        public static object ToObject(this Node node, Type type) {
             if(node == null)
                 return type.GetDefaultValue();
             return TryCreateConverter(type, out var converter)
-                ? converter.ConvertToObject(node)
-                : type.GetDefaultValue();
+                       ? converter.ConvertToObject(node)
+                       : type.GetDefaultValue();
         }
         #endregion
 
@@ -177,9 +157,15 @@ namespace DotLogix.Core.Nodes {
         }
 
         private static bool TryCreateNodeConverter(Type instanceType, out INodeConverter converter) {
+            var converterAttribute = instanceType.GetCustomAttribute<NodeConverterAttribute>();
+            if(converterAttribute != null) {
+                converter = converterAttribute.CreateNodeConverter();
+                return true;
+            }
+
             var dataType = instanceType.ToDataType();
             var nodeType = GetNodeType(dataType);
-            for(var i = NodeConverterFactories.Count-1; i >= 0; i--) {
+            for(var i = NodeConverterFactories.Count - 1; i >= 0; i--) {
                 var converterFactory = NodeConverterFactories[i];
                 if(converterFactory.TryCreateConverter(nodeType, dataType, out converter))
                     return true;

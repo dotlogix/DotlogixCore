@@ -175,8 +175,8 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Styles\CheckBoxStyle.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Styles\ListBoxStyle.xaml">
       <SubType>Designer</SubType>

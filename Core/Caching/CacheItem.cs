@@ -2,13 +2,13 @@
 // Copyright 2018(C) , DotLogix
 // File:  CacheItem.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 namespace DotLogix.Core.Caching {
     /// <summary>
-    /// An item for a cache implementation
+    ///     An item for a cache implementation
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>

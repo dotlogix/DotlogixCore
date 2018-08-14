@@ -3,7 +3,7 @@
 // File:  RepositoryBase.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  03.04.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -18,39 +18,39 @@ using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {
-    public abstract class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class, ISimpleEntity {
-        private readonly IEntitySetProvider _entitySetProvider;
+    public abstract class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class, ISimpleEntity, new() {
         private IEntitySet<TEntity> _entitySet;
 
         protected bool AllowCaching { get; }
-        protected IEntitySet<TEntity> EntitySet => _entitySet ?? (_entitySet = OnModifyEntitySet(_entitySetProvider.UseSet<TEntity>()));
+        protected IEntitySet<TEntity> EntitySet => _entitySet ?? (_entitySet = OnModifyEntitySet(EntitySetProvider.UseSet<TEntity>()));
+        protected IEntitySetProvider EntitySetProvider { get; }
 
         protected RepositoryBase(IEntitySetProvider entitySetProvider, bool allowCaching = true) {
-            _entitySetProvider = entitySetProvider;
+            EntitySetProvider = entitySetProvider;
             AllowCaching = allowCaching;
         }
 
-        public virtual Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default(CancellationToken)) {
+        public virtual Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default) {
             return EntitySet.GetAsync(id, cancellationToken);
         }
 
-        public virtual Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default(CancellationToken)) {
+        public virtual Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default) {
             return EntitySet.GetRangeAsync(ids, cancellationToken);
         }
 
-        public virtual Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken)) {
+        public virtual Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default) {
             return EntitySet.GetAsync(guid, cancellationToken);
         }
 
-        public virtual Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default(CancellationToken)) {
+        public virtual Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default) {
             return EntitySet.GetRangeAsync(guids, cancellationToken);
         }
 
-        public virtual Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default(CancellationToken)) {
+        public virtual Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
             return EntitySet.GetAllAsync(cancellationToken);
         }
 
-        public virtual Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default(CancellationToken)) {
+        public virtual Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
             return EntitySet.Query().Where(filterExpression).ToEnumerableAsync(cancellationToken);
         }
 
@@ -76,8 +76,7 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
             return set;
         }
 
-        protected virtual EntityCollection<TEntity> OnCreateCache()
-        {
+        protected virtual EntityCollection<TEntity> OnCreateCache() {
             return new EntityCollection<TEntity>();
         }
     }

@@ -3,50 +3,19 @@
 // File:  ListExtensions.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Collections.Generic;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Extensions {
-    public class SelectorComparer<T, TKey> : IComparer<T> where TKey : IComparable {
-        private readonly Func<T, TKey> _comparableSelector;
-
-        public SelectorComparer(Func<T, TKey> comparableSelector) {
-            _comparableSelector = comparableSelector;
-        }
-
-        public int Compare(T x, T y) {
-            return _comparableSelector.Invoke(x).CompareTo(_comparableSelector.Invoke(y));
-        }
-    }
-
-    public class SelectorEqualityComparer<T, TKey> : IEqualityComparer<T> where TKey : IComparable {
-        private readonly Func<T, TKey> _comparableSelector;
-
-        public SelectorEqualityComparer(Func<T, TKey> comparableSelector) {
-            _comparableSelector = comparableSelector;
-        }
-
-        public bool Equals(T x, T y) {
-            return Equals(_comparableSelector(x), _comparableSelector(y));
-        }
-
-        public int GetHashCode(T x) {
-            return _comparableSelector(x).GetHashCode();
-        }
-
-        public int Compare(T x, T y) {
-            return _comparableSelector(x).CompareTo(_comparableSelector(y));
-        }
-    }
-
     public static class ListExtensions {
         /// <summary>
-        /// Takes the last n elements of a list
+        ///     Takes the last n elements of a list
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list">The list</param>
@@ -66,7 +35,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Swaps two values of a list
+        ///     Swaps two values of a list
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list">The list</param>
@@ -81,7 +50,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Inserts a value in a sorted order. Only works in lists where the values are sorted already
+        ///     Inserts a value in a sorted order. Only works in lists where the values are sorted already
         /// </summary>
         /// <param name="list">The list</param>
         /// <param name="item">The item to insert</param>
@@ -105,7 +74,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Inserts a value in a sorted order. Only works in lists where the values are sorted already
+        ///     Inserts a value in a sorted order. Only works in lists where the values are sorted already
         /// </summary>
         /// <param name="list">The list</param>
         /// <param name="item">The item to insert</param>
@@ -115,7 +84,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Inserts a value in a sorted order. Only works in lists where the values are sorted already
+        ///     Inserts a value in a sorted order. Only works in lists where the values are sorted already
         /// </summary>
         /// <param name="list">The list</param>
         /// <param name="item">The item to insert</param>

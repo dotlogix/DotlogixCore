@@ -1,3 +1,12 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  WebRequestResultWriterBase.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  28.04.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System;
 using System.Text;
 using System.Threading.Tasks;
@@ -6,25 +15,21 @@ using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.Mime;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Exceptions;
+#endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {
-    public class WebRequestResultWriterBase : IAsyncWebRequestResultWriter{
+    public class WebRequestResultWriterBase : IAsyncWebRequestResultWriter {
         public async Task WriteAsync(WebRequestResult requestResult) {
             var response = requestResult.Context.Response;
-            if (response.IsCompleted)
+            if(response.IsCompleted)
                 return;
 
-            if (requestResult.Succeed)
-            {
+            if(requestResult.Succeed)
                 await WriteResultAsync(response, requestResult);
-            }
             else
-            {
-                
                 await WriteExceptionAsync(response, requestResult);
-            }
 
-            if (requestResult.CustomStatusCode != null)
+            if(requestResult.CustomStatusCode != null)
                 response.StatusCode = requestResult.CustomStatusCode;
 
             await response.CompleteAsync();
@@ -32,8 +37,7 @@ namespace DotLogix.Core.Rest.Services.Writer {
 
         protected virtual Task WriteExceptionAsync(IAsyncHttpResponse asyncHttpResponse, WebRequestResult webRequestResult) {
             var restException = GetRestExceptionRecursive(webRequestResult.Exception);
-            if (asyncHttpResponse.StatusCode == HttpStatusCodes.Success.Ok)
-            {
+            if(asyncHttpResponse.StatusCode == HttpStatusCodes.Success.Ok) {
                 asyncHttpResponse.StatusCode = restException != null
                                                    ? restException.ErrorCode
                                                    : HttpStatusCodes.ServerError.InternalServerError;
@@ -47,15 +51,13 @@ namespace DotLogix.Core.Rest.Services.Writer {
                 sb.AppendLine();
                 sb.AppendLine(webRequestResult.Exception.ToString());
                 message = sb.ToString();
-            } else {
+            } else
                 message = webRequestResult.Exception.ToString();
-            }
             return asyncHttpResponse.WriteToResponseStreamAsync(message);
         }
 
         protected virtual Task WriteResultAsync(IAsyncHttpResponse asyncHttpResponse, WebRequestResult webRequestResult) {
-            if(webRequestResult.ReturnValue == null)
-            {
+            if(webRequestResult.ReturnValue == null) {
                 asyncHttpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
                 return Task.CompletedTask;
             }
@@ -65,17 +67,14 @@ namespace DotLogix.Core.Rest.Services.Writer {
         }
 
 
-        protected RestException GetRestExceptionRecursive(Exception exception)
-        {
-            switch (exception)
-            {
+        protected RestException GetRestExceptionRecursive(Exception exception) {
+            switch(exception) {
                 case RestException restException:
                     return restException;
                 case AggregateException ae:
-                    foreach (var innerException in ae.InnerExceptions)
-                    {
+                    foreach(var innerException in ae.InnerExceptions) {
                         var restException = GetRestExceptionRecursive(innerException);
-                        if (restException != null)
+                        if(restException != null)
                             return restException;
                     }
                     break;

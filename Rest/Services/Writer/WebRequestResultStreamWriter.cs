@@ -1,3 +1,12 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  WebRequestResultStreamWriter.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  28.04.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System;
 using System.IO;
 using System.Text;
@@ -7,15 +16,16 @@ using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.Mime;
 using DotLogix.Core.Rest.Server.Http.State;
+#endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {
     public class WebRequestResultStreamWriter : WebRequestResultWriterBase {
-        protected WebRequestResultStreamWriter() { }
         public static IAsyncWebRequestResultWriter Instance { get; } = new WebRequestResultStreamWriter();
+        protected WebRequestResultStreamWriter() { }
+
         protected override async Task WriteResultAsync(IAsyncHttpResponse asyncHttpResponse, WebRequestResult webRequestResult) {
             var returnValue = webRequestResult.ReturnValue;
-            if (returnValue == null)
-            {
+            if(returnValue == null) {
                 asyncHttpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
                 return;
             }
@@ -23,22 +33,17 @@ namespace DotLogix.Core.Rest.Services.Writer {
             var result = await GetStreamResult(webRequestResult);
             asyncHttpResponse.ContentType = result.ContentType;
             try {
-                if (result.SendInChunks)
-                {
+                if(result.SendInChunks) {
                     var chunkSize = result.ChunkSize;
                     asyncHttpResponse.ChunkSize = chunkSize;
                     var buffer = new byte[chunkSize];
                     int read;
-                    while ((read = await result.OutputStream.ReadAsync(buffer, 0, chunkSize)) > 0)
-                    {
+                    while((read = await result.OutputStream.ReadAsync(buffer, 0, chunkSize)) > 0) {
                         await asyncHttpResponse.WriteToResponseStreamAsync(buffer, 0, read);
                         await asyncHttpResponse.CompleteChunksAsync();
                     }
-                }
-                else
-                {
+                } else
                     await result.OutputStream.CopyToAsync(asyncHttpResponse.OutputStream);
-                }
             } finally {
                 result.OutputStream?.Dispose();
             }
@@ -66,7 +71,6 @@ namespace DotLogix.Core.Rest.Services.Writer {
                             var memStream = new MemoryStream(Encoding.UTF8.GetBytes(base64String));
                             memStream.Seek(0, SeekOrigin.Begin);
                             return new WebRequestStreamResult(memStream, MimeTypes.Application.OctetStream);
-                            break;
                         case TransportModes.Raw:
                             result = streamResult;
                             break;

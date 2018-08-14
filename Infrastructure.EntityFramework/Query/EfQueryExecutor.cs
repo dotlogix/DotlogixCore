@@ -1,4 +1,13 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  EfQueryExecutor.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  03.04.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -6,16 +15,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Queries;
 using Microsoft.EntityFrameworkCore;
+#endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
     public class EfQueryExecutor<T> : IQueryExecutor<T> {
         private readonly IQueryable<T> _innerQueryable;
+
         public EfQueryExecutor(IQueryable<T> innerQueryable) {
             _innerQueryable = innerQueryable;
         }
 
         public IAsyncEnumerable<T> ToAsyncEnumerable() {
             return _innerQueryable.ToAsyncEnumerable();
+        }
+
+        public IQueryable<T> ToQueryable() {
+            return _innerQueryable;
         }
 
         public Task<bool> AnyAsync(CancellationToken cancellationToken) {
@@ -62,23 +77,19 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
             return _innerQueryable.FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
-        public Task<T> LastAsync(CancellationToken cancellationToken)
-        {
+        public Task<T> LastAsync(CancellationToken cancellationToken) {
             return _innerQueryable.LastAsync(cancellationToken);
         }
 
-        public Task<T> LastAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
-        {
+        public Task<T> LastAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken) {
             return _innerQueryable.LastAsync(predicate, cancellationToken);
         }
 
-        public Task<T> LastOrDefaultAsync(CancellationToken cancellationToken)
-        {
+        public Task<T> LastOrDefaultAsync(CancellationToken cancellationToken) {
             return _innerQueryable.LastOrDefaultAsync(cancellationToken);
         }
 
-        public Task<T> LastOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
-        {
+        public Task<T> LastOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken) {
             return _innerQueryable.LastOrDefaultAsync(predicate, cancellationToken);
         }
 

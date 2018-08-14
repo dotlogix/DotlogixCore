@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  WebRequestProcessor.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -15,7 +15,6 @@ using DotLogix.Core.Nodes;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
-using DotLogix.Core.Rest.Server.Http.Parameters;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
@@ -85,8 +84,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
             }
         }
 
-        protected virtual void AppendParameterValues(StringBuilder builder, NodeMap parameters)
-        {
+        protected virtual void AppendParameterValues(StringBuilder builder, NodeMap parameters) {
             builder.Append(parameters);
         }
     }

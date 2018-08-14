@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  CacheExtensions.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -14,7 +14,7 @@ using DotLogix.Core.Caching;
 namespace DotLogix.Core.Extensions {
     public static class CacheExtensions {
         /// <summary>
-        /// Stores a value in a cache using a <see cref="ValidUntilCachePolicy"/> with the given timestamp
+        ///     Stores a value in a cache using a <see cref="ValidUntilCachePolicy" /> with the given timestamp
         /// </summary>
         /// <param name="cache">The cache</param>
         /// <param name="key">The key of the value</param>
@@ -25,7 +25,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Stores a value in a cache using a <see cref="ValidUntilCachePolicy"/> with the given duration
+        ///     Stores a value in a cache using a <see cref="ValidUntilCachePolicy" /> with the given duration
         /// </summary>
         /// <param name="cache">The cache</param>
         /// <param name="key">The key of the value</param>

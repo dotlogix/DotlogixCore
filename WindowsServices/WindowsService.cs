@@ -3,7 +3,7 @@
 // File:  WindowsService.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  21.02.2018
-// LastEdited:  21.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -17,7 +17,6 @@ using DotLogix.Core.Diagnostics;
 #endregion
 
 namespace DotLogix.Core.WindowsServices {
-
     public class WindowsService {
         public ApplicationMode Mode { get; set; }
         public string ProgramExecutable { get; }
@@ -37,8 +36,7 @@ namespace DotLogix.Core.WindowsServices {
             InitializeLoggers(eventLog);
         }
 
-        protected virtual void OnStart(string[] args) {
-        }
+        protected virtual void OnStart(string[] args) { }
 
         protected virtual void OnStop() {
             Log.Shutdown();
@@ -121,12 +119,10 @@ namespace DotLogix.Core.WindowsServices {
                     var split = line.Split(' ');
                     var commandCount = split.Length - 1;
                     var commandArgs = new string[commandCount];
-                    if(commandCount > 0) {
+                    if(commandCount > 0)
                         Array.Copy(split, 1, commandArgs, 0, commandCount);
-                    }
                     running = OnCommand(split[0], commandArgs);
                 } while(running);
-                
             } catch(Exception e) {
                 Log.Critical(e);
             }
@@ -143,7 +139,6 @@ namespace DotLogix.Core.WindowsServices {
                 default:
                     Console.WriteLine("Possible commands:\n\texit\n\tclear\n\thelp");
                     return true;
-
             }
         }
 

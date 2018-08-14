@@ -1,3 +1,12 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  WebServiceEvent.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  05.03.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,6 +14,7 @@ using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Routes;
+#endregion
 
 namespace DotLogix.Core.Rest.Server.Http {
     public class WebServiceEvent : IWebServiceEvent {
@@ -19,16 +29,6 @@ namespace DotLogix.Core.Rest.Server.Http {
 
         public void Subscribe(IAsyncHttpContext context, IWebServiceRoute route, AsyncWebRequestRouter router) {
             Subscribe(CreateSubscription(context, route, router));
-        }
-
-        protected virtual WebServiceEventSubscription CreateSubscription(IAsyncHttpContext context, IWebServiceRoute route, AsyncWebRequestRouter router) {
-            return new WebServiceEventSubscription(context, route, router);
-        }
-
-        protected void Subscribe(IWebServiceEventSubscription subscription)
-        {
-            lock (_subscriptionLock)
-                _subscriptions.Add(subscription);
         }
 
         public async Task TriggerAsync(object sender, WebServiceEventArgs eventArgs) {
@@ -53,6 +53,15 @@ namespace DotLogix.Core.Rest.Server.Http {
                     await AsyncHttpServer.SendErrorMessageAsync(response, e);
                 }
             }
+        }
+
+        protected virtual WebServiceEventSubscription CreateSubscription(IAsyncHttpContext context, IWebServiceRoute route, AsyncWebRequestRouter router) {
+            return new WebServiceEventSubscription(context, route, router);
+        }
+
+        protected void Subscribe(IWebServiceEventSubscription subscription) {
+            lock(_subscriptionLock)
+                _subscriptions.Add(subscription);
         }
     }
 }

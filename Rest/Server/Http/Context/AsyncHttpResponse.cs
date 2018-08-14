@@ -2,28 +2,26 @@
 // Copyright 2018(C) , DotLogix
 // File:  AsyncHttpResponse.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Mime;
-using DotLogix.Core.Rest.Server.Http.Parameters;
 using DotLogix.Core.Rest.Server.Http.State;
 using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http.Context {
     public class AsyncHttpResponse : IAsyncHttpResponse {
-        private readonly IParameterParser _parameterParser;
         public const int DefaultChunkSize = 2_097_152; // 2MiB;
+        private readonly IParameterParser _parameterParser;
 
         private AsyncHttpResponse(HttpListenerResponse originalResponse, IParameterParser parameterParser) {
             _parameterParser = parameterParser;
@@ -47,7 +45,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         public int ChunkSize { get; set; }
         public Encoding ContentEncoding { get; set; }
         public HttpStatusCode StatusCode { get; set; }
-        public MemoryStream OutputStream { get; private set; }
+        public MemoryStream OutputStream { get; }
         public HttpListenerResponse OriginalResponse { get; }
 
         public async Task WriteToResponseStreamAsync(byte[] data, int offset, int count) {
@@ -59,9 +57,8 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
                 await writer.WriteAsync(message);
         }
 
-        public async Task CompleteChunksAsync()
-        {
-            if (TransferState == TransferState.Completed)
+        public async Task CompleteChunksAsync() {
+            if(TransferState == TransferState.Completed)
                 throw new InvalidOperationException("Sending is not possible if the transfer has been completed already");
 
             if(TransferState == TransferState.None) {
@@ -69,8 +66,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
                 EnsurePrepared();
             }
 
-            if (OutputStream.Length > 0)
-            {
+            if(OutputStream.Length > 0) {
                 OutputStream.Seek(0, SeekOrigin.Begin);
                 await OutputStream.CopyToAsync(OriginalResponse.OutputStream, ChunkSize);
                 OutputStream.SetLength(0);
@@ -79,17 +75,15 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         }
 
         public async Task CompleteAsync() {
-            if (TransferState == TransferState.Completed)
+            if(TransferState == TransferState.Completed)
                 throw new InvalidOperationException("Sending is not possible if the transfer has been completed already");
 
-            if(OriginalResponse.SendChunked) {
+            if(OriginalResponse.SendChunked)
                 await CompleteChunksAsync();
-            } else {
-                if (TransferState == TransferState.None) {
+            else {
+                if(TransferState == TransferState.None)
                     EnsurePrepared();
-                }
-                if (OutputStream.Length > 0)
-                {
+                if(OutputStream.Length > 0) {
                     OutputStream.Seek(0, SeekOrigin.Begin);
                     await OutputStream.CopyToAsync(OriginalResponse.OutputStream, 81920);
                 }
@@ -101,7 +95,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         }
 
         private void PrepareHeaders() {
-            OriginalResponse.Headers = _parameterParser.Serialize<WebHeaderCollection>(HeaderParameters); ;
+            OriginalResponse.Headers = _parameterParser.Serialize<WebHeaderCollection>(HeaderParameters);
         }
 
         private void EnsurePrepared() {
@@ -113,7 +107,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
             OriginalResponse.StatusDescription = StatusCode.Description;
             OriginalResponse.ContentType = ContentType.Code;
             OriginalResponse.ContentEncoding = ContentEncoding;
-            if (OriginalResponse.SendChunked == false)
+            if(OriginalResponse.SendChunked == false)
                 OriginalResponse.ContentLength64 = OutputStream.Length;
         }
 

@@ -3,14 +3,13 @@
 // File:  AsyncHttpRequest.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  30.06.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Data;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -28,12 +27,13 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
     }
 
     public class ExtendedParameterParser : ParameterParserBase {
-        public ExtendedParameterParser(IParameterParser fallBackParser = null) {
-            FallBackParser = fallBackParser ?? PrimitiveParameterParser.Instance;
-        }
         public IParameterParser FallBackParser { get; }
         public Dictionary<string, IParameterParser> SpecializedParsers { get; } = new Dictionary<string, IParameterParser>();
         public static ExtendedParameterParser Default => CreateDefaultParser();
+
+        public ExtendedParameterParser(IParameterParser fallBackParser = null) {
+            FallBackParser = fallBackParser ?? PrimitiveParameterParser.Instance;
+        }
 
         private static ExtendedParameterParser CreateDefaultParser() {
             var parser = new ExtendedParameterParser();
@@ -41,17 +41,14 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         }
 
         public override void DeserializeValue(string name, string[] values, NodeMap nodeMap) {
-            if (SpecializedParsers.TryGetValue(name, out var parameterParser) == false) {
+            if(SpecializedParsers.TryGetValue(name, out var parameterParser) == false)
                 parameterParser = FallBackParser;
-            }
             parameterParser.DeserializeValue(name, values, nodeMap);
         }
 
         public override void SerializeValue(string name, Node valueNode, NameValueCollection collection) {
-            if (SpecializedParsers.TryGetValue(name, out var parameterParser) == false)
-            {
+            if(SpecializedParsers.TryGetValue(name, out var parameterParser) == false)
                 parameterParser = FallBackParser;
-            }
             parameterParser.SerializeValue(name, valueNode, collection);
         }
     }
@@ -157,7 +154,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         }
 
         public override void SerializeValue(string name, Node valueNode, NameValueCollection collection) {
-            switch (valueNode.Type) {
+            switch(valueNode.Type) {
                 case NodeTypes.Empty:
                 case NodeTypes.Value:
                     collection.Add(name, ((NodeValue)valueNode).GetValue<string>());

@@ -3,7 +3,7 @@
 // File:  SortedCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  05.03.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -61,16 +61,6 @@ namespace DotLogix.Core.Collections {
                 _itemList.InsertSorted(item, _comparer);
         }
 
-        public void AddRange(IEnumerable<T> items) {
-            if(items == null)
-                throw new ArgumentNullException(nameof(items));
-            lock(_lock)
-            {
-                _itemList.AddRange(items);
-                _itemList.Sort(_comparer);
-            };
-        }
-
         public void Clear() {
             lock(_lock)
                 _itemList.Clear();
@@ -109,5 +99,14 @@ namespace DotLogix.Core.Collections {
         }
 
         bool ICollection<T>.IsReadOnly => false;
+
+        public void AddRange(IEnumerable<T> items) {
+            if(items == null)
+                throw new ArgumentNullException(nameof(items));
+            lock(_lock) {
+                _itemList.AddRange(items);
+                _itemList.Sort(_comparer);
+            }
+        }
     }
 }

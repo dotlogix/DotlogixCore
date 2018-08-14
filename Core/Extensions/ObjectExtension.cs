@@ -2,37 +2,20 @@
 // Copyright 2018(C) , DotLogix
 // File:  ObjectExtension.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  03.07.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Extensions {
     public static class ObjectExtension {
-        public static T ExchangeIfDefault<T>(this T source, T exchangeValue = default(T)) {
+        public static T ExchangeIfDefault<T>(this T source, T exchangeValue = default) {
             return Equals(source, default(T)) ? exchangeValue : source;
-        }
-
-        public static T Cast<T>(this object obj) {
-            return (T)obj;
-        }
-
-        public static T SafeCast<T>(this object obj) where T : class {
-            return obj as T;
-        }
-
-        public static T[] ToSingleElementArray<T>(this T value) {
-            return new[] {value};
-        }
-
-        public static IEnumerable<T> ToSingleElementEnumerable<T>(this T value) {
-            yield return value;
         }
 
         public static DataType GetDataType(this object instance) {
@@ -67,7 +50,9 @@ namespace DotLogix.Core.Extensions {
                 try {
                     target = Enum.ToObject(targetType, value);
                     return true;
-                } catch { }
+                } catch {
+                    // ignored
+                }
             }
 
             var sourceTypeConverter = TypeDescriptor.GetConverter(sourceType);
@@ -82,7 +67,7 @@ namespace DotLogix.Core.Extensions {
                 target = targetTypeConverter.ConvertFrom(value);
                 return true;
             }
-            target = default(object);
+            target = default;
             return false;
         }
 
@@ -97,7 +82,7 @@ namespace DotLogix.Core.Extensions {
                 target = (TTarget)convertedValue;
                 return true;
             }
-            target = default(TTarget);
+            target = default;
             return false;
         }
         #endregion

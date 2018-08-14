@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  RouteBaseAttribute.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -17,7 +17,7 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
     public abstract class RouteBaseAttribute : RouteAttribute {
         public RouteType RouteType { get; }
 
-        protected RouteBaseAttribute(string pattern, RouteType routeType, int priority=0) : base(pattern, priority) {
+        protected RouteBaseAttribute(string pattern, RouteType routeType, int priority = 0) : base(pattern, priority) {
             RouteType = routeType;
         }
 

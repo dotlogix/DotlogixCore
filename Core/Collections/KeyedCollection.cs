@@ -3,7 +3,7 @@
 // File:  KeyedCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  05.03.2018
-// LastEdited:  05.03.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -38,7 +38,7 @@ namespace DotLogix.Core.Collections {
 
         public KeyedCollection(Func<TValue, TKey> keySelector, IEqualityComparer<TKey> equalityComparer, IEnumerable<TValue> values) {
             _keySelector = keySelector;
-            _dictionary = new ConcurrentDictionary<TKey, TValue>(values.ToDictionary(keySelector,equalityComparer));
+            _dictionary = new ConcurrentDictionary<TKey, TValue>(values.ToDictionary(keySelector, equalityComparer));
         }
 
         public void CopyTo(TValue[] array, int arrayIndex) {
@@ -57,6 +57,23 @@ namespace DotLogix.Core.Collections {
             return _dictionary.ContainsKey(_keySelector.Invoke(value));
         }
 
+        void ICollection<TValue>.Add(TValue value) {
+            if(TryAdd(value) == false)
+                throw new Exception("A value with this key already exists");
+        }
+
+        bool ICollection<TValue>.Remove(TValue value) {
+            return TryRemove(value);
+        }
+
+        public IEnumerator<TValue> GetEnumerator() {
+            return _dictionary.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
+        }
+
         public bool TryAdd(TValue value) {
             return _dictionary.TryAdd(_keySelector.Invoke(value), value);
         }
@@ -65,9 +82,8 @@ namespace DotLogix.Core.Collections {
             return _dictionary.GetOrAdd(_keySelector.Invoke(value), value);
         }
 
-        public void AddOrUpdate(TValue value)
-        {
-            _dictionary[_keySelector.Invoke(value)] =  value;
+        public void AddOrUpdate(TValue value) {
+            _dictionary[_keySelector.Invoke(value)] = value;
         }
 
         public bool TryRemove(TValue value) {
@@ -84,23 +100,6 @@ namespace DotLogix.Core.Collections {
 
         public bool ContainsKey(TKey key) {
             return _dictionary.ContainsKey(key);
-        }
-
-        void ICollection<TValue>.Add(TValue value)
-        {
-            if(TryAdd(value) == false)
-                throw new Exception("A value with this key already exists");
-        }
-        bool ICollection<TValue>.Remove(TValue value) {
-            return TryRemove(value);
-        }
-
-        public IEnumerator<TValue> GetEnumerator() {
-            return _dictionary.Values.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
         }
     }
 }

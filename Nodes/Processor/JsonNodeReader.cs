@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  JsonNodeReader.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  17.02.2018
+// Created:  03.03.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -172,7 +172,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             throw new JsonParsingException(pos, json, $"The character {current} is not allowed in the current state. Maybe your string is not escaped correctly");
                         continue;
                     case '\"':
-                        var str = JsonStrings.UnescapeJsonString(json, pos, i-1);
+                        var str = JsonStrings.UnescapeJsonString(json, pos, i - 1);
                         pos = i;
                         return str;
                     case '\\':

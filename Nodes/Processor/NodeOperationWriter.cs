@@ -1,9 +1,9 @@
 ﻿// ==================================================
 // Copyright 2018(C) , DotLogix
-// File:  INodeProcessor.cs
+// File:  NodeOperationWriter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  22.02.2018
-// LastEdited:  28.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region

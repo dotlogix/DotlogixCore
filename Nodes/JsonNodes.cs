@@ -3,7 +3,7 @@
 // File:  JsonNodes.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -17,6 +17,10 @@ namespace DotLogix.Core.Nodes {
         private const int StringBuilderCapacity = 256;
 
         #region ToNode
+        public static TNode ToNode<TNode>(string json) where TNode : Node {
+            return (TNode)ToNode(json);
+        }
+
         public static Node ToNode(string json) {
             var reader = new JsonNodeReader(json);
             var writer = new NodeWriter();
@@ -26,11 +30,7 @@ namespace DotLogix.Core.Nodes {
         #endregion
 
         #region ToJson
-        public static string ToJson<TInstance>(TInstance instance, JsonNodesFormatter formatter = null) {
-            return ToJsonInternal(instance, typeof(TInstance), formatter);
-        }
-
-        public static string ToJson(Node node, JsonNodesFormatter formatter = null) {
+        public static string ToJson(this Node node, JsonNodesFormatter formatter = null) {
             var builder = new StringBuilder(StringBuilderCapacity);
             var nodeReader = new NodeReader(node);
             var nodeWriter = new JsonNodeWriter(builder, formatter);

@@ -2,17 +2,15 @@
 // Copyright 2018(C) , DotLogix
 // File:  ParseJsonBodyPreProcessor.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
-using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Mime;
-using DotLogix.Core.Rest.Server.Http.Parameters;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
@@ -34,7 +32,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
                 try {
                     var jsonData = JsonNodes.ToNode(json);
                     request.UserDefinedParameters.AddChild(JsonDataParamName, jsonData);
-                } catch (Exception e) {
+                } catch(Exception e) {
                     webServiceContext.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
                 }
             }

@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  ExpressionExtensions.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -15,7 +15,7 @@ using System.Reflection;
 namespace DotLogix.Core.Extensions {
     public static class ExpressionExtensions {
         /// <summary>
-        /// Gets the target member of a expression
+        ///     Gets the target member of a expression
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -27,7 +27,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Gets the target field of a expression
+        ///     Gets the target field of a expression
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -39,7 +39,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Gets the target property of a expression
+        ///     Gets the target property of a expression
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>

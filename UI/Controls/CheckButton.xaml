@@ -13,7 +13,8 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="{Binding ElementName=Self, Path=CheckAreaThickness}" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="{Binding ElementName=Self, Path=Text}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="0" Text="{Binding ElementName=Self, Path=Text}" VerticalAlignment="Center"
+                       HorizontalAlignment="Center" />
             <Rectangle Grid.Column="1" Margin="2">
                 <Rectangle.Style>
                     <Style TargetType="Rectangle">

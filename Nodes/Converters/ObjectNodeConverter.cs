@@ -3,7 +3,7 @@
 // File:  ObjectNodeConverter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -88,7 +88,7 @@ namespace DotLogix.Core.Nodes.Converters {
             object instance;
             if(_isDefaultCtor)
                 instance = _ctor.Invoke();
-            else if(TryConstructWith(_ctor, nodeMap, out instance))
+            else if(TryConstructWith(_ctor, nodeMap, out instance) == false)
                 throw new InvalidOperationException("Object can not be constructed with the given nodes");
 
             foreach(var accessor in _accessorsToWrite) {

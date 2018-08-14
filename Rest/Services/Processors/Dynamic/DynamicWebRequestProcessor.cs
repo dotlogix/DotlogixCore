@@ -2,14 +2,13 @@
 // Copyright 2018(C) , DotLogix
 // File:  DynamicWebRequestProcessor.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
 using System.Reflection;
 using System.Text;
-using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;

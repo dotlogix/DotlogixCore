@@ -3,7 +3,7 @@
 // File:  Optional.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  19.03.2018
-// LastEdited:  19.03.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -16,7 +16,7 @@ namespace DotLogix.Core {
         public static Optional<TValue> Undefined => new Optional<TValue>();
         public bool IsDefined { get; }
         public bool IsDefault => IsDefined && Equals(Value, default(TValue));
-        public bool IsUndefinedOrDefault => IsDefined == false || Equals(Value, default(TValue));
+        public bool IsUndefinedOrDefault => (IsDefined == false) || Equals(Value, default(TValue));
         public TValue Value { get; }
 
         public Optional(TValue value) {
@@ -24,7 +24,7 @@ namespace DotLogix.Core {
             Value = value;
         }
 
-        public TValue GetValueOrDefault(TValue defaultValue = default(TValue)) {
+        public TValue GetValueOrDefault(TValue defaultValue = default) {
             return IsDefined ? Value : defaultValue;
         }
 

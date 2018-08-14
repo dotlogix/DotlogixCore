@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  PatternRange.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -46,7 +46,7 @@ namespace DotLogix.Core.Utils.Patterns {
 
 
         public static PatternRange Parse(string rangeStr) {
-            return TryParse(rangeStr, out var range) ? range : default(PatternRange);
+            return TryParse(rangeStr, out var range) ? range : default;
         }
 
         public static bool TryParse(string rangeStr, out PatternRange patternRange) {

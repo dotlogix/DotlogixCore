@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  StringExtension.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  17.02.2018
+// Created:  04.06.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -16,7 +16,7 @@ using DotLogix.Core.Types;
 namespace DotLogix.Core.Extensions {
     public static class StringExtension {
         /// <summary>
-        /// Counts the occurances of a character in a string.
+        ///     Counts the occurances of a character in a string.
         /// </summary>
         /// <param name="str">The string</param>
         /// <param name="character">The character to count</param>
@@ -25,7 +25,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Counts the occurances of a character in a string.
+        ///     Counts the occurances of a character in a string.
         /// </summary>
         /// <param name="str">The string</param>
         /// <param name="character">The character to count</param>
@@ -36,7 +36,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Counts the occurances of a character in a char array.
+        ///     Counts the occurances of a character in a char array.
         /// </summary>
         /// <param name="chars">The char array</param>
         /// <param name="character">The character to count</param>
@@ -45,7 +45,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Counts the occurances of a character in a char array.
+        ///     Counts the occurances of a character in a char array.
         /// </summary>
         /// <param name="chars">The char array</param>
         /// <param name="character">The character to count</param>
@@ -57,7 +57,8 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Counts the occurances of a character in a char array. Also outputs the position of the last occurance of the character
+        ///     Counts the occurances of a character in a char array. Also outputs the position of the last occurance of the
+        ///     character
         /// </summary>
         /// <param name="chars">The char array</param>
         /// <param name="character">The character to count</param>
@@ -80,27 +81,28 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// exchanges the value of source with another value if it is null, empty
+        ///     exchanges the value of source with another value if it is null, empty
         /// </summary>
         /// <param name="source">The string value</param>
         /// <param name="exchangeValue">The value to exchange</param>
         /// <returns></returns>
-        public static string ExchangeIfDefaultOrEmpty(this string source, string exchangeValue = default(string)) {
+        public static string ExchangeIfDefaultOrEmpty(this string source, string exchangeValue = default) {
             return string.IsNullOrEmpty(source) ? exchangeValue : source;
         }
 
         /// <summary>
-        /// exchanges the value of source with another value if it is null, empty or only contains whitespaces
+        ///     exchanges the value of source with another value if it is null, empty or only contains whitespaces
         /// </summary>
         /// <param name="source">The string value</param>
         /// <param name="exchangeValue">The value to exchange</param>
         /// <returns></returns>
-        public static string ExchangeIfDefaultOrWhitespace(this string source, string exchangeValue = default(string)) {
+        public static string ExchangeIfDefaultOrWhitespace(this string source, string exchangeValue = default) {
             return string.IsNullOrWhiteSpace(source) ? exchangeValue : source;
         }
 
         /// <summary>
-        /// Set the length of string to a specified length. If the string is longer than the string is cut in the middle, else it will be filled with the padding character
+        ///     Set the length of string to a specified length. If the string is longer than the string is cut in the middle, else
+        ///     it will be filled with the padding character
         /// </summary>
         /// <param name="value">The string value</param>
         /// <param name="padding">The padding character</param>
@@ -163,9 +165,31 @@ namespace DotLogix.Core.Extensions {
             return result.ToArray();
         }
 
+        #region Join
+        public static StringBuilder AppendJoin<T>(this StringBuilder sb, string separator, IEnumerable<T> values) {
+            if(values == null)
+                throw new ArgumentNullException(nameof(values));
+            if(separator == null)
+                separator = string.Empty;
+            using(var enumerator = values.GetEnumerator()) {
+                if(!enumerator.MoveNext())
+                    return sb;
+
+                if(enumerator.Current != null)
+                    sb.Append(enumerator.Current);
+                while(enumerator.MoveNext()) {
+                    sb.Append(separator);
+                    if(enumerator.Current != null)
+                        sb.Append(enumerator.Current);
+                }
+                return sb;
+            }
+        }
+        #endregion
+
         #region Base64
         /// <summary>
-        /// Converts a string to its base64 encoded version
+        ///     Converts a string to its base64 encoded version
         /// </summary>
         /// <param name="plain">The string to convert</param>
         /// <param name="encoding">The encoding used to transform the string into bytes (default is UTF8)</param>
@@ -176,7 +200,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Converts a string back of its base64 encoded version
+        ///     Converts a string back of its base64 encoded version
         /// </summary>
         /// <param name="base64String">The base64 encoded string</param>
         /// <param name="encoding">The encoding used to transform the string into bytes (default is UTF8)</param>
@@ -189,7 +213,7 @@ namespace DotLogix.Core.Extensions {
 
         #region SplitAndKeep
         /// <summary>
-        /// Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
+        ///     Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
         /// </summary>
         /// <param name="value">The string to split</param>
         /// <param name="delimiters">The delimiters</param>
@@ -199,7 +223,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
+        ///     Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
         /// </summary>
         /// <param name="value">The string to split</param>
         /// <param name="options">The options used for splitting</param>
@@ -210,7 +234,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
+        ///     Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
         /// </summary>
         /// <param name="value">The string to split</param>
         /// <param name="maxCount">The maxmimum count of splits</param>
@@ -220,7 +244,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
+        ///     Same as string.Split, but keeps the delimiter as an own entry in the resulting enumerable
         /// </summary>
         /// <param name="value">The string to split</param>
         /// <param name="maxCount">The maxmimum count of splits</param>
@@ -245,20 +269,19 @@ namespace DotLogix.Core.Extensions {
 
         #region Parse
         /// <summary>
-        /// Convert a string to another type. Only works for the conversion of a string to primitives
+        ///     Convert a string to another type. Only works for the conversion of a string to primitives
         /// </summary>
         /// <param name="targetType">The target type</param>
         /// <param name="value">The string representation of the type</param>
         /// <returns>The result value if the conversion succeed</returns>
         public static object ParseTo(this string value, Type targetType) {
-            if(TryParseTo(value, targetType, out var convertedValue) == false) {
+            if(TryParseTo(value, targetType, out var convertedValue) == false)
                 throw new NotSupportedException($"Conversion between {value.GetType()} and {targetType} is not supported");
-            }
             return convertedValue;
         }
 
         /// <summary>
-        /// Trys to convert a string to another type. Only works for the conversion of a string to primitives
+        ///     Trys to convert a string to another type. Only works for the conversion of a string to primitives
         /// </summary>
         /// <param name="targetType">The target type</param>
         /// <param name="value">The string representation of the type</param>
@@ -360,7 +383,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Convert a string to another type. Only works for the conversion of a string to primitives
+        ///     Convert a string to another type. Only works for the conversion of a string to primitives
         /// </summary>
         /// <typeparam name="TTarget">The target type</typeparam>
         /// <param name="value">The string representation of the type</param>
@@ -371,7 +394,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        /// Trys to convert a string to another type. Only works for the conversion of a string to primitives
+        ///     Trys to convert a string to another type. Only works for the conversion of a string to primitives
         /// </summary>
         /// <typeparam name="TTarget">The target type</typeparam>
         /// <param name="value">The string representation of the type</param>
@@ -383,12 +406,12 @@ namespace DotLogix.Core.Extensions {
                 target = (TTarget)convertedValue;
                 return true;
             }
-            target = default(TTarget);
+            target = default;
             return false;
         }
 
         /// <summary>
-        /// Try to convert a string to the provided enum type
+        ///     Try to convert a string to the provided enum type
         /// </summary>
         /// <typeparam name="TEnum">The type of the enum</typeparam>
         /// <param name="enumValue">The string representation of a enum value</param>
@@ -411,41 +434,15 @@ namespace DotLogix.Core.Extensions {
         public static string SubstringUntil(this string value, int start, int count, params char[] delimiters) {
             var idx = value.IndexOfAny(delimiters, start, count);
             if(idx == -1)
-                return start > 0 || (count > 0 && count < value.Length) ? value.Substring(start, count) : value;
+                return (start > 0) || ((count > 0) && (count < value.Length)) ? value.Substring(start, count) : value;
             return value.Substring(start, idx - start);
         }
 
-        public static string SubstringUntil(this string value, params char[] delimiters)
-        {
+        public static string SubstringUntil(this string value, params char[] delimiters) {
             var idx = value.IndexOfAny(delimiters);
-            if (idx == -1)
+            if(idx == -1)
                 return value;
             return value.Substring(0, idx);
-        }
-        #endregion
-
-        #region Join
-        public static StringBuilder AppendJoin<T>(this StringBuilder sb, string separator, IEnumerable<T> values)
-        {
-            if(values == null)
-                throw new ArgumentNullException(nameof(values));
-            if(separator == null)
-                separator = string.Empty;
-            using(var enumerator = values.GetEnumerator()) {
-                if(!enumerator.MoveNext())
-                    return sb;
-
-                if(enumerator.Current != null) {
-                    sb.Append(enumerator.Current);
-                }
-                while(enumerator.MoveNext()) {
-                    sb.Append(separator);
-                    if(enumerator.Current != null) {
-                        sb.Append(enumerator.Current);
-                    }
-                }
-                return sb;
-            }
         }
         #endregion
     }

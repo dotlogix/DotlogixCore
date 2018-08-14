@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  AsyncHttpServer.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -113,33 +113,25 @@ namespace DotLogix.Core.Rest.Server.Http {
             try {
                 httpContext = CreateContext(originalContext);
             } catch(Exception e) {
-                if (IsRunning)
+                if(IsRunning)
                     Log.Error(e);
                 return;
             }
 
             var response = httpContext.Response;
-            try
-            {
+            try {
                 await _requestHandler.HandleRequestAsync(httpContext);
-                if ((response.IsCompleted) && (httpContext.PreventAutoSend == false))
+                if((response.IsCompleted == false) && (httpContext.PreventAutoSend == false))
                     await response.CompleteAsync();
-            }
-            catch (Exception e)
-            {
+            } catch(Exception e) {
                 Log.Error(e);
                 await SendErrorMessageAsync(response, e);
-            }
-            finally
-            {
-                httpContext?.Dispose();
-                try
-                {
+            } finally {
+                httpContext.Dispose();
+                try {
                     _requestSemaphore.Release();
-                }
-                catch (Exception e)
-                {
-                    if (IsRunning)
+                } catch(Exception e) {
+                    if(IsRunning)
                         Log.Error(e);
                 }
             }

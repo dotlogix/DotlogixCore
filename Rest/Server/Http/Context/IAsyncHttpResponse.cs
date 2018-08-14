@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  IAsyncHttpResponse.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -13,7 +13,6 @@ using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Mime;
-using DotLogix.Core.Rest.Server.Http.Parameters;
 using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 #endregion
 

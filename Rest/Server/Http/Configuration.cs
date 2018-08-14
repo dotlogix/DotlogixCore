@@ -1,12 +1,14 @@
 ﻿// ==================================================
 // Copyright 2018(C) , DotLogix
-// File:  ConcurrencyOptions.cs
+// File:  Configuration.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
+#region
 using DotLogix.Core.Rest.Server.Http.Context;
+#endregion
 
 namespace DotLogix.Core.Rest.Server.Http {
     public class Configuration {

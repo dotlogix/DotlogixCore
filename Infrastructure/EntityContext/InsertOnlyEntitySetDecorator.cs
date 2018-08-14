@@ -1,7 +1,17 @@
-﻿using System.Collections.Generic;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  InsertOnlyEntitySetDecorator.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  04.04.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System.Collections.Generic;
 using System.Linq;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.Queries;
+#endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
     public class InsertOnlyEntitySetDecorator<TEntity> : EntitySetDecoratorBase<TEntity> where TEntity : class, IInsertOnlyEntity {

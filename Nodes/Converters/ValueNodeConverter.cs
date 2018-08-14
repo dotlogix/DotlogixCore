@@ -3,7 +3,7 @@
 // File:  ValueNodeConverter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -22,10 +22,10 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         public override object ConvertToObject(Node node) {
-            if (node.Type == NodeTypes.Empty)
+            if(node.Type == NodeTypes.Empty)
                 return Type.GetDefaultValue();
 
-            if (node is NodeValue nodeValue)
+            if(node is NodeValue nodeValue)
                 return nodeValue.GetValue(Type);
             throw new ArgumentException("Node is not a NodeValue");
         }

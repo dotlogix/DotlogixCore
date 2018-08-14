@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  RouteAttribute.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -23,7 +23,7 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
         public string Pattern { get; }
         public int Priority { get; set; }
 
-        protected RouteAttribute(string pattern, int priority=0) {
+        protected RouteAttribute(string pattern, int priority = 0) {
             Priority = priority;
             Pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
         }

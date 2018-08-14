@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  AsyncWebRequestRouter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  21.06.2018
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -54,7 +54,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                 await asyncHttpContext.Response.CompleteAsync();
                 return;
             }
-            if (asyncHttpContext.Request.HeaderParameters.TryGetChildValue(EventSubscriptionParameterName, out string eventName)) {
+            if(asyncHttpContext.Request.HeaderParameters.TryGetChildValue(EventSubscriptionParameterName, out string eventName)) {
                 if(ServerEvents.TryGetValue(eventName, out var serverEvent) == false) {
                     await asyncHttpContext.Response.WriteToResponseStreamAsync("The event subscription could not be handled, because the event is not registered on the server");
                     asyncHttpContext.Response.StatusCode = HttpStatusCodes.ClientError.BadRequest;
@@ -112,11 +112,11 @@ namespace DotLogix.Core.Rest.Server.Http {
             if(routeMatch == null)
                 return false;
 
-            if (routeMatch.UrlParameters == null)
+            if(routeMatch.UrlParameters == null)
                 return true;
 
-            foreach (var parameter in routeMatch.UrlParameters)
-                asyncHttpRequest.UrlParameters.CreateValue(parameter.Key, parameter.Value);
+            foreach(var parameter in routeMatch.UrlParameters)
+                asyncHttpRequest.UrlParameters.AddChild(parameter.Key, parameter.Value);
 
             return true;
         }

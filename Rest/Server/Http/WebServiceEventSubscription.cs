@@ -1,13 +1,20 @@
+// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  WebServiceEventSubscription.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  05.03.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
 using System;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Routes;
+#endregion
 
 namespace DotLogix.Core.Rest.Server.Http {
     public class WebServiceEventSubscription : IWebServiceEventSubscription {
-        public IAsyncHttpContext Context { get; }
-        public IWebServiceRoute Route { get; }
-        public AsyncWebRequestRouter Router { get; }
         public string Channel { get; }
 
         public WebServiceEventSubscription(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route, AsyncWebRequestRouter asyncWebRequestRouter) {
@@ -19,9 +26,14 @@ namespace DotLogix.Core.Rest.Server.Http {
                 Channel = channel;
         }
 
+        public IAsyncHttpContext Context { get; }
+        public IWebServiceRoute Route { get; }
+        public AsyncWebRequestRouter Router { get; }
+
         public Guid Guid { get; }
+
         public bool CheckPreCondition(object sender, WebServiceEventArgs eventArgs) {
-            return Channel == null || string.Equals(eventArgs.Channel, Channel, StringComparison.OrdinalIgnoreCase);
+            return (Channel == null) || string.Equals(eventArgs.Channel, Channel, StringComparison.OrdinalIgnoreCase);
         }
 
         protected bool Equals(WebServiceEventSubscription other) {
@@ -47,15 +59,24 @@ namespace DotLogix.Core.Rest.Server.Http {
             return Guid.GetHashCode();
         }
 
-        /// <summary>Returns a value that indicates whether the values of two <see cref="T:DotLogix.Core.Rest.Server.Http.WebServiceEventSubscription" /> objects are equal.</summary>
+        /// <summary>
+        ///     Returns a value that indicates whether the values of two
+        ///     <see cref="T:DotLogix.Core.Rest.Server.Http.WebServiceEventSubscription" /> objects are equal.
+        /// </summary>
         /// <param name="left">The first value to compare.</param>
         /// <param name="right">The second value to compare.</param>
-        /// <returns>true if the <paramref name="left" /> and <paramref name="right" /> parameters have the same value; otherwise, false.</returns>
+        /// <returns>
+        ///     true if the <paramref name="left" /> and <paramref name="right" /> parameters have the same value; otherwise,
+        ///     false.
+        /// </returns>
         public static bool operator ==(WebServiceEventSubscription left, WebServiceEventSubscription right) {
             return Equals(left, right);
         }
 
-        /// <summary>Returns a value that indicates whether two <see cref="T:DotLogix.Core.Rest.Server.Http.WebServiceEventSubscription" /> objects have different values.</summary>
+        /// <summary>
+        ///     Returns a value that indicates whether two
+        ///     <see cref="T:DotLogix.Core.Rest.Server.Http.WebServiceEventSubscription" /> objects have different values.
+        /// </summary>
         /// <param name="left">The first value to compare.</param>
         /// <param name="right">The second value to compare.</param>
         /// <returns>true if <paramref name="left" /> and <paramref name="right" /> are not equal; otherwise, false.</returns>

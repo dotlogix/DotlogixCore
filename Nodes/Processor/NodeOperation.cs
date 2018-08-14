@@ -1,4 +1,12 @@
-﻿namespace DotLogix.Core.Nodes.Processor {
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodeOperation.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  03.03.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+namespace DotLogix.Core.Nodes.Processor {
     public struct NodeOperation {
         public readonly NodeOperationTypes Type;
         public readonly string Name;

@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  ColorEnum.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  06.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -13,12 +13,14 @@ using DotLogix.Core.Enumeration;
 namespace Test {
     [SupportsFlags]
     public sealed class ColorEnum : Enum<ColorEnum, ColorEnum.ColorEnumMember> {
-        public static readonly ColorEnumMember Red = Instance.RegisterColor("Red", 1);
-        public static readonly ColorEnumMember Blue = Instance.RegisterColor("Blue", 2);
-        public static readonly ColorEnumMember Green = Instance.RegisterColor("Green", 4);
-
         public static ColorEnum Instance { get; } =
             Enums.Register<ColorEnum, ColorEnumMember>(new ColorEnum());
+
+        public static readonly ColorEnumMember Red = Instance.RegisterColor("Red", 1);
+
+        public static readonly ColorEnumMember Blue = Instance.RegisterColor("Blue", 2);
+
+        public static readonly ColorEnumMember Green = Instance.RegisterColor("Green", 4);
 
         private ColorEnumMember RegisterColor(string name, int value) {
             return Register(new ColorEnumMember(this, name, value));

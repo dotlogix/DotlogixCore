@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  JsonNodesFormatter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  17.02.2018
+// Created:  04.03.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -11,7 +11,9 @@
 
 namespace DotLogix.Core.Nodes.Processor {
     public class JsonNodesFormatter {
-        private static JsonNodesFormatter _defaultFormatter = new JsonNodesFormatter();
+        public static JsonNodesFormatter Idented => new JsonNodesFormatter{Ident = true};
+        public static JsonNodesFormatter Default => new JsonNodesFormatter();
+
         public bool Ident { get; set; }
         public int IdentSize { get; set; }
 
@@ -22,14 +24,6 @@ namespace DotLogix.Core.Nodes.Processor {
         public JsonNodesFormatter(JsonNodesFormatter basedOn) {
             Ident = basedOn.Ident;
             IdentSize = basedOn.IdentSize;
-        }
-
-        public static JsonNodesFormatter CreateNewDefault() {
-            return new JsonNodesFormatter(_defaultFormatter);
-        }
-
-        public static void ReplaceDefault(JsonNodesFormatter defaultFormatter) {
-            _defaultFormatter = defaultFormatter;
         }
     }
 

@@ -1,13 +1,19 @@
-﻿using System.Collections.Generic;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  Hierarchy.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  10.03.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System.Collections.Generic;
 using System.Linq;
+#endregion
 
-namespace DotLogix.Core.Collections
-{
-
+namespace DotLogix.Core.Collections {
     public class HierarchyCollection<TKey, TValue> : KeyedCollection<TKey, Hierarchy<TKey, TValue>> {
-        public HierarchyCollection() : base(i=>i.Key) {
-            
-        }
+        public HierarchyCollection() : base(i => i.Key) { }
     }
 
 
@@ -20,6 +26,7 @@ namespace DotLogix.Core.Collections
         public bool IsNode => _children.Count > 0;
         public Hierarchy<TKey, TValue> this[TKey key] => _children[key];
         public IEnumerable<Hierarchy<TKey, TValue>> Children => _children.Values;
+
         public IEnumerable<Hierarchy<TKey, TValue>> ChildrenRecursive {
             get {
                 var list = new List<Hierarchy<TKey, TValue>>();
@@ -28,21 +35,19 @@ namespace DotLogix.Core.Collections
             }
         }
 
-        private void GetChildrenRecursive(List<Hierarchy<TKey, TValue>> children) {
-            children.AddRange(_children.Values);
-            foreach(var child in _children.Values) {
-                child.GetChildrenRecursive(children);
-            }
-        }
 
-
-        public Hierarchy(TKey key, TValue value = default(TValue)) {
+        public Hierarchy(TKey key, TValue value = default) {
             Key = key;
             Value = value;
         }
 
-        public void Clear()
-        {
+        private void GetChildrenRecursive(List<Hierarchy<TKey, TValue>> children) {
+            children.AddRange(_children.Values);
+            foreach(var child in _children.Values)
+                child.GetChildrenRecursive(children);
+        }
+
+        public void Clear() {
             _children.Clear();
         }
 
@@ -52,19 +57,17 @@ namespace DotLogix.Core.Collections
             return hierarchy;
         }
 
-        public bool Remove(TKey key)
-        {
+        public bool Remove(TKey key) {
             return _children.Remove(key);
         }
 
-        public bool TryGetValue(TKey key, out TValue value)
-        {
+        public bool TryGetValue(TKey key, out TValue value) {
             if(TryGetChild(key, out var child)) {
                 value = child.Value;
                 return true;
             }
 
-            value = default(TValue);
+            value = default;
             return true;
         }
 
@@ -72,13 +75,11 @@ namespace DotLogix.Core.Collections
             return _children.TryGetValue(key, out child);
         }
 
-        public bool ContainsKey(TKey key)
-        {
+        public bool ContainsKey(TKey key) {
             return _children.ContainsKey(key);
         }
 
-        public void AddRecursive(TKey parentKey, TKey key, TValue value)
-        {
+        public void AddRecursive(TKey parentKey, TKey key, TValue value) {
             if(TryGetChildRecursive(parentKey, out var child) == false)
                 throw new KeyNotFoundException();
 
@@ -90,7 +91,7 @@ namespace DotLogix.Core.Collections
         }
 
         public bool TryGetValueRecursive(TKey key, out TValue value) {
-            if (TryGetChildRecursive(key, out var child)) {
+            if(TryGetChildRecursive(key, out var child)) {
                 value = child.Value;
                 return true;
             }
@@ -100,12 +101,11 @@ namespace DotLogix.Core.Collections
                 return true;
             }
 
-            value = default(TValue);
+            value = default;
             return true;
         }
 
-        public bool TryGetChildRecursive(TKey key, out Hierarchy<TKey, TValue> child)
-        {
+        public bool TryGetChildRecursive(TKey key, out Hierarchy<TKey, TValue> child) {
             if(_children.TryGetValue(key, out child))
                 return true;
 
@@ -117,11 +117,8 @@ namespace DotLogix.Core.Collections
             return false;
         }
 
-        public bool ContainsKeyRecursive(TKey key)
-        {
+        public bool ContainsKeyRecursive(TKey key) {
             return TryGetChildRecursive(key, out _);
         }
-
     }
-
 }

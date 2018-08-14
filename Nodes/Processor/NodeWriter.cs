@@ -1,4 +1,14 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  NodeWriter.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  16.07.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
+#endregion
 
 namespace DotLogix.Core.Nodes.Processor {
     public class NodeWriter : NodeWriterBase {
@@ -9,7 +19,7 @@ namespace DotLogix.Core.Nodes.Processor {
             CheckName(name);
 
             var map = new NodeMap();
-            if(Root == null) 
+            if(Root == null)
                 Root = map;
             else
                 AddChild(name, map);
@@ -70,15 +80,13 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
-        private void AddChild(string name, Node node)
-        {
-            switch (CurrentContainer)
-            {
+        private void AddChild(string name, Node node) {
+            switch(CurrentContainer) {
                 case NodeContainerType.List:
-                    ((NodeList) CurrentNodeCollection).AddChild(node);
+                    ((NodeList)CurrentNodeCollection).AddChild(node);
                     break;
                 case NodeContainerType.Map:
-                    ((NodeMap) CurrentNodeCollection).AddChild(name, node);
+                    ((NodeMap)CurrentNodeCollection).AddChild(name, node);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

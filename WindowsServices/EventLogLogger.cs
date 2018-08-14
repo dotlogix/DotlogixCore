@@ -1,15 +1,23 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2018(C) , DotLogix
+// File:  EventLogLogger.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created:  21.02.2018
+// LastEdited:  01.08.2018
+// ==================================================
+
+#region
+using System;
 using System.Diagnostics;
 using DotLogix.Core.Diagnostics;
+#endregion
 
-namespace DotLogix.Core.WindowsServices
-{
-
-    public class EventLogLogger : LoggerBase
-    {
+namespace DotLogix.Core.WindowsServices {
+    public class EventLogLogger : LoggerBase {
         private static readonly ILogMessageFormatter MessageFormatter = new EventLogMessageFormatter();
 
         private readonly EventLog _eventLog;
+
         public EventLogLogger(EventLog eventLog) : base("EventLogLogger") {
             _eventLog = eventLog ?? throw new ArgumentNullException(nameof(eventLog));
         }

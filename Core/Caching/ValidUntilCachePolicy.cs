@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  ValidUntilCachePolicy.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  13.02.2018
-// LastEdited:  17.02.2018
+// Created:  17.02.2018
+// LastEdited:  01.08.2018
 // ==================================================
 
 #region
@@ -12,7 +12,7 @@ using System;
 
 namespace DotLogix.Core.Caching {
     /// <summary>
-    /// A cache policy where values are valid until a given timestamp
+    ///     A cache policy where values are valid until a given timestamp
     /// </summary>
     public class ValidUntilCachePolicy : ICachePolicy {
         private readonly DateTime _validUntilUtc;

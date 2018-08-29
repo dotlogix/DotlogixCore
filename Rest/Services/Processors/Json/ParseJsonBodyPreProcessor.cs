@@ -31,7 +31,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
             if(json.Length > 1) {
                 try {
                     var jsonData = JsonNodes.ToNode(json);
-                    request.UserDefinedParameters.AddChild(JsonDataParamName, jsonData);
+                    request.UserDefinedParameters.Add(JsonDataParamName, jsonData);
                 } catch(Exception e) {
                     webServiceContext.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
                 }

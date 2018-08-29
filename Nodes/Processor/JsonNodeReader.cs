@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
@@ -25,7 +26,7 @@ namespace DotLogix.Core.Nodes.Processor {
             String = 1 << 5,
             ValueAssignment = 1 << 6,
             ValueDelimiter = 1 << 7,
-            Other = 256
+            Other = 1 << 8
         }
 
         private readonly char[] _json;
@@ -68,10 +69,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             allowedCharacters = JsonCharacter.End;
                             continue;
                         }
-
-                        allowedCharacters = stateStack.Peek() == NodeContainerType.Map
-                                                ? JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject
-                                                : JsonCharacter.ValueDelimiter | JsonCharacter.CloseList;
+                        allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject, JsonCharacter.ValueDelimiter | JsonCharacter.CloseList);
                         continue;
                     case JsonCharacter.OpenList:
                         nodeWriter.BeginList(name);
@@ -83,33 +81,29 @@ namespace DotLogix.Core.Nodes.Processor {
                     case JsonCharacter.String:
                         i++;
                         var str = NextJsonString(json, ref i);
-                        if((stateStack.Peek() == NodeContainerType.Map) && (name == null)) {
+                        if((stateStack.Count > 0) && (stateStack.Peek() == NodeContainerType.Map) && (name == null)) {
                             name = str;
                             allowedCharacters = JsonCharacter.ValueAssignment;
                             continue;
                         }
                         nodeWriter.WriteValue(name, str);
                         name = null;
-                        allowedCharacters = stateStack.Peek() == NodeContainerType.Map
-                                                ? JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject
-                                                : JsonCharacter.ValueDelimiter | JsonCharacter.CloseList;
+                        allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject, JsonCharacter.ValueDelimiter | JsonCharacter.CloseList);
                         continue;
                     case JsonCharacter.ValueAssignment:
                         allowedCharacters = JsonCharacter.OpenObject | JsonCharacter.OpenList | JsonCharacter.String | JsonCharacter.Other;
                         continue;
                     case JsonCharacter.ValueDelimiter:
-                        allowedCharacters = stateStack.Peek() == NodeContainerType.Map
-                                                ? JsonCharacter.String
-                                                : JsonCharacter.OpenObject | JsonCharacter.OpenList | JsonCharacter.String | JsonCharacter.Other;
+                        allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.String, JsonCharacter.OpenObject | JsonCharacter.OpenList | JsonCharacter.String | JsonCharacter.Other);
                         continue;
                     case JsonCharacter.Other:
                         var value = NextJsonValue(json, ref i);
                         nodeWriter.WriteValue(name, value);
                         name = null;
-                        allowedCharacters = stateStack.Peek() == NodeContainerType.Map
-                                                ? JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject
-                                                : JsonCharacter.ValueDelimiter | JsonCharacter.CloseList;
+
                         i--;
+
+                        allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject, JsonCharacter.ValueDelimiter | JsonCharacter.CloseList);
                         continue;
                     default:
                         throw new JsonParsingException(i, json, "The current state is invalid");
@@ -132,7 +126,7 @@ namespace DotLogix.Core.Nodes.Processor {
                     value = false;
                     return true;
                 default:
-                    if(double.TryParse(valueStr, NumberStyles.AllowDecimalPoint, NumberFormatInfo.InvariantInfo, out var number) == false) {
+                    if(double.TryParse(valueStr, NumberStyles.AllowDecimalPoint|NumberStyles.AllowLeadingSign|NumberStyles.AllowExponent, NumberFormatInfo.InvariantInfo, out var number) == false) {
                         value = null;
                         return false;
                     }
@@ -151,33 +145,61 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         private static string NextJsonString(char[] json, ref int pos) {
-            var escaped = false;
             for(var i = pos; i < json.Length; i++) {
+                var escaped = false;
+
                 var current = json[i];
-                if(escaped && (current >= ' ')) {
-                    escaped = false;
-                    continue;
+                if(current == '\\') {
+                    if(json.Length <= ++i)
+                        throw new JsonParsingException(i, json, "The escape sequence '\\' requires at least one following character to be valid.");
+                    current = json[i];
+                    escaped = true;
                 }
 
-                switch(current) {
-                    case '/':
-                    case '\b':
-                    case '\f':
-                    case '\n':
-                    case '\r':
-                    case '\t':
-                        throw new JsonParsingException(pos, json, $"The character {current} is not allowed in the current state. Maybe your string is not escaped correctly");
-                    default:
-                        if(current < ' ')
-                            throw new JsonParsingException(pos, json, $"The character {current} is not allowed in the current state. Maybe your string is not escaped correctly");
-                        continue;
+
+                if(escaped) {
+                    switch(current) {
+                        //must
+                        case '\\':
+                        case '\"':
+                        //can
+                        case '/':
+                        case 'b':
+                        case 'f':
+                        case 'n':
+                        case 'r':
+                        case 't':
+                            continue;
+                        case 'u':
+                            var to = ++i + 4;
+                            if(json.Length <= to)
+                                throw new JsonParsingException(i, json, "The escape sequence '\\u' requires 4 following hex digits to be valid.");
+
+                            for(; i < to; i++) {
+                                current = json[i];
+                                if(JsonStrings.IsHex(current))
+                                    continue;
+                                throw new JsonParsingException(i, json, $"The character '{current}' is not a valid hex character.");
+                            }
+                            continue;
+                        default:
+                                throw new JsonParsingException(i, json, $"The character '{current}' can not be escaped.");
+                    }
+                }
+
+                switch (current)
+                {
                     case '\"':
                         var str = JsonStrings.UnescapeJsonString(json, pos, i - 1);
                         pos = i;
                         return str;
                     case '\\':
-                        escaped = true;
-                        break;
+                        throw new JsonParsingException(i, json, $"The character '{current}' must be escaped to be valid.");
+                    default:
+                        int currentInt = current;
+                        if (currentInt < 0x20 || (currentInt >= 0x7F && currentInt <= 0x9F))
+                            throw new JsonParsingException(i, json, $"The character '{JsonStrings.ToCharAsUnicode(current)}' is a control character and requires to be escaped to be valid.");
+                        continue;
                 }
             }
             throw new JsonParsingException(pos, json, "The string never ends");
@@ -231,6 +253,12 @@ namespace DotLogix.Core.Nodes.Processor {
                 }
             }
             return JsonCharacter.End;
+        }
+
+        private static JsonCharacter GetAllowedCharacters(Stack<NodeContainerType> stateStack, JsonCharacter forMap, JsonCharacter forList) {
+            if(stateStack.Count == 0)
+                return JsonCharacter.End;
+            return stateStack.Peek() == NodeContainerType.Map ? forMap : forList;
         }
     }
 }

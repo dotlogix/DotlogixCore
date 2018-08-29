@@ -17,9 +17,9 @@ namespace DotLogix.Core.Rest.Server.Routes {
         public bool Success { get; }
         public string Match { get; }
         public int Length { get; }
-        public IDictionary<string, Node> UrlParameters { get; }
+        public IDictionary<string, object> UrlParameters { get; }
 
-        public RouteMatch(bool success, string match, int length, IDictionary<string, Node> parameters) {
+        public RouteMatch(bool success, string match, int length, IDictionary<string, object> parameters) {
             Success = success;
             Match = match;
             Length = length;

@@ -108,7 +108,7 @@ namespace DotLogix.Core.Extensions {
             var rightOnly = new HashSet<T>(right, comparer);
             var intersect = new HashSet<T>(leftOnly, comparer);
 
-            intersect.ExceptWith(intersect);
+            intersect.IntersectWith(rightOnly);
 
             if(intersect.Count > 0) {
                 leftOnly.ExceptWith(intersect);
@@ -177,6 +177,16 @@ namespace DotLogix.Core.Extensions {
         public static List<T> AsList<T>(this IEnumerable<T> enumerable) {
             if(enumerable is List<T> list)
                 return list;
+
+            return new List<T>(enumerable);
+        }
+
+        /// <summary>
+        ///     Converts a enumerable to a collection, but checks if it is already a collection
+        /// </summary>
+        public static ICollection<T> AsCollection<T>(this IEnumerable<T> enumerable) {
+            if(enumerable is ICollection<T> collection)
+                return collection;
 
             return new List<T>(enumerable);
         }

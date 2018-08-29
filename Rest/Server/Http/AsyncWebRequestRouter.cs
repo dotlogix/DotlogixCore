@@ -9,6 +9,7 @@
 #region
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.State;
@@ -54,7 +55,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                 await asyncHttpContext.Response.CompleteAsync();
                 return;
             }
-            if(asyncHttpContext.Request.HeaderParameters.TryGetChildValue(EventSubscriptionParameterName, out string eventName)) {
+            if(asyncHttpContext.Request.HeaderParameters.TryGetValue(EventSubscriptionParameterName, out string eventName)) {
                 if(ServerEvents.TryGetValue(eventName, out var serverEvent) == false) {
                     await asyncHttpContext.Response.WriteToResponseStreamAsync("The event subscription could not be handled, because the event is not registered on the server");
                     asyncHttpContext.Response.StatusCode = HttpStatusCodes.ClientError.BadRequest;
@@ -116,7 +117,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                 return true;
 
             foreach(var parameter in routeMatch.UrlParameters)
-                asyncHttpRequest.UrlParameters.AddChild(parameter.Key, parameter.Value);
+                asyncHttpRequest.UrlParameters.Add(parameter.Key, parameter.Value);
 
             return true;
         }

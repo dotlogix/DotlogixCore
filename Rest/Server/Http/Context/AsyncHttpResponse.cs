@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -38,7 +39,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         public TransferState TransferState { get; private set; }
         public bool IsCompleted => TransferState == TransferState.Completed;
 
-        public NodeMap HeaderParameters { get; }
+        public IDictionary<string, object> HeaderParameters { get; }
 
         public MimeType ContentType { get; set; }
         public long ContentLength64 { get; set; }

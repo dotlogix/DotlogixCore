@@ -8,6 +8,7 @@
 
 #region
 using System.Reflection;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http.Context;
@@ -23,7 +24,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
         protected override bool TryGetParameterValue(IAsyncHttpRequest request, ParameterInfo methodParam, out object paramValue) {
             Node child = null;
 
-            if(request.UserDefinedParameters.TryGetChild(JsonDataParamName, out var node)) {
+            if(request.UserDefinedParameters.TryGetValue(JsonDataParamName, out Node node)) {
                 if(methodParam.IsDefined(typeof(JsonBodyAttribute)))
                     child = node;
                 else if(node is NodeMap nodeMap)
@@ -31,7 +32,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
             }
             if(child == null)
                 return base.TryGetParameterValue(request, methodParam, out paramValue);
-            paramValue = Nodes.Nodes.ToObject(child, methodParam.ParameterType);
+            paramValue = child.ToObject(methodParam.ParameterType);
             return true;
         }
     }

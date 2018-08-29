@@ -117,7 +117,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 _builder.Append(name, 1, name.Length - 1);
             } else
                 _builder.Append(name);
-            _builder.Append(_formatter.Ident ? "\" : " : "\":");
+            _builder.Append("\":");
         }
 
         private void AppendValueString(object value) {

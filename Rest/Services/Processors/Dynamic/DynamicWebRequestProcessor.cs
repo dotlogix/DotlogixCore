@@ -9,6 +9,7 @@
 #region
 using System.Reflection;
 using System.Text;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
@@ -45,10 +46,10 @@ namespace DotLogix.Core.Rest.Services.Processors.Dynamic {
         protected virtual bool TryGetParameterValue(IAsyncHttpRequest request, ParameterInfo methodParam, out object paramValue) {
             var name = methodParam.Name;
             var type = methodParam.ParameterType;
-            if(request.UserDefinedParameters.TryGetChildValue(name, type, out paramValue) ||
-               request.QueryParameters.TryGetChildValue(name, type, out paramValue) ||
-               request.UrlParameters.TryGetChildValue(name, type, out paramValue) ||
-               request.HeaderParameters.TryGetChildValue(name, type, out paramValue))
+            if(request.UserDefinedParameters.TryGetValue(name, type, out paramValue) ||
+               request.QueryParameters.TryGetValue(name, type, out paramValue) ||
+               request.UrlParameters.TryGetValue(name, type, out paramValue) ||
+               request.HeaderParameters.TryGetValue(name, type, out paramValue))
                 return true;
 
             if(methodParam.IsOptional) {

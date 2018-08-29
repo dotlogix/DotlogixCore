@@ -95,11 +95,11 @@ namespace DotLogix.Core.Nodes {
             return ToNode(null, instance, instanceType);
         }
 
-        public static Node ToNode(string name, object instance) {
+        internal static Node ToNode(string name, object instance) {
             return ToNode(name, instance, instance?.GetType());
         }
 
-        public static Node ToNode(string name, object instance, Type instanceType) {
+        internal static Node ToNode(string name, object instance, Type instanceType) {
             if(instance is Node node)
                 return node;
             var nodeWriter = new NodeWriter();

@@ -27,7 +27,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{8FFD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsServices", "WindowsServices\WindowsServices.csproj", "{C03B019E-2021-4D97-9D7D-E43429EC3779}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Config", "Config\Config.csproj", "{4A968E40-2BC3-4627-A561-85AE0E5AA108}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Config", "Config\Config.csproj", "{4A968E40-2BC3-4627-A561-85AE0E5AA108}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene", "Lucene\Lucene.csproj", "{03CBCF33-7908-44C7-9A9A-772363E6EE3F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,10 @@ Global
 		{4A968E40-2BC3-4627-A561-85AE0E5AA108}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A968E40-2BC3-4627-A561-85AE0E5AA108}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A968E40-2BC3-4627-A561-85AE0E5AA108}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03CBCF33-7908-44C7-9A9A-772363E6EE3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03CBCF33-7908-44C7-9A9A-772363E6EE3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03CBCF33-7908-44C7-9A9A-772363E6EE3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03CBCF33-7908-44C7-9A9A-772363E6EE3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
@@ -59,33 +60,36 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
         }
 
         protected virtual void AppendParameterValues(StringBuilder builder, IAsyncHttpRequest request) {
-            if(request.UrlParameters.ChildCount > 0) {
+            if(request.UrlParameters.Count > 0) {
                 builder.AppendLine("Url:");
                 AppendParameterValues(builder, request.UrlParameters);
                 builder.AppendLine();
             }
 
-            if(request.QueryParameters.ChildCount > 0) {
+            if(request.QueryParameters.Count > 0) {
                 builder.AppendLine("Query:");
                 AppendParameterValues(builder, request.QueryParameters);
                 builder.AppendLine();
             }
 
-            if(request.HeaderParameters.ChildCount > 0) {
+            if(request.HeaderParameters.Count > 0) {
                 builder.AppendLine("Header:");
                 AppendParameterValues(builder, request.HeaderParameters);
                 builder.AppendLine();
             }
 
-            if(request.UserDefinedParameters.ChildCount > 0) {
+            if(request.UserDefinedParameters.Count > 0) {
                 builder.AppendLine("UserDefined:");
                 AppendParameterValues(builder, request.UserDefinedParameters);
                 builder.AppendLine();
             }
         }
 
-        protected virtual void AppendParameterValues(StringBuilder builder, NodeMap parameters) {
-            builder.Append(parameters);
+        protected virtual void AppendParameterValues(StringBuilder builder, IDictionary<string, object> parameters) {
+            foreach(var parameter in parameters) {
+                builder.Append($"{parameter.Key} = {(parameter.Value is Array array ? string.Join(",", array) : parameter.Value)}");
+            }
+
         }
     }
 }

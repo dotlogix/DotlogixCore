@@ -7,6 +7,7 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -20,7 +21,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
     public interface IAsyncHttpResponse {
         TransferState TransferState { get; }
         bool IsCompleted { get; }
-        NodeMap HeaderParameters { get; }
+        IDictionary<string, object> HeaderParameters { get; }
         MimeType ContentType { get; set; }
         long ContentLength64 { get; set; }
         int ChunkSize { get; set; }

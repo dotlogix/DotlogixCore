@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -18,10 +19,10 @@ using DotLogix.Core.Rest.Server.Http.Mime;
 
 namespace DotLogix.Core.Rest.Server.Http.Context {
     public interface IAsyncHttpRequest {
-        NodeMap HeaderParameters { get; }
-        NodeMap QueryParameters { get; }
-        NodeMap UrlParameters { get; }
-        NodeMap UserDefinedParameters { get; }
+        IDictionary<string, object> HeaderParameters { get; }
+        IDictionary<string, object> QueryParameters { get; }
+        IDictionary<string, object> UrlParameters { get; }
+        IDictionary<string, object> UserDefinedParameters { get; }
         Uri Url { get; }
         HttpMethods HttpMethod { get; }
         MimeType ContentType { get; }

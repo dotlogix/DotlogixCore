@@ -92,11 +92,10 @@ namespace TestApp {
         private static async Task Main(string[] args) {
             var json = "{\"name\":\"Alex\",\"id\":1,\"guid\":\"605f282d-f216-4588-bede-512753ffc0cb\"}";
             var node = JsonNodes.ToNode<NodeMap>(json);
-
-            var dynNode = DynamicNode.From(node);
-            dynNode.Child = DynamicNode.Map();
-
-            Console.WriteLine(JsonNodes.ToJson(dynNode.Node, JsonNodesFormatter.Idented));
+            node.AddChild("person", Nodes.ToNode(new Person{FirstName="Alex", LastName = "Schill"}));
+            node.GetChild<NodeMap>("person").AddChild("childPerson", Nodes.ToNode(new Person { FirstName = "Alex", LastName = "Schill" }));
+            var flat = node.Flatten();
+            Console.WriteLine(JsonNodes.ToJson(flat, JsonNodesFormatter.Idented));
 
             Console.Read();
         }

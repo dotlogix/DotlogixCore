@@ -23,7 +23,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication.Basic {
         }
 
         public override Task AuthenticateAsync(WebRequestResult webRequestResult, string data) {
-            var dataSplit = data.FromBase64String().Split(':');
+            var dataSplit = StringExtensions.DecodeBase64(data).Split(':');
             if(dataSplit.Length == 2)
                 return _callbackAsync.Invoke(this, webRequestResult, dataSplit[0], dataSplit[1]);
 

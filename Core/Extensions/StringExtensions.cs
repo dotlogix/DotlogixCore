@@ -14,7 +14,7 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Extensions {
-    public static class StringExtension {
+    public static class StringExtensions {
         /// <summary>
         ///     Counts the occurances of a character in a string.
         /// </summary>
@@ -194,8 +194,21 @@ namespace DotLogix.Core.Extensions {
         /// <param name="plain">The string to convert</param>
         /// <param name="encoding">The encoding used to transform the string into bytes (default is UTF8)</param>
         /// <returns></returns>
-        public static string ToBase64String(this string plain, Encoding encoding = null) {
+        public static string EncodeBase64(string plain, Encoding encoding = null) {
+            if(plain == null)
+                throw new ArgumentNullException(nameof(plain));
             var bytes = (encoding ?? Encoding.UTF8).GetBytes(plain);
+            return EncodeBase64(bytes);
+        }
+
+        /// <summary>
+        ///     Converts a byte[] to its base64 encoded version
+        /// </summary>
+        /// <param name="bytes">The bytes to convert</param>
+        /// <returns></returns>
+        public static string EncodeBase64(byte[] bytes) {
+            if(bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
             return Convert.ToBase64String(bytes);
         }
 
@@ -205,10 +218,139 @@ namespace DotLogix.Core.Extensions {
         /// <param name="base64String">The base64 encoded string</param>
         /// <param name="encoding">The encoding used to transform the string into bytes (default is UTF8)</param>
         /// <returns></returns>
-        public static string FromBase64String(this string base64String, Encoding encoding = null) {
-            var bytes = Convert.FromBase64String(base64String);
+        public static string DecodeBase64(string base64String, Encoding encoding = null) {
+            if(base64String == null)
+                throw new ArgumentNullException(nameof(base64String));
+            var bytes = DecodeBase64ToArray(base64String);
             return (encoding ?? Encoding.UTF8).GetString(bytes);
         }
+
+        /// <summary>
+        ///     Converts a string back of its base64 encoded version
+        /// </summary>
+        /// <param name="base64String">The base64 encoded string</param>
+        /// <returns></returns>
+        public static byte[] DecodeBase64ToArray(string base64String) {
+            if(base64String == null)
+                throw new ArgumentNullException(nameof(base64String));
+            return Convert.FromBase64String(base64String);
+        }
+        #endregion
+
+        #region Base64Url
+
+        /// <summary>
+        ///     Converts a string to its base64 url encoded version
+        /// </summary>
+        /// <param name="plain">The string to convert</param>
+        /// <param name="encoding">The encoding used to transform the string into bytes (default is UTF8)</param>
+        /// <returns></returns>
+        public static string EncodeBase64Url(string plain, Encoding encoding = null) {
+            if(plain == null)
+                throw new ArgumentNullException(nameof(plain));
+            var bytes = (encoding ?? Encoding.UTF8).GetBytes(plain);
+            return EncodeBase64Url(bytes);
+        }
+
+        /// <summary>
+        ///     Converts a byte[] to its base64 url encoded version
+        /// </summary>
+        /// <param name="bytes">The bytes to convert</param>
+        /// <returns></returns>
+        public static string EncodeBase64Url(byte[] bytes) {
+            if(bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
+
+            var arraySize = ((bytes.Length + 2) / 3) * 4;
+            var chrArray = new char[arraySize];
+
+            // Start with default Base64 encoding.
+            var count = Convert.ToBase64CharArray(bytes, 0, bytes.Length, chrArray, 0);
+
+            // Fix up '+' -> '-' and '/' -> '_'. Drop padding characters.
+            for (var i = 0; i < count; i++) {
+                var ch = chrArray[i];
+                switch(ch) {
+                    case '+':
+                        chrArray[i] = '-';
+                        break;
+                    case '/':
+                        chrArray[i] = '_';
+                        break;
+                    case '=':
+                        return new string(chrArray, 0, i);
+                    default:
+                        continue;
+                }
+            }
+            return new string(chrArray);
+        }
+
+        /// <summary>
+        ///     Converts a string back of its base64 url encoded version
+        /// </summary>
+        /// <param name="base64String">The base64 url encoded string</param>
+        /// <param name="encoding">The encoding used to transform the string into bytes (default is UTF8)</param>
+        /// <returns></returns>
+        public static string DecodeBase64Url(string base64String, Encoding encoding = null) {
+            if(base64String == null)
+                throw new ArgumentNullException(nameof(base64String));
+            var bytes = DecodeBase64UrlToArray(base64String);
+            return (encoding ?? Encoding.UTF8).GetString(bytes);
+        }
+
+        /// <summary>
+        ///     Converts a string back of its base64 url encoded version
+        /// </summary>
+        /// <param name="base64String">The base64 url encoded string</param>
+        /// <returns></returns>
+        public static byte[] DecodeBase64UrlToArray(string base64String) {
+            if(base64String == null)
+                throw new ArgumentNullException(nameof(base64String));
+
+            var arraySize = base64String.Length;
+            switch (base64String.Length % 4)
+            {
+                case 0:
+                    break;
+                case 2:
+                    arraySize += 2;
+                    break;
+                case 3:
+                    arraySize += 1;
+                    break;
+            }
+
+            var chrArray = new char[arraySize];
+
+            for (var i = 0; i < base64String.Length; i++)
+            {
+                var ch = base64String[i];
+                if (ch == '-')
+                {
+                    chrArray[i] = '+';
+                }
+                else if (ch == '_')
+                {
+                    chrArray[i] = '/';
+                }
+                else
+                {
+                    chrArray[i] = ch;
+                }
+            }
+
+            for (var i = base64String.Length; i < chrArray.Length; i++)
+            {
+                chrArray[i] = '=';
+            }
+            
+            // Decode.
+            // If the caller provided invalid base64 chars, they'll be caught here.
+            return Convert.FromBase64CharArray(chrArray, 0, chrArray.Length);
+
+        }
+
         #endregion
 
         #region SplitAndKeep

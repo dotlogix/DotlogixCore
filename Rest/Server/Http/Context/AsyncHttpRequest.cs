@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -20,10 +21,10 @@ using DotLogix.Core.Rest.Server.Http.Mime;
 
 namespace DotLogix.Core.Rest.Server.Http.Context {
     public interface IParameterParser {
-        NodeMap Deserialize(NameValueCollection collection);
-        TCollection Serialize<TCollection>(NodeMap nodeMap) where TCollection : NameValueCollection, new();
-        void DeserializeValue(string name, string[] values, NodeMap nodeMap);
-        void SerializeValue(string name, Node valueNode, NameValueCollection collection);
+        IDictionary<string, object> Deserialize(NameValueCollection collection);
+        TCollection Serialize<TCollection>(IDictionary<string, object> parameters) where TCollection : NameValueCollection, new();
+        void DeserializeValue(string name, string[] values, IDictionary<string, object> parameters);
+        void SerializeValue(string name, object value, NameValueCollection collection);
     }
 
     public class ExtendedParameterParser : ParameterParserBase {
@@ -36,30 +37,29 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         }
 
         private static ExtendedParameterParser CreateDefaultParser() {
-            var parser = new ExtendedParameterParser();
-            return parser;
+            return new ExtendedParameterParser();
         }
 
-        public override void DeserializeValue(string name, string[] values, NodeMap nodeMap) {
+        public override void DeserializeValue(string name, string[] values, IDictionary<string, object> parameters) {
             if(SpecializedParsers.TryGetValue(name, out var parameterParser) == false)
                 parameterParser = FallBackParser;
-            parameterParser.DeserializeValue(name, values, nodeMap);
+            parameterParser.DeserializeValue(name, values, parameters);
         }
 
-        public override void SerializeValue(string name, Node valueNode, NameValueCollection collection) {
+        public override void SerializeValue(string name, object value, NameValueCollection collection) {
             if(SpecializedParsers.TryGetValue(name, out var parameterParser) == false)
                 parameterParser = FallBackParser;
-            parameterParser.SerializeValue(name, valueNode, collection);
+            parameterParser.SerializeValue(name, value, collection);
         }
     }
 
     public class AsyncHttpRequest : IAsyncHttpRequest {
-        private AsyncHttpRequest(HttpListenerRequest originalRequest, NodeMap headerMap, NodeMap queryMap) {
+        private AsyncHttpRequest(HttpListenerRequest originalRequest, IDictionary<string, object> headerParameters, IDictionary<string, object> queryParameters) {
             OriginalRequest = originalRequest;
-            HeaderParameters = headerMap;
-            QueryParameters = queryMap;
-            UrlParameters = new NodeMap();
-            UserDefinedParameters = new NodeMap();
+            HeaderParameters = headerParameters;
+            QueryParameters = queryParameters;
+            UrlParameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            UserDefinedParameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             ContentType = MimeType.Parse(originalRequest.ContentType);
             HttpMethod = AsyncHttpServer.HttpMethodFromString(originalRequest.HttpMethod);
             ContentLength64 = originalRequest.ContentLength64;
@@ -67,10 +67,10 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
             InputStream = originalRequest.InputStream;
         }
 
-        public NodeMap HeaderParameters { get; }
-        public NodeMap QueryParameters { get; }
-        public NodeMap UrlParameters { get; }
-        public NodeMap UserDefinedParameters { get; }
+        public IDictionary<string, object> HeaderParameters { get; }
+        public IDictionary<string, object> QueryParameters { get; }
+        public IDictionary<string, object> UrlParameters { get; }
+        public IDictionary<string, object> UserDefinedParameters { get; }
 
         public Uri Url => OriginalRequest.Url;
         public HttpMethods HttpMethod { get; }
@@ -98,74 +98,67 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         }
 
         public static AsyncHttpRequest Create(HttpListenerRequest originalRequest, IParameterParser parameterParser) {
-            var headerMap = parameterParser.Deserialize(originalRequest.Headers);
-            var queryMap = parameterParser.Deserialize(originalRequest.QueryString);
-            return new AsyncHttpRequest(originalRequest, headerMap, queryMap);
+            var headerParameters = parameterParser.Deserialize(originalRequest.Headers);
+            var queryParameters = parameterParser.Deserialize(originalRequest.QueryString);
+            return new AsyncHttpRequest(originalRequest, headerParameters, queryParameters);
         }
     }
 
 
     public abstract class ParameterParserBase : IParameterParser {
-        public NodeMap Deserialize(NameValueCollection collection) {
-            var nodeMap = new NodeMap();
+        public IDictionary<string, object> Deserialize(NameValueCollection collection) {
+            var parameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             for(var i = 0; i < collection.Count; i++) {
                 var name = collection.GetKey(i);
                 var values = collection.GetValues(i);
 
-                DeserializeValue(name, values, nodeMap);
+                DeserializeValue(name, values, parameters);
             }
-            return nodeMap;
+            return parameters;
         }
 
-        public TCollection Serialize<TCollection>(NodeMap nodeMap) where TCollection : NameValueCollection, new() {
+        public TCollection Serialize<TCollection>(IDictionary<string, object> parameters) where TCollection : NameValueCollection, new() {
             var collection = new TCollection();
-            foreach(var childNode in nodeMap.Children()) {
-                var name = childNode.Name;
-                SerializeValue(name, childNode, collection);
+            foreach(var parameter in parameters) {
+                SerializeValue(parameter.Key, parameter.Value, collection);
             }
             return collection;
         }
 
-        public abstract void DeserializeValue(string name, string[] values, NodeMap nodeMap);
-        public abstract void SerializeValue(string name, Node valueNode, NameValueCollection collection);
+        public abstract void DeserializeValue(string name, string[] values, IDictionary<string, object> parameters);
+        public abstract void SerializeValue(string name, object value, NameValueCollection collection);
     }
 
     public class PrimitiveParameterParser : ParameterParserBase {
         public static IParameterParser Instance { get; } = new PrimitiveParameterParser();
         private PrimitiveParameterParser() { }
 
-        public override void DeserializeValue(string name, string[] values, NodeMap nodeMap) {
+        public override void DeserializeValue(string name, string[] values, IDictionary<string, object> parameters) {
             if(values == null)
                 return;
 
             switch(values.Length) {
                 case 0:
-                    nodeMap.CreateValue(name);
+                    parameters.Add(name, null);
                     break;
                 case 1:
-                    nodeMap.CreateValue(name, values[0]);
+                    parameters.Add(name, values[0]);
                     break;
                 default:
-                    var list = nodeMap.CreateList(name);
-                    foreach(var value in values)
-                        list.AddChild(new NodeValue(value));
+                    parameters.Add(name, values);
                     break;
             }
         }
 
-        public override void SerializeValue(string name, Node valueNode, NameValueCollection collection) {
-            switch(valueNode.Type) {
-                case NodeTypes.Empty:
-                case NodeTypes.Value:
-                    collection.Add(name, ((NodeValue)valueNode).GetValue<string>());
-                    break;
-                case NodeTypes.Map:
-                    foreach(var childNode in ((NodeList)valueNode).Children())
-                        collection.Add(name, ((NodeValue)childNode).GetValue<string>());
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+        public override void SerializeValue(string name, object value, NameValueCollection collection) {
+            if(!(value is Array array))
+            {
+                collection.Add(name, value.ToString());
+                return;
             }
+
+            foreach(var child in array)
+                collection.Add(name, child.ToString());
         }
     }
 }

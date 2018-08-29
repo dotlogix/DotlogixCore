@@ -12,6 +12,7 @@ using System.IO;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Processor;
 #endregion
 
 namespace DotLogix.Core.Config {
@@ -40,7 +41,7 @@ namespace DotLogix.Core.Config {
             AutoReload = false;
             EnableFileWatching = false;
             try {
-                var json = JsonNodes.ToJson(CurrentConfig);
+                var json = JsonNodes.ToJson(CurrentConfig, JsonNodesFormatter.Idented);
                 File.WriteAllText(AbsolutePath, json);
                 HasChanged = false;
                 return true;

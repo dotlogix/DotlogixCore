@@ -30,7 +30,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
         }
 
         public override void ReAttach(TEntity entity) {
-            _dbSet.Attach(entity);
+            var entry = _dbSet.Attach(entity);
         }
 
         public override void ReAttachRange(IEnumerable<TEntity> entities) {

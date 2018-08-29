@@ -12,6 +12,6 @@ using DotLogix.Core.Rest.Services.Writer;
 
 namespace DotLogix.Core.Rest.Services.Attributes.ResultWriter {
     public class StreamRouteResultWriterAttribute : RouteResultWriterAttribute {
-        protected StreamRouteResultWriterAttribute() : base(() => WebRequestResultStreamWriter.Instance) { }
+        public StreamRouteResultWriterAttribute() : base(() => WebRequestResultStreamWriter.Instance) { }
     }
 }

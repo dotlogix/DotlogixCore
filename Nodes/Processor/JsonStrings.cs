@@ -7,7 +7,9 @@
 // ==================================================
 
 #region
+using System.Globalization;
 using System.Text;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
@@ -117,7 +119,8 @@ namespace DotLogix.Core.Nodes.Processor {
                         current = 't';
                         break;
                     default:
-                        if(current < ' ') {
+                        int currentInt = current;
+                        if (currentInt <= 0x20 || (currentInt >= 0x7F && currentInt <= 0x9F)) {
                             ToCharAsUnicode(current, unicodeBuffer);
                             builder.Append(unicodeBuffer);
                         } else
@@ -142,6 +145,13 @@ namespace DotLogix.Core.Nodes.Processor {
             }
             if(addQuotes)
                 builder.Append("\"");
+        }
+
+        public static string ToCharAsUnicode(int chr)
+        {
+            var unicodeBuffer = new char[6];
+            ToCharAsUnicode(chr, unicodeBuffer);
+            return new string(unicodeBuffer);
         }
 
         private static void ToCharAsUnicode(int chr, char[] buffer) {
@@ -171,6 +181,10 @@ namespace DotLogix.Core.Nodes.Processor {
             if(hex <= 57) // <= '9'
                 return hex - 48; // - '0'
             return hex - 87; // - 10 + 'a'
+        }
+
+        public static bool IsHex(int hex) {
+            return HexToInt(hex).LaysBetween(0, 15);
         }
     }
 }

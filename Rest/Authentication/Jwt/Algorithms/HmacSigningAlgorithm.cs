@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DotLogix.Core.Rest.Services.Processors.Authentication.Jwt.Algorithms {
+namespace DotLogix.Core.Rest.Authentication.Jwt.Algorithms {
     public class HmacSigningAlgorithm : SigningAlgorithmBase {
         private readonly HMAC _hmac;
         public HmacSigningAlgorithm(string key, HmacAlgorithm algorithm) : base(algorithm.ToString().ToLower()) {

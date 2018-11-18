@@ -29,8 +29,8 @@ namespace DotLogix.Core.Utils.Patterns {
 
         public string Name { get; }
 
-        public virtual string GetRegexPattern(string variant, string[] args) {
-            return PatternVariants.TryGetValue(variant ?? DefaultVariant, out var pattern) ? pattern : null;
+        public virtual bool TryGetRegexPattern(string variant, string[] args, out string pattern) {
+            return PatternVariants.TryGetValue(variant ?? DefaultVariant, out pattern);
         }
     }
 }

@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {

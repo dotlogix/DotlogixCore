@@ -9,13 +9,11 @@
 #region
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {

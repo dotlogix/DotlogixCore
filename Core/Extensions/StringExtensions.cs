@@ -454,8 +454,13 @@ namespace DotLogix.Core.Extensions {
                         target = Enum.Parse(targetType, value);
                         result = true;
                     } catch {
-                        target = null;
-                        result = false;
+                        try {
+                            target = Enum.Parse(targetType, value, true);
+                            result = true;
+                        } catch {
+                            target = null;
+                            result = false;
+                        }
                     }
                     break;
                 case DataTypeFlags.SByte:

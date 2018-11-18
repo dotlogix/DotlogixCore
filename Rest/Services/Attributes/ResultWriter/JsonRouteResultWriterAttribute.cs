@@ -7,7 +7,6 @@
 // ==================================================
 
 #region
-using System;
 using DotLogix.Core.Rest.Services.Writer;
 #endregion
 

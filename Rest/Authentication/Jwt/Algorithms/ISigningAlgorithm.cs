@@ -1,4 +1,4 @@
-﻿namespace DotLogix.Core.Rest.Services.Processors.Authentication.Jwt.Algorithms
+﻿namespace DotLogix.Core.Rest.Authentication.Jwt.Algorithms
 {
     public interface ISigningAlgorithm {
         string Name { get; }

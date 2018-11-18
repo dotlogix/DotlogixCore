@@ -18,7 +18,7 @@ using DotLogix.Core.Rest.Services.Exceptions;
 
 namespace DotLogix.Core.Rest.Services.Processors.Json {
     public class ParseJsonBodyPreProcessor : WebRequestProcessorBase {
-        public const string JsonDataParamName = "jsonData";
+        public const string JsonDataParamName = "$jsonData";
         public static IWebRequestProcessor Instance { get; } = new ParseJsonBodyPreProcessor();
         private ParseJsonBodyPreProcessor() : base(int.MaxValue) { }
 

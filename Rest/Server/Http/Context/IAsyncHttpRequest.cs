@@ -13,7 +13,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Mime;
 #endregion
 
@@ -29,7 +28,6 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         long ContentLength64 { get; }
         Encoding ContentEncoding { get; }
         Stream InputStream { get; }
-        HttpListenerRequest OriginalRequest { get; }
         Task<int> ReadDataFromRequestStreamAsync(byte[] data, int offset, int count);
         Task<byte[]> ReadDataFromRequestStreamAsync();
         Task<string> ReadStringFromRequestStreamAsync();

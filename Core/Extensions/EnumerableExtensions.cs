@@ -236,8 +236,8 @@ namespace DotLogix.Core.Extensions {
             var i = list.Count;
             do {
                 var rand = random.Next(i);
-                list.Swap(rand, i);
-                yield return list[--i];
+                list.Swap(rand, --i);
+                yield return list[i];
             } while(i > 1);
             yield return list[0];
         }
@@ -370,8 +370,8 @@ namespace DotLogix.Core.Extensions {
         /// <param name="keySelector">The function to get the key of the current element</param>
         /// <param name="parentKeySelector">The function to get the key of the parent element</param>
         /// <returns></returns>
-        public static Hierarchy<TKey, TValue> ToHierarchy<TKey, TValue>(this IEnumerable<TValue> items, Func<TValue, TKey> keySelector, Func<TValue, TKey> parentKeySelector) {
-            var root = new Hierarchy<TKey, TValue>(default);
+        public static Hierarchy<TKey, TValue> ToHierarchy<TKey, TValue>(this IEnumerable<TValue> items, Func<TValue, TKey> keySelector, Func<TValue, TKey> parentKeySelector) where TKey : IComparable {
+            var root = new Hierarchy<TKey, TValue>(default, default);
             var dict = new Dictionary<TKey, Hierarchy<TKey, TValue>>();
             var grouped = items.GroupBy(parentKeySelector.Invoke).ToList();
             while(grouped.Count > 0) {
@@ -388,13 +388,13 @@ namespace DotLogix.Core.Extensions {
                     grouped.RemoveAt(i);
 
                     foreach(var value in group) {
-                        var hierarchy = parent.Add(keySelector.Invoke(value), value);
+                        var hierarchy = parent.AddChild(keySelector.Invoke(value), value);
                         dict.Add(hierarchy.Key, hierarchy);
                     }
                 }
 
                 if(grouped.Count == prevCount)
-                    throw new InvalidOperationException("Can not resolve the whole hierarchy, maxbe there are some cross dependencies");
+                    throw new InvalidOperationException("Can not resolve the whole hierarchy, maybe there are some cross dependencies");
             }
             return root;
         }

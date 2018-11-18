@@ -7,7 +7,6 @@
 // ==================================================
 
 #region
-using System.Globalization;
 using System.Text;
 using DotLogix.Core.Extensions;
 #endregion

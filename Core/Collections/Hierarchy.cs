@@ -2,123 +2,150 @@
 // Copyright 2018(C) , DotLogix
 // File:  Hierarchy.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  10.03.2018
-// LastEdited:  01.08.2018
+// Created:  03.09.2018
+// LastEdited:  03.09.2018
 // ==================================================
 
 #region
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Collections {
-    public class HierarchyCollection<TKey, TValue> : KeyedCollection<TKey, Hierarchy<TKey, TValue>> {
-        public HierarchyCollection() : base(i => i.Key) { }
-    }
-
-
-    public class Hierarchy<TKey, TValue> {
+    public class Hierarchy<TKey, TValue> where TKey : IComparable {
         private readonly Dictionary<TKey, Hierarchy<TKey, TValue>> _children = new Dictionary<TKey, Hierarchy<TKey, TValue>>();
-
-        public TKey Key { get; }
-        public TValue Value { get; set; }
-        public bool IsLeaf => _children.Count == 0;
-        public bool IsNode => _children.Count > 0;
         public Hierarchy<TKey, TValue> this[TKey key] => _children[key];
-        public IEnumerable<Hierarchy<TKey, TValue>> Children => _children.Values;
 
-        public IEnumerable<Hierarchy<TKey, TValue>> ChildrenRecursive {
+        public int Count => _children.Count;
+
+
+        public Hierarchy<TKey, TValue> Root {
             get {
-                var list = new List<Hierarchy<TKey, TValue>>();
-                GetChildrenRecursive(list);
-                return list;
+                Hierarchy<TKey, TValue> ancestor;
+                var current = this;
+                while((ancestor = current.Ancestor) != null)
+                    current = ancestor;
+                return current;
             }
         }
 
+        public bool IsRoot => Ancestor == null;
 
-        public Hierarchy(TKey key, TValue value = default) {
+        public Hierarchy<TKey, TValue> Ancestor { get; private set; }
+        public bool HasAncestor => Ancestor != null;
+
+        public TKey Key { get; }
+        public TValue Value { get; set; }
+
+
+        public Hierarchy(TKey key, TValue value, Hierarchy<TKey, TValue> ancestor = default) {
             Key = key;
             Value = value;
+            Ancestor = ancestor;
         }
 
-        private void GetChildrenRecursive(List<Hierarchy<TKey, TValue>> children) {
-            children.AddRange(_children.Values);
-            foreach(var child in _children.Values)
-                child.GetChildrenRecursive(children);
+
+        public IEnumerable<Hierarchy<TKey, TValue>> Children() {
+            return _children.Values.ToList();
+        }
+
+        public IEnumerable<TValue> Values() {
+            return _children.Values.Select(n => n.Value).ToList();
+        }
+
+        public IEnumerable<Hierarchy<TKey, TValue>> Ancestors() {
+            var current = this;
+            while((current = current.Ancestor) != null)
+                yield return current;
+        }
+
+        public IEnumerable<Hierarchy<TKey, TValue>> Descendants() {
+            var currentLevel = new List<IEnumerable<Hierarchy<TKey, TValue>>> {Children()};
+            var nextLevel = new List<IEnumerable<Hierarchy<TKey, TValue>>>();
+
+            do {
+                foreach(var child in currentLevel.Balance()) {
+                    yield return child;
+                    nextLevel.Add(child.Children());
+                }
+
+                var temp = currentLevel;
+                currentLevel = nextLevel;
+                nextLevel = temp;
+                nextLevel.Clear();
+            } while(currentLevel.Count > 0);
         }
 
         public void Clear() {
+            foreach(var child in _children.Values)
+                child.Ancestor = null;
             _children.Clear();
         }
 
-        public Hierarchy<TKey, TValue> Add(TKey key, TValue value) {
-            var hierarchy = new Hierarchy<TKey, TValue>(key, value);
+        #region Remove
+        public void RemoveChild(TKey key) {
+            var child = _children[key];
+
+            child.Ancestor = null;
+            _children.Remove(key);
+        }
+        #endregion
+
+        #region Get
+        public Hierarchy<TKey, TValue> GetChild(TKey key) {
+            if(key == null)
+                throw new ArgumentNullException(nameof(key));
+
+            return _children.TryGetValue(key, out var child) ? child : null;
+        }
+
+        public bool TryGetChild(TKey key, out Hierarchy<TKey, TValue> child) {
+            if(key == null)
+                throw new ArgumentNullException(nameof(key));
+
+            return _children.TryGetValue(key, out child);
+        }
+
+        public TValue GetValue(TKey key, TValue defaultValue = default) {
+            return TryGetChild(key, out var child) ? child.Value : defaultValue;
+        }
+
+        public bool TryGetValue(TKey key, out TValue value) {
+            if(TryGetChild(key, out var child))
+                value = child.Value;
+
+            value = default;
+            return false;
+        }
+        #endregion
+
+        #region Add
+        public void AddChild(Hierarchy<TKey, TValue> child) {
+            if(child == null)
+                throw new ArgumentNullException(nameof(child));
+
+            if(child.Ancestor != null)
+                throw new ArgumentException(nameof(Hierarchy<TKey, TValue>) + " already has an ancestor", nameof(child));
+
+            child.Ancestor = this;
+            _children.Add(child.Key, child);
+        }
+
+        public Hierarchy<TKey, TValue> AddChild(TKey key, TValue value) {
+            if(key == null)
+                throw new ArgumentNullException(nameof(key));
+
+            var hierarchy = new Hierarchy<TKey, TValue>(key, value, this);
             _children.Add(key, hierarchy);
             return hierarchy;
         }
 
-        public bool Remove(TKey key) {
-            return _children.Remove(key);
+        public void AddChildren(IEnumerable<Hierarchy<TKey, TValue>> children) {
+            foreach(var child in children)
+                AddChild(child);
         }
-
-        public bool TryGetValue(TKey key, out TValue value) {
-            if(TryGetChild(key, out var child)) {
-                value = child.Value;
-                return true;
-            }
-
-            value = default;
-            return true;
-        }
-
-        public bool TryGetChild(TKey key, out Hierarchy<TKey, TValue> child) {
-            return _children.TryGetValue(key, out child);
-        }
-
-        public bool ContainsKey(TKey key) {
-            return _children.ContainsKey(key);
-        }
-
-        public void AddRecursive(TKey parentKey, TKey key, TValue value) {
-            if(TryGetChildRecursive(parentKey, out var child) == false)
-                throw new KeyNotFoundException();
-
-            child.Add(key, value);
-        }
-
-        public bool RemoveRecursive(TKey key) {
-            return _children.Remove(key) || _children.Values.Any(child => child.RemoveRecursive(key));
-        }
-
-        public bool TryGetValueRecursive(TKey key, out TValue value) {
-            if(TryGetChildRecursive(key, out var child)) {
-                value = child.Value;
-                return true;
-            }
-
-            if(_children.Values.Any(childHierarchy => childHierarchy.TryGetChildRecursive(key, out child))) {
-                value = child.Value;
-                return true;
-            }
-
-            value = default;
-            return true;
-        }
-
-        public bool TryGetChildRecursive(TKey key, out Hierarchy<TKey, TValue> child) {
-            if(_children.TryGetValue(key, out child))
-                return true;
-
-            foreach(var childHierarchy in _children.Values) {
-                if(childHierarchy.TryGetChildRecursive(key, out child))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool ContainsKeyRecursive(TKey key) {
-            return TryGetChildRecursive(key, out _);
-        }
+        #endregion
     }
 }

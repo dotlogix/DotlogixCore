@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Text;
 using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Nodes

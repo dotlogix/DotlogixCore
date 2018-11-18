@@ -13,7 +13,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Mime;
 using DotLogix.Core.Rest.Server.Http.State;
 using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
@@ -46,7 +45,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         public int ChunkSize { get; set; }
         public Encoding ContentEncoding { get; set; }
         public HttpStatusCode StatusCode { get; set; }
-        public MemoryStream OutputStream { get; }
+        public Stream OutputStream { get; }
         public HttpListenerResponse OriginalResponse { get; }
 
         public async Task WriteToResponseStreamAsync(byte[] data, int offset, int count) {

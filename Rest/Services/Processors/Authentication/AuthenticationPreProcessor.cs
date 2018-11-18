@@ -12,12 +12,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes;
+using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
-using DotLogix.Core.Rest.Services.Processors.Authentication.Base;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Authentication {

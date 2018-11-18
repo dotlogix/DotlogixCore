@@ -46,7 +46,7 @@ namespace DotLogix.Core {
         }
 
         public bool Equals(Optional<TValue> other) {
-            return (IsDefined == other.IsDefined) && EqualityComparer<TValue>.Default.Equals(Value, other.Value);
+            return (IsDefined == other.IsDefined) && (IsDefined==false || EqualityComparer<TValue>.Default.Equals(Value, other.Value));
         }
 
         public bool Equals(TValue other) {
@@ -62,10 +62,11 @@ namespace DotLogix.Core {
         public override bool Equals(object obj) {
             switch(obj) {
                 case null:
-                    return false;
-                case Optional<TValue> optional when Equals(optional):
-                case TValue value when Equals(value):
-                    return true;
+                    return Equals(Value, null);
+                case Optional<TValue> optional:
+                    return Equals(optional);
+                case TValue value:
+                    return Equals(value);
             }
             return false;
         }
@@ -73,9 +74,7 @@ namespace DotLogix.Core {
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode() {
-            unchecked {
-                return (IsDefined.GetHashCode() * 397) ^ EqualityComparer<TValue>.Default.GetHashCode(Value);
-            }
+            return IsDefined && Value != null ? Value.GetHashCode() : 0;
         }
 
         /// <summary>

@@ -9,7 +9,6 @@
 #region
 using System;
 using System.Collections.Generic;
-using DotLogix.Core.Nodes.Processor;
 #endregion
 
 namespace DotLogix.Core.Nodes {

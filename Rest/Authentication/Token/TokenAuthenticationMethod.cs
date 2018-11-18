@@ -9,11 +9,11 @@
 #region
 using System;
 using System.Threading.Tasks;
+using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Services.Processors.Authentication.Base;
 #endregion
 
-namespace DotLogix.Core.Rest.Services.Processors.Authentication.Token {
+namespace DotLogix.Core.Rest.Authentication.Token {
     public class TokenAuthenticationMethod : AuthenticationMethodBase {
         private readonly ValidateTokenAsyncCallback _callbackAsync;
 

@@ -14,7 +14,7 @@ using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Exceptions;
 #endregion
 
-namespace DotLogix.Core.Rest.Services.Processors.Authentication.Base {
+namespace DotLogix.Core.Rest.Authentication.Base {
     public abstract class AuthenticationMethodBase : IAuthenticationMethod {
         protected AuthenticationMethodBase(string name, params string[] supportedDataFormats) {
             Name = name;

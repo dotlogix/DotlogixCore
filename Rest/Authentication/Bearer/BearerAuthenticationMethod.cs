@@ -8,11 +8,11 @@
 
 #region
 using System.Threading.Tasks;
+using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Services.Processors.Authentication.Base;
 #endregion
 
-namespace DotLogix.Core.Rest.Services.Processors.Authentication.Bearer {
+namespace DotLogix.Core.Rest.Authentication.Bearer {
     public class BearerAuthenticationMethod : AuthenticationMethodBase {
         private readonly ValidateBearerAsyncCallback _callbackAsync;
 

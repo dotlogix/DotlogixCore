@@ -14,12 +14,12 @@ using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Rest.Authentication.Base;
+using DotLogix.Core.Rest.Authentication.Jwt.Algorithms;
 using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Services.Processors.Authentication.Base;
-using DotLogix.Core.Rest.Services.Processors.Authentication.Jwt.Algorithms;
 #endregion
 
-namespace DotLogix.Core.Rest.Services.Processors.Authentication.Jwt {
+namespace DotLogix.Core.Rest.Authentication.Jwt {
     public class JwtAuthenticationMethod<TClaim> : AuthenticationMethodBase {
         private readonly Dictionary<string, ISigningAlgorithm> _algorithms;
         private readonly ValidateClaimAsyncCallback<TClaim> _callbackAsync;

@@ -102,7 +102,7 @@ namespace DotLogix.Core.Extensions {
                 list.Insert(0, item);
                 return;
             }
-            var index = list.BinarySearch(item);
+            var index = list.BinarySearch(item, comparer);
             if(index < 0)
                 index = ~index;
             list.Insert(index, item);

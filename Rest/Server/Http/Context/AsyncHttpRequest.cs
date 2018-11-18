@@ -8,14 +8,12 @@
 
 #region
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Mime;
 #endregion
 

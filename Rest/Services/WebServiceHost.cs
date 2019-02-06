@@ -79,13 +79,7 @@ namespace DotLogix.Core.Rest.Services {
 
                 var dynamicInvoke = methodInfo.CreateDynamicInvoke();
 
-                string route;
-                if(string.IsNullOrEmpty(serviceInstance.RoutePrefix) == false)
-                    route = serviceInstance.RoutePrefix + routeAttribute.Pattern;
-                else
-                    route = routeAttribute.Pattern;
-
-                var serviceRoute = routeAttribute.BuildRoute(serviceInstance, _currentRouteIndex++, dynamicInvoke, route);
+                var serviceRoute = routeAttribute.BuildRoute(serviceInstance, _currentRouteIndex++, dynamicInvoke, routeAttribute.Pattern);
                 if(serviceRoute == null)
                     continue;
 
@@ -102,7 +96,8 @@ namespace DotLogix.Core.Rest.Services {
                 if(resultWriterAttribute != null)
                     serviceRoute.WebRequestResultWriter = resultWriterAttribute.CreateResultWriter();
 
-                _router.ServerRoutes.Add(serviceRoute);
+
+                _router.ServerRoutes.Add(serviceInstance.RoutePrefix ?? "",serviceRoute);
                 count++;
             }
             if(count > 0)

@@ -12,11 +12,27 @@ using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core {
-    public struct Optional<TValue> {
+    public struct Optional<TValue> : IOptional<TValue>{
         public static Optional<TValue> Undefined => new Optional<TValue>();
         public bool IsDefined { get; }
         public bool IsDefault => IsDefined && Equals(Value, default(TValue));
         public bool IsUndefinedOrDefault => (IsDefined == false) || Equals(Value, default(TValue));
+        object IOptional.Value => Value;
+
+        object IOptional.GetValueOrDefault(object defaultValue) {
+            return GetValueOrDefault((TValue)defaultValue);
+        }
+
+        bool IOptional.TryGetValue(out object value) {
+            if(TryGetValue(out var tvalue)) {
+                value = tvalue;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
         public TValue Value { get; }
 
         public Optional(TValue value) {

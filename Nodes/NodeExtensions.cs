@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
+using DotLogix.Core.Nodes.Processor;
 #endregion
 
 namespace DotLogix.Core.Nodes {
@@ -217,5 +218,16 @@ namespace DotLogix.Core.Nodes {
         }
         #endregion
         #endregion
+
+        public static Node Clone(this Node node) {
+            var reader = new NodeReader(node);
+            var writer = new NodeWriter();
+            reader.CopyTo(writer);
+            return writer.Root;
+        }
+
+        public static TNode Clone<TNode>(this TNode node) where TNode : Node {
+            return (TNode)Clone((Node)node);
+        }
     }
 }

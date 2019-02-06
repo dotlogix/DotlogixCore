@@ -119,7 +119,11 @@ namespace DotLogix.Core.Nodes.Processor {
                         break;
                     default:
                         int currentInt = current;
-                        if (currentInt <= 0x20 || (currentInt >= 0x7F && currentInt <= 0x9F)) {
+                        if (currentInt < 0x20 || (currentInt >= 0x7F && currentInt <= 0x9F)) {
+                            if(safeCharactersCount > 0) {
+                                builder.Append(value, i - safeCharactersCount, safeCharactersCount);
+                                safeCharactersCount = 0;
+                            }
                             ToCharAsUnicode(current, unicodeBuffer);
                             builder.Append(unicodeBuffer);
                         } else

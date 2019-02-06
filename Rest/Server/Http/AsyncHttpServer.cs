@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Server.Http.Context;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Exceptions;
 using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;

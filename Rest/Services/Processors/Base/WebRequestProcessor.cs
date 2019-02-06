@@ -33,32 +33,33 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
             Descriptors.Add(new MethodDescriptor(dynamicInvoke));
         }
 
-        public override async Task ProcessAsync(WebServiceContext webServiceContext) {
-            var webRequestResult = webServiceContext.RequestResult;
-            var parameters = CreateParameters(webRequestResult);
+        public override async Task ProcessAsync(WebServiceContext context) {
+            var webRequestResult = context.RequestResult;
+            var parameters = CreateParameters(context);
             if(webRequestResult.Handled)
                 return;
 
             try {
-                var result = await InvokeAsync(webRequestResult, parameters);
+                var result = await InvokeAsync(context, parameters);
                 webRequestResult.TrySetResult(result);
             } catch(Exception e) {
                 webRequestResult.TrySetException(e);
             }
         }
 
-        protected virtual object[] CreateParameters(WebRequestResult webRequestResult) {
-            return new object[] {webRequestResult.Context};
+        protected virtual object[] CreateParameters(WebServiceContext context) {
+            return new object[] {context};
         }
 
-        protected virtual async Task<object> InvokeAsync(WebRequestResult webRequest, object[] parameters) {
+        protected virtual async Task<object> InvokeAsync(WebServiceContext context, object[] parameters) {
             var returnValue = DynamicInvoke.Invoke(Target, parameters);
             if(IsAsyncMethod)
                 returnValue = await ((Task)returnValue).UnpackResultAsync();
             return returnValue;
         }
 
-        protected virtual void AppendParameterValues(StringBuilder builder, IAsyncHttpRequest request) {
+        protected virtual void AppendParameterValues(StringBuilder builder, WebServiceContext context) {
+            var request = context.HttpRequest;
             if(request.UrlParameters.Count > 0) {
                 builder.AppendLine("Url:");
                 AppendParameterValues(builder, request.UrlParameters);
@@ -77,9 +78,9 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
                 builder.AppendLine();
             }
 
-            if(request.UserDefinedParameters.Count > 0) {
+            if(context.Variables.Count > 0) {
                 builder.AppendLine("UserDefined:");
-                AppendParameterValues(builder, request.UserDefinedParameters);
+                AppendParameterValues(builder, context.Variables);
                 builder.AppendLine();
             }
         }

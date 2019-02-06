@@ -22,7 +22,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             Context = asyncHttpContext;
             Route = route;
             Router = asyncWebRequestRouter;
-            if(Context.Request.HeaderParameters.TryGetValue(AsyncWebRequestRouter.EventSubscriptionChannelParameterName, out string channel))
+            if(Context.Request.HeaderParameters.TryGetValueAs(AsyncWebRequestRouter.EventSubscriptionChannelParameterName, out string channel))
                 Channel = channel;
         }
 

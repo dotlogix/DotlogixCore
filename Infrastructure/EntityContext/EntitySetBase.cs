@@ -20,23 +20,23 @@ using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
     public abstract class EntitySetBase<TEntity> : IEntitySet<TEntity> where TEntity : ISimpleEntity {
-        public Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default) {
+        public virtual Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default) {
             return Query().Where(e => e.Id == id).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default) {
+        public virtual Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default) {
             return Query().Where(e => ids.Contains(e.Id)).ToEnumerableAsync(cancellationToken);
         }
 
-        public Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default) {
+        public virtual Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default) {
             return Query().Where(e => e.Guid == guid).SingleOrDefaultAsync(cancellationToken);
         }
 
-        public Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default) {
+        public virtual Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default) {
             return Query().Where(e => guids.Contains(e.Guid)).ToEnumerableAsync(cancellationToken);
         }
 
-        public Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
+        public virtual Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
             return Query().ToEnumerableAsync(cancellationToken);
         }
 
@@ -48,7 +48,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
         public abstract void ReAttachRange(IEnumerable<TEntity> entities);
         public abstract IQuery<TEntity> Query();
 
-        public Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
+        public virtual Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
             return Query().Where(filterExpression).ToEnumerableAsync(cancellationToken);
         }
     }

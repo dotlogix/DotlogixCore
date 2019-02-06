@@ -17,12 +17,12 @@ namespace DotLogix.Core.Nodes {
         private const int StringBuilderCapacity = 256;
 
         #region ToNode
-        public static TNode ToNode<TNode>(string json) where TNode : Node {
-            return (TNode)ToNode(json);
+        public static TNode ToNode<TNode>(string json, bool ignoreOverflow=false) where TNode : Node {
+            return (TNode)ToNode(json, ignoreOverflow);
         }
 
-        public static Node ToNode(string json) {
-            var reader = new JsonNodeReader(json);
+        public static Node ToNode(string json, bool ignoreOverflow=false) {
+            var reader = new JsonNodeReader(json, ignoreOverflow);
             var writer = new NodeWriter();
             reader.CopyTo(writer);
             return writer.Root;

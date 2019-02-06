@@ -30,16 +30,16 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
 
         public AuthenticationPreProcessor(int priority, params IAuthenticationMethod[] authMethods) : this(priority, authMethods.AsEnumerable()) { }
 
-        public override Task ProcessAsync(WebServiceContext webServiceContext) {
-            var authenticationDescriptor = webServiceContext.Route.RequestProcessor.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
+        public override Task ProcessAsync(WebServiceContext context) {
+            var authenticationDescriptor = context.Route.RequestProcessor.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
             if((authenticationDescriptor != null) && (authenticationDescriptor.RequiresAuthentication == false))
                 return Task.CompletedTask;
 
-            var request = webServiceContext.HttpRequest;
-            var result = webServiceContext.RequestResult;
+            var request = context.HttpRequest;
+            var result = context.RequestResult;
             var headerParameters = request.HeaderParameters;
 
-            if(headerParameters.TryGetValue(AuthorizationParameterName, out string authParameter) == false) {
+            if(headerParameters.TryGetValueAs(AuthorizationParameterName, out string authParameter) == false) {
                 SetInvalidFormatException(result);
                 return Task.CompletedTask;
             }

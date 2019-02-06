@@ -9,7 +9,7 @@
 #region
 #endregion
 
-namespace DotLogix.Core.Rest.Server.Http.Mime {
+namespace DotLogix.Core.Rest.Server.Http.Headers {
     public static class MimeTypes {
         public static class Application {
             public static MimeType Gzip { get; } = new MimeType("application/gzip");

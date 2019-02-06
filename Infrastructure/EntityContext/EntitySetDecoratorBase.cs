@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
@@ -16,58 +17,38 @@ using DotLogix.Architecture.Infrastructure.Queries;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
-    public abstract class EntitySetDecoratorBase<TEnity> : IEntitySet<TEnity> where TEnity : ISimpleEntity {
-        protected IEntitySet<TEnity> BaseEntitySet { get; }
+    public abstract class EntitySetDecoratorBase<TEntity> : EntitySetBase<TEntity>, IEntitySet<TEntity> where TEntity : ISimpleEntity {
+        protected IEntitySet<TEntity> BaseEntitySet { get; }
 
-        protected EntitySetDecoratorBase(IEntitySet<TEnity> baseEntitySet) {
+        protected EntitySetDecoratorBase(IEntitySet<TEntity> baseEntitySet) {
             BaseEntitySet = baseEntitySet;
         }
 
-        public virtual IQuery<TEnity> Query() {
+        public override IQuery<TEntity> Query() {
             return BaseEntitySet.Query();
         }
 
-        public virtual Task<TEnity> GetAsync(int id, CancellationToken cancellationToken = default) {
-            return BaseEntitySet.GetAsync(id, cancellationToken);
-        }
-
-        public virtual Task<IEnumerable<TEnity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default) {
-            return BaseEntitySet.GetRangeAsync(ids, cancellationToken);
-        }
-
-        public virtual Task<TEnity> GetAsync(Guid guid, CancellationToken cancellationToken = default) {
-            return BaseEntitySet.GetAsync(guid, cancellationToken);
-        }
-
-        public virtual Task<IEnumerable<TEnity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default) {
-            return BaseEntitySet.GetRangeAsync(guids, cancellationToken);
-        }
-
-        public virtual Task<IEnumerable<TEnity>> GetAllAsync(CancellationToken cancellationToken = default) {
-            return BaseEntitySet.GetAllAsync(cancellationToken);
-        }
-
-        public virtual void Add(TEnity entity) {
+        public override void Add(TEntity entity) {
             BaseEntitySet.Add(entity);
         }
 
-        public virtual void AddRange(IEnumerable<TEnity> entities) {
+        public override void AddRange(IEnumerable<TEntity> entities) {
             BaseEntitySet.AddRange(entities);
         }
 
-        public virtual void Remove(TEnity entity) {
+        public override void Remove(TEntity entity) {
             BaseEntitySet.Remove(entity);
         }
 
-        public virtual void RemoveRange(IEnumerable<TEnity> entities) {
+        public override void RemoveRange(IEnumerable<TEntity> entities) {
             BaseEntitySet.RemoveRange(entities);
         }
 
-        public void ReAttach(TEnity entity) {
+        public override void ReAttach(TEntity entity) {
             BaseEntitySet.ReAttach(entity);
         }
 
-        public void ReAttachRange(IEnumerable<TEnity> entities) {
+        public override void ReAttachRange(IEnumerable<TEntity> entities) {
             BaseEntitySet.ReAttachRange(entities);
         }
     }

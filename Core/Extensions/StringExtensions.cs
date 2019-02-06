@@ -578,6 +578,21 @@ namespace DotLogix.Core.Extensions {
         #endregion
 
         #region SubStringUntil
+        public static string SubstringBetween(this string value, string startValue, string endValue, int startIndex=0, int count=-1, StringComparison comparison = StringComparison.OrdinalIgnoreCase) {
+            if(count < 0)
+                count = value.Length-startIndex;
+
+            startIndex = value.IndexOf(startValue, startIndex, count, comparison);
+            if(startIndex == -1)
+                return null;
+
+            startIndex += startValue.Length;
+            var endIndex = value.IndexOf(endValue, startIndex + 1, count - startIndex - 1, comparison);
+            if(endIndex == -1)
+                return null;
+            return value.Substring(startIndex, endIndex - startIndex);
+        }
+
         public static string SubstringUntil(this string value, int start, int count, params char[] delimiters) {
             var idx = value.IndexOfAny(delimiters, start, count);
             if(idx == -1)

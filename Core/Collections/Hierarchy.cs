@@ -3,7 +3,7 @@
 // File:  Hierarchy.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  03.09.2018
-// LastEdited:  03.09.2018
+// LastEdited:  13.12.2018
 // ==================================================
 
 #region

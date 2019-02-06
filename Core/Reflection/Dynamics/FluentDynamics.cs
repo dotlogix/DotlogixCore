@@ -69,7 +69,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
                 access = GetAccessModifiers(constructorInfo);
                 visibility = GetVisibilityModifiers(constructorInfo);
             }
-            return new DynamicCtor(declaringType, null, access, visibility, ctorDelegate);
+            return new DynamicCtor(declaringType, constructorInfo, access, visibility, ctorDelegate);
         }
 
         public static DynamicCtor CreateDefaultCtor(this Type declaringType, bool allowNonPublic = true) {

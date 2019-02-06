@@ -13,7 +13,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http.Context {
@@ -21,7 +21,6 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         IDictionary<string, object> HeaderParameters { get; }
         IDictionary<string, object> QueryParameters { get; }
         IDictionary<string, object> UrlParameters { get; }
-        IDictionary<string, object> UserDefinedParameters { get; }
         Uri Url { get; }
         HttpMethods HttpMethod { get; }
         MimeType ContentType { get; }

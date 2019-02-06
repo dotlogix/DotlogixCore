@@ -14,6 +14,8 @@ using System.Globalization;
 
 namespace DotLogix.Core.Nodes.Processor {
     public class JsonNodeReader : NodeReaderBase {
+        public bool IgnoreOverflow { get; }
+
         [Flags]
         public enum JsonCharacter {
             None = 0,
@@ -30,7 +32,8 @@ namespace DotLogix.Core.Nodes.Processor {
 
         private readonly char[] _json;
 
-        public JsonNodeReader(string json) {
+        public JsonNodeReader(string json, bool ignoreOverflow = false) {
+            IgnoreOverflow = ignoreOverflow;
             _json = json.ToCharArray();
         }
 
@@ -42,10 +45,13 @@ namespace DotLogix.Core.Nodes.Processor {
 
             for(var i = 0; i < json.Length; i++) {
                 var nextCharacter = NextJsonCharacter(json, ref i);
-                if((allowedCharacters & nextCharacter) == 0)
+                if((allowedCharacters & nextCharacter) == 0) {
+                    if(IgnoreOverflow && (allowedCharacters == JsonCharacter.None || allowedCharacters == JsonCharacter.End))
+                        return;
                     throw new JsonParsingException(i, json, $"Character {json[i]} is not allowed in the current state, allowed characters are {allowedCharacters:F}");
+                }
 
-                switch(nextCharacter) {
+                switch (nextCharacter) {
                     case JsonCharacter.End:
                         allowedCharacters = JsonCharacter.None;
                         continue;

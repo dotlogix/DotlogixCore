@@ -14,7 +14,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http.Context {

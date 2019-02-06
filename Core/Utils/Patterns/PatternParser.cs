@@ -9,19 +9,21 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Interfaces;
 #endregion
 
 namespace DotLogix.Core.Utils.Patterns {
-    public class PatternParser {
+    public class PatternParser : ICloneable<PatternParser> {
         private static readonly Regex PatternRegex = new Regex(@"<<(?<name>\w+)(?:\|(?<type>\w+)(?::(?<variant>\w+))?(?:\|(?<args>[^|>]+(?:\|[^|>]+)+))?)?>>");
-        private readonly Dictionary<string, IRegexPatternType> _patterns = new Dictionary<string, IRegexPatternType>(StringComparer.OrdinalIgnoreCase);
+        protected Dictionary<string, IRegexPatternType> Patterns { get; } = new Dictionary<string, IRegexPatternType>(StringComparer.OrdinalIgnoreCase);
         public static PatternParser Default { get; }
 
         public IRegexPatternType this[string name] {
-            get => _patterns[name];
-            set => _patterns[name] = value;
+            get => Patterns[name];
+            set => Patterns[name] = value;
         }
 
         static PatternParser() {
@@ -48,23 +50,23 @@ namespace DotLogix.Core.Utils.Patterns {
         }
 
         public IRegexPatternType GetPattern(string name) {
-            return _patterns.TryGetValue(name, out var pattern) ? pattern : null;
+            return Patterns.TryGetValue(name, out var pattern) ? pattern : null;
         }
 
         public bool TryGetPattern(string name, out IRegexPatternType pattern) {
-            return _patterns.TryGetValue(name, out pattern);
+            return Patterns.TryGetValue(name, out pattern);
         }
 
         public bool ContainsPattern(string name) {
-            return _patterns.ContainsKey(name);
+            return Patterns.ContainsKey(name);
         }
 
         public void AddPattern(IRegexPatternType patternType) {
-            _patterns.Add(patternType.Name, patternType);
+            Patterns.Add(patternType.Name, patternType);
         }
 
         public bool RemovePattern(string name) {
-            return _patterns.Remove(name);
+            return Patterns.Remove(name);
         }
 
         public string ToRegexPattern(string pattern) {
@@ -74,7 +76,7 @@ namespace DotLogix.Core.Utils.Patterns {
         private string ToRegexPattern(Match match) {
             var name = match.Groups["name"].Value;
             var type = match.Groups["type"].GetValueOrDefault("any");
-            var variant = match.Groups["variant"].GetValueOrDefault(string.Empty);
+            var variant = match.Groups["variant"].GetValueOrDefault();
             var args = match.Groups["args"].Value.Split('|');
 
             if(TryGetPattern(type, out var patternType) == false)
@@ -82,6 +84,19 @@ namespace DotLogix.Core.Utils.Patterns {
 
             var succeed = patternType.TryGetRegexPattern(variant, args, out var pattern);
             return succeed ? string.Concat("(?<", name, ">", pattern, ")") : match.Value;
+        }
+
+        public PatternParser Clone() {
+            var parser = new PatternParser();
+            foreach(var pattern in Patterns.Values)
+                parser.AddPattern(pattern);
+            return parser;
+        }
+
+        /// <summary>Creates a new object that is a copy of the current instance.</summary>
+        /// <returns>A new object that is a copy of this instance.</returns>
+        object ICloneable.Clone() {
+            return Clone();
         }
     }
 }

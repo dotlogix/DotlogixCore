@@ -12,7 +12,7 @@ using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Utils {
-    public class SelectorEqualityComparer<T, TKey> : IEqualityComparer<T> where TKey : IComparable {
+    public class SelectorEqualityComparer<T, TKey> : IEqualityComparer<T> {
         private readonly Func<T, TKey> _comparableSelector;
 
         public SelectorEqualityComparer(Func<T, TKey> comparableSelector) {
@@ -20,15 +20,11 @@ namespace DotLogix.Core.Utils {
         }
 
         public bool Equals(T x, T y) {
-            return Equals(_comparableSelector(x), _comparableSelector(y));
+            return Equals(_comparableSelector.Invoke(x), _comparableSelector.Invoke(y));
         }
 
         public int GetHashCode(T x) {
-            return _comparableSelector(x).GetHashCode();
-        }
-
-        public int Compare(T x, T y) {
-            return _comparableSelector(x).CompareTo(_comparableSelector(y));
+            return _comparableSelector.Invoke(x).GetHashCode();
         }
     }
 }

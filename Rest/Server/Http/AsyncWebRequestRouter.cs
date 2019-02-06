@@ -54,7 +54,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                 await asyncHttpContext.Response.CompleteAsync();
                 return;
             }
-            if(asyncHttpContext.Request.HeaderParameters.TryGetValue(EventSubscriptionParameterName, out string eventName)) {
+            if(asyncHttpContext.Request.HeaderParameters.TryGetValueAs(EventSubscriptionParameterName, out string eventName)) {
                 if(ServerEvents.TryGetValue(eventName, out var serverEvent) == false) {
                     await asyncHttpContext.Response.WriteToResponseStreamAsync("The event subscription could not be handled, because the event is not registered on the server");
                     asyncHttpContext.Response.StatusCode = HttpStatusCodes.ClientError.BadRequest;
@@ -85,30 +85,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             var httpMethod = asyncHttpRequest.HttpMethod;
             var path = asyncHttpRequest.Url.LocalPath;
 
-            route = null;
-            RouteMatch routeMatch = null;
-            var routePriority = int.MinValue;
-            var matchLength = int.MinValue;
-            foreach(var serverRoute in ServerRoutes) {
-                if((serverRoute.AcceptedRequests & httpMethod) == 0) // route does not accept the type of the request
-                    continue;
-
-                if(serverRoute.Priority < routePriority) // another route has a higher priority
-                    continue;
-
-                var match = serverRoute.Match(httpMethod, path);
-                if(match.Success == false) // match is not successful
-                    continue;
-
-                if(match.Length < matchLength) // another route better matches the path
-                    continue;
-
-                route = serverRoute;
-                routeMatch = match;
-                routePriority = serverRoute.Priority;
-                matchLength = match.Length;
-            }
-
+            var routeMatch = ServerRoutes.FindBestMatch(httpMethod, path, out route);
             if(routeMatch == null)
                 return false;
 

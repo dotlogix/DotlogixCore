@@ -19,9 +19,10 @@ namespace DotLogix.Core.Rest.Server.Http {
         Head = 4,
         Post = 8,
         Put = 16,
-        Delete = 32,
-        Trace = 64,
-        Connect = 128,
-        Any = Options | Get | Head | Post | Put | Delete | Trace | Connect
+        Patch = 32,
+        Delete = 64,
+        Trace = 128,
+        Connect = 256,
+        Any = Options | Get | Head | Post | Put | Patch| Delete | Trace | Connect
     }
 }

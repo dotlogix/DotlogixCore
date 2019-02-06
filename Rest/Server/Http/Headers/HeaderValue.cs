@@ -1,37 +1,34 @@
-﻿// ==================================================
-// Copyright 2018(C) , DotLogix
-// File:  MimeType.cs
-// Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  01.08.2018
-// ==================================================
-
-#region
-#endregion
-
-#region
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
-#endregion
+using DotLogix.Core.Extensions;
 
-namespace DotLogix.Core.Rest.Server.Http.Mime {
-    public class MimeType {
-        public string Code { get; }
-        public bool HasAttributes => (Attributes != null) && (Attributes.Count > 0);
-        public IDictionary<string, Optional<string>> Attributes { get; }
-
-        public MimeType(string code, IDictionary<string, Optional<string>> attributes = null) {
-            Code = code;
+namespace DotLogix.Core.Rest.Server.Http.Headers {
+    public class HeaderValue {
+        public HeaderValue(string value, IDictionary<string, Optional<string>> attributes = null) {
+            Value = value;
             Attributes = attributes != null ? new ReadOnlyDictionary<string, Optional<string>>(attributes) : null;
         }
 
+        public string Value { get; }
+        public bool HasAttributes => (Attributes != null) && (Attributes.Count > 0);
+        public IDictionary<string, Optional<string>> Attributes { get; }
+
+        public Optional<string> GetAttribute(string name) {
+            return Attributes.GetValue(name);
+        }
+
+        public bool HasAttribute(string name, bool onlyWithValue=false) {
+            return Attributes.TryGetValue(name, out var value) && (value.IsDefined || onlyWithValue == false);
+        }
+
+
         public override string ToString() {
             if(HasAttributes == false)
-                return Code;
+                return Value;
 
-            var sb = new StringBuilder(Code);
+            var sb = new StringBuilder(Value);
             foreach(var attribute in Attributes) {
                 sb.Append(';');
                 sb.Append(attribute.Key);
@@ -44,8 +41,8 @@ namespace DotLogix.Core.Rest.Server.Http.Mime {
             return sb.ToString();
         }
 
-        protected bool Equals(MimeType other) {
-            return string.Equals(Code, other.Code);
+        protected bool Equals(HeaderValue other) {
+            return string.Equals(Value, other.Value);
         }
 
         public override bool Equals(object obj) {
@@ -55,11 +52,11 @@ namespace DotLogix.Core.Rest.Server.Http.Mime {
                 return true;
             if(obj.GetType() != GetType())
                 return false;
-            return Equals((MimeType)obj);
+            return Equals((HeaderValue)obj);
         }
 
         public override int GetHashCode() {
-            return Code != null ? Code.GetHashCode() : 0;
+            return Value != null ? Value.GetHashCode() : 0;
         }
 
         /// <summary>
@@ -72,7 +69,7 @@ namespace DotLogix.Core.Rest.Server.Http.Mime {
         ///     true if the <paramref name="left" /> and <paramref name="right" /> parameters have the same value; otherwise,
         ///     false.
         /// </returns>
-        public static bool operator ==(MimeType left, MimeType right) {
+        public static bool operator ==(HeaderValue left, HeaderValue right) {
             return Equals(left, right);
         }
 
@@ -83,14 +80,11 @@ namespace DotLogix.Core.Rest.Server.Http.Mime {
         /// <param name="left">The first value to compare.</param>
         /// <param name="right">The second value to compare.</param>
         /// <returns>true if <paramref name="left" /> and <paramref name="right" /> are not equal; otherwise, false.</returns>
-        public static bool operator !=(MimeType left, MimeType right) {
+        public static bool operator !=(HeaderValue left, HeaderValue right) {
             return !Equals(left, right);
         }
 
-        public static MimeType Parse(string value) {
-            if(value == null)
-                return new MimeType(null);
-
+        protected static (string code, IDictionary<string, Optional<string>> attributes) ExtractParts(string value) {
             var parts = value.Split(';');
             if(parts.Length < 1)
                 throw new ArgumentException("The provided value is not a valid mime type", nameof(value));
@@ -99,13 +93,14 @@ namespace DotLogix.Core.Rest.Server.Http.Mime {
                 attributes = new Dictionary<string, Optional<string>>(parts.Length - 1);
                 for(var i = 1; i < parts.Length; i++) {
                     var keyValue = parts[i].Split(new[] {'='}, 2);
-                    var attrName = keyValue[0].Trim(' ');
-                    var attrValue = keyValue.Length > 1 ? keyValue[1].Trim(' ') : Optional<string>.Undefined;
+                    var attrName = keyValue[0].Trim(' ', '"');
+                    var attrValue = keyValue.Length > 1 ? keyValue[1].Trim(' ', '"') : Optional<string>.Undefined;
                     attributes[attrName] = attrValue;
                 }
             }
+
             var code = parts[0].Trim(' ');
-            return new MimeType(code, attributes);
+            return (code, attributes);
         }
     }
 }

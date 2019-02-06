@@ -13,7 +13,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
 using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 #endregion
@@ -105,7 +105,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
             PrepareHeaders();
             OriginalResponse.StatusCode = StatusCode.Code;
             OriginalResponse.StatusDescription = StatusCode.Description;
-            OriginalResponse.ContentType = ContentType.Code;
+            OriginalResponse.ContentType = ContentType.Value;
             OriginalResponse.ContentEncoding = ContentEncoding;
             if(OriginalResponse.SendChunked == false)
                 OriginalResponse.ContentLength64 = OutputStream.Length;

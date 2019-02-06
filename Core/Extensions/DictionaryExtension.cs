@@ -14,6 +14,8 @@ using System.Linq;
 
 namespace DotLogix.Core.Extensions {
     public static class DictionaryExtension {
+        #region Reverse
+
         /// <summary>
         ///     Reverses a dictionary so values will be the keys and the keys will be the values
         /// </summary>
@@ -27,6 +29,10 @@ namespace DotLogix.Core.Extensions {
         public static KeyValuePair<TValue, TKey> Reverse<TKey, TValue>(this KeyValuePair<TKey, TValue> kvpair) {
             return new KeyValuePair<TValue, TKey>(kvpair.Value, kvpair.Key);
         }
+
+        #endregion
+
+        #region Key
 
         /// <summary>
         ///     Find the the key of an item in the dictionary
@@ -52,34 +58,16 @@ namespace DotLogix.Core.Extensions {
             return false;
         }
 
-        public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue defaultValue)
+        #endregion
+
+        #region Get
+
+        public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue defaultValue = default)
         {
             return dict.TryGetValue(key, out var value) ? value : defaultValue;
         }
 
-        /// <summary>Gets and removes the value associated with the specified key.</summary>
-        /// <param name="dict">The dictionary</param>
-        /// <param name="key">The key of the value to get and remove.</param>
-        /// <returns>The value associated with the specified key. If the specified key is not found, a get operation throws a <see cref="T:System.Collections.Generic.KeyNotFoundException"></see>, and a set operation creates a new element with the specified key.</returns>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
-        /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">The property is retrieved and <paramref name="key">key</paramref> does not exist in the collection.</exception>
-        public static TValue Pop<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
-        {
-            if (TryPop(dict, key, out var value))
-                return value;
-            throw new KeyNotFoundException();
-        }
-
-        /// <summary>Gets and removes the value associated with the specified key.</summary>
-        /// <param name="dict">The dictionary</param>
-        /// <param name="key">The key of the value to get and remove.</param>
-        /// <param name="value">When this method returns, contains the value associated with the specified key, if the key is found; otherwise, the default value for the type of the value parameter. This parameter is passed uninitialized.</param>
-        /// <returns>true if the <see cref="T:System.Collections.Generic.Dictionary`2"></see> contains an element with the specified key; otherwise, false.</returns>
-        public static bool TryPop<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, out TValue value) {
-            return dict.TryGetValue(key, out value) && dict.Remove(key);
-        }
-
-        public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key)
+        public static TValue GetValueAs<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key)
         {
             if (dict.TryGetValue(key, out var obj) == false)
                 throw new KeyNotFoundException();
@@ -88,33 +76,92 @@ namespace DotLogix.Core.Extensions {
             return value;
         }
 
-        public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key, TValue defaultValue) {
+        public static TValue GetValueAs<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key, TValue defaultValue) {
             return dict.TryGetValue(key, out var obj) && obj.TryConvertTo(out TValue value) ? value : defaultValue;
         }
 
-        public static bool TryGetValue<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key, out TValue value) {
+
+        public static object GetValueAs<TKey>(this IDictionary<TKey, object> dict, TKey key, Type targetType, object defaultValue = default)
+        {
+            return dict.TryGetValue(key, out var obj) && obj.TryConvertTo(targetType, out var value) ? value : defaultValue;
+        }
+
+        public static bool TryGetValueAs<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key, out TValue value) {
             if(dict.TryGetValue(key, out var obj) && obj.TryConvertTo(out value))
                 return true;
             value = default;
             return false;
         }
 
-
-        public static object GetValue<TKey>(this IDictionary<TKey, object> dict, TKey key, Type targetType, object defaultValue = default)
-        {
-            return dict.TryGetValue(key, out var obj) && obj.TryConvertTo(targetType, out var value) ? value : defaultValue;
-        }
-
-        public static bool TryGetValue<TKey>(this IDictionary<TKey, object> dict, TKey key, Type targetType, out object value)
+        public static bool TryGetValueAs<TKey>(this IDictionary<TKey, object> dict, TKey key, Type targetType, out object value)
         {
             if (dict.TryGetValue(key, out var obj) && obj.TryConvertTo(targetType, out value))
                 return true;
             value = default;
             return false;
         }
+        #endregion
+
+        #region Add
+
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value) {
+            if(dict.TryGetValue(key, out var existing))
+                return existing;
+            dict[key] = value;
+            return value;
+        }
+        
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, Func<TKey,TValue> valueFunc) {
+            if(dict.TryGetValue(key, out var existing))
+                return existing;
+            var value = valueFunc.Invoke(key);
+            dict[key] = value;
+            return value;
+        }
+
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, Func<TValue> valueFunc) {
+            if(dict.TryGetValue(key, out var existing))
+                return existing;
+            var value = valueFunc.Invoke();
+            dict[key] = value;
+            return value;
+        }
+        public static bool TryAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value) {
+            if(dict.ContainsKey(key))
+                return false;
+            dict[key] = value;
+            return true;
+        }
+
+        #endregion
+
+        #region Pop
+
+        /// <summary>Gets and removes the value associated with the specified key.</summary>
+        /// <param name="dict">The dictionary</param>
+        /// <param name="key">The key of the value to get and remove.</param>
+        /// <returns>The value associated with the specified key. If the specified key is not found, a get operation throws a <see cref="T:System.Collections.Generic.KeyNotFoundException"></see>, and a set operation creates a new element with the specified key.</returns>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
+        /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">The property is retrieved and <paramref name="key">key</paramref> does not exist in the collection.</exception>
+        public static TValue PopValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
+        {
+            if (TryPopValue(dict, key, out var value))
+                return value;
+            throw new KeyNotFoundException();
+        }
+
+        /// <summary>Gets and removes the value associated with the specified key.</summary>
+        /// <param name="dict">The dictionary</param>
+        /// <param name="key">The key of the value to get and remove.</param>
+        /// <returns>The value associated with the specified key. If the specified key is not found, a get operation returns the default value</returns>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
+        /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">The property is retrieved and <paramref name="key">key</paramref> does not exist in the collection.</exception>
+        public static TValue PopValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue defaultValue) {
+            return TryPopValue(dict, key, out var value) ? value : defaultValue;
+        }
 
 
-        public static TValue PopValue<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key)
+        public static TValue PopValueAs<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key)
         {
             if (dict.TryGetValue(key, out var obj) == false)
                 throw new KeyNotFoundException();
@@ -125,6 +172,15 @@ namespace DotLogix.Core.Extensions {
             return value;
         }
 
+        /// <summary>Gets and removes the value associated with the specified key.</summary>
+        /// <param name="dict">The dictionary</param>
+        /// <param name="key">The key of the value to get and remove.</param>
+        /// <param name="value">When this method returns, contains the value associated with the specified key, if the key is found; otherwise, the default value for the type of the value parameter. This parameter is passed uninitialized.</param>
+        /// <returns>true if the <see cref="T:System.Collections.Generic.Dictionary`2"></see> contains an element with the specified key; otherwise, false.</returns>
+        public static bool TryPopValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, out TValue value) {
+            return dict.TryGetValue(key, out value) && dict.Remove(key);
+        }
+
         public static bool TryPopValue<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key, out TValue value)
         {
             if (dict.TryGetValue(key, out var obj) && obj.TryConvertTo(out value) && dict.Remove(key))
@@ -132,5 +188,7 @@ namespace DotLogix.Core.Extensions {
             value = default;
             return false;
         }
+
+        #endregion
     }
 }

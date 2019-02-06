@@ -27,7 +27,7 @@ namespace DotLogix.Core.Rest.Authentication.Jwt.Algorithms {
         public RsaSigningAlgorithm(X509Certificate2 certificate, RsaAlgorithm algorithm) {
             Certificate = certificate;
             Algorithm = algorithm;
-            Name = algorithm.ToString().ToLower();
+            Name = algorithm.ToString().ToUpper();
 
             _algorithmName = GetAlgorithmName(algorithm);
             _padding = GetAlgorithmPadding(algorithm);

@@ -1,14 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>DotLogix.Lucene</AssemblyName>
-    <RootNamespace>DotLogix.Lucene</RootNamespace>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
+    <RootNamespace>DotLogix.Core.Lucene</RootNamespace>
+	<Company>DotLogix</Company>
+    <Product>DotLogix Core</Product>
+    <PackageId>DotLogix.Core</PackageId>
+    <Authors>DotLogix</Authors>
+      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+</PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
+    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).dll $(SolutionDir)..\assemblies\$(ConfigurationName)\&#xD;&#xA;xcopy /Y $(TargetDir)$(TargetName).pdb $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
   </Target>
 
   <ItemGroup>

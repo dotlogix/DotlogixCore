@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2018(C) , DotLogix
-// File:  Singletons.cs
+// Copyright 2019(C) , DotLogix
+// File:  Singleton.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  27.04.2018
-// LastEdited:  01.08.2018
+// Created:  15.08.2018
+// LastEdited:  06.02.2019
 // ==================================================
 
 namespace DotLogix.Core.Patterns {

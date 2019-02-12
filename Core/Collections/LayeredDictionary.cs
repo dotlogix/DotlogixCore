@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2018(C) , DotLogix
+// Copyright 2019(C) , DotLogix
 // File:  LayeredDictionary.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  13.12.2018
-// LastEdited:  13.12.2018
+// LastEdited:  07.02.2019
 // ==================================================
 
 #region
@@ -264,9 +264,8 @@ namespace DotLogix.Core.Collections {
 
         public TDictionary Reduce(TDictionary targetDictionary) {
             foreach(var layer in LayerStack) {
-                foreach(var value in layer) {
+                foreach(var value in layer)
                     targetDictionary[value.Key] = value.Value;
-                }
             }
 
             return targetDictionary;

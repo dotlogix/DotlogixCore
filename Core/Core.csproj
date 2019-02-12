@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45;net47</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <Company>DotLogix</Company>
     <Product>DotLogix Core</Product>
     <PackageId>DotLogix.Core</PackageId>
@@ -10,6 +10,9 @@
     <RootNamespace>DotLogix.Core</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,14 +25,14 @@
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
+    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).dll $(SolutionDir)..\assemblies\$(ConfigurationName)\&#xD;&#xA;xcopy /Y $(TargetDir)$(TargetName).pdb $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
   </Target>
 
 </Project>

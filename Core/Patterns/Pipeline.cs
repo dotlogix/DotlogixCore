@@ -7,21 +7,16 @@ using System.Threading.Tasks;
 namespace DotLogix.Core.Patterns
 {
 
-    public class Pipeline<TIn, TOut> : PipelineStep<TIn, TOut>, IPipeline<TIn, TOut>{
-        protected List<IPipelineStep<TIn, TOut>> Steps { get; } = new List<IPipelineStep<TIn, TOut>>();
+    public class Pipeline<TIn, TResult> : ProcessingStep<TIn, TIn, TResult>, IList<ProcessingStep<TIn, TIn, TResult>> {
+        protected List<ProcessingStep<TIn, TIn, TResult>> Steps { get; } = new List<ProcessingStep<TIn, TIn, TResult>>();
 
-        public override async Task<Optional<TOut>> Execute(TIn value) {
-            var result = Optional<TOut>.Undefined;
-            if(Steps.Count > 0) {
-                result = await Steps[0].Execute(value);
-            }
-
-            return result.IsDefined ? result : await Next(value);
+        public override Task<TResult> InvokeAsync(TIn value) {
+            return Steps[0].InvokeAsync(value);
         }
 
         /// <summary>Returns an enumerator that iterates through the collection.</summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
-        public IEnumerator<IPipelineStep<TIn, TOut>> GetEnumerator() {
+        public IEnumerator<ProcessingStep<TIn, TIn, TResult>> GetEnumerator() {
             return Steps.GetEnumerator();
         }
 
@@ -34,16 +29,23 @@ namespace DotLogix.Core.Patterns
         /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
         /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
-        public void Add(IPipelineStep<TIn, TOut> item) {
+        public void Add(ProcessingStep<TIn, TIn, TResult> item) {
             Steps.Add(item);
             Sync(Steps.Count-1);
+        }
+
+        /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
+        /// <param name="next">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
+        /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
+        public void Add(Func<TIn, Func<TIn, Task<TResult>>, Task<TResult>> next) {
+            Add(new LambdaProcessingStep<TIn, TIn, TResult>(next));
         }
 
         /// <summary>Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only. </exception>
         public void Clear() {
             foreach(var step in Steps) {
-                step.NextStep = null;
+                step.ContinueWith(default(ProcessingStep<TIn, TIn, TResult>));
             }
             Steps.Clear();
         }
@@ -52,7 +54,7 @@ namespace DotLogix.Core.Patterns
         /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
         /// <returns>
         /// <see langword="true" /> if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, <see langword="false" />.</returns>
-        public bool Contains(IPipelineStep<TIn, TOut> item) {
+        public bool Contains(ProcessingStep<TIn, TIn, TResult> item) {
             return Steps.Contains(item);
         }
 
@@ -64,7 +66,7 @@ namespace DotLogix.Core.Patterns
         /// <exception cref="T:System.ArgumentOutOfRangeException">
         /// <paramref name="arrayIndex" /> is less than 0.</exception>
         /// <exception cref="T:System.ArgumentException">The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1" /> is greater than the available space from <paramref name="arrayIndex" /> to the end of the destination <paramref name="array" />.</exception>
-        public void CopyTo(IPipelineStep<TIn, TOut>[] array, int arrayIndex) {
+        public void CopyTo(ProcessingStep<TIn, TIn, TResult>[] array, int arrayIndex) {
             Steps.CopyTo(array, arrayIndex);
         }
 
@@ -73,7 +75,7 @@ namespace DotLogix.Core.Patterns
         /// <returns>
         /// <see langword="true" /> if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, <see langword="false" />. This method also returns <see langword="false" /> if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.</returns>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
-        public bool Remove(IPipelineStep<TIn, TOut> item) {
+        public bool Remove(ProcessingStep<TIn, TIn, TResult> item) {
             var index = Steps.IndexOf(item);
             if(index == -1)
                 return false;
@@ -94,7 +96,7 @@ namespace DotLogix.Core.Patterns
         /// <summary>Determines the index of a specific item in the <see cref="T:System.Collections.Generic.IList`1" />.</summary>
         /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1" />.</param>
         /// <returns>The index of <paramref name="item" /> if found in the list; otherwise, -1.</returns>
-        public int IndexOf(IPipelineStep<TIn, TOut> item) {
+        public int IndexOf(ProcessingStep<TIn, TIn, TResult> item) {
             return Steps.IndexOf(item);
         }
 
@@ -104,7 +106,7 @@ namespace DotLogix.Core.Patterns
         /// <exception cref="T:System.ArgumentOutOfRangeException">
         /// <paramref name="index" /> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1" />.</exception>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IList`1" /> is read-only.</exception>
-        public void Insert(int index, IPipelineStep<TIn, TOut> item) {
+        public void Insert(int index, ProcessingStep<TIn, TIn, TResult> item) {
             Steps.Insert(index, item);
             Sync(index);
         }
@@ -117,7 +119,7 @@ namespace DotLogix.Core.Patterns
         public void RemoveAt(int index) {
             Steps.RemoveAt(index);
             var current = Steps[index];
-            current.NextStep = null;
+            current.ContinueWith(default(ProcessingStep<TIn, TIn, TResult>));
             Sync(index);
         }
 
@@ -127,14 +129,14 @@ namespace DotLogix.Core.Patterns
         /// <exception cref="T:System.ArgumentOutOfRangeException">
         /// <paramref name="index" /> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1" />.</exception>
         /// <exception cref="T:System.NotSupportedException">The property is set and the <see cref="T:System.Collections.Generic.IList`1" /> is read-only.</exception>
-        public IPipelineStep<TIn, TOut> this[int index] {
+        public ProcessingStep<TIn, TIn, TResult> this[int index] {
             get => Steps[index];
             set {
                 if(value == null)
                     throw new ArgumentNullException(nameof(value));
 
                 var current = Steps[index];
-                current.NextStep = null;
+                current.ContinueWith(default(ProcessingStep<TIn, TIn, TResult>));
 
                 Steps[index] = value;
                 Sync(index);
@@ -144,9 +146,9 @@ namespace DotLogix.Core.Patterns
         private void Sync(int index) {
             var current = Steps[index];
             if(index > 0)
-                Steps[index-1].NextStep = current;
+                Steps[index-1].ContinueWith(current);
             if(index < Count-1)
-                current.NextStep = Steps[index+1];
+                current.ContinueWith(Steps[index+1]);
         }
     }
 }

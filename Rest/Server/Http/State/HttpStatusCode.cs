@@ -12,6 +12,7 @@ using System;
 
 namespace DotLogix.Core.Rest.Server.Http.State {
     public class HttpStatusCode {
+        public HttpStatusCodeGroup Group => HttpStatusCodes.GetGroup(Code);
         public int Code { get; }
         public string Description { get; }
 

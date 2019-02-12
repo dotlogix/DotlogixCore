@@ -8,14 +8,15 @@
     <Product>DotLogix Architecture</Product>
     <PackageId>DotLogix.Architecture.Domain</PackageId>
     <Authors>DotLogix</Authors>
-  </PropertyGroup>
+      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+</PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
+    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).dll $(SolutionDir)..\assemblies\$(ConfigurationName)\&#xD;&#xA;xcopy /Y $(TargetDir)$(TargetName).pdb $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
   </Target>
 
 </Project>

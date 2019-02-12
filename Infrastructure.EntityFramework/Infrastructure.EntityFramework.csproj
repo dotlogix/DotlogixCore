@@ -8,7 +8,8 @@
     <Product>DotLogix Architecture</Product>
     <PackageId>DotLogix.Architecture.Infrastructure.EntityFramework</PackageId>
     <Authors>DotLogix</Authors>
-  </PropertyGroup>
+      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
@@ -19,7 +20,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
+    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).dll $(SolutionDir)..\assemblies\$(ConfigurationName)\&#xD;&#xA;xcopy /Y $(TargetDir)$(TargetName).pdb $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
   </Target>
 
 </Project>

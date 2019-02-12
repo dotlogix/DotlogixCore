@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2018(C) , DotLogix
+// Copyright 2019(C) , DotLogix
 // File:  KeyedCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  15.08.2018
-// LastEdited:  13.12.2018
+// LastEdited:  07.02.2019
 // ==================================================
 
 #region

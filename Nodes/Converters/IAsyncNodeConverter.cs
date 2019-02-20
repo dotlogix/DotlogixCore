@@ -8,15 +8,16 @@
 
 #region
 using System;
+using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
-    public interface INodeConverter {
+    public interface IAsyncNodeConverter {
         Type Type { get; }
         DataType DataType { get; }
-        void Write(object instance, string rootName, INodeWriter writer);
-        object ConvertToObject(Node node);
+        ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer);
+        object ConvertToObject(Node node, ConverterSettings settings);
     }
 }

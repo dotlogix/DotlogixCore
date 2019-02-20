@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
@@ -17,11 +18,11 @@ namespace DotLogix.Core.Nodes.Converters {
     public class ValueNodeConverter : NodeConverter {
         public ValueNodeConverter(DataType dynamicType) : base(dynamicType) { }
 
-        public override void Write(object instance, string rootName, INodeWriter writer) {
-            writer.WriteValue(rootName, instance);
+        public override ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
+            return writer.WriteValueAsync(rootName, instance);
         }
 
-        public override object ConvertToObject(Node node) {
+        public override object ConvertToObject(Node node, ConverterSettings settings) {
             if(node.Type == NodeTypes.Empty)
                 return Type.GetDefaultValue();
 

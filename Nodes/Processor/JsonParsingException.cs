@@ -18,14 +18,11 @@ namespace DotLogix.Core.Nodes.Processor {
         public int LinePosition { get; }
         public string Near { get; }
 
-        public JsonParsingException(int position, char[] json, string message) : base(message) {
+        public JsonParsingException(string message, int position, int line, int linePosition, string near) : base(message) {
             Position = position;
-            Line = json.OccurancesOf('\n', 0, position, out var lastNewLine);
-            LinePosition = lastNewLine == -1 ? position : position - lastNewLine;
-
-            var nearStart = Math.Max(position - 10, 0);
-            var nearEnd = Math.Min(nearStart + 20, json.Length);
-            Near = new string(json, nearStart, nearEnd - nearStart);
+            Line = line;
+            LinePosition = linePosition;
+            Near = near;
         }
     }
 }

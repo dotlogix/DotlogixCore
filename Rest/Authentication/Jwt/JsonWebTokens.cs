@@ -24,7 +24,7 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
             header.AddOrReplaceChild("typ", new NodeValue("JWT"));
 
             var headerStr = StringExtensions.EncodeBase64Url(header.ToJson());
-            var payloadStr = StringExtensions.EncodeBase64Url(JsonNodes.ToJson(token.Payload, JsonNodesFormatter.Default));
+            var payloadStr = StringExtensions.EncodeBase64Url(JsonNodes.ToJson(token.Payload, JsonFormatterSettings.Default));
             var tokenStr = string.Concat(headerStr, ".", payloadStr);
 
             var signatureStr = StringExtensions.EncodeBase64Url(signingAlgorithm.CalculateSignature(Encoding.UTF8.GetBytes(tokenStr)));

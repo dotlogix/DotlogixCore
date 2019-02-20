@@ -9,60 +9,63 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
-    public abstract class NodeWriterBase : INodeWriter {
+    public abstract class NodeWriterBase : IAsyncNodeWriter {
         protected readonly Stack<NodeContainerType> ContainerStack = new Stack<NodeContainerType>();
+        protected NodeWriterBase(ConverterSettings converterSettings = null) {
+            ConverterSettings = converterSettings ?? new ConverterSettings();
+        }
         protected NodeContainerType CurrentContainer => ContainerStack.Count > 0 ? ContainerStack.Peek() : NodeContainerType.None;
         protected int ContainerCount => ContainerStack.Count;
+        protected ConverterSettings ConverterSettings { get; }
 
-        public virtual void BeginMap() => BeginMap(null);
-        public abstract void BeginMap(string name);
-        public abstract void EndMap();
+        public virtual ValueTask BeginMapAsync() => BeginMapAsync(null);
+        public abstract ValueTask BeginMapAsync(string name);
+        public abstract ValueTask EndMapAsync();
 
-        public virtual void BeginList() => BeginList(null);
-        public abstract void BeginList(string name);
-        public abstract void EndList();
+        public virtual ValueTask BeginListAsync() => BeginListAsync(null);
+        public abstract ValueTask BeginListAsync(string name);
+        public abstract ValueTask EndListAsync();
 
-        public virtual void WriteValue(object value) => WriteValue(null, value);
-        public abstract void WriteValue(string name, object value);
+        public virtual ValueTask WriteValueAsync(object value) => WriteValueAsync(null, value);
+        public abstract ValueTask WriteValueAsync(string name, object value);
 
-        public virtual void AutoComplete() {
+        public virtual async ValueTask AutoCompleteAsync() {
             while(ContainerStack.Count > 0) {
+                ValueTask task;
                 switch(ContainerStack.Pop()) {
                     case NodeContainerType.Map:
-                        EndMap();
+                        task = EndMapAsync();
                         break;
                     case NodeContainerType.List:
-                        EndList();
+                        task = EndListAsync();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+
+                if(task.IsCompleted == false)
+                    await task;
             }
         }
 
-        public void Execute(NodeOperation operation) {
+        public ValueTask ExecuteAsync(NodeOperation operation) {
             switch(operation.Type) {
                 case NodeOperationTypes.BeginMap:
-                    BeginMap(operation.Name);
-                    break;
+                    return BeginMapAsync(operation.Name);
                 case NodeOperationTypes.EndMap:
-                    EndMap();
-                    break;
+                    return EndMapAsync();
                 case NodeOperationTypes.BeginList:
-                    BeginList(operation.Name);
-                    break;
+                    return BeginListAsync(operation.Name);
                 case NodeOperationTypes.EndList:
-                    EndList();
-                    break;
+                    return EndListAsync();
                 case NodeOperationTypes.WriteValue:
-                    WriteValue(operation.Name, operation.Value);
-                    break;
+                    return WriteValueAsync(operation.Name, operation.Value);
                 case NodeOperationTypes.AutoComplete:
-                    AutoComplete();
-                    break;
+                    return AutoCompleteAsync();
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -90,7 +90,7 @@ namespace TestApp {
             node.AddChild("person", Nodes.ToNode(new Person{FirstName="Alex", LastName = "Schill"}));
             node.GetChild<NodeMap>("person").AddChild("childPerson", Nodes.ToNode(new Person { FirstName = "Alex", LastName = "Schill" }));
             var flat = node.Flatten();
-            Console.WriteLine(JsonNodes.ToJson(flat, JsonNodesFormatter.Idented));
+            Console.WriteLine(JsonNodes.ToJson(flat, JsonFormatterSettings.Idented));
 
             Console.Read();
         }

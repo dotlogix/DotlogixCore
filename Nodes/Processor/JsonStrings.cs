@@ -7,6 +7,8 @@
 // ==================================================
 
 #region
+using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 using DotLogix.Core.Extensions;
 #endregion
@@ -17,15 +19,16 @@ namespace DotLogix.Core.Nodes.Processor {
             return UnescapeJsonString(value.ToCharArray(), 0, value.Length, removeQuotes);
         }
 
-        public static string UnescapeJsonString(char[] json, int startIndex, int endIndex, bool removeQuotes = false) {
+        public static string UnescapeJsonString(char[] json, int startIndex, int count, bool removeQuotes = false) {
             var sb = new StringBuilder();
             var safeCharactersStart = -1;
             var safeCharactersCount = 0;
             if(removeQuotes) {
                 startIndex++;
-                endIndex--;
+                count--;
             }
 
+            var endIndex = startIndex + count-1;
             for(var i = startIndex; i <= endIndex; i++) {
                 var current = json[i];
                 if(current == '\\') {
@@ -56,7 +59,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             i += 4;
                             break;
                         default:
-                            throw new JsonParsingException(i, json, "Character is not valid at this point, maybe your json string is not escaped correctly");
+                            throw new JsonParsingException("Character is not valid at this point, maybe your json string is not escaped correctly", i, 0, 0, null);
                     }
                     i++;
                 } else {
@@ -74,7 +77,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 sb.Append(current);
             }
 
-            var length = endIndex - startIndex;
+            var length = count - startIndex;
             if(safeCharactersCount == length)
                 return new string(json, startIndex, length);
 
@@ -92,7 +95,7 @@ namespace DotLogix.Core.Nodes.Processor {
         public static void AppendJsonString(StringBuilder builder, string value, bool addQuotes = false) {
             if(addQuotes)
                 builder.Append("\"");
-            var unicodeBuffer = new char[6];
+            char[] unicodeBuffer = null;
 
             var safeCharactersCount = 0;
             for(var i = 0; i < value.Length; i++) {
@@ -124,7 +127,7 @@ namespace DotLogix.Core.Nodes.Processor {
                                 builder.Append(value, i - safeCharactersCount, safeCharactersCount);
                                 safeCharactersCount = 0;
                             }
-                            ToCharAsUnicode(current, unicodeBuffer);
+                            ToCharAsUnicode(current, ref unicodeBuffer);
                             builder.Append(unicodeBuffer);
                         } else
                             safeCharactersCount++;
@@ -157,7 +160,19 @@ namespace DotLogix.Core.Nodes.Processor {
             return new string(unicodeBuffer);
         }
 
-        private static void ToCharAsUnicode(int chr, char[] buffer) {
+        public static void ToCharAsUnicode(int chr, char[] buffer) {
+            buffer[0] = '\\';
+            buffer[1] = 'u';
+
+            for(var i = 5; i > 1; i--) {
+                buffer[i] = IntToHex(chr & 15);
+                chr >>= 4;
+            }
+        }
+        
+        public static void ToCharAsUnicode(int chr, ref char[] buffer) {
+            if(buffer == null)
+                buffer = new char[6];
             buffer[0] = '\\';
             buffer[1] = 'u';
 
@@ -167,7 +182,7 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
-        private static char FromCharAsUnicode(char[] buffer, int startIndex) {
+        public static char FromCharAsUnicode(char[] buffer, int startIndex) {
             var chr = HexToInt(buffer[startIndex]);
             for(var i = startIndex + 1; i < (startIndex + 4); i++)
                 chr = (chr << 4) + HexToInt(buffer[i]);
@@ -188,6 +203,40 @@ namespace DotLogix.Core.Nodes.Processor {
 
         public static bool IsHex(int hex) {
             return HexToInt(hex).LaysBetween(0, 15);
+        }
+
+        public static char[] QuickFormatDateTime(DateTime dt)
+        {
+            char[] chars = new char[22];
+            Write2Chars(chars, 0, dt.Day);
+            chars[2] = '.';
+            Write2Chars(chars, 3, dt.Month);
+            chars[5] = '.';
+            Write2Chars(chars, 6, dt.Year % 100);
+            chars[8] = ' ';
+            Write2Chars(chars, 9, dt.Hour);
+            chars[11] = ' ';
+            Write2Chars(chars, 12, dt.Minute);
+            chars[14] = ' ';
+            Write2Chars(chars, 15, dt.Second);
+            chars[17] = ' ';
+            Write2Chars(chars, 18, dt.Millisecond / 10);
+            chars[20] = Digit(dt.Millisecond % 10);
+            chars[21] = 'z';
+            return chars;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void Write2Chars(char[] chars, int offset, int value)
+        {
+            chars[offset] = Digit(value / 10);
+            chars[offset+1] = Digit(value % 10);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static char Digit(int value)
+        {
+            return (char) (value + '0');
         }
     }
 }

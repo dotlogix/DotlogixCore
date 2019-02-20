@@ -10,6 +10,7 @@
 using System.Reflection;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Services.Context;
@@ -19,8 +20,11 @@ using DotLogix.Core.Rest.Services.Processors.Dynamic;
 namespace DotLogix.Core.Rest.Services.Processors.Json {
     public class JsonWebRequestProcessor : DynamicWebRequestProcessor {
         private const string JsonDataParamName = ParseJsonBodyPreProcessor.JsonDataParamName;
+        private readonly ConverterSettings _settings;
 
-        public JsonWebRequestProcessor(object target, DynamicInvoke dynamicInvoke) : base(target, dynamicInvoke) { }
+        public JsonWebRequestProcessor(object target, DynamicInvoke dynamicInvoke, ConverterSettings settings = null) : base(target, dynamicInvoke) {
+            _settings = settings ?? new ConverterSettings();
+        }
 
         protected override bool TryGetParameterValue(WebServiceContext context, ParameterInfo methodParam, out object paramValue) {
             Node child = null;
@@ -33,7 +37,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
             }
             if(child == null)
                 return base.TryGetParameterValue(context, methodParam, out paramValue);
-            paramValue = child.ToObject(methodParam.ParameterType);
+            paramValue = child.ToObject(methodParam.ParameterType, _settings);
             return true;
         }
     }

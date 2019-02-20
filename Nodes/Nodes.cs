@@ -11,6 +11,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Converters;
 using DotLogix.Core.Nodes.Factories;
@@ -20,7 +21,7 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes {
     public static class Nodes {
-        private static readonly ConcurrentDictionary<Type, INodeConverter> CachedNodeConverters = new ConcurrentDictionary<Type, INodeConverter>();
+        private static readonly ConcurrentDictionary<Type, IAsyncNodeConverter> CachedNodeConverters = new ConcurrentDictionary<Type, IAsyncNodeConverter>();
 
         private static readonly List<INodeConverterFactory> NodeConverterFactories = new List<INodeConverterFactory>();
 
@@ -58,69 +59,77 @@ namespace DotLogix.Core.Nodes {
 
 
         #region WriteTo
-        public static void WriteTo(object instance, INodeWriter writer) {
-            WriteTo(null, instance, instance?.GetType(), writer);
+        public static ValueTask WriteToAsync(object instance, IAsyncNodeWriter writer) {
+            return WriteToAsync(null, instance, instance?.GetType(), writer);
         }
 
-        public static void WriteTo(object instance, Type instanceType, INodeWriter writer) {
-            WriteTo(null, instance, instanceType, writer);
+        public static ValueTask WriteToAsync(object instance, Type instanceType, IAsyncNodeWriter writer) {
+            return WriteToAsync(null, instance, instanceType, writer);
         }
 
-        public static void WriteTo(string name, object instance, INodeWriter writer) {
-            WriteTo(name, instance, instance?.GetType(), writer);
+        public static ValueTask WriteToAsync(string name, object instance, IAsyncNodeWriter writer) {
+            return WriteToAsync(name, instance, instance?.GetType(), writer);
         }
 
-        public static void WriteTo(string name, object instance, Type instanceType, INodeWriter writer) {
+        public static ValueTask WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer) {
             if(instance == null) {
-                writer.WriteValue(name, null);
-                return;
+                return writer.WriteValueAsync(name, null);
+            }
+
+            if(instance is Node node) {
+                var reader = new NodeReader(node);
+                return reader.CopyToAsync(writer);
             }
 
             if(instanceType == null)
                 throw new ArgumentNullException(nameof(instanceType));
 
             if(TryCreateConverter(instanceType, out var converter))
-                converter.Write(instance, name, writer);
-            else
-                writer.WriteValue(name, null);
+                return converter.WriteAsync(instance, name, writer);
+
+            return writer.WriteValueAsync(name, null);
         }
         #endregion
 
         #region ToNode
-        public static Node ToNode(object instance) {
-            return ToNode(null, instance, instance?.GetType());
+        public static Node ToNode(object instance, ConverterSettings settings = null) {
+            return ToNode(null, instance, instance?.GetType(), settings);
         }
 
-        public static Node ToNode(object instance, Type instanceType) {
-            return ToNode(null, instance, instanceType);
+        public static Node ToNode(object instance, Type instanceType, ConverterSettings settings = null) {
+            return ToNode(null, instance, instanceType, settings);
         }
 
-        internal static Node ToNode(string name, object instance) {
-            return ToNode(name, instance, instance?.GetType());
+        internal static Node ToNode(string name, object instance, ConverterSettings settings = null) {
+            return ToNode(name, instance, instance?.GetType(), settings);
         }
 
-        internal static Node ToNode(string name, object instance, Type instanceType) {
+        internal static Node ToNode(string name, object instance, Type instanceType, ConverterSettings settings = null) {
             if(instance is Node node)
                 return node;
-            var nodeWriter = new NodeWriter();
-            WriteTo(name, instance, instanceType, nodeWriter);
+            var nodeWriter = new NodeWriter(settings);
+            WriteToAsync(name, instance, instanceType, nodeWriter);
             return nodeWriter.Root;
         }
         #endregion
 
         #region ToObject
-        public static T ToObject<T>(this Node node) {
+        public static T ToObject<T>(this Node node, ConverterSettings settings = null) {
             if(node == null)
                 return default;
-
-            return (T)ToObject(node, typeof(T));
+            
+            return (T)ToObject(node, typeof(T), settings);
         }
 
-        public static object ToObject(this Node node, Type type) {
+        public static object ToObject(this Node node, Type type, ConverterSettings settings = null) {
             if(node == null)
                 return type.GetDefaultValue();
+
+            if(type.IsInstanceOfType(node))
+                return node;
+
             return TryCreateConverter(type, out var converter)
-                       ? converter.ConvertToObject(node)
+                       ? converter.ConvertToObject(node, settings)
                        : type.GetDefaultValue();
         }
         #endregion
@@ -134,7 +143,7 @@ namespace DotLogix.Core.Nodes {
             NodeConverterFactories.Add(factory);
         }
 
-        public static bool RegisterConverter(INodeConverter converter, bool replaceIfExists = false) {
+        public static bool RegisterConverter(IAsyncNodeConverter converter, bool replaceIfExists = false) {
             if((replaceIfExists == false) && CachedNodeConverters.ContainsKey(converter.Type))
                 return false;
 
@@ -143,7 +152,7 @@ namespace DotLogix.Core.Nodes {
         }
 
 
-        public static bool TryCreateConverter(Type instanceType, out INodeConverter converter) {
+        public static bool TryCreateConverter(Type instanceType, out IAsyncNodeConverter converter) {
             if(CachedNodeConverters.TryGetValue(instanceType, out converter))
                 return true;
 
@@ -156,7 +165,7 @@ namespace DotLogix.Core.Nodes {
             return false;
         }
 
-        private static bool TryCreateNodeConverter(Type instanceType, out INodeConverter converter) {
+        private static bool TryCreateNodeConverter(Type instanceType, out IAsyncNodeConverter converter) {
             var converterAttribute = instanceType.GetCustomAttribute<NodeConverterAttribute>();
             if(converterAttribute != null) {
                 converter = converterAttribute.CreateNodeConverter();

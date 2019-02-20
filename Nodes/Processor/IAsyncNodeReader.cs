@@ -7,12 +7,14 @@
 // ==================================================
 
 #region
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
-    public interface INodeReader {
-        void CopyTo(INodeWriter writer);
-        IEnumerable<NodeOperation> Read();
+    public interface IAsyncNodeReader : IDisposable {
+        ValueTask CopyToAsync(IAsyncNodeWriter writer);
+        ValueTask<IEnumerable<NodeOperation>> ReadAsync();
     }
 }

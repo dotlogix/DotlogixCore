@@ -8,11 +8,11 @@ namespace DotLogix.Core.Rest.Server.Http.Headers {
     public class HeaderValue {
         public HeaderValue(string value, IDictionary<string, Optional<string>> attributes = null) {
             Value = value;
-            Attributes = attributes != null ? new ReadOnlyDictionary<string, Optional<string>>(attributes) : null;
+            Attributes = attributes ?? new Dictionary<string, Optional<string>>();
         }
 
         public string Value { get; }
-        public bool HasAttributes => (Attributes != null) && (Attributes.Count > 0);
+        public bool HasAttributes => Attributes.Count > 0;
         public IDictionary<string, Optional<string>> Attributes { get; }
 
         public Optional<string> GetAttribute(string name) {

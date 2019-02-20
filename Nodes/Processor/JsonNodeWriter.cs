@@ -9,7 +9,9 @@
 #region
 using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Types;
 #endregion
@@ -17,24 +19,27 @@ using DotLogix.Core.Types;
 namespace DotLogix.Core.Nodes.Processor {
     public class JsonNodeWriter : NodeWriterBase {
         private readonly StringBuilder _builder;
-
-        private readonly JsonNodesFormatter _formatter;
+        private readonly TextWriter _writer;
+        private readonly int _bufferSize;
+        private readonly JsonFormatterSettings _formatterSettings;
         private bool _isFirstChild = true;
 
-        public JsonNodeWriter(StringBuilder builder, JsonNodesFormatter formatter = null) {
-            _builder = builder;
-            _formatter = formatter ?? JsonNodesFormatter.Default;
+        public JsonNodeWriter(TextWriter writer, JsonFormatterSettings formatterSettings = null, int bufferSize = 100) : base(formatterSettings ?? JsonFormatterSettings.Default) {
+            _writer = writer;
+            _bufferSize = bufferSize;
+            _builder = new StringBuilder(bufferSize);
+            _formatterSettings = formatterSettings ?? (JsonFormatterSettings)ConverterSettings;
         }
 
 
-        public override void BeginMap(string name) {
+        public override async ValueTask BeginMapAsync(string name) {
             CheckName(name, out var appendName);
 
             if(_isFirstChild == false)
                 _builder.Append(',');
 
-            if(_formatter.Ident)
-                WriteIdent();
+            if(_formatterSettings.Ident)
+                WriteIdentAsync();
 
             if(appendName)
                 AppendName(name);
@@ -43,26 +48,39 @@ namespace DotLogix.Core.Nodes.Processor {
 
             PushContainer(NodeContainerType.Map);
             _isFirstChild = true;
+
+            if(_builder.Length >= _bufferSize) {
+                var task = _writer.WriteAsync(_builder.ToString());
+                if(task.IsCompleted == false)
+                    await task;
+                _builder.Clear();
+            }
         }
 
-        public override void EndMap() {
+        public override async ValueTask EndMapAsync() {
             PopExpectedContainer(NodeContainerType.Map);
             _isFirstChild = false;
 
-            if(_formatter.Ident)
-                WriteIdent();
-
+            if(_formatterSettings.Ident)
+                WriteIdentAsync();
             _builder.Append('}');
+            
+            if(_builder.Length >= _bufferSize || ContainerCount == 0) {
+                var task = _writer.WriteAsync(_builder.ToString());
+                if(task.IsCompleted == false)
+                    await task;
+                _builder.Clear();
+            }
         }
 
-        public override void BeginList(string name) {
+        public override async ValueTask BeginListAsync(string name) {
             CheckName(name, out var appendName);
 
             if(_isFirstChild == false)
                 _builder.Append(',');
 
-            if(_formatter.Ident)
-                WriteIdent();
+            if(_formatterSettings.Ident)
+                WriteIdentAsync();
 
             if(appendName)
                 AppendName(name);
@@ -71,52 +89,72 @@ namespace DotLogix.Core.Nodes.Processor {
 
             PushContainer(NodeContainerType.List);
             _isFirstChild = true;
+
+            if(_builder.Length >= _bufferSize) {
+                var task = _writer.WriteAsync(_builder.ToString());
+                if(task.IsCompleted == false)
+                    await task;
+                _builder.Clear();
+            }
         }
 
-        public override void EndList() {
+        public override async ValueTask EndListAsync() {
             PopExpectedContainer(NodeContainerType.List);
             _isFirstChild = false;
 
-            if(_formatter.Ident)
-                WriteIdent();
-
+            if(_formatterSettings.Ident)
+                WriteIdentAsync();
             _builder.Append(']');
+            
+            if(_builder.Length >= _bufferSize || ContainerCount == 0) {
+                var task = _writer.WriteAsync(_builder.ToString());
+                if(task.IsCompleted == false)
+                    await task;
+                _builder.Clear();
+            }
         }
 
-        public override void WriteValue(string name, object value) {
+        public override async ValueTask WriteValueAsync(string name, object value) {
             CheckName(name, out var appendName);
 
             if(_isFirstChild == false)
                 _builder.Append(',');
 
-            if(_formatter.Ident)
-                WriteIdent();
+            if(_formatterSettings.Ident)
+                WriteIdentAsync();
 
             if(appendName)
                 AppendName(name);
 
             AppendValueString(value);
             _isFirstChild = false;
+
+            if(_builder.Length >= _bufferSize || ContainerCount == 0) {
+                var task = _writer.WriteAsync(_builder.ToString());
+                if(task.IsCompleted == false)
+                    await task;
+                _builder.Clear();
+            }
         }
 
-        private void WriteIdent() {
+        private void WriteIdentAsync() {
+            if(ContainerCount == 0)
+                return;
+
             _builder.AppendLine();
 
-            var identCount = ContainerCount * _formatter.IdentSize;
+            var identCount = ContainerCount * _formatterSettings.IdentSize;
             if(identCount > 0)
                 _builder.Append(' ', identCount);
         }
 
         private void AppendName(string name) {
-            name = JsonStrings.EscapeJsonString(name);
             _builder.Append('"');
-            int first = name[0];
-            if((60 <= first) && (first <= 90)) {
-                // if('A' <= first && first <= 'Z') -> is uppercase
-                _builder.Append((char)(first | 32)); // first | ' ' -> to lower
-                _builder.Append(name, 1, name.Length - 1);
-            } else
-                _builder.Append(name);
+
+            if(_formatterSettings.NamingStrategy != null)
+                name = _formatterSettings.NamingStrategy.TransformName(name);
+            JsonStrings.AppendJsonString(_builder, name);
+
             _builder.Append("\":");
         }
 
@@ -125,35 +163,52 @@ namespace DotLogix.Core.Nodes.Processor {
                 _builder.Append("null");
                 return;
             }
-
             var dataType = value.GetDataType();
             var flags = dataType.Flags & DataTypeFlags.PrimitiveMask;
             switch(flags) {
-                case DataTypeFlags.Guid:
-                    _builder.Append('\"');
-                    _builder.Append(((Guid)value).ToString("D"));
-                    _builder.Append('\"');
-                    break;
                 case DataTypeFlags.Bool:
                     _builder.Append((bool)value ? "true" : "false");
                     break;
+                case DataTypeFlags.Guid:
+                    _builder.Append('\"');
+                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.GuidFormat, _formatterSettings.FormatProvider));
+                    _builder.Append('\"');
+                    break;
                 case DataTypeFlags.Enum:
-                    _builder.Append(((Enum)value).ToString("D"));
+                    _builder.Append('\"');
+                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.EnumFormat, _formatterSettings.FormatProvider));
+                    _builder.Append('\"');
                     break;
-                case var _ when (flags & DataTypeFlags.NumericMask) != 0:
-                    _builder.Append(((IFormattable)value).ToString("G", NumberFormatInfo.InvariantInfo));
+                case DataTypeFlags.Char:
+                    value = new string((char)value, 1);
+                    goto case DataTypeFlags.String;
+                case DataTypeFlags.SByte:
+                case DataTypeFlags.Byte:
+                case DataTypeFlags.Short:
+                case DataTypeFlags.UShort:
+                case DataTypeFlags.Int:
+                case DataTypeFlags.UInt:
+                case DataTypeFlags.Long:
+                case DataTypeFlags.ULong:
+                case DataTypeFlags.Float:
+                case DataTypeFlags.Double:
+                case DataTypeFlags.Decimal:
+                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.NumberFormat, _formatterSettings.FormatProvider));
                     break;
-                case var _ when (flags & DataTypeFlags.TextMask) != 0:
+                case DataTypeFlags.DateTime:
+                case DataTypeFlags.DateTimeOffset:
+                case DataTypeFlags.TimeSpan:
+                    _builder.Append('\"');
+                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.TimeFormat, _formatterSettings.FormatProvider));
+                    _builder.Append('\"');
+                    break;
+                case DataTypeFlags.String:
                     JsonStrings.AppendJsonString(_builder, (string)value, true);
-                    break;
-                case var _ when (flags & DataTypeFlags.TimeMask) != 0:
-                    _builder.Append('\"');
-                    _builder.Append(((IFormattable)value).ToString("u", DateTimeFormatInfo.InvariantInfo));
-                    _builder.Append('\"');
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
         }
 
         private void CheckName(string name, out bool appendName) {

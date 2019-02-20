@@ -222,7 +222,9 @@ namespace DotLogix.Core.Nodes {
         public static Node Clone(this Node node) {
             var reader = new NodeReader(node);
             var writer = new NodeWriter();
-            reader.CopyTo(writer);
+            var task = reader.CopyToAsync(writer);
+            if(task.IsCompleted == false)
+                task.ConfigureAwait(false).GetAwaiter().GetResult();
             return writer.Root;
         }
 

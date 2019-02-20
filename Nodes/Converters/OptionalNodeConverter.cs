@@ -7,6 +7,7 @@
 // ==================================================
 
 #region
+using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
@@ -15,13 +16,12 @@ namespace DotLogix.Core.Nodes.Converters {
     public class OptionalNodeConverter<TValue> : NodeConverter {
         public OptionalNodeConverter(DataType dataType) : base(dataType) { }
 
-        public override void Write(object instance, string rootName, INodeWriter writer) {
+        public override ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
             var opt = (Optional<TValue>)instance;
-            if(opt.IsDefined)
-                Nodes.WriteTo(rootName, opt.Value, typeof(TValue), writer);
+            return opt.IsDefined ? Nodes.WriteToAsync(rootName, opt.Value, typeof(TValue), writer) : default;
         }
 
-        public override object ConvertToObject(Node node) {
+        public override object ConvertToObject(Node node, ConverterSettings settings) {
             if(node.Type == NodeTypes.Empty)
                 return new Optional<TValue>(default);
 

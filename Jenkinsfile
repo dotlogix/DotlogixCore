@@ -4,7 +4,6 @@ pipeline {
     stage('Build') {
       steps {
         echo 'Building started'
-        git(url: 'https://git.dotlogixcloud.de/dotlogix/Core.git', branch: 'master', credentialsId: 'DotlogixGiteaApiToken')
         echo 'Building finished'
       }
     }

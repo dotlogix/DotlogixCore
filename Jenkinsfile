@@ -5,7 +5,7 @@ pipeline {
       steps {
         echo 'Building started'
         bat '"C:\\Program Files (x86)\\Nuget\\nuget.exe" restore Core.sln'
-        bat "\"${tool 'MSBuild'}\" Core.sln /p:Configuration=Release /p:Platform=\"Any CPU\" /p:ProductVersion=1.0.0.${env.BUILD_NUMBER}"
+        bat "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\MSBuild\\15.0\\Bin\\" Core.sln /p:Configuration=Release /p:Platform=\"Any CPU\" /p:ProductVersion=1.0.0.${env.BUILD_NUMBER}"
         echo 'Building finished'
       }
     }

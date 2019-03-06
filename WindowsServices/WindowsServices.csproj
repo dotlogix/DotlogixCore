@@ -33,9 +33,6 @@
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotLogix.Core">
-      <HintPath>..\..\assemblies\Debug\DotLogix.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
@@ -56,6 +53,12 @@
     <Compile Include="EventLogMessageFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{211d84b7-e3ba-4fd6-9885-bae2a7fb6d04}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

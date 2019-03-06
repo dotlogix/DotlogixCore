@@ -41,7 +41,7 @@ namespace DotLogix.Core.Config {
             AutoReload = false;
             EnableFileWatching = false;
             try {
-                var json = JsonNodes.ToJson(CurrentConfig, JsonNodesFormatter.Idented);
+                var json = JsonNodes.ToJson(CurrentConfig, JsonFormatterSettings.Idented);
                 File.WriteAllText(AbsolutePath, json);
                 HasChanged = false;
                 return true;

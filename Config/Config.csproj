@@ -6,7 +6,7 @@
     <RootNamespace>DotLogix.Core.Config</RootNamespace>
 	<Company>DotLogix</Company>
     <Product>DotLogix Core</Product>
-    <PackageId>DotLogix.Core</PackageId>
+    <PackageId>DotLogix.Config</PackageId>
     <Authors>DotLogix</Authors>
       <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 </PropertyGroup>
@@ -18,15 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Nodes\Nodes.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="DotLogix.Core">
-      <HintPath>..\..\assemblies\Debug\DotLogix.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DotLogix.Nodes">
-      <HintPath>..\..\assemblies\Debug\DotLogix.Nodes.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

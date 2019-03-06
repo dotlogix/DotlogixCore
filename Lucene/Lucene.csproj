@@ -6,7 +6,7 @@
     <RootNamespace>DotLogix.Core.Lucene</RootNamespace>
 	<Company>DotLogix</Company>
     <Product>DotLogix Core</Product>
-    <PackageId>DotLogix.Core</PackageId>
+    <PackageId>DotLogix.Lucene</PackageId>
     <Authors>DotLogix</Authors>
       <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 </PropertyGroup>

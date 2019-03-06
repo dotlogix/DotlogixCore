@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsServices", "WindowsS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Config", "Config\Config.csproj", "{4A968E40-2BC3-4627-A561-85AE0E5AA108}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene", "Lucene\Lucene.csproj", "{03CBCF33-7908-44C7-9A9A-772363E6EE3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lucene", "Lucene\Lucene.csproj", "{03CBCF33-7908-44C7-9A9A-772363E6EE3F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

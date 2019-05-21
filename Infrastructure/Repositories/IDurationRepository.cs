@@ -10,8 +10,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.Entities;
-using DotLogix.Architecture.Infrastructure.Entities.Options;
+using DotLogix.Architecture.Common.Entities;
+using DotLogix.Architecture.Common.Options;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {

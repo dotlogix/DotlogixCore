@@ -18,7 +18,7 @@ using DotLogix.Core.Rest.Server.Routes;
 namespace DotLogix.Core.Rest.Services.Context {
     public class WebServiceContext : IDisposable {
         private static readonly AsyncLocal<WebServiceContext> AsyncCurrent = new AsyncLocal<WebServiceContext>();
-        public IDictionary<string, object> Variables { get; } = new Dictionary<string, object>();
+        public IDictionary<string, object> Variables { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         public static WebServiceContext Current => AsyncCurrent.Value;
         public static WebRequestResult CurrentRequestResult => Current.RequestResult;
 

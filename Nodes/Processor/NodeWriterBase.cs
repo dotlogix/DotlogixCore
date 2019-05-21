@@ -16,7 +16,7 @@ namespace DotLogix.Core.Nodes.Processor {
     public abstract class NodeWriterBase : IAsyncNodeWriter {
         protected readonly Stack<NodeContainerType> ContainerStack = new Stack<NodeContainerType>();
         protected NodeWriterBase(ConverterSettings converterSettings = null) {
-            ConverterSettings = converterSettings ?? new ConverterSettings();
+            ConverterSettings = converterSettings ?? ConverterSettings.Default;
         }
         protected NodeContainerType CurrentContainer => ContainerStack.Count > 0 ? ContainerStack.Peek() : NodeContainerType.None;
         protected int ContainerCount => ContainerStack.Count;

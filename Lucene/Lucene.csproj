@@ -8,15 +8,28 @@
     <Product>DotLogix Core</Product>
     <PackageId>DotLogix.Lucene</PackageId>
     <Authors>DotLogix</Authors>
-      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<RepositoryUrl>https://git.dotlogixcloud.de</RepositoryUrl>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<RepositoryType>git</RepositoryType>
+	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+		<AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <Version>1.1.0</Version>
 </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    
-  </Target>
 
   <ItemGroup>
     <PackageReference Include="Lucene.Net" Version="3.0.3" />
   </ItemGroup>
 
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<ItemGroup>
+			<PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+			<AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
+		</ItemGroup>
+		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="..\assemblies\$(Configuration)" /> 
+		<Copy SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
+	</Target>
 </Project>

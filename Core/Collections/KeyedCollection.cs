@@ -46,6 +46,8 @@ namespace DotLogix.Core.Collections {
         }
 
         public int Count => _dictionary.Count;
+        public IEnumerable<TKey> Keys => _dictionary.Keys.ToList();
+        public IEnumerable<KeyValuePair<TKey, TValue>> Pairs => _dictionary.ToList();
 
         public bool IsReadOnly => false;
 

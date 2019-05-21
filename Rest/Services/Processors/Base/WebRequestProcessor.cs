@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
@@ -43,6 +44,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
                 var result = await InvokeAsync(context, parameters);
                 webRequestResult.TrySetResult(result);
             } catch(Exception e) {
+                Log.Error(e);
                 webRequestResult.TrySetException(e);
             }
         }

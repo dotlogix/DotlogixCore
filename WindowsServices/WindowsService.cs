@@ -11,9 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.Configuration.Install;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
+using System.Text.RegularExpressions;
+using DotLogix.Core.Collections;
 using DotLogix.Core.Diagnostics;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.WindowsServices {
@@ -23,6 +27,7 @@ namespace DotLogix.Core.WindowsServices {
         public string LogDirectory { get; }
 
         public string ServiceName { get; }
+        public KeyedCollection<string, ConsoleCommand> Commands { get; } = new KeyedCollection<string, ConsoleCommand>(c=>c.Name);
 
 
         public WindowsService(string serviceName, string logDirectory) {
@@ -30,6 +35,22 @@ namespace DotLogix.Core.WindowsServices {
             LogDirectory = logDirectory;
             Mode = Environment.UserInteractive ? ApplicationMode.UserInteractive : ApplicationMode.Service;
             ServiceName = serviceName;
+
+            bool NoArgs(ConsoleCommand cmd, string[] args) => args.Length == 0;
+
+            Commands.AddOrUpdate(new ConsoleCommand("exit", "exit", (cmd, args) => 0, NoArgs));
+            Commands.AddOrUpdate(new ConsoleCommand("help", "help", OnCommand_Help, NoArgs));
+            Commands.AddOrUpdate(new ConsoleCommand("clear", "clear", OnCommand_Clear, NoArgs));
+        }
+
+        private int? OnCommand_Help(ConsoleCommand cmd, string[] args) {
+            foreach(var consoleCommand in Commands.OrderBy(c=>c.Name))
+                Console.WriteLine(consoleCommand.Description);
+            return null;
+        }
+        private int? OnCommand_Clear(ConsoleCommand cmd, string[] args) {
+            Console.Clear();
+            return null;
         }
 
         protected virtual void OnConfiguration(string[] args, EventLog eventLog) {
@@ -40,6 +61,43 @@ namespace DotLogix.Core.WindowsServices {
 
         protected virtual void OnStop() {
             Log.Shutdown();
+        }
+
+        public void Run(string[] args) {
+            switch(Mode) {
+                case ApplicationMode.UserInteractive:
+                    OnConfiguration(args, null);
+                    UserInteractiveStartup(args);
+                    break;
+                case ApplicationMode.Service:
+                    var serviceBase = new ServiceWrapper(this, ServiceName);
+                    OnConfiguration(args, serviceBase.EventLog);
+                    ServiceBase.Run(serviceBase);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        protected virtual int? OnCommand(string command, string[] args) {
+            if(Commands.TryGetValue(command, out var cmd)) {
+                if(cmd.ValidateArguments != null && cmd.ValidateArguments.Invoke(cmd, args) == false) {
+                    Console.WriteLine("Invalid usage of command "+cmd.Name);
+                    Console.WriteLine(cmd.HelpText ?? cmd.Description);
+                    return null;
+                }
+
+                if(args.Length == 1 && args[0] == "help") {
+                    Console.WriteLine(cmd.HelpText ?? cmd.Description);
+                    return null;
+                }
+
+                return cmd.Callback.Invoke(cmd, args);
+            }
+
+            Console.WriteLine("Command could not be found possible commands are");
+            OnCommand_Help(cmd, args);
+            return null;
         }
 
         protected virtual void InitializeLoggers(EventLog eventLog) {
@@ -56,22 +114,6 @@ namespace DotLogix.Core.WindowsServices {
                 Log.LogLevel = LogLevels.Trace;
                 Log.AttachLoggers(loggers);
                 Log.Initialize();
-            }
-        }
-
-        public void Run(string[] args) {
-            switch(Mode) {
-                case ApplicationMode.UserInteractive:
-                    OnConfiguration(args, null);
-                    UserInteractiveStartup(args);
-                    break;
-                case ApplicationMode.Service:
-                    var serviceBase = new ServiceWrapper(this, ServiceName);
-                    OnConfiguration(args, serviceBase.EventLog);
-                    ServiceBase.Run(serviceBase);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -110,36 +152,34 @@ namespace DotLogix.Core.WindowsServices {
             try {
                 OnStart(args);
 
-                var running = true;
+                int? exitCode = null;
+                var commandParserRegex = new Regex("(?:\\s(\\w+)|(?:\"([^\"]+)\"))+");
                 do {
                     var line = Console.ReadLine();
                     if(line == null)
                         continue;
 
-                    var split = line.Split(' ');
-                    var commandCount = split.Length - 1;
-                    var commandArgs = new string[commandCount];
-                    if(commandCount > 0)
-                        Array.Copy(split, 1, commandArgs, 0, commandCount);
-                    running = OnCommand(split[0], commandArgs);
-                } while(running);
+                    var commandName = line.SubstringUntil(' ');
+
+                    string[] commandArgs;
+                    if(commandName.Length == line.Length)
+                        commandArgs = new string[0];
+                    else {
+                        var argsMatch = commandParserRegex.Match(line, commandName.Length);
+                        if(argsMatch.Success) {
+                            commandArgs = argsMatch.Groups.Cast<Group>().Skip(1).Where(g => g.Success).Select(c => c.Value.Trim()).ToArray();
+                        } else
+                            commandArgs = new[] {"help"};
+                    }
+
+                    exitCode = OnCommand(commandName, commandArgs);
+                } while(exitCode.HasValue == false);
+
+                Environment.ExitCode = exitCode.Value;
             } catch(Exception e) {
                 Log.Critical(e);
             }
             OnStop();
-        }
-
-        protected virtual bool OnCommand(string command, string[] args) {
-            switch(command) {
-                case "exit":
-                    return false;
-                case "clear":
-                    Console.Clear();
-                    return true;
-                default:
-                    Console.WriteLine("Possible commands:\n\texit\n\tclear\n\thelp");
-                    return true;
-            }
         }
 
         private bool InstallService() {

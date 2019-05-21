@@ -8,7 +8,7 @@
 
 #region
 using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.Entities;
+using DotLogix.Architecture.Common.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using Microsoft.EntityFrameworkCore;
 #endregion

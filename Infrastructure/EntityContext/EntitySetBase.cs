@@ -13,7 +13,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.Entities;
+using DotLogix.Architecture.Common.Entities;
 using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 #endregion

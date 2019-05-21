@@ -1,13 +1,13 @@
 // ==================================================
 // Copyright 2018(C) , DotLogix
-// File:  InsertOnlyEntity.cs
+// File:  ITitled.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Architecture.Infrastructure.Entities.Base {
-    public abstract class InsertOnlyEntity : SimpleEntity, IInsertOnlyEntity {
-        public bool IsActive { get; set; }
+namespace DotLogix.Architecture.Common.Options {
+    public interface ITitled {
+        string Title { get; set; }
     }
 }

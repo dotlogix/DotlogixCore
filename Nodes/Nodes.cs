@@ -129,7 +129,7 @@ namespace DotLogix.Core.Nodes {
                 return node;
 
             return TryCreateConverter(type, out var converter)
-                       ? converter.ConvertToObject(node, settings)
+                       ? converter.ConvertToObject(node, settings ?? ConverterSettings.Default)
                        : type.GetDefaultValue();
         }
         #endregion

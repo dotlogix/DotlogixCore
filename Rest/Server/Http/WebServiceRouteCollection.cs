@@ -128,7 +128,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                     if((webServiceRoute.AcceptedRequests & httpMethod) == 0)
                         continue;
 
-                    if(overwrite == false && bestRoute != null) {
+                    if(bestRoute != null) {
                         if(bestRoute.Priority > webServiceRoute.Priority)
                             continue;
                         overwrite |= bestRoute.Priority < webServiceRoute.Priority;
@@ -138,7 +138,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                     if(match.Success == false)
                         continue;
                     
-                    if(overwrite == false && bestMatch != null) {
+                    if(bestMatch != null) {
                         if(bestMatch.Length > match.Length)
                             continue;
                         overwrite |= bestMatch.Length < match.Length;

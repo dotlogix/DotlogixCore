@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Threading.Tasks;
+using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
@@ -33,6 +34,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
                     var jsonData = JsonNodes.ToNode(json);
                     context.Variables.Add(JsonDataParamName, jsonData);
                 } catch(Exception e) {
+                    Log.Error(e);
                     context.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
                 }
             }

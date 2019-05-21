@@ -8,7 +8,15 @@
     <Product>DotLogix Core</Product>
     <PackageId>DotLogix.Core.Nodes</PackageId>
     <Authors>DotLogix</Authors>
-      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<RepositoryUrl>https://git.dotlogixcloud.de</RepositoryUrl>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<RepositoryType>git</RepositoryType>
+	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+		<AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <Version>1.1.0</Version>
 </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -27,8 +35,13 @@
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    
-  </Target>
 
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<ItemGroup>
+			<PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+			<AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
+		</ItemGroup>
+		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="..\assemblies\$(Configuration)" /> 
+		<Copy SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
+	</Target>
 </Project>

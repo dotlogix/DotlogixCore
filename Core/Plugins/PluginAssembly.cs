@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -28,7 +29,7 @@ namespace DotLogix.Core.Plugins {
             Directory = Path.GetDirectoryName(file);
         }
 
-        public bool Load() {
+        public bool Load(params object[] args) {
             if(PluginState != PluginState.None)
                 return PluginState == PluginState.Loaded;
             var pluginType = typeof(T);
@@ -40,8 +41,15 @@ namespace DotLogix.Core.Plugins {
             if(count > 0) {
                 try {
                     for(var i = 0; i < count; i++)
-                        instances[i] = validType[i].Instantiate<T>();
+                        instances[i] = validType[i].Instantiate<T>(args);
                 } catch(Exception e) {
+                    if(LastError != null) {
+                        var exceptions = LastError is AggregateException ae ? ae.InnerExceptions.ToList() : new List<Exception> {LastError};
+                        exceptions.Add(e);
+                        LastError = new AggregateException(exceptions);
+                    }
+
+
                     LastError = e;
                     Instances = null;
                     PluginState = PluginState.Failed;

@@ -1,13 +1,13 @@
 // ==================================================
 // Copyright 2018(C) , DotLogix
-// File:  Entity.cs
+// File:  InsertOnlyModel.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Architecture.Infrastructure.Entities.Base {
-    public abstract class Entity : InsertOnlyEntity, IEntity {
-        public int Order { get; set; }
+namespace DotLogix.Architecture.Common.Models.Base {
+    public abstract class InsertOnlyModel : SimpleModel, IInsertOnlyModel {
+        public bool IsActive { get; set; }
     }
 }

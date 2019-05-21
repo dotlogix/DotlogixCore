@@ -11,7 +11,7 @@
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<RepositoryType>git</RepositoryType>
 	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

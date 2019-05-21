@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
@@ -30,30 +31,41 @@ namespace DotLogix.Core.Nodes.Converters {
             _valueField = dynamicType.GetField("value");
         }
 
-        public override void Write(object instance, string rootName, INodeWriter writer) {
+        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
             var keyFieldValue = _keyField.GetValue(instance);
             var valueFieldValue = _valueField.GetValue(instance);
 
-            writer.BeginMap(rootName);
-            Nodes.WriteTo(KeyNodeName, keyFieldValue, _keyField.ValueType, writer);
-            Nodes.WriteTo(ValueNodeName, valueFieldValue, _valueField.ValueType, writer);
-            writer.EndMap();
+            var task = writer.BeginMapAsync(rootName);
+            if(task.IsCompleted == false)
+                await task;
+
+            task = Nodes.WriteToAsync(KeyNodeName, keyFieldValue, _keyField.ValueType, writer);
+            if(task.IsCompleted == false)
+                await task;
+
+            task = Nodes.WriteToAsync(ValueNodeName, valueFieldValue, _valueField.ValueType, writer);
+            if(task.IsCompleted == false)
+                await task;
+
+            task = writer.EndMapAsync();
+            if(task.IsCompleted == false)
+                await task;
         }
 
-        public override object ConvertToObject(Node node) {
+        public override object ConvertToObject(Node node, ConverterSettings settings) {
             if(!(node is NodeMap nodeMap))
                 throw new ArgumentException("Node is not a NodeMap");
 
-            var keyNode = nodeMap.GetChild(KeyNodeName);
+            var keyNode = nodeMap.GetChild(settings.NamingStrategy?.TransformName(KeyNodeName) ?? KeyNodeName);
             if(keyNode == null)
                 throw new ArgumentException("KeyNode is not defined");
 
-            var valueNode = nodeMap.GetChild(ValueNodeName);
+            var valueNode = nodeMap.GetChild(settings.NamingStrategy?.TransformName(ValueNodeName) ?? ValueNodeName);
             if(valueNode == null)
                 throw new ArgumentException("ValueNode is not defined");
 
-            var keyFieldValue = Nodes.ToObject(keyNode, _keyField.ValueType);
-            var valueFieldValue = Nodes.ToObject(valueNode, _valueField.ValueType);
+            var keyFieldValue = Nodes.ToObject(keyNode, _keyField.ValueType, settings);
+            var valueFieldValue = Nodes.ToObject(valueNode, _valueField.ValueType, settings);
 
             var instance = _defaultCtor.Invoke();
             _keyField.SetValue(instance, keyFieldValue);

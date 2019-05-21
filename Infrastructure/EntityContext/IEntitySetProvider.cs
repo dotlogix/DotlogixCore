@@ -7,7 +7,7 @@
 // ==================================================
 
 #region
-using DotLogix.Architecture.Infrastructure.Entities;
+using DotLogix.Architecture.Common.Entities;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {

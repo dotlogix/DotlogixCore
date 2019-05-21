@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -8,15 +8,33 @@
     <Authors>DotLogix</Authors>
     <AssemblyName>DotLogix.Application</AssemblyName>
     <RootNamespace>DotLogix.Architecture.Application</RootNamespace>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<RepositoryUrl>https://git.dotlogixcloud.de</RepositoryUrl>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<RepositoryType>git</RepositoryType>
+	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+	<AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
-  </Target>
 
+  <ItemGroup>
+    <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+    <AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
+  </ItemGroup>
+  
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<ItemGroup>
+			<PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+			<AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
+		</ItemGroup>
+		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="..\assemblies\$(Configuration)" /> 
+		<Copy SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
+	</Target>
 </Project>

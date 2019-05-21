@@ -7,12 +7,11 @@
 // ==================================================
 
 #region
-using System;
 using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Attributes.ResultWriter {
     public class JsonRouteResultWriterAttribute : RouteResultWriterAttribute {
-        protected JsonRouteResultWriterAttribute() : base(()=> WebRequestResultJsonWriter.Instance) { }
+        public JsonRouteResultWriterAttribute() : base(()=> WebRequestResultJsonWriter.Instance) { }
     }
 }

@@ -13,7 +13,7 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes.Factories {
     public class ValueNodeConverterFactory : NodeConverterFactoryBase {
-        public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out INodeConverter converter) {
+        public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
             converter = null;
             if(nodeType != NodeTypes.Value)
                 return false;

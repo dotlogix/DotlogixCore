@@ -8,12 +8,12 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Nodes;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
 using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 #endregion
@@ -38,14 +38,14 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         public TransferState TransferState { get; private set; }
         public bool IsCompleted => TransferState == TransferState.Completed;
 
-        public NodeMap HeaderParameters { get; }
+        public IDictionary<string, object> HeaderParameters { get; }
 
         public MimeType ContentType { get; set; }
         public long ContentLength64 { get; set; }
         public int ChunkSize { get; set; }
         public Encoding ContentEncoding { get; set; }
         public HttpStatusCode StatusCode { get; set; }
-        public MemoryStream OutputStream { get; }
+        public Stream OutputStream { get; }
         public HttpListenerResponse OriginalResponse { get; }
 
         public async Task WriteToResponseStreamAsync(byte[] data, int offset, int count) {
@@ -105,7 +105,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
             PrepareHeaders();
             OriginalResponse.StatusCode = StatusCode.Code;
             OriginalResponse.StatusDescription = StatusCode.Description;
-            OriginalResponse.ContentType = ContentType.Code;
+            OriginalResponse.ContentType = ContentType.Value;
             OriginalResponse.ContentEncoding = ContentEncoding;
             if(OriginalResponse.SendChunked == false)
                 OriginalResponse.ContentLength64 = OutputStream.Length;

@@ -13,7 +13,7 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes.Factories {
     public interface INodeConverterFactory {
-        INodeConverter CreateConverter(NodeTypes nodeType, DataType dataType);
-        bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out INodeConverter converter);
+        IAsyncNodeConverter CreateConverter(NodeTypes nodeType, DataType dataType);
+        bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter);
     }
 }

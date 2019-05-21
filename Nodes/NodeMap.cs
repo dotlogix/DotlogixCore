@@ -15,7 +15,7 @@ using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Nodes {
     public class NodeMap : NodeContainer {
-        private readonly Dictionary<string, Node> _nodeMap = new Dictionary<string, Node>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Node> _nodeMap = new Dictionary<string, Node>();
 
         private Node _last;
 

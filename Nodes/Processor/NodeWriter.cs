@@ -8,14 +8,16 @@
 
 #region
 using System;
+using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
     public class NodeWriter : NodeWriterBase {
         protected NodeContainer CurrentNodeCollection;
+        public NodeWriter(ConverterSettings converterSettings = null) : base(converterSettings) { }
         public Node Root { get; private set; }
 
-        public override void BeginMap(string name) {
+        public override ValueTask BeginMapAsync(string name) {
             CheckName(name);
 
             var map = new NodeMap();
@@ -26,14 +28,16 @@ namespace DotLogix.Core.Nodes.Processor {
 
             CurrentNodeCollection = map;
             PushContainer(NodeContainerType.Map);
+            return default;
         }
 
-        public override void EndMap() {
+        public override ValueTask EndMapAsync() {
             PopExpectedContainer(NodeContainerType.Map);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
+            return default;
         }
 
-        public override void BeginList(string name) {
+        public override ValueTask BeginListAsync(string name) {
             CheckName(name);
 
             var list = new NodeList();
@@ -44,14 +48,16 @@ namespace DotLogix.Core.Nodes.Processor {
 
             CurrentNodeCollection = list;
             PushContainer(NodeContainerType.List);
+            return default;
         }
 
-        public override void EndList() {
+        public override ValueTask EndListAsync() {
             PopExpectedContainer(NodeContainerType.List);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
+            return default;
         }
 
-        public override void WriteValue(string name, object value) {
+        public override ValueTask WriteValueAsync(string name, object value) {
             CheckName(name);
 
             var val = new NodeValue(value);
@@ -59,6 +65,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 Root = val;
             else
                 AddChild(name, val);
+            return default;
         }
 
         private void CheckName(string name) {

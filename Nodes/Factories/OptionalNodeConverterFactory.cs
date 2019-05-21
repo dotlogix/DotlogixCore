@@ -15,10 +15,10 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes.Factories {
     public class OptionalNodeConverterFactory : NodeConverterFactoryBase {
-        public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out INodeConverter converter) {
+        public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
             if(dataType.Type.IsAssignableToOpenGeneric(typeof(Optional<>), out var genericTypeArguments)) {
                 var collectionConverterType = typeof(OptionalNodeConverter<>).MakeGenericType(genericTypeArguments);
-                converter = (INodeConverter)Activator.CreateInstance(collectionConverterType, dataType);
+                converter = (IAsyncNodeConverter)Activator.CreateInstance(collectionConverterType, dataType);
                 return true;
             }
 

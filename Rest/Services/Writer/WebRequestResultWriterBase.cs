@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Exceptions;
 #endregion
@@ -20,7 +20,7 @@ using DotLogix.Core.Rest.Services.Exceptions;
 namespace DotLogix.Core.Rest.Services.Writer {
     public class WebRequestResultWriterBase : IAsyncWebRequestResultWriter {
         public async Task WriteAsync(WebRequestResult requestResult) {
-            var response = requestResult.Context.Response;
+            var response = requestResult.HttpContext.Response;
             if(response.IsCompleted)
                 return;
 

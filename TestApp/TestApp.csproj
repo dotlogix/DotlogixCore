@@ -38,9 +38,6 @@
     <Reference Include="BCrypt.Net-Next, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\BCrypt.Net-Next.3.1.0\lib\net452\BCrypt.Net-Next.dll</HintPath>
     </Reference>
-    <Reference Include="DotLogix.Rest">
-      <HintPath>..\..\assemblies\Debug\DotLogix.Rest.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -71,6 +68,10 @@
     <ProjectReference Include="..\Nodes\Nodes.csproj">
       <Project>{089b5d0d-b58f-4857-ba7c-3b39f3675eea}</Project>
       <Name>Nodes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rest\Rest.csproj">
+      <Project>{7250b0ec-d301-4510-9b24-460e25f760d9}</Project>
+      <Name>Rest</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

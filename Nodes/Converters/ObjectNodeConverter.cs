@@ -10,6 +10,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
@@ -74,28 +75,35 @@ namespace DotLogix.Core.Nodes.Converters {
             return memberTypes;
         }
 
-        public override void Write(object instance, string rootName, INodeWriter writer) {
-            writer.BeginMap(rootName);
-            foreach(var accessor in _accessorsToRead)
-                Nodes.WriteTo(accessor.Name, accessor.GetValue(instance), accessor.ValueType, writer);
-            writer.EndMap();
+        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
+            var task = writer.BeginMapAsync(rootName);
+            if(task.IsCompleted == false)
+                await task;
+            foreach(var accessor in _accessorsToRead) {
+                task = Nodes.WriteToAsync(accessor.Name, accessor.GetValue(instance), accessor.ValueType, writer);
+                if(task.IsCompleted == false)
+                    await task;
+            }
+            task = writer.EndMapAsync();
+            if(task.IsCompleted == false)
+                await task;
         }
 
-        public override object ConvertToObject(Node node) {
+        public override object ConvertToObject(Node node, ConverterSettings settings) {
             if(!(node is NodeMap nodeMap))
                 throw new ArgumentException("Node is not a NodeMap");
 
             object instance;
             if(_isDefaultCtor)
                 instance = _ctor.Invoke();
-            else if(TryConstructWith(_ctor, nodeMap, out instance) == false)
+            else if(TryConstructWith(_ctor, nodeMap, settings, out instance) == false)
                 throw new InvalidOperationException("Object can not be constructed with the given nodes");
 
             foreach(var accessor in _accessorsToWrite) {
-                var accessorNode = nodeMap.GetChild(accessor.Name);
+                var accessorNode = nodeMap.GetChild(settings.NamingStrategy?.TransformName(accessor.Name) ?? accessor.Name);
                 if(accessorNode == null)
                     continue;
-                var accessorValue = Nodes.ToObject(accessorNode, accessor.ValueType);
+                var accessorValue = Nodes.ToObject(accessorNode, accessor.ValueType, settings);
                 accessor.SetValue(instance, accessorValue);
             }
             return instance;
@@ -119,7 +127,7 @@ namespace DotLogix.Core.Nodes.Converters {
             return true;
         }
 
-        private bool TryConstructWith(DynamicCtor ctor, NodeMap nodeMap, out object instance) {
+        private bool TryConstructWith(DynamicCtor ctor, NodeMap nodeMap, ConverterSettings settings, out object instance) {
             instance = null;
 
             var parameters = ctor.Parameters;
@@ -127,11 +135,11 @@ namespace DotLogix.Core.Nodes.Converters {
             var parametersForCtor = new object[parameterCount];
             for(var i = 0; i < parameterCount; i++) {
                 var parameter = parameters[i];
-                var parameterNode = nodeMap.GetChild(parameter.Name);
+                var parameterNode = nodeMap.GetChild(settings.NamingStrategy?.TransformName(parameter.Name) ?? parameter.Name);
                 if(parameterNode == null)
                     return false;
 
-                parametersForCtor[i] = Nodes.ToObject(parameterNode, parameter.ParameterType);
+                parametersForCtor[i] = Nodes.ToObject(parameterNode, parameter.ParameterType, settings);
             }
 
             instance = ctor.Invoke(parametersForCtor);

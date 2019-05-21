@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DotLogix.Architecture.Infrastructure.Entities;
+using DotLogix.Architecture.Common.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.EntityFramework.Query;
 using DotLogix.Architecture.Infrastructure.Queries;
@@ -30,7 +30,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
         }
 
         public override void ReAttach(TEntity entity) {
-            _dbSet.Attach(entity);
+            var  entry = _dbSet.Attach(entity);
         }
 
         public override void ReAttachRange(IEnumerable<TEntity> entities) {

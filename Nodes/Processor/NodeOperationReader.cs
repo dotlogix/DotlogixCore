@@ -8,10 +8,11 @@
 
 #region
 using System.Collections.Generic;
+using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
-    public class NodeOperationReader : INodeReader {
+    public class NodeOperationReader : IAsyncNodeReader {
         public IEnumerable<NodeOperation> Operations { get; }
 
         public NodeOperationReader(IEnumerable<NodeOperation> operations) {
@@ -19,13 +20,19 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
 
-        public void CopyTo(INodeWriter writer) {
-            foreach(var nodeOperation in Operations)
-                writer.Execute(nodeOperation);
+        public async ValueTask CopyToAsync(IAsyncNodeWriter writer) {
+            foreach(var nodeOperation in Operations) {
+                var task = writer.ExecuteAsync(nodeOperation);
+                if(task.IsCompleted)
+                    await task;
+            }
+                
         }
 
-        public IEnumerable<NodeOperation> Read() {
-            return Operations;
+        public ValueTask<IEnumerable<NodeOperation>> ReadAsync() {
+            return new ValueTask<IEnumerable<NodeOperation>>(Operations);
         }
+
+        public void Dispose() { }
     }
 }

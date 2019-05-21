@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Text;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Nodes.Processor;
 
 namespace DotLogix.Core.Nodes
 {
     public class DynamicNode : DynamicObject
     {
+        private readonly ConverterSettings _settings;
         public NodeContainer Node { get; }
 
-        private DynamicNode(NodeContainer node)
-        {
+        private DynamicNode(NodeContainer node, ConverterSettings settings = null) {
+            this._settings = settings ?? new ConverterSettings();
             Node = node;
         }
 
@@ -31,7 +31,7 @@ namespace DotLogix.Core.Nodes
                     childNode = nodeList.GetChild(index);
                     break;
                 case NodeMap nodeMap when objIndex is string name:
-                    childNode = nodeMap.GetChild(name);
+                    childNode = nodeMap.GetChild(_settings.NamingStrategy?.TransformName(name) ?? name);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -47,7 +47,7 @@ namespace DotLogix.Core.Nodes
                 result = null;
                 return false;
             }
-            var childNode = nodeMap.GetChild(binder.Name);
+            var childNode = nodeMap.GetChild(_settings.NamingStrategy?.TransformName(binder.Name) ?? binder.Name);
             result = ToValue(childNode);
             return true;
         }
@@ -97,7 +97,7 @@ namespace DotLogix.Core.Nodes
 
             try
             {
-                result = Nodes.ToObject(Node, binder.ReturnType);
+                result = Nodes.ToObject(Node, binder.ReturnType, _settings);
                 return true;
             }
             catch

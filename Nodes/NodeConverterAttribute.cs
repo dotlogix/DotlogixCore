@@ -16,13 +16,13 @@ using DotLogix.Core.Utils;
 namespace DotLogix.Core.Nodes {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class NodeConverterAttribute : InstantiatorAttribute {
-        public NodeConverterAttribute(Type singletonType, string propertyName) : base(singletonType, propertyName, typeof(INodeConverter)) { }
-        public NodeConverterAttribute(Type type) : base(type, typeof(INodeConverter)) { }
+        public NodeConverterAttribute(Type singletonType, string propertyName) : base(singletonType, propertyName, typeof(IAsyncNodeConverter)) { }
+        public NodeConverterAttribute(Type type) : base(type, typeof(IAsyncNodeConverter)) { }
         protected NodeConverterAttribute(Func<object> instantiateFunc) : base(instantiateFunc) { }
         protected NodeConverterAttribute(IInstantiator instantiator) : base(instantiator) { }
 
-        public INodeConverter CreateNodeConverter() {
-            return GetInstance<INodeConverter>();
+        public IAsyncNodeConverter CreateNodeConverter() {
+            return GetInstance<IAsyncNodeConverter>();
         }
     }
 }

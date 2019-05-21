@@ -16,7 +16,7 @@ using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Nodes {
     public abstract class Node {
-        protected const string PathSeperator = "\\";
+        protected const string PathSeparator = "\\";
         protected const string RootCharacter = "~";
         protected const string SelfCharacter = ".";
         protected const string AncestorCharacter = "..";
@@ -95,7 +95,7 @@ namespace DotLogix.Core.Nodes {
         public string Name { get; internal set; }
         public int Index => Ancestor is NodeList list ? list.IndexOfChild(this) : -1;
 
-        private string CalculatePath() {
+        public string CalculatePath(string pathSeparator = PathSeparator, bool rooted = true) {
             var pathParts = new Stack<string>();
             var currentNode = this;
             NodeContainer ancestor;
@@ -112,9 +112,9 @@ namespace DotLogix.Core.Nodes {
                 }
                 currentNode = ancestor;
             }
-
-            pathParts.Push(RootCharacter);
-            return string.Join(PathSeperator, pathParts);
+            if(rooted)
+                pathParts.Push(RootCharacter);
+            return string.Join(pathSeparator, pathParts);
         }
         #endregion
 

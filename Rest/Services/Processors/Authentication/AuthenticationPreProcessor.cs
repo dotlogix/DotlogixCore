@@ -11,12 +11,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Nodes;
+using DotLogix.Core.Extensions;
+using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
-using DotLogix.Core.Rest.Services.Processors.Authentication.Base;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Authentication {
@@ -30,16 +30,16 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
 
         public AuthenticationPreProcessor(int priority, params IAuthenticationMethod[] authMethods) : this(priority, authMethods.AsEnumerable()) { }
 
-        public override Task ProcessAsync(WebServiceContext webServiceContext) {
-            var authenticationDescriptor = webServiceContext.Route.RequestProcessor.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
+        public override Task ProcessAsync(WebServiceContext context) {
+            var authenticationDescriptor = context.Route.RequestProcessor.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
             if((authenticationDescriptor != null) && (authenticationDescriptor.RequiresAuthentication == false))
                 return Task.CompletedTask;
 
-            var request = webServiceContext.HttpRequest;
-            var result = webServiceContext.RequestResult;
+            var request = context.HttpRequest;
+            var result = context.RequestResult;
             var headerParameters = request.HeaderParameters;
 
-            if(headerParameters.TryGetChildValue(AuthorizationParameterName, out string authParameter) == false) {
+            if(headerParameters.TryGetValueAs(AuthorizationParameterName, out string authParameter) == false) {
                 SetInvalidFormatException(result);
                 return Task.CompletedTask;
             }

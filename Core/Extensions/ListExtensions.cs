@@ -2,8 +2,8 @@
 // Copyright 2018(C) , DotLogix
 // File:  ListExtensions.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  01.08.2018
+// Created:  15.08.2018
+// LastEdited:  20.11.2018
 // ==================================================
 
 #region
@@ -59,14 +59,17 @@ namespace DotLogix.Core.Extensions {
                 list.Add(item);
                 return;
             }
+
             if(list[list.Count - 1].CompareTo(item) <= 0) {
                 list.Add(item);
                 return;
             }
+
             if(list[0].CompareTo(item) >= 0) {
                 list.Insert(0, item);
                 return;
             }
+
             var index = list.BinarySearch(item);
             if(index < 0)
                 index = ~index;
@@ -94,18 +97,44 @@ namespace DotLogix.Core.Extensions {
                 list.Add(item);
                 return;
             }
+
             if(comparer.Compare(list[list.Count - 1], item) <= 0) {
                 list.Add(item);
                 return;
             }
+
             if(comparer.Compare(list[0], item) >= 0) {
                 list.Insert(0, item);
                 return;
             }
-            var index = list.BinarySearch(item);
+
+            var index = list.BinarySearch(item, comparer);
             if(index < 0)
                 index = ~index;
             list.Insert(index, item);
+        }
+
+
+        /// <summary>
+        ///     Adds the elements of the specified collection to the end of the
+        ///     <see cref="T:System.Collections.Generic.ICollection`1" />.
+        /// </summary>
+        /// <param name="collection">
+        ///     The collection whose elements should be added to the end of the
+        ///     <see cref="T:System.Collections.Generic.ICollection`1" />. The collection itself cannot be <see langword="null" />,
+        ///     but it can contain elements that are <see langword="null" />, if type <paramref name="T" /> is a reference type.
+        /// </param>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="collection" /> is <see langword="null" />.
+        /// </exception>
+        public static void AddRange<T>(this ICollection<T> list, IEnumerable<T> collection) {
+            if(list is List<T> realList) {
+                realList.AddRange(collection);
+                return;
+            }
+
+            foreach(var value in collection)
+                list.Add(value);
         }
     }
 }

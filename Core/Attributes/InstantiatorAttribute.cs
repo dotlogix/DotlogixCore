@@ -21,9 +21,9 @@ namespace DotLogix.Core.Attributes {
 
         public InstantiatorAttribute(Type singletonType, string propertyName, Type constraintType = null) : this(Instantiator.UseSingletonProperty(singletonType, propertyName, constraintType)) { }
 
-        public InstantiatorAttribute(Type type, Type constraintType = null) : this(Instantiator.UseDefaultCtor(type, constraintType)) { }
+        protected InstantiatorAttribute(Type type, Type constraintType = null) : this(Instantiator.UseDefaultCtor(type, constraintType)) { }
 
-        public InstantiatorAttribute(Func<object> instantiateFunc) : this(Instantiator.UseDelegate(instantiateFunc)) { }
+        protected InstantiatorAttribute(Func<object> instantiateFunc) : this(Instantiator.UseDelegate(instantiateFunc)) { }
 
         protected object GetInstance() {
             return _instantiator.GetInstance();

@@ -8,30 +8,36 @@
 
 #region
 using System.Reflection;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http.Context;
+using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Processors.Dynamic;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Json {
     public class JsonWebRequestProcessor : DynamicWebRequestProcessor {
         private const string JsonDataParamName = ParseJsonBodyPreProcessor.JsonDataParamName;
+        private readonly ConverterSettings _settings;
 
-        public JsonWebRequestProcessor(object target, DynamicInvoke dynamicInvoke) : base(target, dynamicInvoke) { }
+        public JsonWebRequestProcessor(object target, DynamicInvoke dynamicInvoke, ConverterSettings settings = null) : base(target, dynamicInvoke) {
+            _settings = settings ?? new ConverterSettings();
+        }
 
-        protected override bool TryGetParameterValue(IAsyncHttpRequest request, ParameterInfo methodParam, out object paramValue) {
+        protected override bool TryGetParameterValue(WebServiceContext context, ParameterInfo methodParam, out object paramValue) {
             Node child = null;
 
-            if(request.UserDefinedParameters.TryGetChild(JsonDataParamName, out var node)) {
+            if(context.Variables.TryGetValueAs(JsonDataParamName, out Node node)) {
                 if(methodParam.IsDefined(typeof(JsonBodyAttribute)))
                     child = node;
                 else if(node is NodeMap nodeMap)
                     child = nodeMap.GetChild(methodParam.Name);
             }
             if(child == null)
-                return base.TryGetParameterValue(request, methodParam, out paramValue);
-            paramValue = Nodes.Nodes.ToObject(child, methodParam.ParameterType);
+                return base.TryGetParameterValue(context, methodParam, out paramValue);
+            paramValue = child.ToObject(methodParam.ParameterType, _settings);
             return true;
         }
     }

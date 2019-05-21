@@ -7,12 +7,12 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Nodes;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 #endregion
 
@@ -20,14 +20,13 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
     public interface IAsyncHttpResponse {
         TransferState TransferState { get; }
         bool IsCompleted { get; }
-        NodeMap HeaderParameters { get; }
+        IDictionary<string, object> HeaderParameters { get; }
         MimeType ContentType { get; set; }
         long ContentLength64 { get; set; }
         int ChunkSize { get; set; }
         Encoding ContentEncoding { get; set; }
         HttpStatusCode StatusCode { get; set; }
-        MemoryStream OutputStream { get; }
-        HttpListenerResponse OriginalResponse { get; }
+        Stream OutputStream { get; }
         Task WriteToResponseStreamAsync(byte[] data, int offset, int count);
         Task WriteToResponseStreamAsync(string message);
         Task CompleteChunksAsync();

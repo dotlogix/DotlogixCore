@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Queries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Extensions.Internal;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
@@ -26,7 +27,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
         }
 
         public IAsyncEnumerable<T> ToAsyncEnumerable() {
-            return _innerQueryable.ToAsyncEnumerable();
+            return _innerQueryable.AsAsyncEnumerable();
         }
 
         public IQueryable<T> ToQueryable() {

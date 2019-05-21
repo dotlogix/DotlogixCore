@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using DotLogix.Core.Nodes.Processor;
 #endregion
 
@@ -100,6 +101,37 @@ namespace DotLogix.Core.Nodes {
             return false;
         }
         #endregion
+
+        #region Flatten
+        public static NodeMap Flatten(this NodeContainer nodeContainer, string separator="_") {
+            var flatMap = new NodeMap();
+            FlattenRecursive(flatMap, nodeContainer, null, separator);
+            return flatMap;
+        }
+
+        private static void FlattenRecursive(NodeMap flatMap, NodeContainer container, string previousPath, string separator) {
+            var childContainers = new List<NodeContainer>();
+            foreach(var child in container.Children()) {
+                switch(child) {
+                    case NodeContainer nodeContainer:
+                        childContainers.Add(nodeContainer);
+                        break;
+                    case NodeValue nodeValue:
+                        var path = previousPath == null ? child.Name ?? child.Index.ToString() : string.Concat(previousPath, separator, child.Name ?? child.Index.ToString());
+                        flatMap.CreateValue(path, nodeValue.Value);
+                        break;
+                }
+            }
+            if(childContainers.Count <= 0)
+                return;
+
+            foreach(var child in childContainers) {
+                var path = previousPath == null ? child.Name ?? child.Index.ToString() : string.Concat(previousPath, separator, child.Name ?? child.Index.ToString());
+                FlattenRecursive(flatMap, child, path, separator);
+            }
+        }
+        #endregion
+
         #endregion
 
         #region NodeList
@@ -186,5 +218,18 @@ namespace DotLogix.Core.Nodes {
         }
         #endregion
         #endregion
+
+        public static Node Clone(this Node node) {
+            var reader = new NodeReader(node);
+            var writer = new NodeWriter();
+            var task = reader.CopyToAsync(writer);
+            if(task.IsCompleted == false)
+                task.ConfigureAwait(false).GetAwaiter().GetResult();
+            return writer.Root;
+        }
+
+        public static TNode Clone<TNode>(this TNode node) where TNode : Node {
+            return (TNode)Clone((Node)node);
+        }
     }
 }

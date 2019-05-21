@@ -26,7 +26,7 @@ namespace DotLogix.Core.Rest.Services.Processors {
         public WebRequestProcessorDescriptorCollection Descriptors { get; }
         public int Priority { get; }
 
-        public abstract Task ProcessAsync(WebServiceContext webServiceContext);
+        public abstract Task ProcessAsync(WebServiceContext context);
 
         public virtual bool ShouldExecute(WebServiceContext webServiceContext) {
             return (webServiceContext.RequestResult.Handled == false) || (IgnoreHandled == false);

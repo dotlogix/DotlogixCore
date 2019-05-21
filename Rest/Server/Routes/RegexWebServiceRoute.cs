@@ -9,7 +9,6 @@
 #region
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Processors;
 #endregion
@@ -19,7 +18,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
         public Regex Regex { get; }
 
         public RegexWebServiceRoute(int routeIndex, string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor, int priority) : base(routeIndex, pattern, acceptedRequests, requestProcessor, priority) {
-            Regex = new Regex(Pattern);
+            Regex = new Regex(Pattern, RegexOptions.Compiled);
         }
 
 
@@ -31,16 +30,17 @@ namespace DotLogix.Core.Rest.Server.Routes {
             if(!match.Success)
                 return RouteMatch.Empty;
 
-            var parameters = new Dictionary<string, Node>();
+            var parameters = new Dictionary<string, object>();
             foreach(var name in names) {
                 var group = match.Groups[name];
                 if(group.Captures.Count > 1) {
-                    var nodeList = new NodeList();
-                    foreach(Capture capture in group.Captures)
-                        nodeList.CreateValue(capture.Value);
-                    parameters.Add(name, nodeList);
+                    var values = new string[group.Captures.Count];
+                    for(int i = 0; i < group.Captures.Count; i++) {
+                        values[i] = group.Captures[i].Value;
+                    }
+                    parameters.Add(name, values);
                 } else
-                    parameters.Add(name, new NodeValue(group.Value));
+                    parameters.Add(name, group.Value);
             }
 
             return new RouteMatch(true, match.Value, match.Length, parameters);

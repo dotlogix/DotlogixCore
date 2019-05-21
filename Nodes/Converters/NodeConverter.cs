@@ -8,12 +8,13 @@
 
 #region
 using System;
+using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
-    public abstract class NodeConverter : INodeConverter {
+    public abstract class NodeConverter : IAsyncNodeConverter {
         protected NodeConverter(DataType dataType) {
             DataType = dataType;
             Type = dataType.Type;
@@ -22,8 +23,8 @@ namespace DotLogix.Core.Nodes.Converters {
         public Type Type { get; }
         public DataType DataType { get; }
 
-        public abstract void Write(object instance, string rootName, INodeWriter writer);
+        public abstract ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer);
 
-        public abstract object ConvertToObject(Node node);
+        public abstract object ConvertToObject(Node node, ConverterSettings settings);
     }
 }

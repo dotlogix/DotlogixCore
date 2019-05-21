@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2018(C) , DotLogix
+// Copyright 2019(C) , DotLogix
 // File:  KeyedCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  05.03.2018
-// LastEdited:  01.08.2018
+// Created:  15.08.2018
+// LastEdited:  07.02.2019
 // ==================================================
 
 #region
@@ -46,6 +46,8 @@ namespace DotLogix.Core.Collections {
         }
 
         public int Count => _dictionary.Count;
+        public IEnumerable<TKey> Keys => _dictionary.Keys.ToList();
+        public IEnumerable<KeyValuePair<TKey, TValue>> Pairs => _dictionary.ToList();
 
         public bool IsReadOnly => false;
 

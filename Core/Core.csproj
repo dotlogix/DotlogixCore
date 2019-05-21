@@ -8,6 +8,16 @@
     <Authors>DotLogix</Authors>
     <AssemblyName>DotLogix.Core</AssemblyName>
     <RootNamespace>DotLogix.Core</RootNamespace>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<RepositoryUrl>https://git.dotlogixcloud.de</RepositoryUrl>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<RepositoryType>git</RepositoryType>
+	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	<AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,14 +30,23 @@
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
-  </Target>
+  <ItemGroup>
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
+  </ItemGroup>
 
+
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<ItemGroup>
+			<PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+			<AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
+		</ItemGroup>
+		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="..\assemblies\$(Configuration)" /> 
+		<Copy SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
+	</Target>
 </Project>

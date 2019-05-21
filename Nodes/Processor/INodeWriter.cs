@@ -6,6 +6,8 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
+using System.Threading.Tasks;
+
 namespace DotLogix.Core.Nodes.Processor {
     public interface INodeWriter {
         void BeginMap();

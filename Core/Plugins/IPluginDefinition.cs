@@ -12,7 +12,7 @@ using System;
 
 namespace DotLogix.Core.Plugins {
     public interface IPluginDefinition {
-        Guid Id { get; }
+        Guid Guid { get; }
         string Name { get; }
     }
 }

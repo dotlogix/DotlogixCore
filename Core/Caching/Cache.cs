@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +49,11 @@ namespace DotLogix.Core.Caching {
         ///     The timespan to check if values are no longer valid
         /// </summary>
         public TimeSpan CheckPolicyInterval { get; }
+
+        /// <summary>
+        ///     The current amount of items
+        /// </summary>
+        public int Count => _cacheItems.Count;
 
         /// <summary>
         ///     Get the value for a given key. Returns default if value can not be found
@@ -156,5 +162,17 @@ namespace DotLogix.Core.Caching {
         ///     Occures when items are discarded in the cache
         /// </summary>
         public event EventHandler<CacheItemsDiscardedEventArgs<TKey, TValue>> ItemsDiscarded;
+
+        /// <summary>Returns an enumerator that iterates through the collection.</summary>
+        /// <returns>An enumerator that can be used to iterate through the collection.</returns>
+        public IEnumerator<CacheItem<TKey, TValue>> GetEnumerator() {
+            return _cacheItems.Values.ToList().GetEnumerator();
+        }
+
+        /// <summary>Returns an enumerator that iterates through a collection.</summary>
+        /// <returns>An <see cref="T:System.Collections.IEnumerator"></see> object that can be used to iterate through the collection.</returns>
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
+        }
     }
 }

@@ -12,8 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.Entities;
-using DotLogix.Architecture.Infrastructure.Entities.Options;
+using DotLogix.Architecture.Common.Entities;
+using DotLogix.Architecture.Common.Options;
 using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Core.Extensions;
 #endregion

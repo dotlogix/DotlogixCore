@@ -8,14 +8,20 @@
 
 #region
 using System;
+using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Caching {
-    public interface ICache<TKey, TValue> {
+    public interface ICache<TKey, TValue> : IEnumerable<CacheItem<TKey, TValue>> {
         /// <summary>
         ///     The timespan to check if values are no longer valid
         /// </summary>
         TimeSpan CheckPolicyInterval { get; }
+        
+        /// <summary>
+        ///     The current amount of items
+        /// </summary>
+        int Count { get; }
 
         /// <summary>
         ///     Get the value for a given key. Returns default if value can not be found

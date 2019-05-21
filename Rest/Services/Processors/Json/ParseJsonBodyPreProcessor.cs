@@ -9,8 +9,9 @@
 #region
 using System;
 using System.Threading.Tasks;
+using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Nodes;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
@@ -18,12 +19,12 @@ using DotLogix.Core.Rest.Services.Exceptions;
 
 namespace DotLogix.Core.Rest.Services.Processors.Json {
     public class ParseJsonBodyPreProcessor : WebRequestProcessorBase {
-        public const string JsonDataParamName = "jsonData";
+        public const string JsonDataParamName = "$jsonData";
         public static IWebRequestProcessor Instance { get; } = new ParseJsonBodyPreProcessor();
         private ParseJsonBodyPreProcessor() : base(int.MaxValue) { }
 
-        public override async Task ProcessAsync(WebServiceContext webServiceContext) {
-            var request = webServiceContext.HttpRequest;
+        public override async Task ProcessAsync(WebServiceContext context) {
+            var request = context.HttpRequest;
             if(request.ContentType != MimeTypes.Application.Json)
                 return;
 
@@ -31,9 +32,10 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
             if(json.Length > 1) {
                 try {
                     var jsonData = JsonNodes.ToNode(json);
-                    request.UserDefinedParameters.AddChild(JsonDataParamName, jsonData);
+                    context.Variables.Add(JsonDataParamName, jsonData);
                 } catch(Exception e) {
-                    webServiceContext.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
+                    Log.Error(e);
+                    context.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
                 }
             }
         }

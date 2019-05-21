@@ -15,13 +15,13 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes.Factories {
     public abstract class NodeConverterFactoryBase : INodeConverterFactory {
-        public INodeConverter CreateConverter(NodeTypes nodeType, DataType dataType) {
+        public IAsyncNodeConverter CreateConverter(NodeTypes nodeType, DataType dataType) {
             if(TryCreateConverter(nodeType, dataType, out var converter))
                 return converter;
 
             throw new InvalidOperationException($"Can not create converter for type {dataType.Type.GetFriendlyName()}");
         }
 
-        public abstract bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out INodeConverter converter);
+        public abstract bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter);
     }
 }

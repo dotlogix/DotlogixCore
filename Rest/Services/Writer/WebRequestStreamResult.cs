@@ -9,7 +9,7 @@
 #region
 using System.IO;
 using DotLogix.Core.Rest.Server.Http.Context;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {

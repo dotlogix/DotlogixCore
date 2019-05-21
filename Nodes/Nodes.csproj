@@ -9,7 +9,7 @@
     <PackageId>DotLogix.Core.Nodes</PackageId>
     <Authors>DotLogix</Authors>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<RepositoryUrl>https://git.dotlogixcloud.de</RepositoryUrl>
+	<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 	<RepositoryType>git</RepositoryType>

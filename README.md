@@ -1,25 +1,23 @@
-# Core
-
-Welcome to the Dotlogix Core library!
+# Welcome to the Dotlogix Core library!
 
 The repo is currently in beta status so the API may change in the future. It is not recommended to use these libraries in production code but all major releases should be stable.
 
 You can find all of the projects also on NuGet: https://www.nuget.org/profiles/dotlogix
 
 
-# Current Roadmap:
+## Current Roadmap:
 
 Release Version 2 of the API.
 
-# All Projects:
+#### All Projects:
 - Add Documentation
 - Fix style guide, ReSharper and "dotnet.settings" to help contributors to keep the style consistent
 
-# DotLogix.Core:
+#### DotLogix.Core:
 - Rework some of the concepts in the core library
 - Add more awesome extension methods and classes
 
-# DotLogix.Architecture Pack:
+#### DotLogix.Architecture Pack:
 - Create some Boilerplate generator or example projects to get the others started
 - Add documentation about behaviour and how things should be used
 - Add documentation about creating own repository handlers
@@ -36,12 +34,12 @@ Release Version 2 of the API.
 - Optional: Reduce overhead of decorators somehow
 - Optional: Add second-level caching for where queries written in C# Expressions (equality will be difficult)
 
-# DotLogix.Rest:
+#### DotLogix.Rest:
 - Adopt Server to be compatible with OWIN, Katana and similar projects
 - Add more intelligent mapping of results and also provide a more convenient way to customize results
 - Add Http Rest Client
 - Add Auto Mapping and Auto-Generation of JS and C# API Clients by using the attributes
 
-# DotLogix.Nodes:
+#### DotLogix.Nodes:
 - Add more converter factories and support for custom converters and attributes
 - Test the async API against more complex data structures and other libraries

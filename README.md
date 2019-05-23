@@ -24,7 +24,7 @@ Release Version 2 of the API.
 - Add mocking framework (should be easy because everything is pure Linq and abstracted)
 - Rework the decorator pattern to be more easy to implement and more flexible
 - Add some common decorators, like prefiltering queries, auto assign values on store/add (like user-specific entities where queries should only contain user-data)
-- Add attributes for entity decorators to express order and behaviour of decorators and in a more the expressive and easy way.
+- Add attributes for entities to define decorators with ordering to allow configuration in a more expressive and easy way.
 - Add some common decorators, like prefiltering queries, auto assign values on store/add (like user-specific entities where queries should only contain user-data)
 - Add or replace methods with virtual methods to be able to override their behaviour
 - Allow the users to auto apply decorators for entities based on a condition

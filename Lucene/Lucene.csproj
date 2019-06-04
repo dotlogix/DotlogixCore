@@ -1,35 +1,55 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(MSBuildThisFileFullPath)\..\..\assemblies\BuildTasks\BuildTasks.dll" />
 
-  <PropertyGroup>
-	<TargetFramework>net472</TargetFramework>
-    <AssemblyName>DotLogix.Lucene</AssemblyName>
-    <RootNamespace>DotLogix.Core.Lucene</RootNamespace>
-	<Company>DotLogix</Company>
-    <Product>DotLogix Core</Product>
-    <PackageId>DotLogix.Lucene</PackageId>
-    <Authors>DotLogix</Authors>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-	<RepositoryType>git</RepositoryType>
-	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<AssemblyVersion>1.1.1</AssemblyVersion>
-    <FileVersion>1.1.1</FileVersion>
-    <Version>1.1.1</Version>
-</PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Company>DotLogix</Company>
+		<Product>DotLogix Core</Product>
+		<PackageId>DotLogix.Core.Lucene</PackageId>
+		<Authors>DotLogix</Authors>
+		<AssemblyName>DotLogix.Lucene</AssemblyName>
+		<RootNamespace>DotLogix.Core.Lucene</RootNamespace>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<RepositoryType>git</RepositoryType>
+		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+		<Version>1.2</Version>
+	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DocumentationFile>D:\git\c-sharp\DotLogix\Core\Lucene\DotLogix.Application.xml</DocumentationFile>
+		<WarningsAsErrors>NU1605</WarningsAsErrors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Lucene.Net" Version="3.0.3" />
-  </ItemGroup>
-
+	<ItemGroup>
+	  <PackageReference Include="Lucene.Net" Version="3.0.3" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Core\Core.csproj" />
+	</ItemGroup>
+  
+	<Target Name="BeforeBuildActions" BeforeTargets="BeforeBuild">
+		<GetCurrentBuildVersion BaseVersion="$(Version)" PackageId="$(PackageId)">
+			<Output TaskParameter="BuildVersion" PropertyName="CurrentBuildVersion" />
+			<Output TaskParameter="PackageVersion" PropertyName="CurrentPackageVersion" />
+		</GetCurrentBuildVersion>
+		<PropertyGroup>
+		  <PackageVersion>$(CurrentPackageVersion)</PackageVersion>
+		  <AssemblyVersion>$(CurrentBuildVersion)</AssemblyVersion>
+		  <FileVersion>$(CurrentBuildVersion)</FileVersion>
+		  <Version>$(CurrentBuildVersion)</Version>
+		</PropertyGroup>
+	</Target>
+  
 	<Target Name="CopyPackage" AfterTargets="Pack">
 		<ItemGroup>
 			<PackageFiles Include="bin\$(Configuration)\*.nupkg" />
 			<AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
 		</ItemGroup>
 		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="..\assemblies\$(Configuration)" /> 
-		<Copy SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
+		<Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
 	</Target>
 </Project>

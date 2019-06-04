@@ -11,6 +11,9 @@ using System.Collections.ObjectModel;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="ObservableCollection{T}"/>
+    /// </summary>
     public static class ObservableCollectionExtension {
         /// <summary>
         ///     Converts a observable collection to a read-only one

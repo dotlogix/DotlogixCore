@@ -128,6 +128,9 @@ namespace DotLogix.Core.Nodes {
             if(type.IsInstanceOfType(node))
                 return node;
 
+            if(type == typeof(object))
+                return DynamicNode.From(node);
+
             return TryCreateConverter(type, out var converter)
                        ? converter.ConvertToObject(node, settings ?? ConverterSettings.Default)
                        : type.GetDefaultValue();

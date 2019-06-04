@@ -80,7 +80,7 @@ namespace DotLogix.Core.WindowsServices {
         }
 
         protected virtual int? OnCommand(string command, string[] args) {
-            if(Commands.TryGetValue(command, out var cmd)) {
+            if(Commands.TryGet(command, out var cmd)) {
                 if(cmd.ValidateArguments != null && cmd.ValidateArguments.Invoke(cmd, args) == false) {
                     Console.WriteLine("Invalid usage of command "+cmd.Name);
                     Console.WriteLine(cmd.HelpText ?? cmd.Description);

@@ -8,7 +8,7 @@ using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
 
-namespace DotLogix.Lucene {
+namespace DotLogix.Core.Lucene {
     public class LuceneIndex : ILuceneIndex {
         private Analyzer _analyzer;
         private Directory _directory;

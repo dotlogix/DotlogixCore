@@ -14,7 +14,9 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
+    /// <inheritdoc />
     public class TextLogMessageFormatter : ILogMessageFormatter {
+        /// <inheritdoc />
         public string Format(LogMessage message) {
             var timeStamp = $"{message.TimeStamp:HH:mm:ss}";
             var logLevel = message.LogLevel.ToString().SetLength(' ', 15);

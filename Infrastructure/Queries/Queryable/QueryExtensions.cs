@@ -14,9 +14,35 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Tracking.Snapshots;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+    public interface IQueryInterceptor {
+        IQuery<TValue> BeforeExecute<TValue>(IQuery<TValue> query);
+        TResult AfterExecute<TResult>(TResult result);
+    }
+
+    public class QueryInterceptor : IQueryInterceptor {
+        private Func<object, object> BeforeExecuteFunc { get; }
+        private Func<object, object> AfterExecuteFunc { get; }
+
+        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        public QueryInterceptor(Func<object, object> beforeExecuteFunc, Func<object, object> afterExecuteFunc) {
+            BeforeExecuteFunc = beforeExecuteFunc;
+            AfterExecuteFunc = afterExecuteFunc;
+        }
+
+        public IQuery<TValue> BeforeExecute<TValue>(IQuery<TValue> query) {
+            return BeforeExecuteFunc != null ? (IQuery<TValue>)BeforeExecuteFunc(query) : query;
+        }
+
+        public TResult AfterExecute<TResult>(TResult result) {
+            return AfterExecuteFunc != null ? (TResult)AfterExecuteFunc(result) : result;
+        }
+    }
+
+
     public static class QueryExtensions {
         #region Any
 
@@ -355,6 +381,17 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
 
         public static Task ForEachAsync<T>(this IQuery<T> source, Action<T> action, CancellationToken cancellationToken = default) {
             return source.QueryExecutor.ToAsyncEnumerable().ForEachAsync(action, cancellationToken);
+        }
+
+        public static IQuery<T> InterceptQuery<T>(this IQuery<T> query, Func<object, object> beforeExecutFunc, Func<object, object> afterExecuteFunc) {
+            return query.InterceptQuery(new QueryInterceptor(beforeExecutFunc, afterExecuteFunc));
+        }
+        
+        public static IQuery<T> InterceptQueryBeforeExecute<T>(this IQuery<T> query, Func<object, object> interceptor) {
+            return query.InterceptQuery(new QueryInterceptor(interceptor, null));
+        }
+        public static IQuery<T> InterceptQueryResult<T>(this IQuery<T> query, Func<object, object> interceptor) {
+            return query.InterceptQuery(new QueryInterceptor(null, interceptor));
         }
 
         #endregion

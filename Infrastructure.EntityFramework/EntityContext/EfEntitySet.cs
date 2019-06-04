@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DotLogix.Architecture.Common.Entities;
+using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.EntityFramework.Query;
 using DotLogix.Architecture.Infrastructure.Queries;

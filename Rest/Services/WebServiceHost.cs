@@ -60,7 +60,7 @@ namespace DotLogix.Core.Rest.Services {
 
         #region Events
         public Task TriggerEventAsync(string name, WebServiceEventArgs eventArgs) {
-            if(_router.ServerEvents.TryGetValue(name, out var webServiceEvent) == false)
+            if(_router.ServerEvents.TryGet(name, out var webServiceEvent) == false)
                 throw new ArgumentException($"Event {name} is not defined", nameof(name));
 
             return webServiceEvent.TriggerAsync(this, eventArgs);

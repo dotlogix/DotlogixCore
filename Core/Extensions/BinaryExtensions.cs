@@ -5,8 +5,19 @@ using System.Threading.Tasks;
 
 namespace DotLogix.Core.Extensions
 {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="byte"/> and <see cref="Stream"/>
+    /// </summary>
     public static class BinaryExtensions
     {
+        /// <summary>
+        /// Find the index of an array of bytes in another array
+        /// </summary>
+        /// <param name="searchWithin">The byte array to search within</param>
+        /// <param name="serachFor">The byte array to search</param>
+        /// <param name="startIndex">The offset to start searching</param>
+        /// <param name="count">The maximum amount bytes to search</param>
+        /// <returns>The index or -1 if the sequence can not be found</returns>
         public static int IndexOfArray(this byte[] searchWithin, byte[] serachFor, int startIndex = 0, int count=-1) {
             if(count == -1)
                 count = searchWithin.Length - startIndex;
@@ -21,27 +32,53 @@ namespace DotLogix.Core.Extensions
             return -1;
         }
 
-        public static IEnumerable<ArraySegment<byte>> SplitByArray(this byte[] searchWithin, byte[] serachFor, int startIndex = 0, int count=-1) {
+        /// <summary>
+        /// Splits an array of bytes using another byte array.
+        /// </summary>
+        /// <param name="searchWithin">The byte array to search within</param>
+        /// <param name="searchFor">The byte array to search</param>
+        /// <param name="startIndex">The offset to start searching</param>
+        /// <param name="count">The maximum amount bytes to search</param>
+        /// <returns>The array segments</returns>
+        public static IEnumerable<ArraySegment<byte>> SplitByArray(this byte[] searchWithin, byte[] searchFor, int startIndex = 0, int count=-1) {
             if(count == -1)
                 count = searchWithin.Length - startIndex;
 
             var endIndex = startIndex + count;
             int segmentEnd;
-            while(endIndex-startIndex > serachFor.Length &&  (segmentEnd = IndexOfArray(searchWithin, serachFor, startIndex, endIndex - startIndex)) != -1) {
+            while(endIndex-startIndex > searchFor.Length &&  (segmentEnd = IndexOfArray(searchWithin, searchFor, startIndex, endIndex - startIndex)) != -1) {
                 yield return new ArraySegment<byte>(searchWithin, startIndex, segmentEnd-startIndex);
-                startIndex = segmentEnd + serachFor.Length;
+                startIndex = segmentEnd + searchFor.Length;
             }
 
             if(endIndex - startIndex > 0)
                 yield return new ArraySegment<byte>(searchWithin, startIndex, endIndex - startIndex);
         }
 
+        /// <summary>
+        /// Checks if parts of two byte arrays are equal.<br></br>
+        /// This method is optimized to compare long pointers instead of each byte
+        /// </summary>
+        /// <param name="data1">The first array</param>
+        /// <param name="data2">The second array</param>
+        /// <returns></returns>
         public static bool EqualBytesLongUnrolled(this byte[] data1, byte[] data2) {
             if (data1.Length != data2.Length)
                 return false;
             return EqualBytesLongUnrolled(data1, data2, 0, 0, data1.Length);
         }
 
+
+        /// <summary>
+        /// Checks if parts of two byte arrays are equal.<br></br>
+        /// This method is optimized to compare long pointers instead of each byte
+        /// </summary>
+        /// <param name="data1">The first array</param>
+        /// <param name="data2">The second array</param>
+        /// <param name="startIndex">The offset to start for the first array</param>
+        /// <param name="startIndex2">The offset to start for the second array</param>
+        /// <param name="count">The amount of bytes to compare</param>
+        /// <returns></returns>
         public static unsafe bool EqualBytesLongUnrolled (this byte[] data1, byte[] data2, int startIndex, int startIndex2, int count)
         {
             if (data1 == data2 && startIndex == startIndex2)

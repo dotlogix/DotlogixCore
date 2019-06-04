@@ -11,12 +11,35 @@ using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Collections {
+    /// <summary>
+    /// A collection with multiple layers, useful for stacked collections
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TCollection"></typeparam>
     public interface ILayeredCollection<TValue, TCollection> : ICollection<TValue> where TCollection : ICollection<TValue> {
+        /// <summary>
+        /// The layers of collections
+        /// </summary>
         IEnumerable<TCollection> Layers { get; }
+        /// <summary>
+        /// The topmost layer
+        /// </summary>
         TCollection CurrentLayer { get; }
 
+        /// <summary>
+        /// Add a new layer to the collection
+        /// </summary>
+        /// <param name="collection"></param>
         void PushLayer(TCollection collection);
+        /// <summary>
+        /// Removes the topmost layer from the stack
+        /// </summary>
+        /// <returns></returns>
         TCollection PopLayer();
+        /// <summary>
+        /// Get the topmost layer but don't remove it
+        /// </summary>
+        /// <returns></returns>
         TCollection PeekLayer();
     }
 }

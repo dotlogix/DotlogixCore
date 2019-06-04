@@ -12,6 +12,9 @@ using DotLogix.Core.Caching;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="ICache{TKey,TValue}"/>
+    /// </summary>
     public static class CacheExtensions {
         /// <summary>
         ///     Stores a value in a cache using a <see cref="ValidUntilCachePolicy" /> with the given timestamp

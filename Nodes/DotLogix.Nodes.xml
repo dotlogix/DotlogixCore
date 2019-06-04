@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DotLogix.Nodes</name>
+    </assembly>
+    <members>
+        <member name="M:DotLogix.Core.Nodes.Processor.NodeOperation.ToString">
+            <summary>Returns the fully qualified type name of this instance.</summary>
+            <returns>The fully qualified type name.</returns>
+        </member>
+        <member name="M:DotLogix.Core.Nodes.Processor.NodeReaderBase.Dispose">
+            <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        </member>
+    </members>
+</doc>

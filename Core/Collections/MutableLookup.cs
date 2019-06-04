@@ -14,6 +14,12 @@ using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Collections {
+    /// <summary>
+    /// A mutable lookup collection
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TCollection"></typeparam>
     public class MutableLookup<TKey, TValue, TCollection> : ILookup<TKey, TValue> where TCollection : ICollection<TValue> {
         private readonly Dictionary<TKey, TCollection> _innerDictionary;
         private readonly Func<TCollection> _instantiateFunc;

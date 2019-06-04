@@ -11,11 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries {
     public interface IQuery<T> {
         IQueryExecutor<T> QueryExecutor { get; }
+        IEnumerable<IQueryInterceptor> Interceptors { get; }
 
         #region Where
 
@@ -83,6 +85,10 @@ namespace DotLogix.Architecture.Infrastructure.Queries {
         IQuery<T> Except(IEnumerable<T> source2);
         IQuery<T> Reverse();
 
+        #endregion
+
+        #region Intercept
+        IQuery<T> InterceptQuery(IQueryInterceptor interceptor);
         #endregion
     }
 }

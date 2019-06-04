@@ -13,6 +13,11 @@ using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Collections {
+    /// <summary>
+    /// A grouping class for lookups
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     public struct LookupGrouping<TKey, TValue> : IGrouping<TKey, TValue> {
         private readonly IEnumerable<TValue> _values;
 

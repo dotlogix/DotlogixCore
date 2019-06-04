@@ -15,6 +15,9 @@ using DotLogix.Core.Reflection.Fluent;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="Task"/>
+    /// </summary>
     public static class TaskExtensions {
         private static readonly ConcurrentDictionary<Type, GetterDelegate> TypeResultAccessors = new ConcurrentDictionary<Type, GetterDelegate>();
 

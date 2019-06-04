@@ -25,7 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Config", "Config\Config.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lucene", "Lucene\Lucene.csproj", "{03CBCF33-7908-44C7-9A9A-772363E6EE3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{B8BA6DA8-018D-4463-B91A-AFC619372DA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{B8BA6DA8-018D-4463-B91A-AFC619372DA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildTasks", "BuildTasks\BuildTasks.csproj", "{2CA0AA63-6E4B-4D62-9A03-FADBDD372636}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +79,10 @@ Global
 		{B8BA6DA8-018D-4463-B91A-AFC619372DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8BA6DA8-018D-4463-B91A-AFC619372DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8BA6DA8-018D-4463-B91A-AFC619372DA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CA0AA63-6E4B-4D62-9A03-FADBDD372636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CA0AA63-6E4B-4D62-9A03-FADBDD372636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CA0AA63-6E4B-4D62-9A03-FADBDD372636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CA0AA63-6E4B-4D62-9A03-FADBDD372636}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

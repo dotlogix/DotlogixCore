@@ -17,7 +17,7 @@ using Lucene.Net.Store;
 using Version = Lucene.Net.Util.Version;
 #endregion
 
-namespace DotLogix.Lucene {
+namespace DotLogix.Core.Lucene {
     public interface ILuceneIndex : IDisposable {
         Analyzer Analyzer { get; }
         Directory Directory { get; }

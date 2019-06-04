@@ -7,9 +7,22 @@ using System.Threading.Tasks;
 namespace DotLogix.Core.Patterns
 {
 
+    /// <summary>
+    /// A pipeline implementation
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
     public class Pipeline<TIn, TResult> : ProcessingStep<TIn, TIn, TResult>, IList<ProcessingStep<TIn, TIn, TResult>> {
+        /// <summary>
+        /// The inner steps of the pipeline
+        /// </summary>
         protected List<ProcessingStep<TIn, TIn, TResult>> Steps { get; } = new List<ProcessingStep<TIn, TIn, TResult>>();
 
+        /// <summary>
+        /// Invoke the pipeline
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public override Task<TResult> InvokeAsync(TIn value) {
             return Steps[0].InvokeAsync(value);
         }

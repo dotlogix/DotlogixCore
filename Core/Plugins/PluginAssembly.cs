@@ -16,6 +16,10 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Plugins {
+    /// <summary>
+    /// An assembly containing some instances of a plugin
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class PluginAssembly<T> {
         public PluginState PluginState { get; private set; }
         public string File { get; }
@@ -24,11 +28,20 @@ namespace DotLogix.Core.Plugins {
         public T[] Instances { get; private set; }
         public Exception LastError { get; private set; }
 
+        /// <summary>
+        /// Creates an instance of <see cref="PluginAssembly{T}"/>
+        /// </summary>
+        /// <param name="file"></param>
         public PluginAssembly(string file) {
             File = file;
             Directory = Path.GetDirectoryName(file);
         }
 
+        /// <summary>
+        /// Load the assembly and instantiate the matching types
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public bool Load(params object[] args) {
             if(PluginState != PluginState.None)
                 return PluginState == PluginState.Loaded;

@@ -7,7 +7,15 @@
 // ==================================================
 
 namespace DotLogix.Core.Diagnostics {
+    /// <summary>
+    /// An interface for log message formatters
+    /// </summary>
     public interface ILogMessageFormatter {
+        /// <summary>
+        /// Formats a log message
+        /// </summary>
+        /// <param name="logMessage"></param>
+        /// <returns></returns>
         string Format(LogMessage logMessage);
     }
 }

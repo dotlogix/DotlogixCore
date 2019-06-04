@@ -14,6 +14,9 @@ using System.Xml.Linq;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
+    /// <summary>
+    /// A xml logger implementation
+    /// </summary>
     public class XmlLogger : LoggerBase, IDisposable {
         private const int Delay = 30000;
         private readonly DateTime _dateTime = DateTime.Now;
@@ -26,6 +29,7 @@ namespace DotLogix.Core.Diagnostics {
         public string LogFile { get; }
         public object SyncRoot { get; }
 
+        /// <inheritdoc />
         public XmlLogger(string directory, string prefix = null) : base("XmlLogger") {
             SyncRoot = new object();
             Directory = directory;

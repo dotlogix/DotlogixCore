@@ -7,9 +7,21 @@
 // ==================================================
 
 namespace DotLogix.Core.Plugins {
+    /// <summary>
+    /// The loading state of a plugin assembly
+    /// </summary>
     public enum PluginState {
+        /// <summary>
+        /// None
+        /// </summary>
         None,
+        /// <summary>
+        /// Loaded
+        /// </summary>
         Loaded,
+        /// <summary>
+        /// Failed
+        /// </summary>
         Failed
     }
 }

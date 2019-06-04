@@ -7,11 +7,13 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using DotLogix.Architecture.Domain.Services;
 #endregion
 
 namespace DotLogix.Architecture.Application.Context {
     public interface IApplicationContext {
+        IDictionary<string, object> Variables { get; }
         TService UseService<TService>() where TService : class, IDomainService;
     }
 }

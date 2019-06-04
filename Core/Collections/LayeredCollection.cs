@@ -13,7 +13,11 @@ using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Collections {
+    /// <inheritdoc />
     public class LayeredCollection<TValue, TCollection> : ILayeredCollection<TValue, TCollection> where TCollection : ICollection<TValue> {
+        /// <summary>
+        /// The internal stack of collections
+        /// </summary>
         protected Stack<TCollection> LayerStack { get; }
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
@@ -141,14 +145,17 @@ namespace DotLogix.Core.Collections {
         public IEnumerable<TCollection> Layers => LayerStack;
         public TCollection CurrentLayer => LayerStack.Count > 0 ? LayerStack.Peek() : default;
 
+        /// <inheritdoc />
         public void PushLayer(TCollection collection) {
             LayerStack.Push(collection);
         }
 
+        /// <inheritdoc />
         public TCollection PopLayer() {
             return LayerStack.Pop();
         }
 
+        /// <inheritdoc />
         public TCollection PeekLayer() {
             return LayerStack.Peek();
         }

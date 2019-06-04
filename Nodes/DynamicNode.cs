@@ -8,9 +8,9 @@ namespace DotLogix.Core.Nodes
     public class DynamicNode : DynamicObject
     {
         private readonly ConverterSettings _settings;
-        public NodeContainer Node { get; }
+        public Node Node { get; }
 
-        private DynamicNode(NodeContainer node, ConverterSettings settings = null) {
+        private DynamicNode(Node node, ConverterSettings settings = null) {
             this._settings = settings ?? new ConverterSettings();
             Node = node;
         }
@@ -36,7 +36,7 @@ namespace DotLogix.Core.Nodes
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            result = ToValue(childNode);
+            result = new DynamicNode(childNode, _settings);
             return true;
         }
 
@@ -48,7 +48,7 @@ namespace DotLogix.Core.Nodes
                 return false;
             }
             var childNode = nodeMap.GetChild(_settings.NamingStrategy?.TransformName(binder.Name) ?? binder.Name);
-            result = ToValue(childNode);
+            result = new DynamicNode(childNode, _settings);
             return true;
         }
 
@@ -97,7 +97,7 @@ namespace DotLogix.Core.Nodes
 
             try
             {
-                result = Nodes.ToObject(Node, binder.ReturnType, _settings);
+                result = Node.ToObject(binder.ReturnType, _settings);
                 return true;
             }
             catch
@@ -116,38 +116,23 @@ namespace DotLogix.Core.Nodes
                 case DynamicNode dynNode:
                     return dynNode.Node;
                 default:
-                    return Nodes.ToNode(value);
+                    return Nodes.ToNode(value, _settings);
             }
         }
 
-        private object ToValue(Node node)
+        public static dynamic From(Node node, ConverterSettings settings = null)
         {
-            switch (node.Type)
-            {
-                case NodeTypes.Empty:
-                case NodeTypes.Value:
-                    return ((NodeValue)node).Value;
-                case NodeTypes.List:
-                case NodeTypes.Map:
-                    return new DynamicNode((NodeContainer)node);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return new DynamicNode(node, settings);
         }
 
-        public static dynamic From(NodeContainer nodeContainer)
+        public static dynamic Map(ConverterSettings settings = null)
         {
-            return new DynamicNode(nodeContainer);
+            return new DynamicNode(new NodeMap(), settings);
         }
 
-        public static dynamic Map()
+        public static dynamic List(ConverterSettings settings = null)
         {
-            return new DynamicNode(new NodeMap());
-        }
-
-        public static dynamic List()
-        {
-            return new DynamicNode(new NodeList());
+            return new DynamicNode(new NodeList(), settings);
         }
     }
 }

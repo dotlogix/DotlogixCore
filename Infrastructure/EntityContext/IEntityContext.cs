@@ -8,11 +8,13 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
     public interface IEntityContext : IEntitySetProvider, IDisposable {
+        IDictionary<string, object> Variables { get; }
         Task CompleteAsync();
     }
 }

@@ -11,6 +11,9 @@ using System.Xml.Linq;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="XElement"/>
+    /// </summary>
     public static class XmlExtension {
         /// <summary>
         ///     Get the value of a descendent of an xml element

@@ -13,6 +13,9 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
+    /// <summary>
+    /// A console formatter
+    /// </summary>
     public class ConsoleLogMessageFormatter : ILogMessageFormatter {
         private static readonly string Padding =
         $"\n{new string(' ', 8)} | {new string(' ', 8)} | {new string(' ', 15)} | {new string(' ', 15)} | {new string(' ', 15)} | "
@@ -20,14 +23,22 @@ namespace DotLogix.Core.Diagnostics {
 
         private static readonly int PaddingLength = 76;
 
+        /// <summary>
+        /// The target width of the console buffer
+        /// </summary>
         public int ConsoleWidth { get; }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="ConsoleLogMessageFormatter"/>
+        /// </summary>
+        /// <param name="consoleWidth"></param>
         public ConsoleLogMessageFormatter(int consoleWidth) {
             if(consoleWidth < 100)
                 throw new ArgumentOutOfRangeException(nameof(consoleWidth), "ConsoleWidth must be greater than 100");
             ConsoleWidth = consoleWidth;
         }
 
+        /// <inheritdoc />
         public string Format(LogMessage message) {
             var timeStamp = $"{message.TimeStamp:HH:mm:ss}";
             var logLevel = message.LogLevel.ToString().SetLength(' ', 8);

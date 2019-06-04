@@ -7,13 +7,14 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using System.Linq;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     public interface IQueryableQueryFactory {
-        IQuery<T> CreateQuery<T>(IQueryable<T> queryable);
-        IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable);
-        IQueryExecutor<T> CreateExecutor<T>(IQueryable<T> queryable);
+        IQuery<T> CreateQuery<T>(IQueryable<T> queryable, IEnumerable<IQueryInterceptor> interceptors = null);
+        IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable, IEnumerable<IQueryInterceptor> interceptors = null);
+        IQueryExecutor<T> CreateExecutor<T>(IQuery<T> query);
     }
 }

@@ -13,6 +13,9 @@ using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="List{T}"/>
+    /// </summary>
     public static class ListExtensions {
         /// <summary>
         ///     Takes the last n elements of a list

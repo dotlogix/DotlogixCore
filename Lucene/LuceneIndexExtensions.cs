@@ -4,7 +4,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 
-namespace DotLogix.Lucene {
+namespace DotLogix.Core.Lucene {
     public static class LuceneIndexExtensions {
         public static QueryParser CreateQueryParser(this ILuceneIndex index, string field) {
             return new QueryParser(index.Version, field, index.Analyzer);

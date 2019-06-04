@@ -15,6 +15,9 @@ using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="IEnumerable{T}"/>
+    /// </summary>
     public static class EnumerableExtensions {
         /// <summary>
         ///     Creates an enumerable of items using a selectorFunc
@@ -91,6 +94,42 @@ namespace DotLogix.Core.Extensions {
         public static IEnumerable<T> CreateEnumerable<T>(this T value, int count = 1) {
             for(var i = 0; i < count; i++)
                 yield return value;
+        }
+
+        /// <summary>
+        ///     Intercepts an enumerable and calling a function for each of the items
+        /// </summary>
+        /// <param name="source">The source enumerable</param>
+        /// <param name="interceptFunc">The interception function</param>
+        /// <returns></returns>
+        public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Func<T, T> interceptFunc)
+        {
+            return source.Select(interceptFunc);
+        }
+
+        /// <summary>
+        ///     A select, but with an additional argument
+        /// </summary>
+        /// <param name="source">The source enumerable</param>
+        /// <param name="selector">The selector function</param>
+        /// <param name="with">An additional parameter for the selector function</param>
+        /// <returns></returns>
+        public static IEnumerable<TTarget> SelectWith<TSource, TTarget, TWith>(this IEnumerable<TSource> source, Func<TSource, TWith, TTarget> selector, TWith with)
+        {
+            return source.Select(s => selector(s, with));
+        }
+
+        /// <summary>
+        ///     Intercepts an enumerable and calling a function for each of the items
+        /// </summary>
+        /// <param name="source">The source enumerable</param>
+        /// <param name="interceptAction">The interception function</param>
+        /// <returns></returns>
+        public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Action<T> interceptAction) {
+            foreach(var value in source) {
+                interceptAction(value);
+                yield return value;
+            }
         }
 
         /// <summary>

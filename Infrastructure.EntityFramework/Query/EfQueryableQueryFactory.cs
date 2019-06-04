@@ -13,20 +13,13 @@ using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
-    public class EfQueryableQueryFactory : IQueryableQueryFactory {
-        public static IQueryableQueryFactory Instance { get; } = new EfQueryableQueryFactory();
-        private EfQueryableQueryFactory() { }
+    public class EfQueryableQueryFactory : QueryableQueryFactory
+    {
+        public new static IQueryableQueryFactory Instance { get; } = new EfQueryableQueryFactory();
+        protected EfQueryableQueryFactory() { }
 
-        public IQuery<T> CreateQuery<T>(IQueryable<T> queryable) {
-            return new QueryableQuery<T>(queryable, this);
-        }
-
-        public IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable) {
-            return new OrderedQueryableQuery<T>(queryable, this);
-        }
-
-        public IQueryExecutor<T> CreateExecutor<T>(IQueryable<T> queryable) {
-            return new EfQueryExecutor<T>(queryable);
+        public override IQueryExecutor<T> CreateExecutor<T>(IQuery<T> query) {
+            return new InterceptableQueryExecutor<T>(query, q => new EfQueryExecutor<T>(q));
         }
     }
 }

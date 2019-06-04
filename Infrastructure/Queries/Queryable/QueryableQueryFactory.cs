@@ -7,24 +7,25 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using System.Linq;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     public class QueryableQueryFactory : IQueryableQueryFactory {
         public static IQueryableQueryFactory Instance { get; } = new QueryableQueryFactory();
-        private QueryableQueryFactory() { }
+        protected QueryableQueryFactory() { }
 
-        public IQuery<T> CreateQuery<T>(IQueryable<T> queryable) {
-            return new QueryableQuery<T>(queryable, this);
+        public virtual IQuery<T> CreateQuery<T>(IQueryable<T> queryable, IEnumerable<IQueryInterceptor> interceptors) {
+            return new QueryableQuery<T>(queryable, this, interceptors);
         }
 
-        public IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable) {
-            return new OrderedQueryableQuery<T>(queryable, this);
+        public virtual IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable, IEnumerable<IQueryInterceptor> interceptors) {
+            return new OrderedQueryableQuery<T>(queryable, this, interceptors);
         }
 
-        public IQueryExecutor<T> CreateExecutor<T>(IQueryable<T> queryable) {
-            return new QueryableQueryExecutor<T>(queryable);
+        public virtual IQueryExecutor<T> CreateExecutor<T>(IQuery<T> query) {
+            return new InterceptableQueryExecutor<T>(query, q => new QueryableQueryExecutor<T>(q));
         }
     }
 }

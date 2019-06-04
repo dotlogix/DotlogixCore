@@ -9,6 +9,9 @@
 using System;
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for numbers/>
+    /// </summary>
     public static class MathExtensions {
         #region Clamp
         /// <summary>

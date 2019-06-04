@@ -14,6 +14,8 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Queries;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
+using DotLogix.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Extensions.Internal;
 #endregion
@@ -22,8 +24,8 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
     public class EfQueryExecutor<T> : IQueryExecutor<T> {
         private readonly IQueryable<T> _innerQueryable;
 
-        public EfQueryExecutor(IQueryable<T> innerQueryable) {
-            _innerQueryable = innerQueryable;
+        public EfQueryExecutor(IQuery<T> query) {
+            _innerQueryable = (query as QueryableQuery<T>)?.InnerQueryable ?? throw new ArgumentException($"Query can not be converted to type {typeof(QueryableQuery<>).GetFriendlyName()}");
         }
 
         public IAsyncEnumerable<T> ToAsyncEnumerable() {

@@ -7,8 +7,9 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Common.Entities;
+using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using Microsoft.EntityFrameworkCore;
 #endregion
@@ -16,20 +17,21 @@ using Microsoft.EntityFrameworkCore;
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
     public class EfEntityContext : IEntityContext {
         public DbContext DbContext { get; }
+        public IDictionary<string, object> Variables { get; } = new Dictionary<string, object>();
 
         public EfEntityContext(DbContext dbContext) {
             DbContext = dbContext;
         }
 
-        public void Dispose() {
+        public virtual void Dispose() {
             DbContext.Dispose();
         }
 
-        public Task CompleteAsync() {
+        public virtual Task CompleteAsync() {
             return DbContext.SaveChangesAsync();
         }
 
-        public IEntitySet<TEntity> UseSet<TEntity>() where TEntity : class, ISimpleEntity {
+        public virtual IEntitySet<TEntity> UseSet<TEntity>() where TEntity : class, ISimpleEntity {
             return new EfEntitySet<TEntity>(DbContext.Set<TEntity>());
         }
     }

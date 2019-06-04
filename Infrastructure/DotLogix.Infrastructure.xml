@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DotLogix.Infrastructure</name>
+    </assembly>
+    <members>
+        <member name="M:DotLogix.Architecture.Infrastructure.Decorators.EntitySetDecoratorAttribute.#ctor(System.Type,System.Int32)">
+            <summary>Initializes a new instance of the <see cref="T:System.Attribute"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Infrastructure.Decorators.EntitySetModifierAttribute.#ctor(System.Int32)">
+            <summary>Initializes a new instance of the <see cref="T:System.Attribute"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Infrastructure.Decorators.IndexedEntitySetDecorator`1.#ctor(DotLogix.Architecture.Infrastructure.EntityContext.IEntitySet{`0},DotLogix.Architecture.Infrastructure.EntityContext.EntityIndex{`0})">
+            <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Infrastructure.Attributes.ManyToOneAttribute.#ctor(System.Type,System.String,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:System.Attribute"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Infrastructure.Attributes.NavigationAttribute.#ctor(System.Type,DotLogix.Architecture.Infrastructure.Attributes.RelationshipType,System.String,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:System.Attribute"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Infrastructure.Attributes.OneToManyAttribute.#ctor(System.Type,System.String,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:System.Attribute"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Infrastructure.Attributes.OneToOneAttribute.#ctor(System.Type,System.String,System.String)">
+            <summary>Initializes a new instance of the <see cref="T:System.Attribute"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Infrastructure.EntityContext.EntityIndex`1.#ctor(DotLogix.Architecture.Infrastructure.EntityContext.EntityCollection{System.Int32,`0},DotLogix.Architecture.Infrastructure.EntityContext.EntityCollection{System.Guid,`0})">
+            <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Infrastructure.Queries.Queryable.QueryInterceptor.#ctor(System.Func{System.Object,System.Object},System.Func{System.Object,System.Object})">
+            <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        </member>
+    </members>
+</doc>

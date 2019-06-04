@@ -7,9 +7,21 @@
 // ==================================================
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// Combination modes of two sequences
+    /// </summary>
     public enum CombineMode {
+        /// <summary>
+        /// Take all of a sequence than continue to the next
+        /// </summary>
         Sequential,
+        /// <summary>
+        /// Take one of each sequence than return
+        /// </summary>
         RoundRobin,
+        /// <summary>
+        /// Shuffle all elements in the sequence
+        /// </summary>
         Shuffled
     }
 }

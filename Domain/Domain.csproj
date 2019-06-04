@@ -1,35 +1,52 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(MSBuildThisFileFullPath)\..\..\assemblies\BuildTasks\BuildTasks.dll" />
 
-<PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>DotLogix.Domain</AssemblyName>
-    <RootNamespace>DotLogix.Architecture.Domain</RootNamespace>
-    <Company>DotLogix</Company>
-    <Product>DotLogix Architecture</Product>
-    <PackageId>DotLogix.Architecture.Domain</PackageId>
-    <Authors>DotLogix</Authors>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-	<RepositoryType>git</RepositoryType>
-	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<AssemblyVersion>1.1.1</AssemblyVersion>
-    <FileVersion>1.1.1</FileVersion>
-    <Version>1.1.1</Version>
-</PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Company>DotLogix</Company>
+		<Product>DotLogix Architecture</Product>
+		<PackageId>DotLogix.Architecture.Domain</PackageId>
+		<Authors>DotLogix</Authors>
+		<AssemblyName>DotLogix.Domain</AssemblyName>
+		<RootNamespace>DotLogix.Architecture.Domain</RootNamespace>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<RepositoryType>git</RepositoryType>
+		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+		<Version>1.2</Version>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-  </ItemGroup>
-
-
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DocumentationFile>D:\git\c-sharp\DotLogix\Core\Domain\DotLogix.Domain.xml</DocumentationFile>
+		<WarningsAsErrors>NU1605</WarningsAsErrors>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Core\Core.csproj" />
+		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+	</ItemGroup>
+  
+	<Target Name="BeforeBuildActions" BeforeTargets="BeforeBuild">
+		<GetCurrentBuildVersion BaseVersion="$(Version)" PackageId="$(PackageId)">
+			<Output TaskParameter="BuildVersion" PropertyName="CurrentBuildVersion" />
+			<Output TaskParameter="PackageVersion" PropertyName="CurrentPackageVersion" />
+		</GetCurrentBuildVersion>
+		<PropertyGroup>
+		  <PackageVersion>$(CurrentPackageVersion)</PackageVersion>
+		  <AssemblyVersion>$(CurrentBuildVersion)</AssemblyVersion>
+		  <FileVersion>$(CurrentBuildVersion)</FileVersion>
+		  <Version>$(CurrentBuildVersion)</Version>
+		</PropertyGroup>
+	</Target>
+  
 	<Target Name="CopyPackage" AfterTargets="Pack">
 		<ItemGroup>
 			<PackageFiles Include="bin\$(Configuration)\*.nupkg" />
 			<AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
 		</ItemGroup>
 		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="..\assemblies\$(Configuration)" /> 
-		<Copy SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
+		<Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
 	</Target>
 </Project>

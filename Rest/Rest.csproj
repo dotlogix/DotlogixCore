@@ -1,40 +1,52 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(MSBuildThisFileFullPath)\..\..\assemblies\BuildTasks\BuildTasks.dll" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>DotLogix.Rest</AssemblyName>
-    <RootNamespace>DotLogix.Core.Rest</RootNamespace>
-    <Company>DotLogix</Company>
-    <Product>DotLogix Core</Product>
-    <PackageId>DotLogix.Core.Rest</PackageId>
-    <Authors>DotLogix</Authors>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-	<RepositoryType>git</RepositoryType>
-	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<AssemblyVersion>1.1.1</AssemblyVersion>
-    <FileVersion>1.1.1</FileVersion>
-    <Version>1.1.1</Version>
-</PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Company>DotLogix</Company>
+		<Product>DotLogix Core</Product>
+		<PackageId>DotLogix.Core.Rest</PackageId>
+		<Authors>DotLogix</Authors>
+		<AssemblyName>DotLogix.Rest</AssemblyName>
+		<RootNamespace>DotLogix.Core.Rest</RootNamespace>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<RepositoryType>git</RepositoryType>
+		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+		<Version>1.2</Version>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Rest.csproj.DotSettings" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Nodes\Nodes.csproj" />
-  </ItemGroup>
-
-
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DocumentationFile>D:\git\c-sharp\DotLogix\Core\Rest\DotLogix.Rest.xml</DocumentationFile>
+		<WarningsAsErrors>NU1605</WarningsAsErrors>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Core\Core.csproj" />
+		<ProjectReference Include="..\Nodes\Nodes.csproj" />
+	</ItemGroup>
+  
+	<Target Name="BeforeBuildActions" BeforeTargets="BeforeBuild">
+		<GetCurrentBuildVersion BaseVersion="$(Version)" PackageId="$(PackageId)">
+			<Output TaskParameter="BuildVersion" PropertyName="CurrentBuildVersion" />
+			<Output TaskParameter="PackageVersion" PropertyName="CurrentPackageVersion" />
+		</GetCurrentBuildVersion>
+		<PropertyGroup>
+		  <PackageVersion>$(CurrentPackageVersion)</PackageVersion>
+		  <AssemblyVersion>$(CurrentBuildVersion)</AssemblyVersion>
+		  <FileVersion>$(CurrentBuildVersion)</FileVersion>
+		  <Version>$(CurrentBuildVersion)</Version>
+		</PropertyGroup>
+	</Target>
+  
 	<Target Name="CopyPackage" AfterTargets="Pack">
 		<ItemGroup>
 			<PackageFiles Include="bin\$(Configuration)\*.nupkg" />
 			<AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
 		</ItemGroup>
 		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="..\assemblies\$(Configuration)" /> 
-		<Copy SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
+		<Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
 	</Target>
 </Project>

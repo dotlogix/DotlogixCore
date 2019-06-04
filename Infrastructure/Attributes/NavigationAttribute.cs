@@ -16,10 +16,4 @@ namespace DotLogix.Architecture.Infrastructure.Attributes {
             TargetProp = targetProp;
         }
     }
-
-    public enum RelationshipType {
-        ManyToOne,
-        OneToMany,
-        OneToOne
-    }
 }

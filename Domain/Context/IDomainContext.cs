@@ -7,12 +7,14 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using DotLogix.Architecture.Domain.Services;
 using DotLogix.Architecture.Domain.UoW;
 #endregion
 
 namespace DotLogix.Architecture.Domain.Context {
     public interface IDomainContext {
+        IDictionary<string, object> Variables { get; }
         TService UseService<TService>(IUnitOfWorkContextFactory contextFactory) where TService : class, IDomainService;
     }
 }

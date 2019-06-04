@@ -13,6 +13,9 @@ using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="IDictionary{TKey,TValue}"/>
+    /// </summary>
     public static class DictionaryExtension {
         #region Reverse
         /// <summary>

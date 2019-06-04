@@ -18,6 +18,9 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="Type"/>
+    /// </summary>
     public static class TypeExtension {
         /// <summary>
         ///     Gets the properties of a type ordered by the inheritance level (deepest first)

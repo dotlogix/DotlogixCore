@@ -8,8 +8,17 @@ using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Utils
 {
+    /// <summary>
+    /// A segment of a stream
+    /// </summary>
     public class StreamSegment : Stream {
+        /// <summary>
+        /// The underlying stream
+        /// </summary>
         public Stream Stream { get; }
+        /// <summary>
+        /// The offset to the start of the stream
+        /// </summary>
         public long Offset { get; }
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>

@@ -28,17 +28,31 @@ namespace DotLogix.Core.Patterns {
         }
     }
 
+    /// <summary>
+    /// A pipeline step calling another method
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
     public class LambdaProcessingStep<TIn, TResult> : ProcessingStep<TIn, TResult> {
         private readonly Func<TIn, Task<TResult>> _callback;
 
+        /// <summary>
+        /// Creates an instance of <see cref="LambdaProcessingStep{TIn,TResult}"/>
+        /// </summary>
+        /// <param name="callback"></param>
         public LambdaProcessingStep(Func<TIn, Task<TResult>> callback) {
             _callback = callback;
         }
 
+        /// <inheritdoc />
         public override Task<TResult> InvokeAsync(TIn value) {
             return _callback.Invoke(value);
         }
 
+        /// <summary>
+        /// Converts a function to a <see cref="LambdaProcessingStep{TIn,TResult}"/>
+        /// </summary>
+        /// <param name="next"></param>
         public static implicit operator LambdaProcessingStep<TIn, TResult>(Func<TIn, Task<TResult>> next) {
             return new LambdaProcessingStep<TIn, TResult>(next);
         }

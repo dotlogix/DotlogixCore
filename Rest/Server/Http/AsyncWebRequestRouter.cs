@@ -55,7 +55,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                 return;
             }
             if(asyncHttpContext.Request.HeaderParameters.TryGetValueAs(EventSubscriptionParameterName, out string eventName)) {
-                if(ServerEvents.TryGetValue(eventName, out var serverEvent) == false) {
+                if(ServerEvents.TryGet(eventName, out var serverEvent) == false) {
                     await asyncHttpContext.Response.WriteToResponseStreamAsync("The event subscription could not be handled, because the event is not registered on the server");
                     asyncHttpContext.Response.StatusCode = HttpStatusCodes.ClientError.BadRequest;
                     await asyncHttpContext.Response.CompleteAsync();

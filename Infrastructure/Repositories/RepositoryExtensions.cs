@@ -10,7 +10,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Common.Entities;
+using DotLogix.Architecture.Infrastructure.Entities;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {

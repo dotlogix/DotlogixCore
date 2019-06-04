@@ -9,25 +9,30 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Common.Entities;
+using DotLogix.Architecture.Infrastructure.Attributes;
+using DotLogix.Architecture.Infrastructure.Decorators;
+using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
+using DotLogix.Core.Extensions;
+using DotLogix.Core.Reflection.Dynamics;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {
     public abstract class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class, ISimpleEntity, new() {
-        private IEntitySet<TEntity> _entitySet;
+        protected static IEnumerable<Func<IEntitySet<TEntity>, IEntitySet<TEntity>>> ModifyEntitySetAttributeCache { get; set; }
 
-        protected bool AllowCaching { get; }
+        private IEntitySet<TEntity> _entitySet;
         protected IEntitySet<TEntity> EntitySet => _entitySet ?? (_entitySet = OnModifyEntitySet(EntitySetProvider.UseSet<TEntity>()));
         protected IEntitySetProvider EntitySetProvider { get; }
 
-        protected RepositoryBase(IEntitySetProvider entitySetProvider, bool allowCaching = true) {
+        protected RepositoryBase(IEntitySetProvider entitySetProvider) {
             EntitySetProvider = entitySetProvider;
-            AllowCaching = allowCaching;
         }
 
         public virtual Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default) {
@@ -71,13 +76,28 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         }
 
         protected virtual IEntitySet<TEntity> OnModifyEntitySet(IEntitySet<TEntity> set) {
-            if(AllowCaching)
-                set = new GuidIndexedEntitySetDecorator<TEntity>(set, OnCreateCache());
-            return set;
+            if(ModifyEntitySetAttributeCache == null)
+                ModifyEntitySetAttributeCache = CreateEntitySetModifiers().ToList();
+
+            return ModifyEntitySetAttributeCache.Aggregate(set, (current, func) => func.Invoke(current));
         }
 
-        protected virtual EntityCollection<TEntity> OnCreateCache() {
-            return new EntityCollection<TEntity>();
+        protected virtual IEnumerable<Func<IEntitySet<TEntity>, IEntitySet<TEntity>>> CreateEntitySetModifiers() {
+            var entityType = typeof(TEntity);
+            var repoType = GetType();
+
+            var types = new List<Type>();
+            types.Add(repoType);
+            types.AddRange(repoType.GetTypesAssignableTo());
+            types.Add(entityType);
+            types.AddRange(entityType.GetTypesAssignableTo());
+
+            var decoratorAttributes = types.SelectMany(t => t.GetCustomAttributes<EntitySetModifierAttribute>());
+
+            var decorators = decoratorAttributes.Distinct().OrderByDescending(d => d.Priority);
+            foreach (var decoratorAttribute in decorators) {
+                yield return decoratorAttribute.GetModifierFunc<TEntity>();
+            }
         }
     }
 }

@@ -12,6 +12,11 @@ using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Caching {
+    /// <summary>
+    /// An interface for cache implementations
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     public interface ICache<TKey, TValue> : IEnumerable<CacheItem<TKey, TValue>> {
         /// <summary>
         ///     The timespan to check if values are no longer valid

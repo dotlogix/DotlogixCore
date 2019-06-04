@@ -1,6 +1,6 @@
 ﻿using Lucene.Net.Documents;
 
-namespace DotLogix.Lucene {
+namespace DotLogix.Core.Lucene {
     public struct DocumentResult {
         public readonly float Score;
         public readonly Document Document;

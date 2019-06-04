@@ -11,8 +11,17 @@ using System;
 #endregion
 
 namespace DotLogix.Core.Plugins {
+    /// <summary>
+    /// A generic definition for plugins
+    /// </summary>
     public interface IPluginDefinition {
+        /// <summary>
+        /// The unique id of the plugin
+        /// </summary>
         Guid Guid { get; }
+        /// <summary>
+        /// The name of the plugin
+        /// </summary>
         string Name { get; }
     }
 }

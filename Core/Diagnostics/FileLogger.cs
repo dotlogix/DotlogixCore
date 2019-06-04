@@ -12,6 +12,9 @@ using System.IO;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
+    /// <summary>
+    /// A file logger implementation
+    /// </summary>
     public class FileLogger : LoggerBase {
         private readonly DateTime _dateTime = DateTime.Now;
         private readonly TextLogMessageFormatter _formatter = new TextLogMessageFormatter();
@@ -20,10 +23,20 @@ namespace DotLogix.Core.Diagnostics {
         private bool _isErrorLog;
         private string _logFileName;
         private StreamWriter _logFileWriter;
-
+        /// <summary>
+        /// The log directory
+        /// </summary>
         public string Directory { get; }
+        /// <summary>
+        /// The log file name %prefix%%dd-MM-yyyy HH-mm-ss%
+        /// </summary>
         public string LogFile { get; private set; }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="FileLogger"/>
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <param name="prefix">The prefix of the date in the log message %prefix%%dd-MM-yyyy HH-mm-ss%</param>
         public FileLogger(string directory, string prefix = null) : base("FileLogger") {
             Directory = directory;
             _logFileName = $"{_dateTime:dd-MM-yyyy HH-mm-ss}";
@@ -34,6 +47,7 @@ namespace DotLogix.Core.Diagnostics {
             LogFile = Path.Combine(directory, $"{_logFileName}.log");
         }
 
+        /// <inheritdoc />
         public override bool Initialize() {
             if(_logFileWriter != null)
                 return true;
@@ -44,6 +58,7 @@ namespace DotLogix.Core.Diagnostics {
             return true;
         }
 
+        /// <inheritdoc />
         public override bool Shutdown() {
             if(_logFileWriter == null)
                 return true;
@@ -53,6 +68,7 @@ namespace DotLogix.Core.Diagnostics {
             return true;
         }
 
+        /// <inheritdoc />
         public override bool Log(LogMessage message) {
             if((_isErrorLog == false) && (message.LogLevel >= LogLevels.Error))
                 ToErrorLogFile();

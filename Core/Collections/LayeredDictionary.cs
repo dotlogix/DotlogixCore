@@ -13,7 +13,11 @@ using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Collections {
+    /// <inheritdoc />
     public class LayeredDictionary<TKey, TValue, TDictionary> : ILayeredDictionary<TKey, TValue, TDictionary> where TDictionary : IDictionary<TKey, TValue> {
+        /// <summary>
+        /// The internal stack of dictionaries
+        /// </summary>
         protected Stack<TDictionary> LayerStack { get; }
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
@@ -262,6 +266,11 @@ namespace DotLogix.Core.Collections {
         /// </returns>
         public ICollection<TValue> Values => LayerStack.SelectMany(l => l.Values).ToList();
 
+        /// <summary>
+        /// Merges all layers to the target dictionary
+        /// </summary>
+        /// <param name="targetDictionary"></param>
+        /// <returns></returns>
         public TDictionary Reduce(TDictionary targetDictionary) {
             foreach(var layer in LayerStack) {
                 foreach(var value in layer)

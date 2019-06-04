@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 #endregion
@@ -16,7 +17,7 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     public class OrderedQueryableQuery<TSource> : QueryableQuery<TSource>, IOrderedQuery<TSource> {
         private readonly IOrderedQueryable<TSource> _innerQueryable;
 
-        public OrderedQueryableQuery(IOrderedQueryable<TSource> innerQueryable, IQueryableQueryFactory factory) : base(innerQueryable, factory) {
+        public OrderedQueryableQuery(IOrderedQueryable<TSource> innerQueryable, IQueryableQueryFactory factory, IEnumerable<IQueryInterceptor> interceptors) : base(innerQueryable, factory, interceptors) {
             _innerQueryable = innerQueryable;
         }
 

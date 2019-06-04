@@ -19,7 +19,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Fac
             _createDbContext = createDbContext;
         }
 
-        public DbContext Create() {
+        public virtual DbContext Create() {
             return _createDbContext.Invoke();
         }
     }

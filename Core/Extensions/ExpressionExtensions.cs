@@ -13,6 +13,9 @@ using System.Reflection;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="Expression"/>
+    /// </summary>
     public static class ExpressionExtensions {
         /// <summary>
         ///     Gets the target member of a expression

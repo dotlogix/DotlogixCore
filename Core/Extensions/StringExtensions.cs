@@ -14,50 +14,53 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="string"/>
+    /// </summary>
     public static class StringExtensions {
         /// <summary>
-        ///     Counts the occurances of a character in a string.
+        ///     Counts the occurrences of a character in a string.
         /// </summary>
         /// <param name="str">The string</param>
         /// <param name="character">The character to count</param>
-        public static int OccurancesOf(this string str, char character) {
-            return OccurancesOf(str.ToCharArray(), character, 0, str.Length, out _);
+        public static int OccurrencesOf(this string str, char character) {
+            return OccurrencesOf(str.ToCharArray(), character, 0, str.Length, out _);
         }
 
         /// <summary>
-        ///     Counts the occurances of a character in a string.
+        ///     Counts the occurrences of a character in a string.
         /// </summary>
         /// <param name="str">The string</param>
         /// <param name="character">The character to count</param>
         /// <param name="start">The start index in the array</param>
         /// <param name="count">The maximum length to count</param>
-        public static int OccurancesOf(this string str, char character, int start, int count) {
-            return OccurancesOf(str.ToCharArray(), character, start, count, out _);
+        public static int OccurrencesOf(this string str, char character, int start, int count) {
+            return OccurrencesOf(str.ToCharArray(), character, start, count, out _);
         }
 
         /// <summary>
-        ///     Counts the occurances of a character in a char array.
+        ///     Counts the occurrences of a character in a char array.
         /// </summary>
         /// <param name="chars">The char array</param>
         /// <param name="character">The character to count</param>
-        public static int OccurancesOf(this char[] chars, char character) {
-            return OccurancesOf(chars, character, 0, chars.Length, out _);
+        public static int OccurrencesOf(this char[] chars, char character) {
+            return OccurrencesOf(chars, character, 0, chars.Length, out _);
         }
 
         /// <summary>
-        ///     Counts the occurances of a character in a char array.
+        ///     Counts the occurrences of a character in a char array.
         /// </summary>
         /// <param name="chars">The char array</param>
         /// <param name="character">The character to count</param>
         /// <param name="start">The start index in the array</param>
         /// <param name="count">The maximum length to count</param>
         /// <returns></returns>
-        public static int OccurancesOf(this char[] chars, char character, int start, int count) {
-            return OccurancesOf(chars, character, start, count, out _);
+        public static int OccurrencesOf(this char[] chars, char character, int start, int count) {
+            return OccurrencesOf(chars, character, start, count, out _);
         }
 
         /// <summary>
-        ///     Counts the occurances of a character in a char array. Also outputs the position of the last occurance of the
+        ///     Counts the occurrences of a character in a char array. Also outputs the position of the last occurance of the
         ///     character
         /// </summary>
         /// <param name="chars">The char array</param>
@@ -66,18 +69,18 @@ namespace DotLogix.Core.Extensions {
         /// <param name="count">The maximum length to count</param>
         /// <param name="lastOccurence">The position of the last occurance of the character</param>
         /// <returns></returns>
-        public static int OccurancesOf(this char[] chars, char character, int start, int count, out int lastOccurence) {
+        public static int OccurrencesOf(this char[] chars, char character, int start, int count, out int lastOccurence) {
             lastOccurence = -1;
 
-            var occurances = 0;
+            var occurrences = 0;
             for(var i = start; i < (start + count); i++) {
                 if(chars[i] != character)
                     continue;
 
-                occurances++;
+                occurrences++;
                 lastOccurence = i;
             }
-            return occurances;
+            return occurrences;
         }
 
         /// <summary>

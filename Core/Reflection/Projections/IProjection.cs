@@ -6,6 +6,8 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
+using System.Threading.Tasks;
+
 namespace DotLogix.Core.Reflection.Projections {
     public interface IProjection {
         void ProjectLeftToRight(object left, object right);

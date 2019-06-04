@@ -11,7 +11,15 @@ using System;
 #endregion
 
 namespace DotLogix.Core.Interfaces {
+    /// <summary>
+    /// A typed cloneable interface
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface ICloneable<out T> : ICloneable {
+        /// <summary>
+        /// Clone object
+        /// </summary>
+        /// <returns></returns>
         new T Clone();
     }
 }

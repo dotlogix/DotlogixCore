@@ -13,14 +13,15 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     public class QueryableQueryExecutor<T> : IQueryExecutor<T> {
         private readonly IQueryable<T> _innerQueryable;
 
-        public QueryableQueryExecutor(IQueryable<T> queryable) {
-            _innerQueryable = queryable;
+        public QueryableQueryExecutor(IQuery<T> query) {
+            _innerQueryable = (query as QueryableQuery<T>)?.InnerQueryable ?? throw new ArgumentException($"Query can not be converted to type {typeof(QueryableQuery<>).GetFriendlyName()}");
         }
 
         #region To

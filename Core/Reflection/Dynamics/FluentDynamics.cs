@@ -14,14 +14,23 @@ using DotLogix.Core.Reflection.Fluent;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="DynamicType"/>
+    /// </summary>
     public static class FluentDynamics {
         #region Type
+        /// <summary>
+        /// Create a dynamic type representation of a system type
+        /// </summary>
         public static DynamicType CreateDynamicType(this Type type, MemberTypes includedMemberTypes = MemberTypes.All) {
             return new DynamicType(type, includedMemberTypes);
         }
         #endregion
 
         #region Invoke
+        /// <summary>
+        /// Create a dynamic type representation of a method
+        /// </summary>
         public static DynamicInvoke CreateDynamicInvoke(this MethodInfo methodInfo) {
             if(methodInfo == null)
                 throw new ArgumentNullException(nameof(methodInfo));
@@ -34,6 +43,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Create a dynamic type representation of a constructor
+        /// </summary>
         public static DynamicCtor CreateDynamicCtor(this ConstructorInfo constructorInfo, bool allowNonPublic = true) {
             if(constructorInfo == null)
                 throw new ArgumentNullException(nameof(constructorInfo));
@@ -45,6 +57,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
             return new DynamicCtor(declaringType, constructorInfo, access, visibility, ctorDelegate);
         }
 
+        /// <summary>
+        /// Create a dynamic type representation of a constructor
+        /// </summary>
         public static DynamicCtor CreateDynamicCtor(this Type declaringType, Type[] parameterTypes,
                                                     bool allowNonPublic = true) {
             if(declaringType == null)
@@ -72,12 +87,18 @@ namespace DotLogix.Core.Reflection.Dynamics {
             return new DynamicCtor(declaringType, constructorInfo, access, visibility, ctorDelegate);
         }
 
+        /// <summary>
+        /// Create a dynamic type representation of a default constructor
+        /// </summary>
         public static DynamicCtor CreateDefaultCtor(this Type declaringType, bool allowNonPublic = true) {
             return CreateDynamicCtor(declaringType, Type.EmptyTypes, allowNonPublic);
         }
         #endregion
 
         #region Getter
+        /// <summary>
+        /// Create a dynamic type representation of a getter
+        /// </summary>
         public static DynamicGetter CreateDynamicGetter(this PropertyInfo propertyInfo) {
             if(propertyInfo == null)
                 throw new ArgumentNullException(nameof(propertyInfo));
@@ -90,7 +111,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
             var visibility = GetVisibilityModifiers(getMethod);
             return new DynamicGetter(access, visibility, getterDelegate);
         }
-
+        /// <summary>
+        /// Create a dynamic type representation of a getter
+        /// </summary>
         public static DynamicGetter CreateDynamicGetter(this FieldInfo fieldInfo) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
@@ -105,6 +128,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         #endregion
 
         #region Setter
+        /// <summary>
+        /// Create a dynamic type representation of a setter
+        /// </summary>
         public static DynamicSetter CreateDynamicSetter(this PropertyInfo propertyInfo) {
             if(propertyInfo == null)
                 throw new ArgumentNullException(nameof(propertyInfo));
@@ -118,7 +144,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
 
             return new DynamicSetter(access, visibility, setterDelegate);
         }
-
+        /// <summary>
+        /// Create a dynamic type representation of a setter
+        /// </summary>
         public static DynamicSetter CreateDynamicSetter(this FieldInfo fieldInfo) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
@@ -133,6 +161,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         #endregion
 
         #region Accessors
+        /// <summary>
+        /// Create a dynamic type representation of a property
+        /// </summary>
         public static DynamicProperty CreateDynamicProperty(this PropertyInfo propertyInfo) {
             if(propertyInfo == null)
                 throw new ArgumentNullException(nameof(propertyInfo));
@@ -140,7 +171,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
             var setter = CreateDynamicSetter(propertyInfo);
             return new DynamicProperty(propertyInfo, getter, setter);
         }
-
+        /// <summary>
+        /// Create a dynamic type representation of a property
+        /// </summary>
         public static DynamicField CreateDynamicField(this FieldInfo fieldInfo) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
@@ -151,6 +184,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         #endregion
 
         #region Visibility
+        /// <summary>
+        /// Get the visibility modifiers of a method
+        /// </summary>
         public static VisibilityModifiers GetVisibilityModifiers(MethodBase methodBase) {
             var methodAttributes = methodBase.Attributes & MethodAttributes.MemberAccessMask;
             switch(methodAttributes) {
@@ -169,6 +205,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
             }
         }
 
+        /// <summary>
+        /// Get the visibility modifiers of a type
+        /// </summary>
         public static VisibilityModifiers GetVisibilityModifiers(Type type) {
             var typeAttributes = type.Attributes & TypeAttributes.VisibilityMask;
             switch(typeAttributes) {
@@ -191,6 +230,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
             }
         }
 
+        /// <summary>
+        /// Get the visibility modifiers of a field
+        /// </summary>
         public static VisibilityModifiers GetVisibilityModifiers(FieldInfo fieldInfo) {
             var fieldAttributes = fieldInfo.Attributes & FieldAttributes.FieldAccessMask;
             switch(fieldAttributes) {
@@ -211,6 +253,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         #endregion
 
         #region Access
+        /// <summary>
+        /// Get the access modifiers of a method
+        /// </summary>
         public static AccessModifiers GetAccessModifiers(MethodBase methodBase) {
             var methodAttributes = methodBase.Attributes;
             var accessModifiers = AccessModifiers.None;
@@ -227,6 +272,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
             return accessModifiers;
         }
 
+        /// <summary>
+        /// Get the access modifiers of a type
+        /// </summary>
         public static AccessModifiers GetAccessModifiers(Type type) {
             const TypeAttributes staticAttributes = TypeAttributes.Abstract | TypeAttributes.Sealed;
 
@@ -252,6 +300,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
             return accessModifiers;
         }
 
+        /// <summary>
+        /// Get the access modifiers of a field
+        /// </summary>
         public static AccessModifiers GetAccessModifiers(FieldInfo fieldInfo) {
             var fieldAttributes = fieldInfo.Attributes & FieldAttributes.FieldAccessMask;
             var accessModifiers = AccessModifiers.None;

@@ -121,6 +121,11 @@ namespace DotLogix.Core.Extensions {
             return value.Substring(0, length);
         }
 
+        /// <summary>
+        /// Wraps a line of text after at a maximum amount of characters.<br></br>
+        /// Line breaks will be inserted after the last possible word
+        /// </summary>
+        /// <returns></returns>
         public static string[] WordWrap(this string value, int wrapAfter) {
             var result = new List<string>();
             var lines = value.Split('\n');
@@ -169,6 +174,10 @@ namespace DotLogix.Core.Extensions {
         }
 
         #region Join
+        /// <summary>
+        /// Appends some values to a <see cref="StringBuilder"/> and places a separator between each item
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
         public static StringBuilder AppendJoin<T>(this StringBuilder sb, string separator, IEnumerable<T> values) {
             if(values == null)
                 throw new ArgumentNullException(nameof(values));
@@ -581,6 +590,10 @@ namespace DotLogix.Core.Extensions {
         #endregion
 
         #region SubStringUntil
+        /// <summary>
+        /// Get the value between two <see cref="string"/> delimiters
+        /// </summary>
+        /// <returns></returns>
         public static string SubstringBetween(this string value, string startValue, string endValue, int startIndex=0, int count=-1, StringComparison comparison = StringComparison.OrdinalIgnoreCase) {
             if(count < 0)
                 count = value.Length-startIndex;
@@ -596,6 +609,10 @@ namespace DotLogix.Core.Extensions {
             return value.Substring(startIndex, endIndex - startIndex);
         }
 
+        /// <summary>
+        /// Get the value between before a any of the <see cref="char"/> delimiter
+        /// </summary>
+        /// <returns></returns>
         public static string SubstringUntil(this string value, int start, int count, params char[] delimiters) {
             var idx = value.IndexOfAny(delimiters, start, count);
             if(idx == -1)
@@ -603,6 +620,10 @@ namespace DotLogix.Core.Extensions {
             return value.Substring(start, idx - start);
         }
 
+        /// <summary>
+        /// Get the value between before a any of the <see cref="char"/> delimiter
+        /// </summary>
+        /// <returns></returns>
         public static string SubstringUntil(this string value, params char[] delimiters) {
             var idx = value.IndexOfAny(delimiters);
             if(idx == -1)

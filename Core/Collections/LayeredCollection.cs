@@ -25,11 +25,12 @@ namespace DotLogix.Core.Collections {
             LayerStack = new Stack<TCollection>();
         }
 
-        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="LayeredCollection{TValue,TCollection}"></see> class.</summary>
         public LayeredCollection(IEnumerable<TCollection> layers) {
             LayerStack = new Stack<TCollection>(layers);
         }
 
+        /// <summary>Initializes a new instance of the <see cref="LayeredCollection{TValue,TCollection}"></see> class.</summary>
         public LayeredCollection(TCollection layer) : this() {
             PushLayer(layer);
         }
@@ -142,7 +143,10 @@ namespace DotLogix.Core.Collections {
         /// <returns>true if the <see cref="T:System.Collections.Generic.ICollection`1"></see> is read-only; otherwise, false.</returns>
         public bool IsReadOnly => false;
 
+        /// <inheritdoc />
         public IEnumerable<TCollection> Layers => LayerStack;
+
+        /// <inheritdoc />
         public TCollection CurrentLayer => LayerStack.Count > 0 ? LayerStack.Peek() : default;
 
         /// <inheritdoc />

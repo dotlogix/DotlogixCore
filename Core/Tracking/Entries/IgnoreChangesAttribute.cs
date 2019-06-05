@@ -11,6 +11,9 @@ using System;
 #endregion
 
 namespace DotLogix.Core.Tracking.Entries {
+    /// <summary>
+    /// Don't track this property
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class IgnoreChangesAttribute : Attribute { }
 }

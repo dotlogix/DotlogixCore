@@ -53,7 +53,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             return Equals((WebServiceEventSubscription)obj);
         }
 
-        /// <summary>Serves as the default hash function.</summary>
+        /// <summary>Serves as the default hash method.</summary>
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() {
             return Guid.GetHashCode();

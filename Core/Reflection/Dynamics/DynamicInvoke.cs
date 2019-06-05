@@ -14,17 +14,49 @@ using DotLogix.Core.Reflection.Delegates;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
+    /// <summary>
+    /// A representation of a method
+    /// </summary>
     public class DynamicInvoke {
+        /// <summary>
+        /// The original method info
+        /// </summary>
         public MethodInfo MethodInfo { get; }
+        /// <summary>
+        /// The access modifiers
+        /// </summary>
         public AccessModifiers Access { get; }
+        /// <summary>
+        /// The visibility modifiers
+        /// </summary>
         public VisibilityModifiers Visibility { get; }
+        /// <summary>
+        /// The invocation delegate
+        /// </summary>
         public InvokeDelegate InvokeDelegate { get; }
-
+        /// <summary>
+        /// The declaring type
+        /// </summary>
         public Type DeclaringType { get; }
+        /// <summary>
+        /// The return type
+        /// </summary>
         public Type ReturnType { get; }
+        /// <summary>
+        /// The parameter infos
+        /// </summary>
         public ParameterInfo[] Parameters { get; }
+        /// <summary>
+        /// The parameter types
+        /// </summary>
         public Type[] ParameterTypes { get; }
+        /// <summary>
+        /// The parameter count
+        /// </summary>
         public int ParameterCount => Parameters.Length;
+        /// <summary>
+        /// The name
+        /// </summary>
         public string Name { get; set; }
 
         internal DynamicInvoke(MethodInfo methodInfo, AccessModifiers access, VisibilityModifiers visibility,
@@ -40,10 +72,20 @@ namespace DotLogix.Core.Reflection.Dynamics {
             ReturnType = methodInfo.ReturnType;
         }
 
+        /// <summary>
+        /// Invoke the delegate with the provided parameters.<br></br>
+        /// The method must be static
+        /// </summary>
+        /// <returns></returns>
         public object StaticInvoke(params object[] parameters) {
             return Invoke(null, parameters);
         }
 
+        /// <summary>
+        /// Invoke the delegate with the provided parameters.<br></br>
+        /// The method must be static
+        /// </summary>
+        /// <returns></returns>
         public object Invoke(object instance, params object[] parameters) {
             if((instance == null) && ((Access & AccessModifiers.Static) == 0))
                 throw new ArgumentNullException(nameof(instance), "Can not read value without an instance");
@@ -64,6 +106,10 @@ namespace DotLogix.Core.Reflection.Dynamics {
             return InvokeDelegate.Invoke(instance, parameters);
         }
 
+        /// <summary>
+        /// Returns a string representation of the method with its parameters
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() {
             return $"{DeclaringType.Name}.{Name}({string.Join(", ", ParameterTypes.Select(t => t.Name))})";
         }

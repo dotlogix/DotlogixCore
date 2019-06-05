@@ -8,7 +8,7 @@
 
 namespace DotLogix.Core.Reflection.Delegates {
     /// <summary>
-    /// A delegate to represent function calls
+    /// A delegate to represent method calls
     /// </summary>
 
     public delegate object InvokeDelegate(object instance, object[] parameters);

@@ -14,7 +14,7 @@ using System.Linq;
 
 namespace DotLogix.Core.Collections {
     /// <inheritdoc />
-    public class LayeredDictionary<TKey, TValue, TDictionary> : ILayeredDictionary<TKey, TValue, TDictionary> where TDictionary : IDictionary<TKey, TValue> {
+    public class LayeredDictionary<TKey, TValue, TDictionary> : ILayeredDictionary<TKey, TValue, TDictionary> where TDictionary : class, IDictionary<TKey, TValue> {
         /// <summary>
         /// The internal stack of dictionaries
         /// </summary>
@@ -141,84 +141,45 @@ namespace DotLogix.Core.Collections {
         /// <returns>true if the <see cref="T:System.Collections.Generic.ICollection`1"></see> is read-only; otherwise, false.</returns>
         public bool IsReadOnly => false;
 
+        /// <inheritdoc />
         public IEnumerable<TDictionary> Layers => LayerStack;
+
+        /// <inheritdoc />
         public TDictionary CurrentLayer => LayerStack.Count > 0 ? LayerStack.Peek() : default;
 
+        /// <inheritdoc />
         public void PushLayer(TDictionary collection) {
             LayerStack.Push(collection);
         }
 
+        /// <inheritdoc />
         public TDictionary PopLayer() {
             return LayerStack.Pop();
         }
 
+        /// <inheritdoc />
         public TDictionary PeekLayer() {
             return LayerStack.Peek();
         }
 
-        /// <summary>
-        ///     Adds an element with the provided key and value to the
-        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-        /// </summary>
-        /// <param name="key">The object to use as the key of the element to add.</param>
-        /// <param name="value">The object to use as the value of the element to add.</param>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
-        /// <exception cref="T:System.ArgumentException">
-        ///     An element with the same key already exists in the
-        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-        /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        ///     The <see cref="T:System.Collections.Generic.IDictionary`2"></see> is
-        ///     read-only.
-        /// </exception>
+
+        /// <inheritdoc />
         public void Add(TKey key, TValue value) {
             CurrentLayer.Add(key, value);
         }
 
-        /// <summary>
-        ///     Determines whether the <see cref="T:System.Collections.Generic.IDictionary`2"></see> contains an element with
-        ///     the specified key.
-        /// </summary>
-        /// <param name="key">The key to locate in the <see cref="T:System.Collections.Generic.IDictionary`2"></see>.</param>
-        /// <returns>
-        ///     true if the <see cref="T:System.Collections.Generic.IDictionary`2"></see> contains an element with the key;
-        ///     otherwise, false.
-        /// </returns>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
+        /// <inheritdoc />
         public bool ContainsKey(TKey key) {
             return LayerStack.Any(l => l.ContainsKey(key));
         }
 
-        /// <summary>
-        ///     Removes the element with the specified key from the
-        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-        /// </summary>
-        /// <param name="key">The key of the element to remove.</param>
-        /// <returns>
-        ///     true if the element is successfully removed; otherwise, false.  This method also returns false if
-        ///     <paramref name="key">key</paramref> was not found in the original
-        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-        /// </returns>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        ///     The <see cref="T:System.Collections.Generic.IDictionary`2"></see> is
-        ///     read-only.
-        /// </exception>
+        /// <inheritdoc />
         public bool Remove(TKey key) {
             return LayerStack.Any(l => l.Remove(key));
         }
 
-        /// <summary>Gets the value associated with the specified key.</summary>
-        /// <param name="key">The key whose value to get.</param>
-        /// <param name="value">
-        ///     When this method returns, the value associated with the specified key, if the key is found;
-        ///     otherwise, the default value for the type of the value parameter. This parameter is passed uninitialized.
-        /// </param>
-        /// <returns>
-        ///     true if the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"></see> contains an
-        ///     element with the specified key; otherwise, false.
-        /// </returns>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
+
+        /// <inheritdoc />
         public bool TryGetValue(TKey key, out TValue value) {
             foreach(var layer in LayerStack) {
                 if(layer.TryGetValue(key, out value))
@@ -229,41 +190,16 @@ namespace DotLogix.Core.Collections {
             return false;
         }
 
-        /// <summary>Gets or sets the element with the specified key.</summary>
-        /// <param name="key">The key of the element to get or set.</param>
-        /// <returns>The element with the specified key.</returns>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
-        /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">
-        ///     The property is retrieved and
-        ///     <paramref name="key">key</paramref> is not found.
-        /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        ///     The property is set and the
-        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see> is read-only.
-        /// </exception>
+        /// <inheritdoc />
         public TValue this[TKey key] {
             get => TryGetValue(key, out var value) ? value : throw new KeyNotFoundException();
-            set { CurrentLayer[key] = value; }
+            set => CurrentLayer[key] = value;
         }
 
-        /// <summary>
-        ///     Gets an <see cref="T:System.Collections.Generic.ICollection`1"></see> containing the keys of the
-        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-        /// </summary>
-        /// <returns>
-        ///     An <see cref="T:System.Collections.Generic.ICollection`1"></see> containing the keys of the object that
-        ///     implements <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-        /// </returns>
+        /// <inheritdoc />
         public ICollection<TKey> Keys => LayerStack.SelectMany(l => l.Keys).ToList();
 
-        /// <summary>
-        ///     Gets an <see cref="T:System.Collections.Generic.ICollection`1"></see> containing the values in the
-        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-        /// </summary>
-        /// <returns>
-        ///     An <see cref="T:System.Collections.Generic.ICollection`1"></see> containing the values in the object that
-        ///     implements <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-        /// </returns>
+        /// <inheritdoc />
         public ICollection<TValue> Values => LayerStack.SelectMany(l => l.Values).ToList();
 
         /// <summary>

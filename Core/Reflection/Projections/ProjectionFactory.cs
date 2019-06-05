@@ -15,12 +15,25 @@ using DotLogix.Core.Reflection.Dynamics;
 #endregion
 
 namespace DotLogix.Core.Reflection.Projections {
+    /// <summary>
+    /// A factory to produce projectsions
+    /// </summary>
     public class ProjectionFactory : IProjectionFactory {
+        /// <summary>
+        /// Try to map as many properties as possible
+        /// </summary>
         public static IProjectionFactory Auto { get; } = new ProjectionFactory();
+        /// <summary>
+        /// Try to map as many properties as possible and include an equality check before assignment
+        /// </summary>
         public static IProjectionFactory AutoWithEqualityCheck { get; } = new ProjectionFactory();
 
+        /// <summary>
+        /// Create a new instance of <see cref="ProjectionFactory"/>
+        /// </summary>
         protected ProjectionFactory() { }
 
+        /// <inheritdoc />
         public virtual IEnumerable<IProjection> CreateProjections(Type left, Type right) {
             var dynamicLeft = left.CreateDynamicType(MemberTypes.Property);
             var dynamicRight = right.CreateDynamicType(MemberTypes.Property);
@@ -39,6 +52,9 @@ namespace DotLogix.Core.Reflection.Projections {
             }
         }
 
+        /// <summary>
+        /// Create a new projection
+        /// </summary>
         protected virtual IProjection CreateProjection(GetterDelegate leftGetter, GetterDelegate rightGetter,
                                                        SetterDelegate leftSetter, SetterDelegate rightSetter) {
             return new Projection(leftGetter, rightGetter, leftSetter, rightSetter);

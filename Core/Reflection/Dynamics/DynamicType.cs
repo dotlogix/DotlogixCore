@@ -15,6 +15,9 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
+    /// <summary>
+    /// A representation of a type
+    /// </summary>
     public class DynamicType {
         private const BindingFlags AllBindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
                                                      BindingFlags.NonPublic;
@@ -25,21 +28,47 @@ namespace DotLogix.Core.Reflection.Dynamics {
         private readonly DynamicCtor _defaultCtor;
         private readonly IReadOnlyDictionary<string, DynamicField> _fieldDict;
         private readonly IReadOnlyDictionary<string, DynamicProperty> _propertiesDict;
+        /// <summary>
+        /// The original type
+        /// </summary>
         public Type Type { get; }
+        /// <summary>
+        /// The name
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// The constructors
+        /// </summary>
         public IReadOnlyList<DynamicCtor> Constructors { get; }
-
+        /// <summary>
+        /// The methods
+        /// </summary>
         public IReadOnlyList<DynamicInvoke> Methods { get; }
 
+        /// <summary>
+        /// The accessors
+        /// </summary>
         public IReadOnlyList<DynamicAccessor> Accessors { get; }
 
+        /// <summary>
+        /// The properties
+        /// </summary>
         public IReadOnlyList<DynamicProperty> Properties { get; }
 
+        /// <summary>
+        /// The fields
+        /// </summary>
         public IReadOnlyList<DynamicField> Fields { get; }
 
+        /// <summary>
+        /// Checks if there is a default constructor
+        /// </summary>
         public bool HasDefaultConstructor => _defaultCtor != null;
 
+        /// <summary>
+        /// Creates an instance of <see cref="DynamicType"/>
+        /// </summary>
         public DynamicType(Type type, MemberTypes includedMemberTypes = MemberTypes.All) {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             Name = type.Name;
@@ -56,30 +85,53 @@ namespace DotLogix.Core.Reflection.Dynamics {
         }
 
         #region Object
+        /// <summary>
+        /// Returns the name of the type
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() {
             return Name;
         }
         #endregion
 
         #region Accessors
+        /// <summary>
+        /// Tries to get a property.<br></br>
+        /// If the property can not be found the method returns null
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
         public DynamicProperty GetPropery(string propertyName) {
             if(propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
             return _propertiesDict.TryGetValue(propertyName, out var property) ? property : null;
         }
 
+        /// <summary>
+        /// Tries to get a field.<br></br>
+        /// If the field can not be found the method returns null
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
         public DynamicField GetField(string fieldName) {
             if(fieldName == null)
                 throw new ArgumentNullException(nameof(fieldName));
             return _fieldDict.TryGetValue(fieldName, out var field) ? field : null;
         }
 
+        /// <summary>
+        /// Tries to get a accessor.<br></br>
+        /// If the accessor can not be found the method returns null
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
         public DynamicAccessor GetAccessor(string accessorName) {
             if(accessorName == null)
                 throw new ArgumentNullException(nameof(accessorName));
             return _accessorsDict.TryGetValue(accessorName, out var accessor) ? accessor : null;
         }
 
+        /// <summary>
+        /// Enumerate all accessors of the type
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
         public IEnumerable<DynamicAccessor> GetAccessors(AccessorTypes types = AccessorTypes.Any,
                                                          ValueAccessModes accessModes = ValueAccessModes.ReadWrite) {
             IEnumerable<DynamicAccessor> accessors;
@@ -103,6 +155,12 @@ namespace DotLogix.Core.Reflection.Dynamics {
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Tries to get a method.<br></br>
+        /// If the method can not be found the method returns null
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
+
         public DynamicInvoke GetMethod(string methodName) {
             if(methodName == null)
                 throw new ArgumentNullException(nameof(methodName));
@@ -112,6 +170,11 @@ namespace DotLogix.Core.Reflection.Dynamics {
             return methods.Count == 1 ? methods[0] : null;
         }
 
+        /// <summary>
+        /// Tries to get a method.<br></br>
+        /// If the method can not be found the method returns null
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
         public DynamicInvoke GetMethod(string methodName, params Type[] parametersTypes) {
             if(methodName == null)
                 throw new ArgumentNullException(nameof(methodName));
@@ -121,12 +184,22 @@ namespace DotLogix.Core.Reflection.Dynamics {
                                                TypeArrayEquals(m.ParameterTypes, parametersTypes));
         }
 
+        /// <summary>
+        /// Enumerate all methods
+        /// </summary>
         public IEnumerable<DynamicInvoke> GetMethods(string methodName) {
             return Methods.Where(m => m.Name == methodName);
         }
         #endregion
 
         #region Ctor
+
+        /// <summary>
+        /// Tries to get a constructor.<br></br>
+        /// If the constructor can not be found the method returns null
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
+
         public DynamicCtor GetConstructor(params Type[] parametersTypes) {
             if(parametersTypes == null)
                 throw new ArgumentNullException(nameof(parametersTypes));
@@ -136,6 +209,10 @@ namespace DotLogix.Core.Reflection.Dynamics {
             return Constructors.FirstOrDefault(c => TypeArrayEquals(c.ParameterTypes, parametersTypes));
         }
 
+        /// <summary>
+        /// Tries to get a constructor.<br></br>
+        /// If the constructor can not be found the method returns null
+        /// </summary>
         public DynamicCtor GetDefaultConstructor() {
             return _defaultCtor;
         }

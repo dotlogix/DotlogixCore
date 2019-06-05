@@ -10,6 +10,7 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Core.Reflection.Fluent.Generator {
@@ -19,6 +20,10 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         /// </summary>
         public ILGenerator IlGenerator { get; }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="FluentIlGenerator"/>
+        /// </summary>
+        /// <param name="ilGenerator"></param>
         public FluentIlGenerator(ILGenerator ilGenerator) {
             IlGenerator = ilGenerator ?? throw new ArgumentNullException(nameof(ilGenerator));
         }

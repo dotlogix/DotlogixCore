@@ -78,7 +78,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Converts the result of a task using a selector function
+        ///     Converts the result of a task using a selector method
         /// </summary>
         /// <typeparam name="TResult">The target type</typeparam>
         /// <typeparam name="TSource">The current type</typeparam>

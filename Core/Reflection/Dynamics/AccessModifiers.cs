@@ -11,14 +11,38 @@ using System;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
+    /// <summary>
+    /// Modifiers for type members
+    /// </summary>
     [Flags]
     public enum AccessModifiers {
+        /// <summary>
+        /// No modifier
+        /// </summary>
         None = 0,
+        /// <summary>
+        /// Static
+        /// </summary>
         Static = 1 << 1,
+        /// <summary>
+        /// Const
+        /// </summary>
         Const = 1 << 2,
+        /// <summary>
+        /// Nested
+        /// </summary>
         Nested = 1 << 3,
+        /// <summary>
+        /// Abstract
+        /// </summary>
         Abstract = 1 << 4,
+        /// <summary>
+        /// Virtual
+        /// </summary>
         Virtual = 1 << 5,
+        /// <summary>
+        /// Sealed
+        /// </summary>
         Sealed = 1 << 6
     }
 }

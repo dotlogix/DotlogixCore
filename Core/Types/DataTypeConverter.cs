@@ -13,19 +13,31 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Types {
+    /// <summary>
+    /// A singleton DataTypeConverter
+    /// </summary>
     public class DataTypeConverter {
         private readonly ConcurrentDictionary<Type, DataType> _cachedDataTypes;
 
+        /// <summary>
+        /// The static singleton instance
+        /// </summary>
         public static DataTypeConverter Instance { get; } = new DataTypeConverter();
 
         private DataTypeConverter() {
             _cachedDataTypes = CreatePrimitiveTypes();
         }
 
+        /// <summary>
+        /// Get a data type of an instance
+        /// </summary>
         public DataType GetDataType(object instance) {
             return GetDataType(instance?.GetType());
         }
 
+        /// <summary>
+        /// Get a data type of a type
+        /// </summary>
         public DataType GetDataType(Type type) {
             return type == null ? DataType.EmptyType : _cachedDataTypes.GetOrAdd(type, CreateDataType);
         }

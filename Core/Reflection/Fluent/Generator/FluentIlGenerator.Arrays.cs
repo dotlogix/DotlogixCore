@@ -12,6 +12,9 @@ using System.Reflection.Emit;
 #endregion
 
 namespace DotLogix.Core.Reflection.Fluent.Generator {
+    /// <summary>
+    /// A fluent il generator
+    /// </summary>
     public partial class FluentIlGenerator {
         /// <summary>
         ///     Pushes an object reference to a new zero-based, one-dimensional array whose elements are of a specific type

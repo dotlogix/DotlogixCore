@@ -8,6 +8,7 @@
 
 #region
 using System.Runtime.InteropServices;
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Core.Interop.Structs {

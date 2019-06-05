@@ -23,8 +23,8 @@ namespace DotLogix.Core.Extensions {
         ///     Creates an enumerable of items using a selectorFunc
         /// </summary>
         /// <param name="initialValue">The initial value</param>
-        /// <param name="selectNextFunc">A function to select the next item</param>
-        /// <param name="hasNextFunc">A function to check if an additional value is available</param>
+        /// <param name="selectNextFunc">A method to select the next item</param>
+        /// <param name="hasNextFunc">A method to check if an additional value is available</param>
         /// <param name="yieldInitial">A flag if the initial value should be yield or skipped</param>
         /// <returns></returns>
         public static IEnumerable<T> Enumerate<T>(this T initialValue, Func<T, T> selectNextFunc, Func<T, bool> hasNextFunc, bool yieldInitial = false) {
@@ -38,8 +38,8 @@ namespace DotLogix.Core.Extensions {
         ///     Creates an enumerable of items using a selectorFunc
         /// </summary>
         /// <param name="initialValue">The initial value</param>
-        /// <param name="selectNextFunc">A function to select the next item</param>
-        /// <param name="conditionFunc">A function to check if the current value should be yield</param>
+        /// <param name="selectNextFunc">A method to select the next item</param>
+        /// <param name="conditionFunc">A method to check if the current value should be yield</param>
         /// <param name="yieldInitial">A flag if the initial value should be yield or skipped</param>
         /// <returns></returns>
         public static IEnumerable<T> EnumerateUntil<T>(this T initialValue, Func<T, T> selectNextFunc, Func<T, bool> conditionFunc, bool yieldInitial = false) {
@@ -97,10 +97,10 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Intercepts an enumerable and calling a function for each of the items
+        ///     Intercepts an enumerable and calling a method for each of the items
         /// </summary>
         /// <param name="source">The source enumerable</param>
-        /// <param name="interceptFunc">The interception function</param>
+        /// <param name="interceptFunc">The interception method</param>
         /// <returns></returns>
         public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Func<T, T> interceptFunc)
         {
@@ -111,8 +111,8 @@ namespace DotLogix.Core.Extensions {
         ///     A select, but with an additional argument
         /// </summary>
         /// <param name="source">The source enumerable</param>
-        /// <param name="selector">The selector function</param>
-        /// <param name="with">An additional parameter for the selector function</param>
+        /// <param name="selector">The selector method</param>
+        /// <param name="with">An additional parameter for the selector method</param>
         /// <returns></returns>
         public static IEnumerable<TTarget> SelectWith<TSource, TTarget, TWith>(this IEnumerable<TSource> source, Func<TSource, TWith, TTarget> selector, TWith with)
         {
@@ -120,10 +120,10 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Intercepts an enumerable and calling a function for each of the items
+        ///     Intercepts an enumerable and calling a method for each of the items
         /// </summary>
         /// <param name="source">The source enumerable</param>
-        /// <param name="interceptAction">The interception function</param>
+        /// <param name="interceptAction">The interception method</param>
         /// <returns></returns>
         public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Action<T> interceptAction) {
             foreach(var value in source) {
@@ -162,7 +162,7 @@ namespace DotLogix.Core.Extensions {
         /// </summary>
         /// <param name="left">The first enumerable</param>
         /// <param name="right">The second enumerable</param>
-        /// <param name="keySelector">The function to select the key to check equality</param>
+        /// <param name="keySelector">The method to select the key to check equality</param>
         /// <param name="comparer">The comparer used to check equality</param>
         /// <returns></returns>
         public static DiffEnumerable<T, T> Diff<T, TKey>(this IEnumerable<T> left, IEnumerable<T> right, Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
@@ -173,9 +173,9 @@ namespace DotLogix.Core.Extensions {
         ///     Searches for differences of two enumerables using a common key and a comparer
         /// </summary>
         /// <param name="left">The first enumerable</param>
-        /// <param name="leftKeySelector">The function to select the key to check equality</param>
+        /// <param name="leftKeySelector">The method to select the key to check equality</param>
         /// <param name="right">The second enumerable</param>
-        /// <param name="rightKeySelector">The function to select the key to check equality</param>
+        /// <param name="rightKeySelector">The method to select the key to check equality</param>
         /// <param name="comparer">The comparer used to check equality</param>
         /// <returns></returns>
         public static DiffEnumerable<TLeft, TRight> Diff<TLeft, TRight, TKey>(this IEnumerable<TLeft> left, Func<TLeft, TKey> leftKeySelector, IEnumerable<TRight> right, Func<TRight, TKey> rightKeySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
@@ -406,8 +406,8 @@ namespace DotLogix.Core.Extensions {
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="items">The items</param>
-        /// <param name="keySelector">The function to get the key of the current element</param>
-        /// <param name="parentKeySelector">The function to get the key of the parent element</param>
+        /// <param name="keySelector">The method to get the key of the current element</param>
+        /// <param name="parentKeySelector">The method to get the key of the parent element</param>
         /// <returns></returns>
         public static Hierarchy<TKey, TValue> ToHierarchy<TKey, TValue>(this IEnumerable<TValue> items, Func<TValue, TKey> keySelector, Func<TValue, TKey> parentKeySelector) where TKey : IComparable {
             var root = new Hierarchy<TKey, TValue>(default, default);

@@ -10,6 +10,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Core.Interop {

@@ -42,9 +42,9 @@ namespace DotLogix.Core.Attributes {
         protected InstantiatorAttribute(Type type, Type constraintType = null) : this(Instantiator.UseDefaultCtor(type, constraintType)) { }
 
         /// <summary>
-        /// Creates an instance of <see cref="InstantiatorAttribute"/> using a delegate function
+        /// Creates an instance of <see cref="InstantiatorAttribute"/> using a delegate method
         /// </summary>
-        /// <param name="instantiateFunc">The factory function</param>
+        /// <param name="instantiateFunc">The factory method</param>
         protected InstantiatorAttribute(Func<object> instantiateFunc) : this(Instantiator.UseDelegate(instantiateFunc)) { }
 
         /// <summary>
@@ -90,9 +90,9 @@ namespace DotLogix.Core.Attributes {
         protected ArgsInstantiatorAttribute(Type type, Type[] parameterTypes, Type constraintType = null) : this(Instantiator.UseCtor(type, parameterTypes, constraintType)) { }
 
         /// <summary>
-        /// Creates an instance of <see cref="InstantiatorAttribute"/> using a delegate function
+        /// Creates an instance of <see cref="InstantiatorAttribute"/> using a delegate method
         /// </summary>
-        /// <param name="instantiateFunc">The factory function</param>
+        /// <param name="instantiateFunc">The factory method</param>
         protected ArgsInstantiatorAttribute(Func<object[], object> instantiateFunc) : this(Instantiator.UseDelegate(instantiateFunc)) { }
 
         /// <summary>

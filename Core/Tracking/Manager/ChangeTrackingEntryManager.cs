@@ -14,27 +14,35 @@ using DotLogix.Core.Tracking.Snapshots;
 #endregion
 
 namespace DotLogix.Core.Tracking.Manager {
+    /// <inheritdoc />
     public class ChangeTrackingEntryManager : IChangeTrackingEntryManager {
         private readonly Dictionary<object, IChangeTrackingEntry> _entryDict = new Dictionary<object, IChangeTrackingEntry>();
         private readonly DynamicAccessor _keyAccessors;
         private readonly ISnapshotFactory _snapshotFactory;
 
+        /// <summary>
+        /// Creates an instance of <see cref="ChangeTrackingEntryManager"/>
+        /// </summary>
         public ChangeTrackingEntryManager(ISnapshotFactory snapshotFactory, DynamicAccessor keyAccessors) {
             _snapshotFactory = snapshotFactory;
             _keyAccessors = keyAccessors;
         }
 
+        /// <inheritdoc />
         public IEnumerable<IChangeTrackingEntry> Entries => _entryDict.Values;
 
+        /// <inheritdoc />
         public IChangeTrackingEntry GetEntry(object key) {
             return TryGetEntry(key, out var entry) ? entry : null;
         }
 
+        /// <inheritdoc />
         public bool TryGetEntry(object target, out IChangeTrackingEntry entry) {
             var key = CalculateKey(target);
             return _entryDict.TryGetValue(key, out entry);
         }
 
+        /// <inheritdoc />
         public IChangeTrackingEntry EnsureEntry(object target, bool autoAttach) {
             var key = CalculateKey(target);
             if(_entryDict.TryGetValue(key, out var entry))
@@ -48,10 +56,12 @@ namespace DotLogix.Core.Tracking.Manager {
             return entry;
         }
 
+        /// <inheritdoc />
         public void Add(IChangeTrackingEntry changeTrackingEntry) {
             _entryDict.Add(changeTrackingEntry.Key, changeTrackingEntry);
         }
 
+        /// <inheritdoc />
         public bool Remove(IChangeTrackingEntry changeTrackingEntry) {
             return _entryDict.Remove(changeTrackingEntry.Key);
         }

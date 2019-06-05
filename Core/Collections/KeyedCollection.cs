@@ -26,7 +26,7 @@ namespace DotLogix.Core.Collections {
         /// </summary>
         protected ConcurrentDictionary<TKey, TValue> InnerDictionary { get; }
         /// <summary>
-        /// The selector function
+        /// The selector method
         /// </summary>
         protected Func<TValue, TKey> KeySelector { get; }
 

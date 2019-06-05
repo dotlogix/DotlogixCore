@@ -53,24 +53,17 @@ namespace DotLogix.Core.Collections {
         ///     The <see cref="T:System.Collections.Generic.IEnumerable`1"></see> sequence of values indexed by the specified
         ///     key.
         /// </returns>
-        private TCollection this[TKey key] {
-            get { return _innerDictionary[key]; }
-        }
+        private TCollection this[TKey key] => _innerDictionary[key];
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Lookup`3" /> class that is empty, has the specified initial
-        ///     capacity, and uses the default equality comparer for the key type.
+        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
-        /// <param name="capacity">The initial number of elements that the <see cref="T:Lookup`3" /> can contain.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        ///     <paramref name="capacity" /> is less than 0.
-        /// </exception>
         public MutableLookup(int capacity, Func<TCollection> instantiateFunc) {
             _instantiateFunc = instantiateFunc;
             _innerDictionary = new Dictionary<TKey, TCollection>(capacity);
         }
         /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Lookup`3" /> class that is empty
+        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup(Func<TCollection> instantiateFunc) {
             _instantiateFunc = instantiateFunc;
@@ -78,32 +71,16 @@ namespace DotLogix.Core.Collections {
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Lookup`3" /> class that is empty, has the default initial
-        ///     capacity, and uses the specified <see cref="T:System.Collections.Generic.IEqualityComparer`1" />.
+        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
-        /// <param name="comparer">
-        ///     The <see cref="T:System.Collections.Generic.IEqualityComparer`1" /> implementation to use when
-        ///     comparing keys, or <see langword="null" /> to use the default
-        ///     <see cref="T:System.Collections.Generic.EqualityComparer`1" /> for the type of the key.
-        /// </param>
         public MutableLookup(IEqualityComparer<TKey> comparer, Func<TCollection> instantiateFunc) {
             _instantiateFunc = instantiateFunc;
             _innerDictionary = new Dictionary<TKey, TCollection>(comparer);
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Lookup`3" /> class that is empty, has the specified initial
-        ///     capacity, and uses the specified <see cref="T:System.Collections.Generic.IEqualityComparer`1" />.
+        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
-        /// <param name="capacity">The initial number of elements that the <see cref="T:Lookup`3" /> can contain.</param>
-        /// <param name="comparer">
-        ///     The <see cref="T:System.Collections.Generic.IEqualityComparer`1" /> implementation to use when
-        ///     comparing keys, or <see langword="null" /> to use the default
-        ///     <see cref="T:System.Collections.Generic.EqualityComparer`1" /> for the type of the key.
-        /// </param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        ///     <paramref name="capacity" /> is less than 0.
-        /// </exception>
         public MutableLookup(int capacity, IEqualityComparer<TKey> comparer, Func<TCollection> instantiateFunc) {
             _instantiateFunc = instantiateFunc;
             _innerDictionary = new Dictionary<TKey, TCollection>(capacity, comparer);
@@ -125,18 +102,18 @@ namespace DotLogix.Core.Collections {
             return GetEnumerator();
         }
 
-        /// <summary>Determines whether a specified key exists in the <see cref="T:System.Linq.ILookup`2"></see>.</summary>
-        /// <param name="key">The key to search for in the <see cref="T:System.Linq.ILookup`2"></see>.</param>
+        /// <summary>Determines whether a specified key exists in the <see cref="MutableLookup{TKey,TValue,TCollection}"></see>.</summary>
+        /// <param name="key">The key to search for in the <see cref="MutableLookup{TKey,TValue,TCollection}"></see>.</param>
         /// <returns>
-        ///     true if <paramref name="key">key</paramref> is in the <see cref="T:System.Linq.ILookup`2"></see>; otherwise,
+        ///     true if <paramref name="key">key</paramref> is in the <see cref="MutableLookup{TKey,TValue,TCollection}"></see>; otherwise,
         ///     false.
         /// </returns>
         public bool Contains(TKey key) {
             return _innerDictionary.ContainsKey(key);
         }
 
-        /// <summary>Gets the number of key/value collection pairs in the <see cref="T:System.Linq.ILookup`2"></see>.</summary>
-        /// <returns>The number of key/value collection pairs in the <see cref="T:System.Linq.ILookup`2"></see>.</returns>
+        /// <summary>Gets the number of key/value collection pairs in the <see cref="MutableLookup{TKey,TValue,TCollection}"></see>.</summary>
+        /// <returns>The number of key/value collection pairs in the <see cref="MutableLookup{TKey,TValue,TCollection}"></see>.</returns>
         public int Count => _innerDictionary.Values.Sum(v => v.Count);
 
         /// <summary>
@@ -148,9 +125,7 @@ namespace DotLogix.Core.Collections {
         ///     The <see cref="T:System.Collections.Generic.IEnumerable`1"></see> sequence of values indexed by the specified
         ///     key.
         /// </returns>
-        IEnumerable<TValue> ILookup<TKey, TValue>.this[TKey key] {
-            get { return _innerDictionary[key]; }
-        }
+        IEnumerable<TValue> ILookup<TKey, TValue>.this[TKey key] => _innerDictionary[key];
 
         /// <summary>Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"></see>.</summary>
         /// <exception cref="T:System.NotSupportedException">
@@ -239,46 +214,29 @@ namespace DotLogix.Core.Collections {
         }
     }
 
+    /// <summary>
+    /// A mutable lookup collection
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     public class MutableLookup<TKey, TValue> : MutableLookup<TKey, TValue, List<TValue>> {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Lookup`3" /> class that is empty, has the specified initial
-        ///     capacity, and uses the default equality comparer for the key type.
+        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup() : base(CreateCollection) { }
         /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Lookup`3" /> class that is empty, has the specified initial
-        ///     capacity, and uses the default equality comparer for the key type.
+        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
-        /// <param name="capacity">The initial number of elements that the <see cref="T:Lookup`3" /> can contain.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        ///     <paramref name="capacity" /> is less than 0.
-        /// </exception>
         public MutableLookup(int capacity) : base(capacity, CreateCollection) { }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Lookup`3" /> class that is empty, has the default initial
-        ///     capacity, and uses the specified <see cref="T:System.Collections.Generic.IEqualityComparer`1" />.
+        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
-        /// <param name="comparer">
-        ///     The <see cref="T:System.Collections.Generic.IEqualityComparer`1" /> implementation to use when
-        ///     comparing keys, or <see langword="null" /> to use the default
-        ///     <see cref="T:System.Collections.Generic.EqualityComparer`1" /> for the type of the key.
-        /// </param>
         public MutableLookup(IEqualityComparer<TKey> comparer) : base(comparer, CreateCollection) { }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Lookup`3" /> class that is empty, has the specified initial
-        ///     capacity, and uses the specified <see cref="T:System.Collections.Generic.IEqualityComparer`1" />.
+        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
-        /// <param name="capacity">The initial number of elements that the <see cref="T:Lookup`3" /> can contain.</param>
-        /// <param name="comparer">
-        ///     The <see cref="T:System.Collections.Generic.IEqualityComparer`1" /> implementation to use when
-        ///     comparing keys, or <see langword="null" /> to use the default
-        ///     <see cref="T:System.Collections.Generic.EqualityComparer`1" /> for the type of the key.
-        /// </param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        ///     <paramref name="capacity" /> is less than 0.
-        /// </exception>
         public MutableLookup(int capacity, IEqualityComparer<TKey> comparer) : base(capacity, comparer, CreateCollection) { }
 
         private static List<TValue> CreateCollection() {

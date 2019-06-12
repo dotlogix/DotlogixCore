@@ -16,6 +16,9 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Factories {
+    /// <summary>
+    /// An implementation of the <see cref="INodeConverterFactory"/> for collection types
+    /// </summary>
     public class ListNodeConverterFactory : NodeConverterFactoryBase {
         private static readonly HashSet<Type> StandardOpenGenerics = new HashSet<Type> {
                                                                                            typeof(IEnumerable<>),
@@ -25,6 +28,7 @@ namespace DotLogix.Core.Nodes.Factories {
                                                                                            typeof(ReadOnlyCollection<>)
                                                                                        };
 
+        /// <inheritdoc />
         public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
             converter = null;
             if(nodeType != NodeTypes.List)

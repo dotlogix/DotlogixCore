@@ -11,5 +11,8 @@ using DotLogix.Architecture.Common.Options;
 #endregion
 
 namespace DotLogix.Architecture.Domain.Models {
+    /// <summary>
+    /// An interface for simple models implementing the <see cref="IGuid"/> interface
+    /// </summary>
     public interface ISimpleModel : IGuid { }
 }

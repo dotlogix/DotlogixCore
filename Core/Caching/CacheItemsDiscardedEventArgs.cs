@@ -23,7 +23,7 @@ namespace DotLogix.Core.Caching {
         public IReadOnlyList<CacheItem<TKey, TValue>> DiscardedItems { get; }
 
         /// <summary>
-        /// Creates an instance of <see cref="CacheItemsDiscardedEventArgs{TKey,TValue}"/>
+        /// Creates a new instance of <see cref="CacheItemsDiscardedEventArgs{TKey,TValue}"/>
         /// </summary>
         /// <param name="discardedItems"></param>
         public CacheItemsDiscardedEventArgs(IReadOnlyList<CacheItem<TKey, TValue>> discardedItems) {

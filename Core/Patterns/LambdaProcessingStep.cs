@@ -22,7 +22,7 @@ namespace DotLogix.Core.Patterns {
         private readonly Func<TIn, Func<TNext, Task<TResult>>, Task<TResult>> _callback;
 
         /// <summary>
-        /// Creates an instance of <see cref="LambdaProcessingStep{TIn,TNext,TResult}"/>
+        /// Creates a new instance of <see cref="LambdaProcessingStep{TIn,TNext,TResult}"/>
         /// </summary>
         /// <param name="callback"></param>
         public LambdaProcessingStep(Func<TIn, Func<TNext, Task<TResult>>, Task<TResult>> callback) {
@@ -53,7 +53,7 @@ namespace DotLogix.Core.Patterns {
         private readonly Func<TIn, Task<TResult>> _callback;
 
         /// <summary>
-        /// Creates an instance of <see cref="LambdaProcessingStep{TIn,TResult}"/>
+        /// Creates a new instance of <see cref="LambdaProcessingStep{TIn,TResult}"/>
         /// </summary>
         /// <param name="callback"></param>
         public LambdaProcessingStep(Func<TIn, Task<TResult>> callback) {

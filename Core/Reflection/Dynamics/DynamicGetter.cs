@@ -51,7 +51,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <returns></returns>
         public object GetValue(object instance) {
             if((instance == null) && ((Access & AccessModifiers.Static) == 0))
-                throw new ArgumentNullException(nameof(instance), "Can not read value without an instance");
+                throw new ArgumentNullException(nameof(instance), "Can not read value without a new instance");
 
             return GetterDelegate.Invoke(instance);
         }

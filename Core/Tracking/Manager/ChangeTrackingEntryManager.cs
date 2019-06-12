@@ -21,7 +21,7 @@ namespace DotLogix.Core.Tracking.Manager {
         private readonly ISnapshotFactory _snapshotFactory;
 
         /// <summary>
-        /// Creates an instance of <see cref="ChangeTrackingEntryManager"/>
+        /// Creates a new instance of <see cref="ChangeTrackingEntryManager"/>
         /// </summary>
         public ChangeTrackingEntryManager(ISnapshotFactory snapshotFactory, DynamicAccessor keyAccessors) {
             _snapshotFactory = snapshotFactory;

@@ -12,13 +12,20 @@ using System.IO;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
-using DotLogix.Core.Nodes.Processor;
 #endregion
 
 namespace DotLogix.Core.Config {
+    /// <summary>
+    ///     An implementation of the <see cref="IConfigurationFile{TConfig}" /> interface to load json files
+    /// </summary>
+    /// <typeparam name="TConfig"></typeparam>
     public class JsonConfigurationFile<TConfig> : ConfigurationFileBase<TConfig> where TConfig : class, new() {
+        /// <summary>
+        ///     Creates a new instance of <see cref="JsonConfigurationFile{TConfig}" />
+        /// </summary>
         public JsonConfigurationFile(string fileName, string directory, bool autoReload) : base(fileName, directory, autoReload) { }
 
+        /// <inheritdoc />
         public override bool TryLoad() {
             if(File.Exists(AbsolutePath) == false) {
                 Log.Debug($"Configuration file for {typeof(TConfig).GetFriendlyName()} can not be found");
@@ -35,6 +42,7 @@ namespace DotLogix.Core.Config {
             }
         }
 
+        /// <inheritdoc />
         public override bool TrySave() {
             var autoReload = AutoReload;
             var enableFileWatching = EnableFileWatching;

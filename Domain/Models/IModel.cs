@@ -11,5 +11,8 @@ using DotLogix.Architecture.Common.Options;
 #endregion
 
 namespace DotLogix.Architecture.Domain.Models {
+    /// <summary>
+    /// An interface combining <see cref="IInsertOnlyModel"/> and <see cref="IOrdered"/> interface
+    /// </summary>
     public interface IModel : IInsertOnlyModel, IOrdered { }
 }

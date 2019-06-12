@@ -11,7 +11,13 @@ using DotLogix.Architecture.Infrastructure.EntityContext;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories.Provider {
+    /// <summary>
+    /// An interface to represent a provider for <see cref="IRepository{TEntity}"/>
+    /// </summary>
     public interface IRepositoryProvider {
+        /// <summary>
+        /// Get or create an instance of <see cref="IRepository"/>
+        /// </summary>
         TRepoInterface Create<TRepoInterface>(IEntitySetProvider entitySetProvider) where TRepoInterface : IRepository;
     }
 }

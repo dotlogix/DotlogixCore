@@ -73,7 +73,7 @@ namespace DotLogix.Core.Collections {
 
 
         /// <summary>
-        /// Creates an instance of <see cref="Hierarchy{TKey,TValue}"/>
+        /// Creates a new instance of <see cref="Hierarchy{TKey,TValue}"/>
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>

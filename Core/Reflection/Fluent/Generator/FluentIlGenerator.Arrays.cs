@@ -140,7 +140,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         /// <summary>
         ///     Loads the address of the array element at a specified array index onto the top of the evaluation stack as type
-        ///     &(managed pointer).
+        ///     &amp;(managed pointer).
         /// </summary>
         public FluentIlGenerator Ldelema(Type type) {
             IlGenerator.Emit(OpCodes.Ldelema, type);

@@ -16,10 +16,18 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert arrays
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ArrayNodeConverter<T> : NodeConverter {
         private readonly Type _elementType = typeof(T);
+        /// <summary>
+        /// Creates a new instance of <see cref="ArrayNodeConverter{T}"/>
+        /// </summary>
         public ArrayNodeConverter(DataType type) : base(type) { }
 
+        /// <inheritdoc />
         public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
             if(!(instance is IEnumerable<T> values))
                 throw new ArgumentException("Instance is not type of IEnumerable<T>");
@@ -38,6 +46,7 @@ namespace DotLogix.Core.Nodes.Converters {
                 await task;
         }
 
+        /// <inheritdoc />
         public override object ConvertToObject(Node node, ConverterSettings settings) {
             if(!(node is NodeList nodeList))
                 throw new ArgumentException("Node is not a NodeList");

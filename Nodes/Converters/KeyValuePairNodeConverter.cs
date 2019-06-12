@@ -16,6 +16,9 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert key value pairs
+    /// </summary>
     public class KeyValuePairNodeConverter : NodeConverter {
         private const string KeyNodeName = "Key";
         private const string ValueNodeName = "Value";
@@ -23,7 +26,9 @@ namespace DotLogix.Core.Nodes.Converters {
         private readonly DynamicCtor _defaultCtor;
         private readonly DynamicField _keyField;
         private readonly DynamicField _valueField;
-
+        /// <summary>
+        /// Creates a new instance of <see cref="KeyValuePairNodeConverter"/>
+        /// </summary>
         public KeyValuePairNodeConverter(DataType type) : base(type) {
             var dynamicType = Type.CreateDynamicType(MemberTypes.Field | MemberTypes.Constructor);
             _defaultCtor = dynamicType.GetDefaultConstructor();
@@ -31,6 +36,7 @@ namespace DotLogix.Core.Nodes.Converters {
             _valueField = dynamicType.GetField("value");
         }
 
+        /// <inheritdoc />
         public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
             var keyFieldValue = _keyField.GetValue(instance);
             var valueFieldValue = _valueField.GetValue(instance);
@@ -52,6 +58,7 @@ namespace DotLogix.Core.Nodes.Converters {
                 await task;
         }
 
+        /// <inheritdoc />
         public override object ConvertToObject(Node node, ConverterSettings settings) {
             if(!(node is NodeMap nodeMap))
                 throw new ArgumentException("Node is not a NodeMap");

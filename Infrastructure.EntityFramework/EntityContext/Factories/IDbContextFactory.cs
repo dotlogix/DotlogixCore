@@ -14,7 +14,13 @@ using Microsoft.EntityFrameworkCore;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Factories {
+    /// <summary>
+    ///     An interface to represent a factory to create a <see cref="DbContext" />
+    /// </summary>
     public interface IDbContextFactory {
+        /// <summary>
+        ///     Creates a new instance of <see cref="DbContext" />
+        /// </summary>
         DbContext Create();
     }
 }

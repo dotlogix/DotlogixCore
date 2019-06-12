@@ -5,9 +5,16 @@ using DotLogix.Core.Nodes.Processor;
 
 namespace DotLogix.Core.Nodes
 {
+    /// <summary>
+    /// Creates a dynamic object with a internal hierarchy structure cast-able to matching types
+    /// </summary>
     public class DynamicNode : DynamicObject
     {
         private readonly ConverterSettings _settings;
+
+        /// <summary>
+        /// The internal node
+        /// </summary>
         public Node Node { get; }
 
         private DynamicNode(Node node, ConverterSettings settings = null) {
@@ -15,6 +22,7 @@ namespace DotLogix.Core.Nodes
             Node = node;
         }
 
+        /// <inheritdoc />
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
             if (indexes.Length != 1)
@@ -40,6 +48,7 @@ namespace DotLogix.Core.Nodes
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             if (!(Node is NodeMap nodeMap))
@@ -52,6 +61,7 @@ namespace DotLogix.Core.Nodes
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object value)
         {
             if (indexes.Length != 1)
@@ -74,6 +84,7 @@ namespace DotLogix.Core.Nodes
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
             if (!(Node is NodeMap nodeMap))
@@ -84,6 +95,7 @@ namespace DotLogix.Core.Nodes
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TryConvert(ConvertBinder binder, out object result)
         {
             if(binder.ReturnType.IsAssignableTo<Node>()) {
@@ -120,16 +132,25 @@ namespace DotLogix.Core.Nodes
             }
         }
 
+        /// <summary>
+        /// Creates a dynamic object using a existing node
+        /// </summary>
         public static dynamic From(Node node, ConverterSettings settings = null)
         {
             return new DynamicNode(node, settings);
         }
 
+        /// <summary>
+        /// Creates a dynamic object using a new node map
+        /// </summary>
         public static dynamic Map(ConverterSettings settings = null)
         {
             return new DynamicNode(new NodeMap(), settings);
         }
 
+        /// <summary>
+        /// Creates a dynamic object using a ne node list
+        /// </summary>
         public static dynamic List(ConverterSettings settings = null)
         {
             return new DynamicNode(new NodeList(), settings);

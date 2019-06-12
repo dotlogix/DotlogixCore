@@ -18,18 +18,54 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeReader"/> interface to read json text
+    /// </summary>
     public class JsonNodeReader : NodeReaderBase {
+        /// <summary>
+        /// A json instruction character
+        /// </summary>
         [Flags]
         public enum JsonCharacter {
+            /// <summary>
+            /// None
+            /// </summary>
             None = 0,
+            /// <summary>
+            /// The end of the character stream
+            /// </summary>
             End = 1 << 0,
+            /// <summary>
+            /// The open object character {
+            /// </summary>
             OpenObject = 1 << 1,
+            /// <summary>
+            /// The close object character }
+            /// </summary>
             CloseObject = 1 << 2,
+            /// <summary>
+            /// The open list character [
+            /// </summary>
             OpenList = 1 << 3,
+            /// <summary>
+            /// The close list character ]
+            /// </summary>
             CloseList = 1 << 4,
+            /// <summary>
+            /// The begin of a string "
+            /// </summary>
             String = 1 << 5,
+            /// <summary>
+            /// The value assignment character :
+            /// </summary>
             ValueAssignment = 1 << 6,
+            /// <summary>
+            /// The value delimiter character ,
+            /// </summary>
             ValueDelimiter = 1 << 7,
+            /// <summary>
+            /// Another unknown character
+            /// </summary>
             Other = 1 << 8
         }
         private readonly char[] _unicodeBuffer = new char[4];
@@ -44,21 +80,28 @@ namespace DotLogix.Core.Nodes.Processor {
         private int _position;
         private string Near => new string(_nearQueue.ToArray());
 
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonNodeReader"/>
+        /// </summary>
         public JsonNodeReader(string json) {
             _jsonChars = json.Select(c => {
                                          ProcessChar(c);
                                          return new ValueTask<char>(c);
                                      }).GetEnumerator();
         }
-
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonNodeReader"/>
+        /// </summary>
         public JsonNodeReader(TextReader reader) {
             _jsonChars = reader.AsAsyncSequence(1024, ProcessChar).GetEnumerator();
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing) {
             _jsonChars?.Dispose();
         }
 
+        /// <inheritdoc />
         public override async ValueTask CopyToAsync(IAsyncNodeWriter nodeWriter) {
             var enumerator = _jsonChars;
             using(enumerator) {

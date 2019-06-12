@@ -80,7 +80,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         }
 
         /// <summary>
-        /// Invoke the constructor and create an instance
+        /// Invoke the constructor and create a new instance
         /// </summary>
         /// <exception cref="ArgumentException"></exception>
         public object Invoke(params object[] parameters) {

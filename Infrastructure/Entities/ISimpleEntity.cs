@@ -11,5 +11,8 @@ using DotLogix.Architecture.Common.Options;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Entities {
+    /// <summary>
+    /// An interface combining <see cref="IIdentity"/> and <see cref="IGuid"/> interface
+    /// </summary>
     public interface ISimpleEntity : IIdentity, IGuid { }
 }

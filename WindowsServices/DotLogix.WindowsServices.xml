@@ -4,9 +4,304 @@
         <name>DotLogix.WindowsServices</name>
     </assembly>
     <members>
-        <member name="M:DotLogix.Core.WindowsServices.ConsoleCommand.#ctor(System.String,System.String,System.Func{DotLogix.Core.WindowsServices.ConsoleCommand,System.String[],System.Nullable{System.Int32}},System.Func{DotLogix.Core.WindowsServices.ConsoleCommand,System.String[],System.Boolean},System.String)">
+        <member name="T:DotLogix.Core.WindowsServices.ApplicationMode">
             <summary>
-              Initialisiert eine neue Instanz der <see cref="T:System.Object" />-Klasse.
+            Application modes
+            </summary>
+        </member>
+        <member name="F:DotLogix.Core.WindowsServices.ApplicationMode.Service">
+            <summary>
+            Windows Service
+            </summary>
+        </member>
+        <member name="F:DotLogix.Core.WindowsServices.ApplicationMode.UserInteractive">
+            <summary>
+            Console
+            </summary>
+        </member>
+        <member name="T:DotLogix.Core.WindowsServices.ConsoleCommandResult">
+            <summary>
+            A helper struct to provide command results 
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.ConsoleCommandResult.ExitNoError">
+            <summary>
+            Exit application without error
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.ConsoleCommandResult.Continue">
+            <summary>
+            Continue application loop
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.ConsoleCommandResult.Exit">
+            <summary>
+            Determines if the application should exit
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.ConsoleCommandResult.ExitCode">
+            <summary>
+            The exit code
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.ConsoleCommandResult.#ctor(System.Boolean,System.Int32)">
+            <summary>
+              Creates a new instance of <see cref="T:DotLogix.Core.WindowsServices.ConsoleCommandResult"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.ConsoleCommandResult.Deconstruct(System.Boolean@,System.Int32@)">
+            <summary>
+            Destruct this command result
+            </summary>
+        </member>
+        <member name="T:DotLogix.Core.WindowsServices.IConsoleCommand">
+            <summary>
+            An interface representing a console command
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.IConsoleCommand.Name">
+            <summary>
+            The name
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.IConsoleCommand.Description">
+            <summary>
+            The description
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.IConsoleCommand.HelpText">
+            <summary>
+            The help text
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.IConsoleCommand.OnExecute(DotLogix.Core.WindowsServices.CommandArgs)">
+            <summary>
+            A callback to execute an action
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.IConsoleCommand.OnValidate(DotLogix.Core.WindowsServices.CommandArgs)">
+            <summary>
+            A callback to validate arguments
+            </summary>
+        </member>
+        <member name="T:DotLogix.Core.WindowsServices.CommandArgs">
+            <summary>
+            A helper struct to hold command arguments
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.CommandArgs.Empty">
+            <summary>
+            No arguments
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.CommandArgs.#ctor(System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IList{System.String})">
+            <summary>
+            Creates a new instance of <see cref="T:DotLogix.Core.WindowsServices.CommandArgs"/>
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.CommandArgs.IsEmpty">
+            <summary>
+            Check if there are parameters
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.CommandArgs.Named">
+            <summary>
+            The named arguments
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.CommandArgs.Unnamed">
+            <summary>
+            The unnamed arguments
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.CommandArgs.Deconstruct(System.Collections.Generic.IDictionary{System.String,System.String}@,System.Collections.Generic.IList{System.String}@)">
+            <summary>
+            Destruct struct
+            </summary>
+        </member>
+        <member name="T:DotLogix.Core.WindowsServices.ConsoleCommand">
+            <summary>
+            A basic console command
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.ConsoleCommand.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.ConsoleCommand.Description">
+            <inheritdoc />
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.ConsoleCommand.HelpText">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.ConsoleCommand.#ctor(System.String,System.String,System.String)">
+            <summary>
+              Creates a new instance of <see cref="T:DotLogix.Core.WindowsServices.ConsoleCommand"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.ConsoleCommand.OnExecute(DotLogix.Core.WindowsServices.CommandArgs)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.ConsoleCommand.OnValidate(DotLogix.Core.WindowsServices.CommandArgs)">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.WindowsServices.LambdaConsoleCommand">
+            <inheritdoc />
+        </member>
+        <member name="F:DotLogix.Core.WindowsServices.LambdaConsoleCommand._callbackFunc">
+            <summary>
+            A callback to execute an action
+            </summary>
+        </member>
+        <member name="F:DotLogix.Core.WindowsServices.LambdaConsoleCommand._validateArguments">
+            <summary>
+            A callback to validate arguments
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.LambdaConsoleCommand.#ctor(System.String,System.String,System.Func{DotLogix.Core.WindowsServices.ConsoleCommand,DotLogix.Core.WindowsServices.CommandArgs,DotLogix.Core.WindowsServices.ConsoleCommandResult},System.Func{DotLogix.Core.WindowsServices.ConsoleCommand,DotLogix.Core.WindowsServices.CommandArgs,System.Boolean},System.String)">
+            <summary>
+              Creates a new instance of <see cref="T:DotLogix.Core.WindowsServices.LambdaConsoleCommand"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.LambdaConsoleCommand.#ctor(System.String,System.String,System.Action{DotLogix.Core.WindowsServices.ConsoleCommand,DotLogix.Core.WindowsServices.CommandArgs},System.Func{DotLogix.Core.WindowsServices.ConsoleCommand,DotLogix.Core.WindowsServices.CommandArgs,System.Boolean},System.String)">
+            <summary>
+              Creates a new instance of <see cref="T:DotLogix.Core.WindowsServices.LambdaConsoleCommand"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.LambdaConsoleCommand.OnExecute(DotLogix.Core.WindowsServices.CommandArgs)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.LambdaConsoleCommand.OnValidate(DotLogix.Core.WindowsServices.CommandArgs)">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.WindowsServices.EventLogLogger">
+            <summary>
+            A logging adapter to log to the windows event log
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.EventLogLogger.#ctor(System.Diagnostics.EventLog)">
+            <summary>
+            Creates a new instance of <see cref="T:DotLogix.Core.WindowsServices.EventLogLogger"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.EventLogLogger.Log(DotLogix.Core.Diagnostics.LogMessage)">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.WindowsServices.EventLogMessageFormatter">
+            <summary>
+            A formatter of log messages for the windows event log
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.EventLogMessageFormatter.Format(DotLogix.Core.Diagnostics.LogMessage)">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.WindowsServices.WindowsService">
+            <summary>
+                A base for windows services
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.WindowsService.Mode">
+            <summary>
+                The application mode
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.WindowsService.ProgramExecutable">
+            <summary>
+                The executable path
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.WindowsService.LogDirectory">
+            <summary>
+                The log directory
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.WindowsService.ServiceName">
+            <summary>
+                The service name
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.WindowsService.Commands">
+            <summary>
+                A collection of commands for user interactive mode
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsService.#ctor(System.String,System.String)">
+            <summary>
+                Creates a new instance of <see cref="T:DotLogix.Core.WindowsServices.WindowsService" />
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsService.OnStart(System.String[])">
+            <summary>
+                A callback to start the service
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsService.OnStop">
+            <summary>
+                A callback to stop the service
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsService.Run(System.String[])">
+            <summary>
+                Start the service loop
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsService.InitializeLoggers(System.Diagnostics.EventLog)">
+            <summary>
+                Create the required loggers
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsService.OnConfiguration(System.String[],System.Diagnostics.EventLog)">
+            <summary>
+                A callback to configure the service
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsService.InstallService">
+            <summary>
+                A callback to install the service
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsService.UninstallService">
+            <summary>
+                A callback to uninstall the service
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsService.OnCommand(System.String,DotLogix.Core.WindowsServices.CommandArgs)">
+            <summary>
+                A callback to handle a user command
+            </summary>
+        </member>
+        <member name="T:DotLogix.Core.WindowsServices.WindowsServiceInstaller">
+            <summary>
+            The internal service installer
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.WindowsServiceInstaller.ServiceName">
+            <summary>
+            The service name
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.WindowsServiceInstaller.StartMode">
+            <summary>
+            The service start mode
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.WindowsServiceInstaller.Account">
+            <summary>
+            The service account
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.WindowsServices.WindowsServiceInstaller.RunAfterInstallation">
+            <summary>
+            A flag to determine if the service should start after installation
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsServiceInstaller.#ctor(System.String,System.ServiceProcess.ServiceStartMode,System.ServiceProcess.ServiceAccount,System.Boolean)">
+            <summary>
+            Creates a new instance of <see cref="T:DotLogix.Core.WindowsServices.WindowsServiceInstaller"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.WindowsServices.WindowsServiceInstaller.ServerInstaller_AfterInstall(System.Object,System.Configuration.Install.InstallEventArgs)">
+            <summary>
+            
             </summary>
         </member>
     </members>

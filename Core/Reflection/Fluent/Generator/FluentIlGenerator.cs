@@ -38,8 +38,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Copies the value type located at the address of an object (type &, * or native int) to the address of the
-        ///     destination object (type &, * or native int).
+        ///     Copies the value type located at the address of an object (type &amp;, * or native int) to the address of the
+        ///     destination object (type &amp;, * or native int).
         /// </summary>
         public FluentIlGenerator Cpobj(Type type) {
             IlGenerator.Emit(OpCodes.Cpobj, type);
@@ -200,7 +200,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes a typed reference to an instance of a specific type onto the evaluation stack.
+        ///     Pushes a typed reference to a new instance of a specific type onto the evaluation stack.
         /// </summary>
         public FluentIlGenerator Mkrefany(Type type) {
             IlGenerator.Emit(OpCodes.Mkrefany, type);
@@ -216,7 +216,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Retrieves the address (type &) embedded in a typed reference.
+        ///     Retrieves the address (type &amp;) embedded in a typed reference.
         /// </summary>
         public FluentIlGenerator Refanyval(Type type) {
             IlGenerator.Emit(OpCodes.Refanyval, type);

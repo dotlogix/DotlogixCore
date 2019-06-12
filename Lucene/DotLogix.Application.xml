@@ -4,5 +4,238 @@
         <name>DotLogix.Lucene</name>
     </assembly>
     <members>
+        <member name="T:DotLogix.Core.Lucene.DocumentResult">
+            <summary>
+            A helper struct to represent document results and their score
+            </summary>
+        </member>
+        <member name="F:DotLogix.Core.Lucene.DocumentResult.Score">
+            <summary>
+            The score retrieved from lucene
+            </summary>
+        </member>
+        <member name="F:DotLogix.Core.Lucene.DocumentResult.Document">
+            <summary>
+            The document
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.DocumentResult.#ctor(System.Single,Lucene.Net.Documents.Document)">
+            <summary>
+            Creates a new instance of <see cref="T:DotLogix.Core.Lucene.DocumentResult"/>
+            </summary>
+        </member>
+        <member name="T:DotLogix.Core.Lucene.FileLuceneIndex">
+            <summary>
+                An file based implementation of the <see cref="T:DotLogix.Core.Lucene.ILuceneIndex" /> interface
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.FileLuceneIndex.IndexPath">
+            <summary>
+            The index path
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.FileLuceneIndex.#ctor(Lucene.Net.Util.LuceneVersion,System.String)">
+            <summary>
+                Creates a new instance of <see cref="T:DotLogix.Core.Lucene.FileLuceneIndex" />
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.FileLuceneIndex.CreateDirectory">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.Lucene.RamLuceneIndex">
+            <summary>
+                An file based implementation of the <see cref="T:DotLogix.Core.Lucene.ILuceneIndex" /> interface
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.RamLuceneIndex.IndexPath">
+            <summary>
+            The index path
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.RamLuceneIndex.#ctor(Lucene.Net.Util.LuceneVersion,System.String)">
+            <summary>
+                Creates a new instance of <see cref="T:DotLogix.Core.Lucene.FileLuceneIndex" />
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.RamLuceneIndex.CreateDirectory">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.Lucene.ILuceneIndex">
+            <summary>
+            An interface to represent a lucene index
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.ILuceneIndex.SearcherManager">
+            <summary>
+            The searcher manager
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.ILuceneIndex.ReaderManager">
+            <summary>
+            The reader manager
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.ILuceneIndex.IndexWriter">
+            <summary>
+            The index writer
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.ILuceneIndex.Analyzer">
+            <summary>
+            The analyzer
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.ILuceneIndex.Directory">
+            <summary>
+            The directory
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.ILuceneIndex.Version">
+            <summary>
+            The index lucene version
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.ILuceneIndex.AddDocument(Lucene.Net.Documents.Document,System.Boolean)">
+            <summary>
+            Add a single document to the index
+            </summary>
+            <param name="document">The document to add</param>
+            <param name="commit">Determines if all changes should be committed directly</param>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.ILuceneIndex.UpdateDocument(Lucene.Net.Index.Term,Lucene.Net.Documents.Document,System.Boolean)">
+            <summary>
+            Update a single document of the index
+            </summary>
+            <param name="matchTerm">The term to match</param>
+            <param name="document">The new document</param>
+            <param name="commit">Determines if all changes should be committed directly</param>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.ILuceneIndex.RemoveDocument(Lucene.Net.Index.Term,System.Boolean)">
+            <summary>
+            Remove a single document from the index
+            </summary>
+            <param name="matchTerm">The term to match</param>
+            <param name="commit">Determines if all changes should be committed directly</param>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.ILuceneIndex.QueryResult(Lucene.Net.Search.Query)">
+            <summary>
+            Get a single document result
+            </summary>
+            <param name="query">A query to match</param>
+            <returns></returns>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.ILuceneIndex.QueryResults(Lucene.Net.Search.Query,System.Int32,System.Boolean)">
+            <summary>
+            Get a range of document results
+            </summary>
+            <param name="query">A query to match</param>
+            <param name="count">The maximum amount of documents</param>
+            <param name="order">Determines if the documents should be ordered</param>
+        </member>
+        <member name="T:DotLogix.Core.Lucene.LuceneIndex">
+            <summary>
+                An implementation of the <see cref="T:DotLogix.Core.Lucene.ILuceneIndex" /> interface
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.LuceneIndex.SearcherManager">
+            <inheritdoc />
+        </member>
+        <member name="P:DotLogix.Core.Lucene.LuceneIndex.ReaderManager">
+            <inheritdoc />
+        </member>
+        <member name="P:DotLogix.Core.Lucene.LuceneIndex.IndexWriter">
+            <inheritdoc />
+        </member>
+        <member name="P:DotLogix.Core.Lucene.LuceneIndex.Analyzer">
+            <inheritdoc />
+        </member>
+        <member name="P:DotLogix.Core.Lucene.LuceneIndex.Directory">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.#ctor(Lucene.Net.Util.LuceneVersion)">
+            <summary>
+                Creates a new instance of <see cref="T:DotLogix.Core.Lucene.LuceneIndex" />
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Lucene.LuceneIndex.Version">
+            <inheritdoc />
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.AddDocument(Lucene.Net.Documents.Document,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.UpdateDocument(Lucene.Net.Index.Term,Lucene.Net.Documents.Document,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.RemoveDocument(Lucene.Net.Index.Term,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.QueryResult(Lucene.Net.Search.Query)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.QueryResults(Lucene.Net.Search.Query,System.Int32,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.CreateAnalyzer">
+            <summary>
+                Create a new <see cref="P:DotLogix.Core.Lucene.LuceneIndex.Analyzer"/>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.CreateIndexWriter(Lucene.Net.Index.OpenMode)">
+            <summary>
+            Create a new <see cref="P:DotLogix.Core.Lucene.LuceneIndex.IndexWriter"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.CreateDirectory">
+            <summary>
+            Create a new <see cref="P:DotLogix.Core.Lucene.LuceneIndex.Directory"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.CreateSearcherManager">
+            <summary>
+            Create a new <see cref="P:DotLogix.Core.Lucene.LuceneIndex.SearcherManager"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.CreateReaderManager">
+            <summary>
+            Create a new <see cref="P:DotLogix.Core.Lucene.LuceneIndex.ReaderManager"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndex.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.Lucene.LuceneIndexExtensions">
+            <summary>
+                A static class providing extension methods for <see cref="T:DotLogix.Core.Lucene.ILuceneIndex" />
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndexExtensions.CreateQueryParser(DotLogix.Core.Lucene.ILuceneIndex,System.String)">
+            <summary>
+            Creates a query parser
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndexExtensions.CreateQueryParser(DotLogix.Core.Lucene.ILuceneIndex,System.String[],System.Collections.Generic.IDictionary{System.String,System.Single})">
+            <summary>
+            Creates a query parser
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndexExtensions.QueryDocument(DotLogix.Core.Lucene.ILuceneIndex,Lucene.Net.Search.Query)">
+            <summary>
+            Get a single document
+            </summary>
+            <param name="index">The index</param>
+            <param name="query">A query to match</param>
+            <returns></returns>
+        </member>
+        <member name="M:DotLogix.Core.Lucene.LuceneIndexExtensions.QueryDocuments(DotLogix.Core.Lucene.ILuceneIndex,Lucene.Net.Search.Query,System.Int32,System.Boolean)">
+            <summary>
+            Get a range of documents
+            </summary>
+            <param name="index">The index</param>
+            <param name="query">A query to match</param>
+            <param name="count">The maximum amount of documents</param>
+            <param name="order">Determines if the documents should be ordered</param>
+        </member>
     </members>
 </doc>

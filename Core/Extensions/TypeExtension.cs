@@ -277,7 +277,7 @@ namespace DotLogix.Core.Extensions {
 
         #region Instantiate
         /// <summary>
-        ///     Creates an instance of this type using the default constructor
+        ///     Creates a new instance of this type using the default constructor
         /// </summary>
         /// <param name="type">The type to instantiate</param>
         /// <returns></returns>
@@ -286,7 +286,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Creates an instance of this type using the constructor with matching parameters
+        ///     Creates a new instance of this type using the constructor with matching parameters
         /// </summary>
         /// <param name="type">The type to instantiate</param>
         /// <param name="parameters">The parameters used for invoking the constructor</param>
@@ -297,7 +297,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Creates an instance of a generic type using the provided generic arguments using the default constructor
+        ///     Creates a new instance of a generic type using the provided generic arguments using the default constructor
         /// </summary>
         /// <param name="genericType">The type to instantiate</param>
         /// <param name="genericArguments">The generic arguments to build the type</param>
@@ -309,7 +309,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Creates an instance of a generic type using the provided generic arguments using the constructor with matching
+        ///     Creates a new instance of a generic type using the provided generic arguments using the constructor with matching
         ///     parameters
         /// </summary>
         /// <param name="genericType">The type to instantiate</param>
@@ -322,7 +322,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Creates an instance of this type using the default constructor
+        ///     Creates a new instance of this type using the default constructor
         /// </summary>
         /// <param name="type">The type to instantiate</param>
         /// <returns></returns>
@@ -331,7 +331,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Creates an instance of this type using the constructor with matching parameters
+        ///     Creates a new instance of this type using the constructor with matching parameters
         /// </summary>
         /// <param name="type">The type to instantiate</param>
         /// <param name="parameters">The parameters used for invoking the constructor</param>
@@ -341,7 +341,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Creates an instance of a generic type using the provided generic arguments using the default constructor
+        ///     Creates a new instance of a generic type using the provided generic arguments using the default constructor
         /// </summary>
         /// <param name="genericType">The type to instantiate</param>
         /// <param name="genericArguments">The generic arguments to build the type</param>
@@ -351,7 +351,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Creates an instance of a generic type using the provided generic arguments using the constructor with matching
+        ///     Creates a new instance of a generic type using the provided generic arguments using the constructor with matching
         ///     parameters
         /// </summary>
         /// <param name="genericType">The type to instantiate</param>

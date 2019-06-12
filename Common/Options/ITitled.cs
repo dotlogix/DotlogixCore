@@ -7,7 +7,13 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Common.Options {
+    /// <summary>
+    /// An interface to force a title
+    /// </summary>
     public interface ITitled {
+        /// <summary>
+        /// The title
+        /// </summary>
         string Title { get; set; }
     }
 }

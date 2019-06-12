@@ -67,7 +67,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         public bool HasDefaultConstructor => _defaultCtor != null;
 
         /// <summary>
-        /// Creates an instance of <see cref="DynamicType"/>
+        /// Creates a new instance of <see cref="DynamicType"/>
         /// </summary>
         public DynamicType(Type type, MemberTypes includedMemberTypes = MemberTypes.All) {
             Type = type ?? throw new ArgumentNullException(nameof(type));

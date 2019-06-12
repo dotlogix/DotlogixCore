@@ -15,21 +15,33 @@ using DotLogix.Core.Reflection.Dynamics;
 #endregion
 
 namespace DotLogix.Architecture.Domain.Services.Factories {
+    /// <summary>
+    /// An implementation of the <see cref="IDomainServiceFactory"/> using reflection and il code to create instances
+    /// </summary>
     public class DynamicDomainServiceFactory : IDomainServiceFactory {
         private readonly DynamicCtor _serviceCtor;
-
+        /// <summary>
+        /// Creates a new instance of <see cref="DynamicDomainServiceFactory"/>
+        /// </summary>
         public DynamicDomainServiceFactory(DynamicCtor serviceCtor) {
             _serviceCtor = serviceCtor;
         }
 
+        /// <inheritdoc />
         public IDomainService Create(IDomainContext domainContext, IUnitOfWorkContextFactory uowContextFactory) {
             return (IDomainService)_serviceCtor.Invoke(domainContext, uowContextFactory);
         }
 
+        /// <summary>
+        /// Create a new <see cref="DynamicDomainServiceFactory"/> using a constructor with the shape .ctor(<see cref="IDomainContext"/>, <see cref="IUnitOfWorkContextFactory"/>)
+        /// </summary>
         public static IDomainServiceFactory CreateFor<TService>() where TService : IDomainService {
             return CreateFor(typeof(TService));
         }
 
+        /// <summary>
+        /// Create a new <see cref="DynamicDomainServiceFactory"/> using a constructor with the shape .ctor(<see cref="IDomainContext"/>, <see cref="IUnitOfWorkContextFactory"/>)
+        /// </summary>
         public static IDomainServiceFactory CreateFor(Type domainServiceType) {
             if(domainServiceType.IsAssignableTo(typeof(IDomainService)) == false)
                 throw new ArgumentException($"Type {domainServiceType} is not assignable to type {nameof(IDomainService)}", nameof(domainServiceType));

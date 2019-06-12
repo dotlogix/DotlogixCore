@@ -7,8 +7,17 @@
 // ==================================================
 
 namespace DotLogix.Core.WindowsServices {
+    /// <summary>
+    /// Application modes
+    /// </summary>
     public enum ApplicationMode {
+        /// <summary>
+        /// Windows Service
+        /// </summary>
         Service,
+        /// <summary>
+        /// Console
+        /// </summary>
         UserInteractive
     }
 }

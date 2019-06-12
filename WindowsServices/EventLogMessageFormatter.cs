@@ -12,7 +12,11 @@ using DotLogix.Core.Diagnostics;
 #endregion
 
 namespace DotLogix.Core.WindowsServices {
+    /// <summary>
+    /// A formatter of log messages for the windows event log
+    /// </summary>
     public class EventLogMessageFormatter : ILogMessageFormatter {
+        /// <inheritdoc />
         public string Format(LogMessage message) {
             var sb = new StringBuilder();
             sb.Append($"{message.TimeStamp:HH:mm:ss}");

@@ -11,7 +11,13 @@ using System;
 #endregion
 
 namespace DotLogix.Architecture.Common.Options {
+    /// <summary>
+    /// An interface to force a guid key
+    /// </summary>
     public interface IGuid {
+        /// <summary>
+        /// The guid
+        /// </summary>
         Guid Guid { get; set; }
     }
 }

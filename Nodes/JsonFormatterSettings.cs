@@ -10,11 +10,26 @@
 #endregion
 
 namespace DotLogix.Core.Nodes {
+    /// <summary>
+    /// Basic node converter settings for json data
+    /// </summary>
     public class JsonFormatterSettings : ConverterSettings{
+        /// <summary>
+        /// Creates new json settings with ident
+        /// </summary>
         public static JsonFormatterSettings Idented => new JsonFormatterSettings{Ident = true};
+        /// <summary>
+        /// Creates new json settings
+        /// </summary>
         public new static JsonFormatterSettings Default => new JsonFormatterSettings();
 
+        /// <summary>
+        /// Determines if the json text should be idented
+        /// </summary>
         public bool Ident { get; set; }
+        /// <summary>
+        /// The amount of spaces to insert for ident (4 by default)
+        /// </summary>
         public int IdentSize { get; set; } = 4;
     }
 }

@@ -14,22 +14,25 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
+    /// <summary>
+    /// An implementation of the <see cref="ILogger"/> interface for entity framework
+    /// </summary>
     public class LoggingAdapter : ILogger {
+        /// <summary>
+        /// The minimum entity framework log level
+        /// </summary>
         public LogLevel MinLogLevel { get; }
 
+
+        /// <summary>
+        /// Create a new instance of <see cref="LoggingAdapter"/>
+        /// </summary>
         public LoggingAdapter(LogLevel minLogLevel = LogLevel.Information) {
             MinLogLevel = minLogLevel;
         }
 
-        /// <summary>Writes a log entry.</summary>
-        /// <param name="logLevel">Entry will be written on this level.</param>
-        /// <param name="eventId">Id of the event.</param>
-        /// <param name="state">The entry to be written. Can be also an object.</param>
-        /// <param name="exception">The exception related to this entry.</param>
-        /// <param name="formatter">
-        ///     Function to create a <c>string</c> message of the <paramref name="state" /> and
-        ///     <paramref name="exception" />.
-        /// </param>
+
+        /// <inheritdoc />
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
             var logLevels = ConvertLogLevel(logLevel);
             if((eventId.Id == 10403) || (Core.Diagnostics.Log.LogLevel > logLevels))
@@ -52,9 +55,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
             return logLevel >= MinLogLevel;
         }
 
-        /// <summary>Begins a logical operation scope.</summary>
-        /// <param name="state">The identifier for the scope.</param>
-        /// <returns>An IDisposable that ends the logical operation scope on dispose.</returns>
+        /// <inheritdoc />
         public IDisposable BeginScope<TState>(TState state) {
             return null;
         }

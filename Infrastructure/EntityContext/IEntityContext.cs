@@ -13,8 +13,19 @@ using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
+    /// <summary>
+    /// An interface to represent an entity context
+    /// </summary>
     public interface IEntityContext : IEntitySetProvider, IDisposable {
+        /// <summary>
+        /// The context variables
+        /// </summary>
         IDictionary<string, object> Variables { get; }
+
+        /// <summary>
+        /// Complete the underlying unit of work and commit all changes to entities
+        /// </summary>
+        /// <returns></returns>
         Task CompleteAsync();
     }
 }

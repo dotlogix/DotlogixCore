@@ -14,6 +14,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http.Headers;
+using DotLogix.Core.Rest.Server.Http.Parameters;
 using DotLogix.Core.Rest.Server.Http.State;
 using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 #endregion

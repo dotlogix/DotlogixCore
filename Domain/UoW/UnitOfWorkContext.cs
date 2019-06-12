@@ -16,21 +16,38 @@ using DotLogix.Architecture.Infrastructure.Repositories.Provider;
 #endregion
 
 namespace DotLogix.Architecture.Domain.UoW {
+    /// <summary>
+    /// An implementation of the <see cref="IUnitOfWorkContext"/> wrapping a <see cref="IEntityContext"/>
+    /// </summary>
     public class UnitOfWorkContext : IUnitOfWorkContext {
+        /// <summary>
+        /// The internal <see cref="IEntityContext"/>
+        /// </summary>
         protected IEntityContext EntityContext { get; }
+        /// <summary>
+        /// The internal <see cref="IRepositoryProvider"/>
+        /// </summary>
         protected IRepositoryProvider RepoProvider { get; }
+        /// <summary>
+        /// The internal cached repository instances
+        /// </summary>
         protected IDictionary<Type, IRepository> RepositoryInstances { get; }
 
+        /// <summary>
+        /// Create a new instance of <see cref="UnitOfWorkContext"/>
+        /// </summary>
         public UnitOfWorkContext(IEntityContext entityContext, IRepositoryProvider repoProvider) {
             EntityContext = entityContext;
             RepoProvider = repoProvider;
             RepositoryInstances = new Dictionary<Type, IRepository>();
         }
 
+        /// <inheritdoc />
         public IUnitOfWorkContext BeginContext() {
             return new NestedUnitOfWorkContext(this);
         }
 
+        /// <inheritdoc />
         public TRepo UseRepository<TRepo>() where TRepo : IRepository {
             var repoInterface = typeof(TRepo);
             if(RepositoryInstances.TryGetValue(repoInterface, out var existing))
@@ -41,10 +58,12 @@ namespace DotLogix.Architecture.Domain.UoW {
             return newInstance;
         }
 
+        /// <inheritdoc />
         public Task CompleteAsync() {
             return EntityContext.CompleteAsync();
         }
 
+        /// <inheritdoc />
         public void Dispose() {
             EntityContext?.Dispose();
         }

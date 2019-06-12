@@ -13,15 +13,23 @@ using DotLogix.Core.Diagnostics;
 #endregion
 
 namespace DotLogix.Core.WindowsServices {
+    /// <summary>
+    /// A logging adapter to log to the windows event log
+    /// </summary>
     public class EventLogLogger : LoggerBase {
         private static readonly ILogMessageFormatter MessageFormatter = new EventLogMessageFormatter();
 
         private readonly EventLog _eventLog;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="EventLogLogger"/>
+        /// </summary>
         public EventLogLogger(EventLog eventLog) : base("EventLogLogger") {
             _eventLog = eventLog ?? throw new ArgumentNullException(nameof(eventLog));
         }
 
+
+        /// <inheritdoc />
         public override bool Log(LogMessage message) {
             switch(message.LogLevel) {
                 case LogLevels.Trace:

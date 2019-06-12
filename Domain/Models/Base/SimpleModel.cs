@@ -11,7 +11,11 @@ using System;
 #endregion
 
 namespace DotLogix.Architecture.Domain.Models.Base {
+    /// <summary>
+    /// An implementation of the <see cref="ISimpleModel"/> interface
+    /// </summary>
     public abstract class SimpleModel : ISimpleModel {
+        /// <inheritdoc />
         public Guid Guid { get; set; }
     }
 }

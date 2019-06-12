@@ -6,18 +6,18 @@
     <members>
         <member name="T:DotLogix.Core.Attributes.InstantiatorAttribute">
             <summary>
-            An attribute to create an instance of <see cref="T:DotLogix.Core.Utils.Instantiator"/>
+            An attribute to create a new instance of <see cref="T:DotLogix.Core.Utils.Instantiator"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Attributes.InstantiatorAttribute.#ctor(DotLogix.Core.Utils.IInstantiator)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using an existing <see cref="T:DotLogix.Core.Utils.IInstantiator"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using an existing <see cref="T:DotLogix.Core.Utils.IInstantiator"/>
             </summary>
             <param name="instantiator">The instance</param>
         </member>
         <member name="M:DotLogix.Core.Attributes.InstantiatorAttribute.#ctor(System.Type,System.String,System.Type)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using a static property of another type
+            Creates a new instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using a static property of another type
             </summary>
             <param name="singletonType">The type containing the property</param>
             <param name="propertyName">The property name</param>
@@ -25,44 +25,44 @@
         </member>
         <member name="M:DotLogix.Core.Attributes.InstantiatorAttribute.#ctor(System.Type,System.Type)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using the default constructor of another type
+            Creates a new instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using the default constructor of another type
             </summary>
             <param name="type">The type</param>
             <param name="constraintType">An optional constraint type to ensure type compatibility</param>
         </member>
         <member name="M:DotLogix.Core.Attributes.InstantiatorAttribute.#ctor(System.Func{System.Object})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using a delegate method
+            Creates a new instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using a delegate method
             </summary>
             <param name="instantiateFunc">The factory method</param>
         </member>
         <member name="M:DotLogix.Core.Attributes.InstantiatorAttribute.GetInstance">
             <summary>
-            Get or create an instance using the configured method
+            Get or create a new instance using the configured method
             </summary>
             <returns></returns>
         </member>
         <member name="M:DotLogix.Core.Attributes.InstantiatorAttribute.GetInstance``1">
             <summary>
-            Get or create an instance as a specific type using the configured method
+            Get or create a new instance as a specific type using the configured method
             </summary>
             <typeparam name="TInstance">The target type</typeparam>
             <returns>The instance if the provided type is compatible, otherwise <value>default</value></returns>
         </member>
         <member name="T:DotLogix.Core.Attributes.ArgsInstantiatorAttribute">
             <summary>
-            An attribute to create an instance of <see cref="T:DotLogix.Core.Utils.IArgsInstantiator"/>
+            An attribute to create a new instance of <see cref="T:DotLogix.Core.Utils.IArgsInstantiator"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Attributes.ArgsInstantiatorAttribute.#ctor(DotLogix.Core.Utils.IArgsInstantiator)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Attributes.ArgsInstantiatorAttribute"/> using an existing <see cref="T:DotLogix.Core.Utils.IInstantiator"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Attributes.ArgsInstantiatorAttribute"/> using an existing <see cref="T:DotLogix.Core.Utils.IInstantiator"/>
             </summary>
             <param name="instantiator">The instance</param>
         </member>
         <member name="M:DotLogix.Core.Attributes.ArgsInstantiatorAttribute.#ctor(System.Type,System.Type[],System.Type)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using a constructor with the specified type arguments
+            Creates a new instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using a constructor with the specified type arguments
             </summary>
             <param name="type">The type</param>
             <param name="parameterTypes">The parameter types used by the constructor</param>
@@ -70,22 +70,22 @@
         </member>
         <member name="M:DotLogix.Core.Attributes.ArgsInstantiatorAttribute.#ctor(System.Func{System.Object[],System.Object})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using a delegate method
+            Creates a new instance of <see cref="T:DotLogix.Core.Attributes.InstantiatorAttribute"/> using a delegate method
             </summary>
             <param name="instantiateFunc">The factory method</param>
         </member>
         <member name="M:DotLogix.Core.Attributes.ArgsInstantiatorAttribute.GetInstance(System.Object[])">
             <summary>
-            Get or create an instance using the configured method
+            Get or create a new instance using the configured method
             </summary>
-            <param name="args">The arguments to create an instance</param>
+            <param name="args">The arguments to create a new instance</param>
             <returns></returns>
         </member>
         <member name="M:DotLogix.Core.Attributes.ArgsInstantiatorAttribute.GetInstance``1(System.Object[])">
             <summary>
-            Get or create an instance as a specific type using the configured method
+            Get or create a new instance as a specific type using the configured method
             </summary>
-            <param name="args">The arguments to create an instance</param>
+            <param name="args">The arguments to create a new instance</param>
             <typeparam name="TInstance">The target type</typeparam>
             <returns>The instance if the provided type is compatible, otherwise <value>default</value></returns>
         </member>
@@ -214,7 +214,7 @@
         </member>
         <member name="M:DotLogix.Core.Caching.CacheItem`2.#ctor(`0,`1,DotLogix.Core.Caching.ICachePolicy)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Caching.CacheItem`2"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Caching.CacheItem`2"/>
             </summary>
             <param name="key">The key</param>
             <param name="value">The value</param>
@@ -234,7 +234,7 @@
         </member>
         <member name="M:DotLogix.Core.Caching.CacheItemsDiscardedEventArgs`2.#ctor(System.Collections.Generic.IReadOnlyList{DotLogix.Core.Caching.CacheItem{`0,`1}})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Caching.CacheItemsDiscardedEventArgs`2"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Caching.CacheItemsDiscardedEventArgs`2"/>
             </summary>
             <param name="discardedItems"></param>
         </member>
@@ -340,13 +340,13 @@
         </member>
         <member name="M:DotLogix.Core.Caching.ValidUntilCachePolicy.#ctor(System.TimeSpan)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Caching.ValidUntilCachePolicy"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Caching.ValidUntilCachePolicy"/>
             </summary>
             <param name="duration">The duration until the item expires</param>
         </member>
         <member name="M:DotLogix.Core.Caching.ValidUntilCachePolicy.#ctor(System.DateTime)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Caching.ValidUntilCachePolicy"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Caching.ValidUntilCachePolicy"/>
             </summary>
             <param name="validUntilUtc">The time when the item has expired</param>
         </member>
@@ -404,7 +404,7 @@
         </member>
         <member name="M:DotLogix.Core.Collections.Hierarchy`2.#ctor(`0,`1,DotLogix.Core.Collections.Hierarchy{`0,`1})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.Hierarchy`2"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.Hierarchy`2"/>
             </summary>
             <param name="key"></param>
             <param name="value"></param>
@@ -568,27 +568,27 @@
         </member>
         <member name="M:DotLogix.Core.Collections.KeyedCollection`2.#ctor(System.Func{`1,`0})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.KeyedCollection`2"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.KeyedCollection`2"/>
             </summary>
             <param name="keySelector">The key selector</param>
         </member>
         <member name="M:DotLogix.Core.Collections.KeyedCollection`2.#ctor(System.Func{`1,`0},System.Collections.Generic.IEnumerable{`1})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.KeyedCollection`2"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.KeyedCollection`2"/>
             </summary>
             <param name="keySelector">The key selector</param>
             <param name="values">The initial values</param>
         </member>
         <member name="M:DotLogix.Core.Collections.KeyedCollection`2.#ctor(System.Func{`1,`0},System.Collections.Generic.IEqualityComparer{`0})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.KeyedCollection`2"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.KeyedCollection`2"/>
             </summary>
             <param name="keySelector">The key selector</param>
             <param name="equalityComparer">The equality comparer</param>
         </member>
         <member name="M:DotLogix.Core.Collections.KeyedCollection`2.#ctor(System.Func{`1,`0},System.Collections.Generic.IEqualityComparer{`0},System.Collections.Generic.IEnumerable{`1})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.KeyedCollection`2"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.KeyedCollection`2"/>
             </summary>
             <param name="keySelector">The key selector</param>
             <param name="equalityComparer">The equality comparer</param>
@@ -1029,22 +1029,22 @@
         </member>
         <member name="M:DotLogix.Core.Collections.MutableLookup`3.#ctor(System.Int32,System.Func{`2})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Collections.MutableLookup`3.#ctor(System.Func{`2})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Collections.MutableLookup`3.#ctor(System.Collections.Generic.IEqualityComparer{`0},System.Func{`2})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Collections.MutableLookup`3.#ctor(System.Int32,System.Collections.Generic.IEqualityComparer{`0},System.Func{`2})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Collections.MutableLookup`3.GetEnumerator">
@@ -1128,6 +1128,7 @@
                 <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
             </summary>
             <param name="key">The key of the element to remove.</param>
+            <param name="value">The key of the element to remove.</param>
             <returns>
                 true if the element is successfully removed; otherwise, false.  This method also returns false if
                 <paramref name="key">key</paramref> was not found in the original
@@ -1161,22 +1162,22 @@
         </member>
         <member name="M:DotLogix.Core.Collections.MutableLookup`2.#ctor">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Collections.MutableLookup`2.#ctor(System.Int32)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Collections.MutableLookup`2.#ctor(System.Collections.Generic.IEqualityComparer{`0})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Collections.MutableLookup`2.#ctor(System.Int32,System.Collections.Generic.IEqualityComparer{`0})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Collections.MutableLookup`3"/>
             </summary>
         </member>
         <member name="T:DotLogix.Core.Collections.SortedCollection`1">
@@ -1243,7 +1244,7 @@
         </member>
         <member name="M:DotLogix.Core.Diagnostics.ConsoleLogger.#ctor(System.Int32,System.Int32,System.Int32)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Diagnostics.ConsoleLogger"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Diagnostics.ConsoleLogger"/>
             </summary>
             <param name="consoleWidth"></param>
             <param name="consoleHeight"></param>
@@ -1690,6 +1691,21 @@
         </member>
         <member name="M:DotLogix.Core.Diagnostics.XmlLogger.Shutdown">
             <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.Extensions.ArrayExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Extensions.ArrayExtensions.Split``1(``0[],``0,System.Int32,System.Int32)">
+            <summary>
+            Splits an array of bytes using another byte array.
+            </summary>
+            <param name="searchWithin">The byte array to search within</param>
+            <param name="searchFor">The byte array to search</param>
+            <param name="startIndex">The offset to start searching</param>
+            <param name="count">The maximum amount bytes to search</param>
+            <returns>The array segments</returns>
         </member>
         <member name="T:DotLogix.Core.Extensions.BinaryExtensions">
             <summary>
@@ -2248,10 +2264,11 @@
                 Adds the elements of the specified collection to the end of the
                 <see cref="T:System.Collections.Generic.ICollection`1" />.
             </summary>
+            <param name="list">The list</param>
             <param name="collection">
                 The collection whose elements should be added to the end of the
                 <see cref="T:System.Collections.Generic.ICollection`1" />. The collection itself cannot be <see langword="null" />,
-                but it can contain elements that are <see langword="null" />, if type <paramref name="T" /> is a reference type.
+                but it can contain elements that are <see langword="null" />, if type <typeparam name="T" /> is a reference type.
             </param>
             <exception cref="T:System.ArgumentNullException">
                 <paramref name="collection" /> is <see langword="null" />.
@@ -3036,14 +3053,14 @@
         </member>
         <member name="M:DotLogix.Core.Extensions.TypeExtension.Instantiate(System.Type)">
             <summary>
-                Creates an instance of this type using the default constructor
+                Creates a new instance of this type using the default constructor
             </summary>
             <param name="type">The type to instantiate</param>
             <returns></returns>
         </member>
         <member name="M:DotLogix.Core.Extensions.TypeExtension.Instantiate(System.Type,System.Object[])">
             <summary>
-                Creates an instance of this type using the constructor with matching parameters
+                Creates a new instance of this type using the constructor with matching parameters
             </summary>
             <param name="type">The type to instantiate</param>
             <param name="parameters">The parameters used for invoking the constructor</param>
@@ -3051,7 +3068,7 @@
         </member>
         <member name="M:DotLogix.Core.Extensions.TypeExtension.Instantiate(System.Type,System.Type[])">
             <summary>
-                Creates an instance of a generic type using the provided generic arguments using the default constructor
+                Creates a new instance of a generic type using the provided generic arguments using the default constructor
             </summary>
             <param name="genericType">The type to instantiate</param>
             <param name="genericArguments">The generic arguments to build the type</param>
@@ -3059,7 +3076,7 @@
         </member>
         <member name="M:DotLogix.Core.Extensions.TypeExtension.Instantiate(System.Type,System.Type[],System.Object[])">
             <summary>
-                Creates an instance of a generic type using the provided generic arguments using the constructor with matching
+                Creates a new instance of a generic type using the provided generic arguments using the constructor with matching
                 parameters
             </summary>
             <param name="genericType">The type to instantiate</param>
@@ -3068,14 +3085,14 @@
         </member>
         <member name="M:DotLogix.Core.Extensions.TypeExtension.Instantiate``1(System.Type)">
             <summary>
-                Creates an instance of this type using the default constructor
+                Creates a new instance of this type using the default constructor
             </summary>
             <param name="type">The type to instantiate</param>
             <returns></returns>
         </member>
         <member name="M:DotLogix.Core.Extensions.TypeExtension.Instantiate``1(System.Type,System.Object[])">
             <summary>
-                Creates an instance of this type using the constructor with matching parameters
+                Creates a new instance of this type using the constructor with matching parameters
             </summary>
             <param name="type">The type to instantiate</param>
             <param name="parameters">The parameters used for invoking the constructor</param>
@@ -3083,7 +3100,7 @@
         </member>
         <member name="M:DotLogix.Core.Extensions.TypeExtension.Instantiate``1(System.Type,System.Type[])">
             <summary>
-                Creates an instance of a generic type using the provided generic arguments using the default constructor
+                Creates a new instance of a generic type using the provided generic arguments using the default constructor
             </summary>
             <param name="genericType">The type to instantiate</param>
             <param name="genericArguments">The generic arguments to build the type</param>
@@ -3091,7 +3108,7 @@
         </member>
         <member name="M:DotLogix.Core.Extensions.TypeExtension.Instantiate``1(System.Type,System.Type[],System.Object[])">
             <summary>
-                Creates an instance of a generic type using the provided generic arguments using the constructor with matching
+                Creates a new instance of a generic type using the provided generic arguments using the constructor with matching
                 parameters
             </summary>
             <param name="genericType">The type to instantiate</param>
@@ -3253,7 +3270,7 @@
         </member>
         <member name="M:DotLogix.Core.Optional`1.#ctor(`0)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Optional`1"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Optional`1"/>
             </summary>
             <param name="value"></param>
         </member>
@@ -3358,7 +3375,7 @@
         </member>
         <member name="M:DotLogix.Core.Patterns.LambdaProcessingStep`3.#ctor(System.Func{`0,System.Func{`1,System.Threading.Tasks.Task{`2}},System.Threading.Tasks.Task{`2}})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Patterns.LambdaProcessingStep`3"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Patterns.LambdaProcessingStep`3"/>
             </summary>
             <param name="callback"></param>
         </member>
@@ -3381,7 +3398,7 @@
         </member>
         <member name="M:DotLogix.Core.Patterns.LambdaProcessingStep`2.#ctor(System.Func{`0,System.Threading.Tasks.Task{`1}})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Patterns.LambdaProcessingStep`2"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Patterns.LambdaProcessingStep`2"/>
             </summary>
             <param name="callback"></param>
         </member>
@@ -3554,7 +3571,6 @@
             Add a pipeline step after the current
             </summary>
             <param name="next"></param>
-            <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
         <member name="M:DotLogix.Core.Patterns.ProcessingStep`3.ContinueWith``1(System.Func{`1,System.Func{``0,System.Threading.Tasks.Task{`2}},System.Threading.Tasks.Task{`2}})">
@@ -3587,7 +3603,7 @@
         </member>
         <member name="M:DotLogix.Core.Patterns.WrappedProcessingStep`4.#ctor(DotLogix.Core.Patterns.ProcessingStep{`0,`3},DotLogix.Core.Patterns.ProcessingStep{`1,`2,`3})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Patterns.WrappedProcessingStep`4"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Patterns.WrappedProcessingStep`4"/>
             </summary>
             <param name="head"></param>
             <param name="tail"></param>
@@ -3654,7 +3670,7 @@
         </member>
         <member name="M:DotLogix.Core.Plugins.PluginAssembly`1.#ctor(System.String)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Plugins.PluginAssembly`1"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Plugins.PluginAssembly`1"/>
             </summary>
             <param name="file"></param>
         </member>
@@ -3672,14 +3688,14 @@
         </member>
         <member name="M:DotLogix.Core.Plugins.PluginFactory.LoadPlugins``1(System.String,System.String,System.IO.SearchOption)">
             <summary>
-            Load all matching plugin types and create an instance of the matching types
+            Load all matching plugin types and create a new instance of the matching types
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
         <member name="M:DotLogix.Core.Plugins.PluginFactory.LoadPlugins``1(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
-            Load all matching plugin types and create an instance of the matching types
+            Load all matching plugin types and create a new instance of the matching types
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>
@@ -3880,7 +3896,7 @@
         </member>
         <member name="M:DotLogix.Core.Reflection.Dynamics.DynamicAccessor.#ctor(System.Reflection.MemberInfo,DotLogix.Core.Reflection.Dynamics.DynamicSetter,DotLogix.Core.Reflection.Dynamics.DynamicGetter,System.Type,DotLogix.Core.Reflection.Dynamics.AccessorTypes)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Reflection.Dynamics.DynamicAccessor"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Reflection.Dynamics.DynamicAccessor"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Dynamics.DynamicAccessor.SetValue(System.Object)">
@@ -3964,7 +3980,7 @@
         </member>
         <member name="M:DotLogix.Core.Reflection.Dynamics.DynamicCtor.Invoke(System.Object[])">
             <summary>
-            Invoke the constructor and create an instance
+            Invoke the constructor and create a new instance
             </summary>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
@@ -4237,7 +4253,7 @@
         </member>
         <member name="M:DotLogix.Core.Reflection.Dynamics.DynamicType.#ctor(System.Type,System.Reflection.MemberTypes)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Reflection.Dynamics.DynamicType"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Reflection.Dynamics.DynamicType"/>
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Dynamics.DynamicType.ToString">
@@ -4654,7 +4670,12 @@
                 an int32.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Ldelema(System.Type)" -->
+        <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Ldelema(System.Type)">
+            <summary>
+                Loads the address of the array element at a specified array index onto the top of the evaluation stack as type
+                &amp;(managed pointer).
+            </summary>
+        </member>
         <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Stelem(System.Type)">
             <summary>
                 Replaces the array element at a given index with the value on the evaluation stack, whose type is specified in
@@ -5175,7 +5196,12 @@
                 Copies a specified number bytes from a source address to a destination address.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Cpobj(System.Type)" -->
+        <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Cpobj(System.Type)">
+            <summary>
+                Copies the value type located at the address of an object (type &amp;, * or native int) to the address of the
+                destination object (type &amp;, * or native int).
+            </summary>
+        </member>
         <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Dup">
             <summary>
                 Copies the current topmost value on the evaluation stack, and then pushes the copy onto the evaluation stack.
@@ -5277,7 +5303,7 @@
         </member>
         <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Mkrefany(System.Type)">
             <summary>
-                Pushes a typed reference to an instance of a specific type onto the evaluation stack.
+                Pushes a typed reference to a new instance of a specific type onto the evaluation stack.
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Refanytype">
@@ -5285,7 +5311,11 @@
                 Retrieves the type token embedded in a typed reference.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Refanyval(System.Type)" -->
+        <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Refanyval(System.Type)">
+            <summary>
+                Retrieves the address (type &amp;) embedded in a typed reference.
+            </summary>
+        </member>
         <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Ldfld(System.Reflection.FieldInfo)">
             <summary>
                 Finds the value of a field in the object whose reference is currently on the evaluation stack.
@@ -5727,7 +5757,7 @@
         </member>
         <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Isinst(System.Type)">
             <summary>
-                Tests whether an object reference (type O) is an instance of a particular class.
+                Tests whether an object reference (type O) is a new instance of a particular class.
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Ldnull">
@@ -6468,7 +6498,7 @@
         </member>
         <member name="M:DotLogix.Core.Tracking.Manager.ChangeTrackingEntryManager.#ctor(DotLogix.Core.Tracking.Snapshots.ISnapshotFactory,DotLogix.Core.Reflection.Dynamics.DynamicAccessor)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Tracking.Manager.ChangeTrackingEntryManager"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Tracking.Manager.ChangeTrackingEntryManager"/>
             </summary>
         </member>
         <member name="P:DotLogix.Core.Tracking.Manager.ChangeTrackingEntryManager.Entries">
@@ -6797,7 +6827,7 @@
         </member>
         <member name="M:DotLogix.Core.Types.DataTypeConverter.GetDataType(System.Object)">
             <summary>
-            Get a data type of an instance
+            Get a data type of a new instance
             </summary>
         </member>
         <member name="M:DotLogix.Core.Types.DataTypeConverter.GetDataType(System.Type)">
@@ -7038,7 +7068,7 @@
         </member>
         <member name="M:DotLogix.Core.Utils.IInstantiator.GetInstance">
             <summary>
-            Get or create an instance
+            Get or create a new instance
             </summary>
         </member>
         <member name="T:DotLogix.Core.Utils.IArgsInstantiator">
@@ -7048,7 +7078,7 @@
         </member>
         <member name="M:DotLogix.Core.Utils.IArgsInstantiator.GetInstance(System.Object[])">
             <summary>
-            Get or create an instance
+            Get or create a new instance
             </summary>
         </member>
         <member name="T:DotLogix.Core.Utils.Instantiator">
@@ -7309,7 +7339,7 @@
         </member>
         <member name="M:DotLogix.Core.Utils.Patterns.RegexPatternType.#ctor(System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String})">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Utils.Patterns.RegexPatternType"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Utils.Patterns.RegexPatternType"/>
             </summary>
             <param name="name">The type name</param>
             <param name="defaultVariant">The default variant</param>
@@ -7317,7 +7347,7 @@
         </member>
         <member name="M:DotLogix.Core.Utils.Patterns.RegexPatternType.#ctor(System.String,System.String)">
             <summary>
-            Creates an instance of <see cref="T:DotLogix.Core.Utils.Patterns.RegexPatternType"/>
+            Creates a new instance of <see cref="T:DotLogix.Core.Utils.Patterns.RegexPatternType"/>
             </summary>
             <param name="name">The type name</param>
             <param name="pattern">The regex pattern</param>

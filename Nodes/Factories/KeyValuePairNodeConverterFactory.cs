@@ -13,7 +13,11 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Factories {
+    /// <summary>
+    /// An implementation of the <see cref="INodeConverterFactory"/> for key value pairs
+    /// </summary>
     public class KeyValuePairNodeConverterFactory : NodeConverterFactoryBase {
+        /// <inheritdoc />
         public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
             converter = null;
 

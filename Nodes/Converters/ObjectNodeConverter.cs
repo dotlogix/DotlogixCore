@@ -17,13 +17,22 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert objects
+    /// </summary>
     public class ObjectNodeConverter : NodeConverter {
         private readonly DynamicAccessor[] _accessorsToRead;
         private readonly DynamicAccessor[] _accessorsToWrite;
         private readonly DynamicCtor _ctor;
         private readonly bool _isDefaultCtor;
+        /// <summary>
+        /// The dynamic type
+        /// </summary>
         public DynamicType DynamicType { get; }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="ObjectNodeConverter"/>
+        /// </summary>
         public ObjectNodeConverter(DataType dataType, AccessorTypes accessorTypes,
                                    bool useReadonly) : base(dataType) {
             var accessorMemberTypes = GetAccessorMemberTypes(accessorTypes);
@@ -75,6 +84,7 @@ namespace DotLogix.Core.Nodes.Converters {
             return memberTypes;
         }
 
+        /// <inheritdoc />
         public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
             var task = writer.BeginMapAsync(rootName);
             if(task.IsCompleted == false)
@@ -89,6 +99,7 @@ namespace DotLogix.Core.Nodes.Converters {
                 await task;
         }
 
+        /// <inheritdoc />
         public override object ConvertToObject(Node node, ConverterSettings settings) {
             if(!(node is NodeMap nodeMap))
                 throw new ArgumentException("Node is not a NodeMap");

@@ -47,7 +47,7 @@ namespace DotLogix.Core.Plugins {
         public Exception LastError { get; private set; }
 
         /// <summary>
-        /// Creates an instance of <see cref="PluginAssembly{T}"/>
+        /// Creates a new instance of <see cref="PluginAssembly{T}"/>
         /// </summary>
         /// <param name="file"></param>
         public PluginAssembly(string file) {

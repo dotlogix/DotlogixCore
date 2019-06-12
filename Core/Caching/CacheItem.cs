@@ -29,7 +29,7 @@ namespace DotLogix.Core.Caching {
         public ICachePolicy Policy { get; }
 
         /// <summary>
-        /// Creates an instance of <see cref="CacheItem{TKey,TValue}"/>
+        /// Creates a new instance of <see cref="CacheItem{TKey,TValue}"/>
         /// </summary>
         /// <param name="key">The key</param>
         /// <param name="value">The value</param>

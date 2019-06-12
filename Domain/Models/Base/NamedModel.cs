@@ -11,7 +11,11 @@ using DotLogix.Architecture.Common.Options;
 #endregion
 
 namespace DotLogix.Architecture.Domain.Models.Base {
+    /// <summary>
+    /// An implementation of the <see cref="IModel"/> and the <see cref="INamed"/> interface
+    /// </summary>
     public abstract class NamedModel : Model, INamed {
+        /// <inheritdoc />
         public string Name { get; set; }
     }
 }

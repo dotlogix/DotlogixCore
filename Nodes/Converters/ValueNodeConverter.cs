@@ -15,13 +15,21 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert primitives
+    /// </summary>
     public class ValueNodeConverter : NodeConverter {
+        /// <summary>
+        /// Creates a new instance of <see cref="ValueNodeConverter"/>
+        /// </summary>
         public ValueNodeConverter(DataType dynamicType) : base(dynamicType) { }
 
+        /// <inheritdoc />
         public override ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
             return writer.WriteValueAsync(rootName, instance);
         }
 
+        /// <inheritdoc />
         public override object ConvertToObject(Node node, ConverterSettings settings) {
             if(node.Type == NodeTypes.Empty)
                 return Type.GetDefaultValue();

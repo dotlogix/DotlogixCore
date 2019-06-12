@@ -88,7 +88,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <returns></returns>
         public object Invoke(object instance, params object[] parameters) {
             if((instance == null) && ((Access & AccessModifiers.Static) == 0))
-                throw new ArgumentNullException(nameof(instance), "Can not read value without an instance");
+                throw new ArgumentNullException(nameof(instance), "Can not read value without a new instance");
 
             var parameterCount = ParameterCount;
             if(parameters.Length >= parameterCount)

@@ -11,7 +11,11 @@ using DotLogix.Architecture.Common.Options;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Entities.Base {
+    /// <summary>
+    /// A simple entity implementing the <see cref="IEntity"/> and the <see cref="INamed"/> interface
+    /// </summary>
     public abstract class NamedEntity : Entity, INamed {
+        /// <inheritdoc />
         public string Name { get; set; }
     }
 }

@@ -15,37 +15,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Tracking.Snapshots;
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
-    public interface IQueryInterceptor {
-        IQuery<TValue> BeforeExecute<TValue>(IQuery<TValue> query);
-        TResult AfterExecute<TResult>(TResult result);
-    }
-
-    public class QueryInterceptor : IQueryInterceptor {
-        private Func<object, object> BeforeExecuteFunc { get; }
-        private Func<object, object> AfterExecuteFunc { get; }
-
-        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
-        public QueryInterceptor(Func<object, object> beforeExecuteFunc, Func<object, object> afterExecuteFunc) {
-            BeforeExecuteFunc = beforeExecuteFunc;
-            AfterExecuteFunc = afterExecuteFunc;
-        }
-
-        public IQuery<TValue> BeforeExecute<TValue>(IQuery<TValue> query) {
-            return BeforeExecuteFunc != null ? (IQuery<TValue>)BeforeExecuteFunc(query) : query;
-        }
-
-        public TResult AfterExecute<TResult>(TResult result) {
-            return AfterExecuteFunc != null ? (TResult)AfterExecuteFunc(result) : result;
-        }
-    }
-
-
+    /// <summary>
+    /// A static class providing extension methods for <see cref="IQuery{T}"/>
+    /// </summary>
     public static class QueryExtensions {
         #region Any
-
         public static Task<bool> AnyAsync<TSource>(this IQuery<TSource> source, CancellationToken cancellationToken = default) {
             return source.QueryExecutor.AnyAsync(cancellationToken);
         }

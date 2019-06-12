@@ -83,7 +83,6 @@ namespace DotLogix.Core.Patterns {
         /// Add a pipeline step after the current
         /// </summary>
         /// <param name="next"></param>
-        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public ProcessingStep<TIn, TNext, TResult> ContinueWith(Func<TNext, Func<TNext, Task<TResult>>, Task<TResult>> next) {
             return ContinueWith<TNext>(next);

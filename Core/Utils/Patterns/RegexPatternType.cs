@@ -24,7 +24,7 @@ namespace DotLogix.Core.Utils.Patterns {
         protected IReadOnlyDictionary<string, string> PatternVariants { get; }
 
         /// <summary>
-        /// Creates an instance of <see cref="RegexPatternType"/>
+        /// Creates a new instance of <see cref="RegexPatternType"/>
         /// </summary>
         /// <param name="name">The type name</param>
         /// <param name="defaultVariant">The default variant</param>
@@ -36,7 +36,7 @@ namespace DotLogix.Core.Utils.Patterns {
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="RegexPatternType"/>
+        /// Creates a new instance of <see cref="RegexPatternType"/>
         /// </summary>
         /// <param name="name">The type name</param>
         /// <param name="pattern">The regex pattern</param>

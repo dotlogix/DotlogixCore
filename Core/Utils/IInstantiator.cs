@@ -6,7 +6,7 @@ namespace DotLogix.Core.Utils {
     /// </summary>
     public interface IInstantiator {
         /// <summary>
-        /// Get or create an instance
+        /// Get or create a new instance
         /// </summary>
         object GetInstance();
     }
@@ -16,7 +16,7 @@ namespace DotLogix.Core.Utils {
     /// </summary>
     public interface IArgsInstantiator {
         /// <summary>
-        /// Get or create an instance
+        /// Get or create a new instance
         /// </summary>
         object GetInstance(params object[] args);
     }

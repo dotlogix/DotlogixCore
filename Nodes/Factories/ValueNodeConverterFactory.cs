@@ -12,7 +12,11 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Factories {
+    /// <summary>
+    /// An implementation of the <see cref="INodeConverterFactory"/> for primitives
+    /// </summary>
     public class ValueNodeConverterFactory : NodeConverterFactoryBase {
+        /// <inheritdoc />
         public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
             converter = null;
             if(nodeType != NodeTypes.Value)

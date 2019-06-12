@@ -17,6 +17,9 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeWriter"/> interface to write json text
+    /// </summary>
     public class JsonNodeWriter : NodeWriterBase {
         private readonly StringBuilder _builder;
         private readonly TextWriter _writer;
@@ -24,6 +27,9 @@ namespace DotLogix.Core.Nodes.Processor {
         private readonly JsonFormatterSettings _formatterSettings;
         private bool _isFirstChild = true;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonNodeReader"/>
+        /// </summary>
         public JsonNodeWriter(TextWriter writer, JsonFormatterSettings formatterSettings = null, int bufferSize = 100) : base(formatterSettings ?? JsonFormatterSettings.Default) {
             _writer = writer;
             _bufferSize = bufferSize;
@@ -32,6 +38,7 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
 
+        /// <inheritdoc />
         public override async ValueTask BeginMapAsync(string name) {
             CheckName(name, out var appendName);
 
@@ -57,6 +64,7 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
+        /// <inheritdoc />
         public override async ValueTask EndMapAsync() {
             PopExpectedContainer(NodeContainerType.Map);
             _isFirstChild = false;
@@ -73,6 +81,7 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
+        /// <inheritdoc />
         public override async ValueTask BeginListAsync(string name) {
             CheckName(name, out var appendName);
 
@@ -98,6 +107,7 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
+        /// <inheritdoc />
         public override async ValueTask EndListAsync() {
             PopExpectedContainer(NodeContainerType.List);
             _isFirstChild = false;
@@ -114,6 +124,7 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
+        /// <inheritdoc />
         public override async ValueTask WriteValueAsync(string name, object value) {
             CheckName(name, out var appendName);
 

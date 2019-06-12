@@ -38,7 +38,7 @@ namespace DotLogix.Core.Collections {
         public TValue this[TKey key] => InnerDictionary[key];
 
         /// <summary>
-        /// Creates an instance of <see cref="KeyedCollection{TKey,TValue}"/>
+        /// Creates a new instance of <see cref="KeyedCollection{TKey,TValue}"/>
         /// </summary>
         /// <param name="keySelector">The key selector</param>
         public KeyedCollection(Func<TValue, TKey> keySelector) {
@@ -47,7 +47,7 @@ namespace DotLogix.Core.Collections {
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="KeyedCollection{TKey,TValue}"/>
+        /// Creates a new instance of <see cref="KeyedCollection{TKey,TValue}"/>
         /// </summary>
         /// <param name="keySelector">The key selector</param>
         /// <param name="values">The initial values</param>
@@ -57,7 +57,7 @@ namespace DotLogix.Core.Collections {
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="KeyedCollection{TKey,TValue}"/>
+        /// Creates a new instance of <see cref="KeyedCollection{TKey,TValue}"/>
         /// </summary>
         /// <param name="keySelector">The key selector</param>
         /// <param name="equalityComparer">The equality comparer</param>
@@ -67,7 +67,7 @@ namespace DotLogix.Core.Collections {
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="KeyedCollection{TKey,TValue}"/>
+        /// Creates a new instance of <see cref="KeyedCollection{TKey,TValue}"/>
         /// </summary>
         /// <param name="keySelector">The key selector</param>
         /// <param name="equalityComparer">The equality comparer</param>

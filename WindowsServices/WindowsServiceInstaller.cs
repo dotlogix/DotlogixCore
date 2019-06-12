@@ -13,13 +13,31 @@ using System.ServiceProcess;
 #endregion
 
 namespace DotLogix.Core.WindowsServices {
+    /// <summary>
+    /// The internal service installer
+    /// </summary>
     [RunInstaller(true)]
     public abstract class WindowsServiceInstaller : Installer {
+        /// <summary>
+        /// The service name
+        /// </summary>
         public string ServiceName { get; }
+        /// <summary>
+        /// The service start mode
+        /// </summary>
         public ServiceStartMode StartMode { get; }
+        /// <summary>
+        /// The service account
+        /// </summary>
         public ServiceAccount Account { get; }
+        /// <summary>
+        /// A flag to determine if the service should start after installation
+        /// </summary>
         public bool RunAfterInstallation { get; }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="WindowsServiceInstaller"/>
+        /// </summary>
         protected WindowsServiceInstaller(string serviceName, ServiceStartMode startMode = ServiceStartMode.Automatic, ServiceAccount account = ServiceAccount.LocalSystem, bool runAfterInstallation = true) {
             ServiceName = serviceName;
             StartMode = startMode;
@@ -42,7 +60,13 @@ namespace DotLogix.Core.WindowsServices {
                 AfterInstall += ServerInstaller_AfterInstall;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ServerInstaller_AfterInstall(object sender, InstallEventArgs e) {
+            if(!RunAfterInstallation)
+                return;
+
             using(var sc = new ServiceController(ServiceName))
                 sc.Start();
         }

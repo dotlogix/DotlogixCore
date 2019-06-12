@@ -56,14 +56,14 @@ namespace DotLogix.Core.Collections {
         private TCollection this[TKey key] => _innerDictionary[key];
 
         /// <summary>
-        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
+        /// Creates a new instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup(int capacity, Func<TCollection> instantiateFunc) {
             _instantiateFunc = instantiateFunc;
             _innerDictionary = new Dictionary<TKey, TCollection>(capacity);
         }
         /// <summary>
-        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
+        /// Creates a new instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup(Func<TCollection> instantiateFunc) {
             _instantiateFunc = instantiateFunc;
@@ -71,7 +71,7 @@ namespace DotLogix.Core.Collections {
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
+        /// Creates a new instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup(IEqualityComparer<TKey> comparer, Func<TCollection> instantiateFunc) {
             _instantiateFunc = instantiateFunc;
@@ -79,7 +79,7 @@ namespace DotLogix.Core.Collections {
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
+        /// Creates a new instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup(int capacity, IEqualityComparer<TKey> comparer, Func<TCollection> instantiateFunc) {
             _instantiateFunc = instantiateFunc;
@@ -184,6 +184,7 @@ namespace DotLogix.Core.Collections {
         ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
         /// </summary>
         /// <param name="key">The key of the element to remove.</param>
+        /// <param name="value">The key of the element to remove.</param>
         /// <returns>
         ///     true if the element is successfully removed; otherwise, false.  This method also returns false if
         ///     <paramref name="key">key</paramref> was not found in the original
@@ -221,21 +222,21 @@ namespace DotLogix.Core.Collections {
     /// <typeparam name="TValue"></typeparam>
     public class MutableLookup<TKey, TValue> : MutableLookup<TKey, TValue, List<TValue>> {
         /// <summary>
-        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
+        /// Creates a new instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup() : base(CreateCollection) { }
         /// <summary>
-        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
+        /// Creates a new instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup(int capacity) : base(capacity, CreateCollection) { }
 
         /// <summary>
-        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
+        /// Creates a new instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup(IEqualityComparer<TKey> comparer) : base(comparer, CreateCollection) { }
 
         /// <summary>
-        /// Creates an instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
+        /// Creates a new instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>
         /// </summary>
         public MutableLookup(int capacity, IEqualityComparer<TKey> comparer) : base(capacity, comparer, CreateCollection) { }
 

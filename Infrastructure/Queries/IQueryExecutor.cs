@@ -14,9 +14,14 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries {
+    /// <summary>
+    /// An interface to represent a query executor
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IQueryExecutor<T> {
         #region To
 

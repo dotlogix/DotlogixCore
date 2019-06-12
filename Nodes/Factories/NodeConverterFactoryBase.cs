@@ -14,7 +14,11 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Factories {
+    /// <summary>
+    /// An base class implementation of the <see cref="INodeConverterFactory"/>
+    /// </summary>
     public abstract class NodeConverterFactoryBase : INodeConverterFactory {
+        /// <inheritdoc />
         public IAsyncNodeConverter CreateConverter(NodeTypes nodeType, DataType dataType) {
             if(TryCreateConverter(nodeType, dataType, out var converter))
                 return converter;
@@ -22,6 +26,7 @@ namespace DotLogix.Core.Nodes.Factories {
             throw new InvalidOperationException($"Can not create converter for type {dataType.Type.GetFriendlyName()}");
         }
 
+        /// <inheritdoc />
         public abstract bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter);
     }
 }

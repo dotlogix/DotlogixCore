@@ -10,7 +10,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Utils.Patterns;
 #endregion
 
 namespace DotLogix.Core.Nodes {
@@ -43,7 +45,10 @@ namespace DotLogix.Core.Nodes {
         #endregion
 
         protected override void AddMatchingNodes(string pattern, List<Node> newResults) {
-            if(_nodeMap.TryGetValue(pattern, out var node))
+            if (pattern.StartsWith("<$") && pattern.EndsWith("$>")) {
+                var regex = new Regex(pattern.Substring(2, pattern.Length - 4));
+                newResults.AddRange(_nodeMap.Values.Where(n => regex.IsMatch(n.Name)));
+            }else if(_nodeMap.TryGetValue(pattern, out var node))
                 newResults.Add(node);
         }
 

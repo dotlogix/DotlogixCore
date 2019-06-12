@@ -46,7 +46,7 @@ namespace DotLogix.Core {
         public TValue Value { get; }
 
         /// <summary>
-        /// Creates an instance of <see cref="Optional{TValue}"/>
+        /// Creates a new instance of <see cref="Optional{TValue}"/>
         /// </summary>
         /// <param name="value"></param>
         public Optional(TValue value) {

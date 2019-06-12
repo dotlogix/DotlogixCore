@@ -22,7 +22,7 @@ namespace DotLogix.Core.Diagnostics {
         private readonly ConsoleLogMessageFormatter _formatter;
 
         /// <summary>
-        /// Creates an instance of <see cref="ConsoleLogger"/>
+        /// Creates a new instance of <see cref="ConsoleLogger"/>
         /// </summary>
         /// <param name="consoleWidth"></param>
         /// <param name="consoleHeight"></param>

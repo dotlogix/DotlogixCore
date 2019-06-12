@@ -12,15 +12,27 @@ using DotLogix.Architecture.Infrastructure.Repositories.Provider;
 #endregion
 
 namespace DotLogix.Architecture.Domain.UoW {
+    /// <summary>
+    /// An implementation of the <see cref="IUnitOfWork"/>
+    /// </summary>
     public class UnitOfWork : IUnitOfWork {
+        /// <summary>
+        /// The internal <see cref="IEntityContextFactory"/>
+        /// </summary>
         protected IEntityContextFactory EntityContextFactory { get; }
+        /// <summary>
+        /// The internal <see cref="IRepositoryProvider"/>
+        /// </summary>
         protected IRepositoryProvider RepoProvider { get; }
-
+        /// <summary>
+        /// Create a new instance of <see cref="UnitOfWork"/>
+        /// </summary>
         public UnitOfWork(IEntityContextFactory entityContextFactory, IRepositoryProvider repoProvider) {
             EntityContextFactory = entityContextFactory;
             RepoProvider = repoProvider;
         }
 
+        /// <inheritdoc />
         public virtual IUnitOfWorkContext BeginContext() {
             var entityContext = EntityContextFactory.Create();
             return new UnitOfWorkContext(entityContext, RepoProvider);

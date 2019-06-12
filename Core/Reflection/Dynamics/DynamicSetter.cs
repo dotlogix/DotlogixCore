@@ -48,7 +48,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <returns></returns>
         public void SetValue(object instance, object value) {
             if((instance == null) && ((Access & AccessModifiers.Static) == 0))
-                throw new ArgumentNullException(nameof(instance), "Can not set value without an instance");
+                throw new ArgumentNullException(nameof(instance), "Can not set value without a new instance");
 
             SetterDelegate.Invoke(instance, value);
         }

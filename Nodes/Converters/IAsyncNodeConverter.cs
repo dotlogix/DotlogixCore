@@ -14,10 +14,26 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// An interface to represent a node converter
+    /// </summary>
     public interface IAsyncNodeConverter {
+        /// <summary>
+        /// The type
+        /// </summary>
         Type Type { get; }
+        /// <summary>
+        /// The data type
+        /// </summary>
         DataType DataType { get; }
+        /// <summary>
+        /// Write the value to the node writer
+        /// </summary>
         ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer);
+
+        /// <summary>
+        /// Convert the node to an object of the target type
+        /// </summary>
         object ConvertToObject(Node node, ConverterSettings settings);
     }
 }

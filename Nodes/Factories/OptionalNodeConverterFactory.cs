@@ -14,7 +14,11 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Factories {
+    /// <summary>
+    /// An implementation of the <see cref="INodeConverterFactory"/> for optional values
+    /// </summary>
     public class OptionalNodeConverterFactory : NodeConverterFactoryBase {
+        /// <inheritdoc />
         public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
             if(dataType.Type.IsAssignableToOpenGeneric(typeof(Optional<>), out var genericTypeArguments)) {
                 var collectionConverterType = typeof(OptionalNodeConverter<>).MakeGenericType(genericTypeArguments);

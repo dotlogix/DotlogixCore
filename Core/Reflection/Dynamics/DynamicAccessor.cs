@@ -63,7 +63,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
 
 
         /// <summary>
-        /// Creates an instance of <see cref="DynamicAccessor"/>
+        /// Creates a new instance of <see cref="DynamicAccessor"/>
         /// </summary>
         protected DynamicAccessor(MemberInfo memberInfo, DynamicSetter setter, DynamicGetter getter, Type valueType, AccessorTypes accessorType) {
             MemberInfo = memberInfo ?? throw new ArgumentNullException(nameof(memberInfo));

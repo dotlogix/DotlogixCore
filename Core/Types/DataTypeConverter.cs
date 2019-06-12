@@ -29,7 +29,7 @@ namespace DotLogix.Core.Types {
         }
 
         /// <summary>
-        /// Get a data type of an instance
+        /// Get a data type of a new instance
         /// </summary>
         public DataType GetDataType(object instance) {
             return GetDataType(instance?.GetType());

@@ -7,5 +7,8 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Domain.Services {
+    /// <summary>
+    /// A non generic marker interface for domain services
+    /// </summary>
     public interface IDomainService { }
 }

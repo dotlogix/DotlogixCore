@@ -22,6 +22,7 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
     public abstract class RouteAttribute : Attribute {
         public string Pattern { get; }
         public int Priority { get; set; }
+        public bool IsRooted { get; set; }
 
         protected RouteAttribute(string pattern, int priority = 0) {
             Priority = priority;
@@ -33,6 +34,7 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
             var acceptedMethods = GetAcceptedHttpMethods(dynamicInvoke);
 
             var route = CreateRoute(routeIndex, pattern, acceptedMethods, requestProcessor);
+            route.IsRooted |= IsRooted;
             RegisterInitialProcessors(route);
             return route;
         }

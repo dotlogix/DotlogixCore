@@ -70,7 +70,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
         /// <summary>
         /// Get all entities matching an expression
         /// </summary>
-        public virtual Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
+        public virtual Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
             return Query().Where(filterExpression).ToEnumerableAsync(cancellationToken);
         }
     }

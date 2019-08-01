@@ -28,21 +28,21 @@ namespace DotLogix.Core.Nodes.Converters {
         public ArrayNodeConverter(DataType type) : base(type) { }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
+        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings) {
             if(!(instance is IEnumerable<T> values))
                 throw new ArgumentException("Instance is not type of IEnumerable<T>");
 
             var task = writer.BeginListAsync(rootName);
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 await task;
             foreach(var value in values) {
-                task = Nodes.WriteToAsync(null, value, _elementType, writer);
-                if(task.IsCompleted == false)
+                task = Nodes.WriteToAsync(null, value, _elementType, writer, settings);
+                if(task.IsCompletedSuccessfully == false)
                     await task;
             }
 
             task = writer.EndListAsync();
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 await task;
         }
 

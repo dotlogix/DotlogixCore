@@ -59,19 +59,22 @@ namespace DotLogix.Core.Nodes {
 
 
         #region WriteTo
-        public static ValueTask WriteToAsync(object instance, IAsyncNodeWriter writer) {
-            return WriteToAsync(null, instance, instance?.GetType(), writer);
+        public static ValueTask WriteToAsync(object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
+            return WriteToAsync(null, instance, instance?.GetType(), writer, settings);
         }
 
-        public static ValueTask WriteToAsync(object instance, Type instanceType, IAsyncNodeWriter writer) {
-            return WriteToAsync(null, instance, instanceType, writer);
+        public static ValueTask WriteToAsync(object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
+            return WriteToAsync(null, instance, instanceType, writer, settings);
         }
 
-        public static ValueTask WriteToAsync(string name, object instance, IAsyncNodeWriter writer) {
-            return WriteToAsync(name, instance, instance?.GetType(), writer);
+        public static ValueTask WriteToAsync(string name, object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
+            return WriteToAsync(name, instance, instance?.GetType(), writer, settings);
         }
 
-        public static ValueTask WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer) {
+        public static ValueTask WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
+            if(settings.ShouldEmitValue(instance) == false)
+                return new ValueTask();
+
             if(instance == null) {
                 return writer.WriteValueAsync(name, null);
             }
@@ -81,11 +84,14 @@ namespace DotLogix.Core.Nodes {
                 return reader.CopyToAsync(writer);
             }
 
+            if(settings.EmitDefinedTypeOnly == false)
+                instanceType = instance.GetType();
+
             if(instanceType == null)
                 throw new ArgumentNullException(nameof(instanceType));
 
             if(TryCreateConverter(instanceType, out var converter))
-                return converter.WriteAsync(instance, name, writer);
+                return converter.WriteAsync(instance, name, writer, settings);
 
             return writer.WriteValueAsync(name, null);
         }
@@ -107,8 +113,11 @@ namespace DotLogix.Core.Nodes {
         internal static Node ToNode(string name, object instance, Type instanceType, ConverterSettings settings = null) {
             if(instance is Node node)
                 return node;
+
+            if(settings == null)
+                settings = ConverterSettings.Default;
             var nodeWriter = new NodeWriter(settings);
-            WriteToAsync(name, instance, instanceType, nodeWriter);
+            WriteToAsync(name, instance, instanceType, nodeWriter, settings);
             return nodeWriter.Root;
         }
         #endregion

@@ -16,12 +16,12 @@ using DotLogix.Architecture.Infrastructure.Queries;
 
 namespace DotLogix.Architecture.Infrastructure.Decorators {
     /// <summary>
-    /// A entity set decorator to disable deletion of entities instead manage existence with the is active flag
+    ///     A entity set decorator to disable deletion of entities instead manage existence with the is active flag
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class InsertOnlyEntitySetDecorator<TEntity> : EntitySetDecoratorBase<TEntity> where TEntity : class, IInsertOnlyEntity {
         /// <summary>
-        /// Creates a new instance of <see cref="InsertOnlyEntitySetDecorator{TEntity}"/>
+        ///     Creates a new instance of <see cref="InsertOnlyEntitySetDecorator{TEntity}" />
         /// </summary>
         public InsertOnlyEntitySetDecorator(IEntitySet<TEntity> baseEntitySet) : base(baseEntitySet) { }
 
@@ -40,14 +40,14 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
         }
 
         /// <summary>
-        /// Mark a single entity as deleted by setting its IsActive flag to false
+        ///     Mark a single entity as deleted by setting its IsActive flag to false
         /// </summary>
         public override void Remove(TEntity entity) {
             entity.IsActive = false;
         }
 
         /// <summary>
-        /// Mark a range of entities as deleted by setting their IsActive flag to false
+        ///     Mark a range of entities as deleted by setting their IsActive flag to false
         /// </summary>
         public override void RemoveRange(IEnumerable<TEntity> entities) {
             foreach(var entity in entities)

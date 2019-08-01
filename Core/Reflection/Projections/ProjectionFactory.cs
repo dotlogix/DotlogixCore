@@ -24,9 +24,13 @@ namespace DotLogix.Core.Reflection.Projections {
         /// </summary>
         public static IProjectionFactory Auto { get; } = new ProjectionFactory();
         /// <summary>
-        /// Try to map as many properties as possible and include an equality check before assignment
+        /// Try to map as many properties as possible and as little as necessary include an equality check before assignment
         /// </summary>
-        public static IProjectionFactory AutoWithEqualityCheck { get; } = new ProjectionFactory();
+        public static IProjectionFactory AutoWithEqualityCheck { get; } = new EqualityCheckProjectionFactory();
+        /// <summary>
+        /// Try to map as many properties as possible and undefined <see cref="Optional{TValue}"/> are ignored include an equality check before assignment
+        /// </summary>
+        public static IProjectionFactory AutoOptional { get; } = new OptionalProjectionFactory();
 
         /// <summary>
         /// Create a new instance of <see cref="ProjectionFactory"/>

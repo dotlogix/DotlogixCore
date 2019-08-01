@@ -6,8 +6,6 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-using System.Threading.Tasks;
-
 namespace DotLogix.Core.Reflection.Projections {
     /// <summary>
     /// An interface for object to object projections

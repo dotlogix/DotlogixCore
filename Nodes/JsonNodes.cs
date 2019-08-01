@@ -34,7 +34,7 @@ namespace DotLogix.Core.Nodes {
         /// </summary>
         public static async ValueTask<TNode> ToNodeAsync<TNode>(TextReader reader) where TNode : Node {
             var task = ToNodeAsync(reader);
-            return (TNode)(task.IsCompleted ? task.Result : await task);
+            return (TNode)(task.IsCompletedSuccessfully ? task.Result : await task);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace DotLogix.Core.Nodes {
         /// </summary>
         public static async ValueTask<TNode> ToNodeAsync<TNode>(Stream stream, Encoding encoding) where TNode : Node {
             var task = ToNodeAsync(stream, encoding);
-            return (TNode)(task.IsCompleted ? task.Result : await task);
+            return (TNode)(task.IsCompletedSuccessfully ? task.Result : await task);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace DotLogix.Core.Nodes {
             var writer = new NodeWriter();
 
             var task = reader.CopyToAsync(writer);
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 task.GetAwaiter().GetResult();
             return writer.Root;
         }
@@ -66,7 +66,7 @@ namespace DotLogix.Core.Nodes {
             var writer = new NodeWriter();
 
             var task = jsonReader.CopyToAsync(writer);
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 await task;
             return writer.Root;
         }
@@ -77,7 +77,7 @@ namespace DotLogix.Core.Nodes {
         public static async ValueTask<Node> ToNodeAsync(Stream stream, Encoding encoding) {
             using(var reader = new StreamReader(stream, encoding ?? Encoding.UTF8)) {
                 var task = ToNodeAsync(reader);
-                return task.IsCompleted ? task.Result : await task;
+                return task.IsCompletedSuccessfully ? task.Result : await task;
             }
         }
         #endregion
@@ -123,7 +123,7 @@ namespace DotLogix.Core.Nodes {
         /// </summary>
         public static string ToJson(object value, Type instanceType, JsonFormatterSettings formatterSettings = null) {
             var task = ToJsonAsync(value, instanceType, formatterSettings);
-            return task.IsCompleted ? task.Result : task.ConfigureAwait(false).GetAwaiter().GetResult();
+            return task.IsCompletedSuccessfully ? task.Result : task.ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace DotLogix.Core.Nodes {
         public static async ValueTask<string> ToJsonAsync(object value, Type instanceType, JsonFormatterSettings formatterSettings = null) {
             using(var writer = new StringWriter(new StringBuilder(StringBuilderCapacity))) {
                 var task = ToJsonAsync(value, instanceType, writer, formatterSettings);
-                if(task.IsCompleted == false)
+                if(task.IsCompletedSuccessfully == false)
                     await task;
                 return writer.ToString();
             }
@@ -165,7 +165,7 @@ namespace DotLogix.Core.Nodes {
         public static async ValueTask ToJsonAsync(object value, Type instanceType, Stream stream, Encoding encoding, JsonFormatterSettings formatterSettings = null) {
             using(var writer = new StreamWriter(stream, encoding)) {
                 var task = ToJsonAsync(value, instanceType, writer, formatterSettings);
-                if(task.IsCompleted == false)
+                if(task.IsCompletedSuccessfully == false)
                     await task;
             }
         }
@@ -181,9 +181,9 @@ namespace DotLogix.Core.Nodes {
                 var nodeReader = new NodeReader(node);
                 task = nodeReader.CopyToAsync(nodeWriter);
             } else {
-                task = Nodes.WriteToAsync(null, value, instanceType, nodeWriter);
+                task = Nodes.WriteToAsync(null, value, instanceType, nodeWriter, formatterSettings);
             }
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 await task;
         }
         #endregion
@@ -201,7 +201,7 @@ namespace DotLogix.Core.Nodes {
         /// </summary>
         public static async ValueTask<TInstance> FromJsonAsync<TInstance>(Stream stream, Encoding encoding, ConverterSettings settings = null) {
             var task = FromJsonAsync(stream, encoding, typeof(TInstance), settings);
-            return (TInstance)(task.IsCompleted ? task.Result : await task);
+            return (TInstance)(task.IsCompletedSuccessfully ? task.Result : await task);
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace DotLogix.Core.Nodes {
         /// </summary>
         public static async ValueTask<TInstance> FromJsonAsync<TInstance>(TextReader reader, ConverterSettings settings = null) {
             var task = FromJsonAsync(reader, typeof(TInstance), settings);
-            return (TInstance)(task.IsCompleted ? task.Result : await task);
+            return (TInstance)(task.IsCompletedSuccessfully ? task.Result : await task);
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace DotLogix.Core.Nodes {
         /// </summary>
         public static async ValueTask<object> FromJsonAsync(TextReader reader, Type instanceType, ConverterSettings settings = null) {
             var task = ToNodeAsync(reader);
-            return (task.IsCompleted ? task.Result : await task).ToObject(instanceType, settings);
+            return (task.IsCompletedSuccessfully ? task.Result : await task).ToObject(instanceType, settings);
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace DotLogix.Core.Nodes {
         public static async ValueTask<object> FromJsonAsync(Stream stream, Encoding encoding, Type instanceType, ConverterSettings settings = null) {
             using(var reader = new StreamReader(stream, encoding ?? Encoding.UTF8)) {
                 var task = FromJsonAsync(reader, instanceType, settings);
-                return task.IsCompleted ? task.Result : await task;
+                return task.IsCompletedSuccessfully ? task.Result : await task;
             }
         }
         #endregion

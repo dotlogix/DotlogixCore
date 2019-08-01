@@ -27,6 +27,12 @@
             The naming strategy (camelCase by default)
             </summary>
         </member>
+        <member name="M:DotLogix.Core.Nodes.ConverterSettings.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Core.Nodes.ConverterSettings.#ctor(DotLogix.Core.Nodes.ConverterSettings)">
+            <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        </member>
         <member name="P:DotLogix.Core.Nodes.ConverterSettings.TimeFormat">
             <summary>
             The time format (u by default)
@@ -47,6 +53,21 @@
             The enum format (D by default)
             </summary>
         </member>
+        <member name="P:DotLogix.Core.Nodes.ConverterSettings.EmitDefault">
+            <summary>
+            Determines if default values should be ignored
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Nodes.ConverterSettings.EmitNull">
+            <summary>
+            Determines if null values should be ignored
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Nodes.ConverterSettings.EmitDefinedTypeOnly">
+            <summary>
+            Determines if only the defined type should be instead of the actual instance type
+            </summary>
+        </member>
         <member name="P:DotLogix.Core.Nodes.ConverterSettings.FormatProvider">
             <summary>
             The format provider (invariant by default)
@@ -63,7 +84,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.ArrayNodeConverter`1"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.ArrayNodeConverter`1.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Converters.ArrayNodeConverter`1.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.ArrayNodeConverter`1.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -80,7 +101,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.CollectionNodeConverter`1"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.CollectionNodeConverter`1.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Converters.CollectionNodeConverter`1.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.CollectionNodeConverter`1.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -101,7 +122,7 @@
             The data type
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <summary>
             Write the value to the node writer
             </summary>
@@ -121,7 +142,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -143,7 +164,7 @@
         <member name="P:DotLogix.Core.Nodes.Converters.NodeConverter.DataType">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.NodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Converters.NodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.NodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -164,7 +185,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.ObjectNodeConverter"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.ObjectNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Converters.ObjectNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.ObjectNodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -181,7 +202,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.OptionalNodeConverter`1"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.OptionalNodeConverter`1.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Converters.OptionalNodeConverter`1.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.OptionalNodeConverter`1.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -197,7 +218,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.ValueNodeConverter"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.ValueNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Converters.ValueNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.ValueNodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -323,6 +344,12 @@
             <summary>
             Creates new json settings
             </summary>
+        </member>
+        <member name="M:DotLogix.Core.Nodes.JsonFormatterSettings.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        </member>
+        <member name="M:DotLogix.Core.Nodes.JsonFormatterSettings.#ctor(DotLogix.Core.Nodes.JsonFormatterSettings)">
+            <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
         </member>
         <member name="P:DotLogix.Core.Nodes.JsonFormatterSettings.Ident">
             <summary>

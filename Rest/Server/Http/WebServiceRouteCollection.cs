@@ -134,7 +134,7 @@ namespace DotLogix.Core.Rest.Server.Http {
                         overwrite |= bestRoute.Priority < webServiceRoute.Priority;
                     }
 
-                    var match = webServiceRoute.Match(httpMethod, unprefixedPath);
+                    var match = webServiceRoute.Match(httpMethod, webServiceRoute.IsRooted ? path : unprefixedPath);
                     if(match.Success == false)
                         continue;
                     

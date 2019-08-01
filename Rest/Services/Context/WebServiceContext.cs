@@ -10,9 +10,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Routes;
+using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Context {
@@ -33,6 +36,14 @@ namespace DotLogix.Core.Rest.Services.Context {
             HttpContext = httpContext;
             Route = route;
             RequestResult = new WebRequestResult(httpContext);
+            var methodDescriptor = route.RequestProcessor?.Descriptors.GetCustomDescriptor<MethodDescriptor>();
+            if(methodDescriptor != null) {
+                var returnType = methodDescriptor.DynamicInvoke.ReturnType;
+                if(returnType.IsAssignableToOpenGeneric(typeof(Task<>), out var arguments))
+                    returnType = arguments[0];
+                RequestResult.ReturnType = returnType;
+            }
+
 
             AsyncCurrent.Value = this;
         }

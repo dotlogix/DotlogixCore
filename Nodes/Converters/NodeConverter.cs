@@ -31,9 +31,10 @@ namespace DotLogix.Core.Nodes.Converters {
         /// <inheritdoc />
         public DataType DataType { get; }
         /// <inheritdoc />
-        public abstract ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer);
+        public abstract ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings);
 
         /// <inheritdoc />
         public abstract object ConvertToObject(Node node, ConverterSettings settings);
+
     }
 }

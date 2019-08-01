@@ -52,8 +52,8 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
         }
 
         /// <inheritdoc />
-        public override Task<IEnumerable<TEnity>> FilterAllAsync(Expression<Func<TEnity, bool>> filterExpression, CancellationToken cancellationToken) {
-            return BaseEntitySet.FilterAllAsync(filterExpression, cancellationToken).ConvertResult(r => (IEnumerable<TEnity>)r.OrderBy(e => e.Order));
+        public override Task<IEnumerable<TEnity>> WhereAsync(Expression<Func<TEnity, bool>> filterExpression, CancellationToken cancellationToken = default) {
+            return BaseEntitySet.WhereAsync(filterExpression, cancellationToken).ConvertResult(r => (IEnumerable<TEnity>)r.OrderBy(e => e.Order));
         }
     }
 }

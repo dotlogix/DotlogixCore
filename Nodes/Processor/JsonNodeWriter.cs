@@ -8,7 +8,6 @@
 
 #region
 using System;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,7 +57,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
             if(_builder.Length >= _bufferSize) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }
@@ -75,7 +74,7 @@ namespace DotLogix.Core.Nodes.Processor {
             
             if(_builder.Length >= _bufferSize || ContainerCount == 0) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }
@@ -101,7 +100,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
             if(_builder.Length >= _bufferSize) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }
@@ -118,7 +117,7 @@ namespace DotLogix.Core.Nodes.Processor {
             
             if(_builder.Length >= _bufferSize || ContainerCount == 0) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }
@@ -142,7 +141,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
             if(_builder.Length >= _bufferSize || ContainerCount == 0) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }

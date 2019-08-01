@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
+using DotLogix.Core;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Decorators {
@@ -33,7 +35,8 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
 
         /// <inheritdoc />
         public override IQuery<TEntity> Query() {
-            return BaseEntitySet.Query();
+            var query = BaseEntitySet.Query();
+            return query;
         }
 
         /// <inheritdoc />

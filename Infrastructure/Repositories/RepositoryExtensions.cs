@@ -22,7 +22,7 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         /// Queries the matching entities and remove them
         /// </summary>
         public static async Task RemoveWhereAsync<TEntity>(this IRepository<TEntity> repository, Expression<Func<TEntity, bool>> filterExpression) where TEntity : class, ISimpleEntity {
-            var entities = await repository.FilterAllAsync(filterExpression);
+            var entities = await repository.WhereAsync(filterExpression);
             repository.RemoveRange(entities);
         }
 

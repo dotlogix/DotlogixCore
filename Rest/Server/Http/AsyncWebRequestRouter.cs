@@ -31,7 +31,7 @@ namespace DotLogix.Core.Rest.Server.Http {
 
         public int RegisteredRoutesCount => ServerRoutes.Count;
 
-        public IAsyncWebRequestResultWriter DefaultResultWriter { get; set; } = WebRequestResultJsonWriter.Instance;
+        public IAsyncWebRequestResultWriter DefaultResultWriter { get; set; } = new WebRequestResultJsonWriter();
 
         #region Helper
         private static async Task ExecuteProcessorsAsync(WebServiceContext webServiceContext, IEnumerable<IWebRequestProcessor> requestProcessors) {

@@ -7,7 +7,6 @@
 // ==================================================
 
 #region
-using System.Linq;
 using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 #endregion

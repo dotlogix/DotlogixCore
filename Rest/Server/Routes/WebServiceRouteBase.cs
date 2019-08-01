@@ -33,6 +33,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
 
         public IWebRequestProcessor RequestProcessor { get; }
         public IAsyncWebRequestResultWriter WebRequestResultWriter { get; set; }
+        public bool IsRooted { get; set; }
         public HttpMethods AcceptedRequests { get; }
         public int RouteIndex { get; }
         public int Priority { get; }

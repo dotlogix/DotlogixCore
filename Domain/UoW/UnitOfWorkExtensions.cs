@@ -41,7 +41,7 @@ namespace DotLogix.Architecture.Domain.UoW {
         /// </summary>
         public static Task<IEnumerable<TEntity>> FilterAllAsync<TEntity, TRepo>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity {
             var repository = context.UseRepository<TRepo>();
-            return repository.FilterAllAsync(filterExpression);
+            return repository.WhereAsync(filterExpression);
         }
         /// <summary>
         /// Get a range of entities by guid
@@ -95,7 +95,7 @@ namespace DotLogix.Architecture.Domain.UoW {
         public static async Task RemoveWhereAsync<TEntity, TRepo>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity
         {
             var repository = context.UseRepository<TRepo>();
-            var entities = await repository.FilterAllAsync(filterExpression);
+            var entities = await repository.WhereAsync(filterExpression);
             if (entities == null)
                 return;
 

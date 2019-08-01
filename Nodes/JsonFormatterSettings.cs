@@ -23,6 +23,15 @@ namespace DotLogix.Core.Nodes {
         /// </summary>
         public new static JsonFormatterSettings Default => new JsonFormatterSettings();
 
+        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        public JsonFormatterSettings() { }
+
+        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        public JsonFormatterSettings(JsonFormatterSettings template) : base(template) {
+            Ident = template.Ident;
+            IdentSize = template.IdentSize;
+        }
+
         /// <summary>
         /// Determines if the json text should be idented
         /// </summary>

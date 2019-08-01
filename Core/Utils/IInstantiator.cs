@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DotLogix.Core.Utils {
+﻿namespace DotLogix.Core.Utils {
     /// <summary>
     /// An interface to instantiate types
     /// </summary>

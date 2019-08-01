@@ -12,7 +12,6 @@ using System.Linq;
 using System.Text;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
-using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Rest.Authentication.Jwt.Algorithms;
 #endregion
 

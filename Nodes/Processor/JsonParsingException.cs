@@ -8,7 +8,6 @@
 
 #region
 using System;
-using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {

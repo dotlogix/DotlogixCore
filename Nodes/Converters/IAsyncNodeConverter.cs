@@ -29,7 +29,7 @@ namespace DotLogix.Core.Nodes.Converters {
         /// <summary>
         /// Write the value to the node writer
         /// </summary>
-        ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer);
+        ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings);
 
         /// <summary>
         /// Convert the node to an object of the target type

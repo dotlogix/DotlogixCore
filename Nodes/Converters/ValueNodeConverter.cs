@@ -25,7 +25,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public ValueNodeConverter(DataType dynamicType) : base(dynamicType) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
+        public override ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings) {
             return writer.WriteValueAsync(rootName, instance);
         }
 

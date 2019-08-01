@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using DotLogix.Core.Extensions;
@@ -20,8 +21,19 @@ namespace DotLogix.Core.Nodes.Factories {
     /// An implementation of the <see cref="INodeConverterFactory"/> for collection types
     /// </summary>
     public class ListNodeConverterFactory : NodeConverterFactoryBase {
+        private static readonly Dictionary<Type, Type> _interfaceRemapping = new Dictionary<Type, Type> {
+                                                                                                  {typeof(IEnumerable), typeof(List<>) },
+                                                                                                  {typeof(IEnumerable<>), typeof(List<>) },
+                                                                                                  {typeof(ICollection), typeof(List<>) },
+                                                                                                  {typeof(ICollection<>), typeof(List<>) },
+                                                                                                  {typeof(IList), typeof(List<>) },
+                                                                                                  {typeof(IList<>), typeof(List<>) },
+                                                                                                  {typeof(IReadOnlyList<>), typeof(List<>) },
+                                                                                                  {typeof(IDictionary<,>), typeof(Dictionary<,>) },
+                                                                                                  {typeof(IReadOnlyDictionary<,>), typeof(Dictionary<,>) },
+                                                                                                  };
+
         private static readonly HashSet<Type> StandardOpenGenerics = new HashSet<Type> {
-                                                                                           typeof(IEnumerable<>),
                                                                                            typeof(Collection<>),
                                                                                            typeof(List<>),
                                                                                            typeof(Dictionary<,>),
@@ -42,9 +54,15 @@ namespace DotLogix.Core.Nodes.Factories {
                 converter = CreateArrayConverter(dataType);
             else if(type.IsGenericType) {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
-                if(genericTypeDefinition == typeof(IEnumerable<>))
-                    converter = CreateArrayConverter(dataType);
-                else if(StandardOpenGenerics.Contains(genericTypeDefinition) || type.IsAssignableToOpenGeneric(typeof(ICollection<>)))
+                if (type.IsInterface) {
+                    if(_interfaceRemapping.TryGetValue(genericTypeDefinition, out var mappedType) == false)
+                        return false;
+                    var genericArguments = type.GetGenericArguments();
+                    type = mappedType.MakeGenericType(genericArguments);
+                    dataType = type.ToDataType();
+                }
+
+                if(StandardOpenGenerics.Contains(genericTypeDefinition) || type.IsAssignableToOpenGeneric(typeof(ICollection<>)))
                     converter = CreateCollectionConverter(dataType);
                 else
                     return false;

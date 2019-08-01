@@ -18,21 +18,20 @@ using DotLogix.Core.Rest.Services.Attributes.Descriptors;
 using DotLogix.Core.Rest.Services.Attributes.Events;
 using DotLogix.Core.Rest.Services.Attributes.ResultWriter;
 using DotLogix.Core.Rest.Services.Attributes.Routes;
-using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
     public class WebServiceHost {
-        private readonly AsyncWebRequestRouter _router;
+        public AsyncWebRequestRouter Router { get; }
         private int _currentRouteIndex;
         public IAsyncHttpServer Server { get; }
-        public WebRequestProcessorCollection GlobalPreProcessors => _router.GlobalPreProcessors;
-        public WebRequestProcessorCollection GlobalPostProcessors => _router.GlobalPostProcessors;
-        public WebServiceEventCollection ServerEvents => _router.ServerEvents;
+        public WebRequestProcessorCollection GlobalPreProcessors => Router.GlobalPreProcessors;
+        public WebRequestProcessorCollection GlobalPostProcessors => Router.GlobalPostProcessors;
+        public WebServiceEventCollection ServerEvents => Router.ServerEvents;
 
         public WebServiceHost(Configuration configuration = null) {
-            _router = new AsyncWebRequestRouter();
-            Server = new AsyncHttpServer(_router, configuration);
+            Router = new AsyncWebRequestRouter();
+            Server = new AsyncHttpServer(Router, configuration);
         }
 
         public WebServiceHost(string urlPrefix, Configuration configuration = null) : this(configuration) {
@@ -44,7 +43,7 @@ namespace DotLogix.Core.Rest.Services {
         }
 
         public void Start() {
-            Log.Info($"HttpServer started with {_router.RegisteredRoutesCount} routes");
+            Log.Info($"HttpServer started with {Router.RegisteredRoutesCount} routes");
             Server.Start();
         }
 
@@ -53,14 +52,10 @@ namespace DotLogix.Core.Rest.Services {
             Server.Stop();
         }
 
-        public void SetDefaultResultWriter(IAsyncWebRequestResultWriter writer) {
-            _router.DefaultResultWriter = writer;
-        }
-
 
         #region Events
         public Task TriggerEventAsync(string name, WebServiceEventArgs eventArgs) {
-            if(_router.ServerEvents.TryGet(name, out var webServiceEvent) == false)
+            if(Router.ServerEvents.TryGet(name, out var webServiceEvent) == false)
                 throw new ArgumentException($"Event {name} is not defined", nameof(name));
 
             return webServiceEvent.TriggerAsync(this, eventArgs);
@@ -97,7 +92,7 @@ namespace DotLogix.Core.Rest.Services {
                     serviceRoute.WebRequestResultWriter = resultWriterAttribute.CreateResultWriter();
 
 
-                _router.ServerRoutes.Add(serviceInstance.RoutePrefix ?? "",serviceRoute);
+                Router.ServerRoutes.Add(serviceInstance.RoutePrefix ?? "",serviceRoute);
                 count++;
             }
             if(count > 0)
@@ -113,7 +108,7 @@ namespace DotLogix.Core.Rest.Services {
 
                 var serviceEvent = eventAttribute.CreateEvent();
 
-                if(_router.ServerEvents.TryAdd(serviceEvent) == false)
+                if(Router.ServerEvents.TryAdd(serviceEvent) == false)
                     throw new InvalidOperationException($"An event with name {serviceEvent.Name} is already defined");
 
                 async void TriggerEvent(object sender, WebServiceEventArgs args) => await serviceEvent.TriggerAsync(sender, args);

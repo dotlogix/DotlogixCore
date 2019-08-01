@@ -10,10 +10,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Authentication.Jwt.Algorithms;
 using DotLogix.Core.Rest.Server.Http;

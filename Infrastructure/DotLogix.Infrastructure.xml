@@ -127,7 +127,7 @@
             Creates a new instance of <see cref="T:DotLogix.Architecture.Infrastructure.Decorators.IndexedEntitySetDecorator`1"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Infrastructure.Decorators.IndexedEntitySetDecorator`1.FilterAllAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
+        <member name="M:DotLogix.Architecture.Infrastructure.Decorators.IndexedEntitySetDecorator`1.WhereAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Architecture.Infrastructure.Decorators.IndexedEntitySetDecorator`1.Add(`0)">
@@ -174,13 +174,13 @@
         </member>
         <member name="T:DotLogix.Architecture.Infrastructure.Decorators.InsertOnlyEntitySetDecorator`1">
             <summary>
-            A entity set decorator to disable deletion of entities instead manage existence with the is active flag
+                A entity set decorator to disable deletion of entities instead manage existence with the is active flag
             </summary>
             <typeparam name="TEntity"></typeparam>
         </member>
         <member name="M:DotLogix.Architecture.Infrastructure.Decorators.InsertOnlyEntitySetDecorator`1.#ctor(DotLogix.Architecture.Infrastructure.EntityContext.IEntitySet{`0})">
             <summary>
-            Creates a new instance of <see cref="T:DotLogix.Architecture.Infrastructure.Decorators.InsertOnlyEntitySetDecorator`1"/>
+                Creates a new instance of <see cref="T:DotLogix.Architecture.Infrastructure.Decorators.InsertOnlyEntitySetDecorator`1" />
             </summary>
         </member>
         <member name="M:DotLogix.Architecture.Infrastructure.Decorators.InsertOnlyEntitySetDecorator`1.Add(`0)">
@@ -191,12 +191,12 @@
         </member>
         <member name="M:DotLogix.Architecture.Infrastructure.Decorators.InsertOnlyEntitySetDecorator`1.Remove(`0)">
             <summary>
-            Mark a single entity as deleted by setting its IsActive flag to false
+                Mark a single entity as deleted by setting its IsActive flag to false
             </summary>
         </member>
         <member name="M:DotLogix.Architecture.Infrastructure.Decorators.InsertOnlyEntitySetDecorator`1.RemoveRange(System.Collections.Generic.IEnumerable{`0})">
             <summary>
-            Mark a range of entities as deleted by setting their IsActive flag to false
+                Mark a range of entities as deleted by setting their IsActive flag to false
             </summary>
         </member>
         <member name="M:DotLogix.Architecture.Infrastructure.Decorators.InsertOnlyEntitySetDecorator`1.Query">
@@ -225,7 +225,7 @@
         <member name="M:DotLogix.Architecture.Infrastructure.Decorators.OrderedEntitySetDecorator`1.GetAllAsync(System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Architecture.Infrastructure.Decorators.OrderedEntitySetDecorator`1.FilterAllAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
+        <member name="M:DotLogix.Architecture.Infrastructure.Decorators.OrderedEntitySetDecorator`1.WhereAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Architecture.Infrastructure.Attributes.ManyToOneAttribute">
@@ -500,7 +500,7 @@
         <member name="M:DotLogix.Architecture.Infrastructure.EntityContext.EntitySetBase`1.Query">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Architecture.Infrastructure.EntityContext.EntitySetBase`1.FilterAllAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
+        <member name="M:DotLogix.Architecture.Infrastructure.EntityContext.EntitySetBase`1.WhereAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
             <summary>
             Get all entities matching an expression
             </summary>
@@ -567,7 +567,7 @@
             Get all entities
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Infrastructure.EntityContext.IEntitySet`1.FilterAllAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
+        <member name="M:DotLogix.Architecture.Infrastructure.EntityContext.IEntitySet`1.WhereAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
             <summary>
             Get all entities matching an expression
             </summary>
@@ -1090,7 +1090,7 @@
             Get all entities
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Infrastructure.Repositories.IRepository`1.FilterAllAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
+        <member name="M:DotLogix.Architecture.Infrastructure.Repositories.IRepository`1.WhereAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
             <summary>
             Get all entities matching an expression
             </summary>
@@ -1163,6 +1163,11 @@
                 The internal entity set
             </summary>
         </member>
+        <member name="P:DotLogix.Architecture.Infrastructure.Repositories.RepositoryBase`1.OriginalEntitySet">
+            <summary>
+                The undecorated and unmodified entity set
+            </summary>
+        </member>
         <member name="P:DotLogix.Architecture.Infrastructure.Repositories.RepositoryBase`1.EntitySetProvider">
             <summary>
                 The internal entity set provider
@@ -1188,7 +1193,7 @@
         <member name="M:DotLogix.Architecture.Infrastructure.Repositories.RepositoryBase`1.GetAllAsync(System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Architecture.Infrastructure.Repositories.RepositoryBase`1.FilterAllAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
+        <member name="M:DotLogix.Architecture.Infrastructure.Repositories.RepositoryBase`1.WhereAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Architecture.Infrastructure.Repositories.RepositoryBase`1.Add(`0)">

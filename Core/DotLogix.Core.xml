@@ -2297,6 +2297,14 @@
             <param name="max">The max value</param>
             <returns></returns>
         </member>
+        <member name="M:DotLogix.Core.Extensions.MathExtensions.LaysBetween(System.Int32,DotLogix.Core.Utils.Patterns.Range)">
+            <summary>
+                Checks if a value is between min and max value
+            </summary>
+            <param name="value">The value to check</param>
+            <param name="range">The range</param>
+            <returns></returns>
+        </member>
         <member name="M:DotLogix.Core.Extensions.MathExtensions.IsPowerOfTwo(System.Int32)">
             <summary>
                 Checks if a value is a power of two
@@ -5900,6 +5908,28 @@
             Create the projections to map the types
             </summary>
         </member>
+        <member name="T:DotLogix.Core.Reflection.Projections.OptionalProjection">
+            <summary>
+            A projection of two value accessors including an equality check
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Reflection.Projections.OptionalProjection.#ctor(DotLogix.Core.Reflection.Delegates.GetterDelegate,DotLogix.Core.Reflection.Delegates.GetterDelegate,DotLogix.Core.Reflection.Delegates.SetterDelegate,DotLogix.Core.Reflection.Delegates.SetterDelegate)">
+            <summary>
+            Creates a new instance of <see cref="T:DotLogix.Core.Reflection.Projections.OptionalProjection"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Reflection.Projections.OptionalProjection.ProjectLeftToRight(System.Object,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Reflection.Projections.OptionalProjection.ProjectRightToLeft(System.Object,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.Reflection.Projections.OptionalProjectionFactory">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Reflection.Projections.OptionalProjectionFactory.CreateProjection(DotLogix.Core.Reflection.Delegates.GetterDelegate,DotLogix.Core.Reflection.Delegates.GetterDelegate,DotLogix.Core.Reflection.Delegates.SetterDelegate,DotLogix.Core.Reflection.Delegates.SetterDelegate)">
+            <inheritdoc />
+        </member>
         <member name="T:DotLogix.Core.Reflection.Projections.Projection">
             <summary>
             A projection of two value accessors
@@ -5952,7 +5982,12 @@
         </member>
         <member name="P:DotLogix.Core.Reflection.Projections.ProjectionFactory.AutoWithEqualityCheck">
             <summary>
-            Try to map as many properties as possible and include an equality check before assignment
+            Try to map as many properties as possible and as little as necessary include an equality check before assignment
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Reflection.Projections.ProjectionFactory.AutoOptional">
+            <summary>
+            Try to map as many properties as possible and undefined <see cref="T:DotLogix.Core.Optional`1"/> are ignored include an equality check before assignment
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Projections.ProjectionFactory.#ctor">

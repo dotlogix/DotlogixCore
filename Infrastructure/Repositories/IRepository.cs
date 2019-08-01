@@ -13,6 +13,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
+using DotLogix.Architecture.Infrastructure.Queries;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {
@@ -50,7 +51,7 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         /// <summary>
         /// Get all entities matching an expression
         /// </summary>
-        Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default);
         #endregion
 
         #region Add

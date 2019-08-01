@@ -9,7 +9,6 @@
 #region
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,8 +51,8 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
 
 
         /// <inheritdoc />
-        public Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
-            return _innerEntitySet.FilterAllAsync(filterExpression, cancellationToken);
+        public Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
+            return _innerEntitySet.WhereAsync(filterExpression, cancellationToken);
         }
 
         /// <inheritdoc />

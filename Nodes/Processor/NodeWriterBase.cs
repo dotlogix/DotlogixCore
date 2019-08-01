@@ -47,7 +47,7 @@ namespace DotLogix.Core.Nodes.Processor {
                         throw new ArgumentOutOfRangeException();
                 }
 
-                if(task.IsCompleted == false)
+                if(task.IsCompletedSuccessfully == false)
                     await task;
             }
         }

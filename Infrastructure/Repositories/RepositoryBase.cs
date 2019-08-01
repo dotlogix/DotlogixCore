@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Decorators;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
+using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 #endregion
@@ -27,6 +28,7 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
     /// </summary>
     public abstract class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class, ISimpleEntity, new() {
         private IEntitySet<TEntity> _entitySet;
+        private IEntitySet<TEntity> _originalEntitySet;
 
         /// <summary>
         ///     The cached list of entity set modifiers
@@ -36,7 +38,12 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         /// <summary>
         ///     The internal entity set
         /// </summary>
-        protected IEntitySet<TEntity> EntitySet => _entitySet ?? (_entitySet = OnModifyEntitySet(EntitySetProvider.UseSet<TEntity>()));
+        protected IEntitySet<TEntity> EntitySet => _entitySet ?? (_entitySet = OnModifyEntitySet(OriginalEntitySet));
+
+        /// <summary>
+        ///     The undecorated and unmodified entity set
+        /// </summary>
+        public IEntitySet<TEntity> OriginalEntitySet => _originalEntitySet ?? (_originalEntitySet = EntitySetProvider.UseSet<TEntity>());
 
         /// <summary>
         ///     The internal entity set provider
@@ -76,7 +83,7 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         }
 
         /// <inheritdoc />
-        public virtual Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
+        public virtual Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
             return EntitySet.Query().Where(filterExpression).ToEnumerableAsync(cancellationToken);
         }
 
@@ -125,7 +132,7 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
 
             var decoratorAttributes = types.SelectMany(t => t.GetCustomAttributes<EntitySetModifierAttribute>());
 
-            var decorators = decoratorAttributes.Distinct().OrderByDescending(d => d.Priority);
+            var decorators = decoratorAttributes.Distinct().OrderBy(d => d.Priority);
             return decorators.Select(d => d.GetModifierFunc<TEntity>());
         }
     }

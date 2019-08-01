@@ -14,8 +14,6 @@ using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
-using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Descriptors;
 #endregion

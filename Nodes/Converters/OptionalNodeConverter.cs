@@ -24,9 +24,9 @@ namespace DotLogix.Core.Nodes.Converters {
         public OptionalNodeConverter(DataType dataType) : base(dataType) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
+        public override ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings) {
             var opt = (Optional<TValue>)instance;
-            return opt.IsDefined ? Nodes.WriteToAsync(rootName, opt.Value, typeof(TValue), writer) : default;
+            return opt.IsDefined ? Nodes.WriteToAsync(rootName, opt.Value, typeof(TValue), writer, settings) : default;
         }
 
         /// <inheritdoc />

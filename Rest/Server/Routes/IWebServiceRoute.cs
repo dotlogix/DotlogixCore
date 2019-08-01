@@ -22,6 +22,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
 
         int RouteIndex { get; }
         int Priority { get; }
+        bool IsRooted { get; set; }
         HttpMethods AcceptedRequests { get; }
         RouteMatch Match(HttpMethods method, string path);
     }

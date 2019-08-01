@@ -85,17 +85,17 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
+        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings) {
             var task = writer.BeginMapAsync(rootName);
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 await task;
             foreach(var accessor in _accessorsToRead) {
-                task = Nodes.WriteToAsync(accessor.Name, accessor.GetValue(instance), accessor.ValueType, writer);
-                if(task.IsCompleted == false)
+                task = Nodes.WriteToAsync(accessor.Name, accessor.GetValue(instance), accessor.ValueType, writer, settings);
+                if(task.IsCompletedSuccessfully == false)
                     await task;
             }
             task = writer.EndMapAsync();
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 await task;
         }
 

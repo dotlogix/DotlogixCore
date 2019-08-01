@@ -17,8 +17,12 @@ using DotLogix.Core.Rest.Server.Http.State;
 
 namespace DotLogix.Core.Rest.Services.Writer {
     public class WebRequestResultJsonWriter : WebRequestResultWriterBase {
-        public static IAsyncWebRequestResultWriter Instance { get; } = new WebRequestResultJsonWriter();
-        private WebRequestResultJsonWriter() { }
+        public static JsonFormatterSettings DefaultFormatterSettings { get; } = JsonFormatterSettings.Idented;
+        public WebRequestResultJsonWriter(JsonFormatterSettings settings = null) {
+            FormatterSettings = settings ?? DefaultFormatterSettings;
+        }
+
+        public JsonFormatterSettings FormatterSettings { get; }
 
 
         protected override Task WriteResultAsync(IAsyncHttpResponse asyncHttpResponse, WebRequestResult webRequestResult) {
@@ -28,7 +32,7 @@ namespace DotLogix.Core.Rest.Services.Writer {
             }
 
             asyncHttpResponse.ContentType = MimeTypes.Application.Json;
-            return asyncHttpResponse.WriteToResponseStreamAsync(JsonNodes.ToJson(webRequestResult.ReturnValue));
+            return asyncHttpResponse.WriteToResponseStreamAsync(JsonNodes.ToJson(webRequestResult.ReturnValue, webRequestResult.ReturnType, FormatterSettings));
         }
     }
 }

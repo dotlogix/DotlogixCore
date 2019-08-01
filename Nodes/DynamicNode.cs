@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Dynamic;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes.Processor;
 
 namespace DotLogix.Core.Nodes
 {

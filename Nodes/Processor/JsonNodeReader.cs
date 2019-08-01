@@ -114,7 +114,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 ValueTask vTask;
                 do {
                     var charTask = NextJsonCharacterAsync(enumerator);
-                    var nextCharacter = charTask.IsCompleted ? charTask.Result : await charTask;
+                    var nextCharacter = charTask.IsCompletedSuccessfully ? charTask.Result : await charTask;
 
                     if((allowedCharacters & nextCharacter) == 0) {
                         if(allowedCharacters == JsonCharacter.None || allowedCharacters == JsonCharacter.End)
@@ -128,7 +128,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             break;
                         case JsonCharacter.OpenObject:
                             vTask = nodeWriter.BeginMapAsync(name);
-                            if(vTask.IsCompleted == false)
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
                             name = null;
 
@@ -139,7 +139,7 @@ namespace DotLogix.Core.Nodes.Processor {
                         case JsonCharacter.CloseObject:
                         case JsonCharacter.CloseList:
                             vTask = stateStack.Pop() == NodeContainerType.Map ? nodeWriter.EndMapAsync() : nodeWriter.EndListAsync();
-                            if(vTask.IsCompleted == false)
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
 
                             if(stateStack.Count == 0) {
@@ -151,7 +151,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             break;
                         case JsonCharacter.OpenList:
                             vTask = nodeWriter.BeginListAsync(name);
-                            if(vTask.IsCompleted == false)
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
                             name = null;
 
@@ -160,7 +160,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             break;
                         case JsonCharacter.String:
                             var strTask = NextJsonStringAsync(enumerator);
-                            var str = strTask.IsCompleted ? strTask.Result : await strTask;
+                            var str = strTask.IsCompletedSuccessfully ? strTask.Result : await strTask;
                             if((stateStack.Count > 0) && (stateStack.Peek() == NodeContainerType.Map) && (name == null)) {
                                 name = str;
                                 allowedCharacters = JsonCharacter.ValueAssignment;
@@ -168,7 +168,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             }
 
                             vTask = nodeWriter.WriteValueAsync(name, str);
-                            if(vTask.IsCompleted == false)
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
                             name = null;
                             allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject, JsonCharacter.ValueDelimiter | JsonCharacter.CloseList);
@@ -181,9 +181,9 @@ namespace DotLogix.Core.Nodes.Processor {
                             break;
                         case JsonCharacter.Other:
                             var valueTask = NextJsonValueAsync(enumerator);
-                            var value = valueTask.IsCompleted ? valueTask.Result : await valueTask;
+                            var value = valueTask.IsCompletedSuccessfully ? valueTask.Result : await valueTask;
                             vTask = nodeWriter.WriteValueAsync(name, value);
-                            if(vTask.IsCompleted == false)
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
                             name = null;
                             allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject, JsonCharacter.ValueDelimiter | JsonCharacter.CloseList);
@@ -236,7 +236,7 @@ namespace DotLogix.Core.Nodes.Processor {
             var builder = new StringBuilder();
             while(enumerator.MoveNext()) {
                 var task = enumerator.Current;
-                var current = task.IsCompleted ? task.Result : await task;
+                var current = task.IsCompletedSuccessfully ? task.Result : await task;
                 switch(current) {
                     case '\"':
                         return builder.ToString();
@@ -245,7 +245,7 @@ namespace DotLogix.Core.Nodes.Processor {
                         if(enumerator.MoveNext() == false)
                             throw new JsonParsingException("The escape sequence '\\' requires at least one following character to be valid.", _position, _line, _position - _lineStart, Near);
                         task = enumerator.Current;
-                        current = task.IsCompleted ? task.Result : await task;
+                        current = task.IsCompletedSuccessfully ? task.Result : await task;
 
                         switch(current) {
                             case '\\':
@@ -273,7 +273,7 @@ namespace DotLogix.Core.Nodes.Processor {
                                     if(enumerator.MoveNext() == false)
                                         throw new JsonParsingException("The escape sequence '\\u' requires 4 following hex digits to be valid.", _position, _line, _position - _lineStart, Near);
                                     task = enumerator.Current;
-                                    current = task.IsCompleted ? task.Result : await task;
+                                    current = task.IsCompletedSuccessfully ? task.Result : await task;
 
                                     if(JsonStrings.IsHex(current) == false)
                                         throw new JsonParsingException($"The character '{current}' is not a valid hex character.", _position, _line, _position - _lineStart, Near);
@@ -313,7 +313,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
             do {
                 var task = enumerator.Current;
-                var current = task.IsCompleted ? task.Result : await task;
+                var current = task.IsCompletedSuccessfully ? task.Result : await task;
                 switch(current) {
                     case ' ':
                     case '\t':
@@ -336,7 +336,7 @@ namespace DotLogix.Core.Nodes.Processor {
             do
             {
                 var task = enumerator.Current;
-                var current = task.IsCompleted ? task.Result : await task;
+                var current = task.IsCompletedSuccessfully ? task.Result : await task;
                 switch (current)
                 {
                     case ' ':

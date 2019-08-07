@@ -68,101 +68,162 @@
             Get or create a service
             </summary>
         </member>
-        <member name="T:DotLogix.Architecture.Domain.Mapper.IMapper`2">
+        <member name="T:DotLogix.Architecture.Domain.Mapper.EntityMapperBase`2">
+            <summary>
+            A basic implementation of the <see cref="T:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2"/> for 1:1 mapping of entities to their corresponding model
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.EntityMapperBase`2.MapEntityToModel(`0,`1)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.EntityMapperBase`2.MapModelToEntity(`0,`1)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.EntityMapperBase`2.ToModel(`0)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.EntityMapperBase`2.ToModel``1(`0)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.EntityMapperBase`2.ToModels(System.Collections.Generic.IEnumerable{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.EntityMapperBase`2.ToModels``1(System.Collections.Generic.IEnumerable{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.EntityMapperBase`2.ToEntity(`1)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.EntityMapperBase`2.ToEntities(System.Collections.Generic.IEnumerable{`1})">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Architecture.Domain.Mapper.FluentEntityMapper`2">
+            <summary>
+            A basic implementation of the <see cref="T:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2"/> using reflection and shallow copying for 1:1 mapping of entities to their corresponding model
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.FluentEntityMapper`2.#ctor(System.Boolean,System.Action{DotLogix.Core.Utils.Mappers.MapBuilder{`0,`1}},System.Action{DotLogix.Core.Utils.Mappers.MapBuilder{`1,`0}})">
+            <summary>
+            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Mapper.FluentEntityMapper`2"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.FluentEntityMapper`2.MapEntityToModel(`0,`1)">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.FluentEntityMapper`2.MapModelToEntity(`0,`1)">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Architecture.Domain.Mapper.IParamMapper`2">
+            <summary>
+            An interface for 1:1 mapping of params with their corresponding entities
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IParamMapper`2.MapParamsToEntity(`0,`1)">
+            <summary>
+            Maps a param model to its corresponding entity
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IParamMapper`2.ToEntity(`0)">
+            <summary>
+            Maps a param model to a new entity
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IParamMapper`2.ToEntities(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Maps a range of param models to new entities
+            </summary>
+        </member>
+        <member name="T:DotLogix.Architecture.Domain.Mapper.FluentParamMapper`2">
+            <summary>
+            A basic implementation of the <see cref="T:DotLogix.Architecture.Domain.Mapper.IParamMapper`2"/> using reflection and shallow copying for 1:1 mapping of entities to their corresponding model
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.FluentParamMapper`2.#ctor(System.Boolean,System.Boolean,System.Action{DotLogix.Core.Utils.Mappers.MapBuilder{`0,`1}})">
+            <summary>
+            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Mapper.FluentEntityMapper`2"/>
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.FluentParamMapper`2.MapParamsToEntity(`0,`1)">
+            <summary>
+            Maps a param model to its corresponding entity
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.FluentParamMapper`2.ToEntity(`0)">
+            <summary>
+            Maps a param model to a new entity
+            </summary>
+        </member>
+        <member name="M:DotLogix.Architecture.Domain.Mapper.FluentParamMapper`2.ToEntities(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Maps a range of param models to new entities
+            </summary>
+        </member>
+        <member name="T:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2">
             <summary>
             An interface for 1:1 mapping of entities with their corresponding model
             </summary>
             <typeparam name="TEntity"></typeparam>
             <typeparam name="TModel"></typeparam>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.IMapper`2.MapEntityToModel(`0,`1)">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2.MapEntityToModel(`0,`1)">
             <summary>
             Maps an entity to its corresponding model
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.IMapper`2.MapModelToEntity(`0,`1)">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2.MapModelToEntity(`0,`1)">
             <summary>
             Maps an model to its corresponding entity
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.IMapper`2.ToModel(`0)">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2.ToModel(`0)">
             <summary>
             Maps an entity to a new model
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.IMapper`2.ToModel``1(`0)">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2.ToModel``1(`0)">
             <summary>
             Maps an entity to a new model derived of the original one
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.IMapper`2.ToModels(System.Collections.Generic.IEnumerable{`0})">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2.ToModels(System.Collections.Generic.IEnumerable{`0})">
             <summary>
             Maps a range of entities to new models
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.IMapper`2.ToModels``1(System.Collections.Generic.IEnumerable{`0})">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2.ToModels``1(System.Collections.Generic.IEnumerable{`0})">
             <summary>
             Maps a range of entities to new models derived of the original one
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.IMapper`2.ToEntity(`1)">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2.ToEntity(`1)">
             <summary>
             Maps a model to a new entity
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.IMapper`2.ToEntities(System.Collections.Generic.IEnumerable{`1})">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2.ToEntities(System.Collections.Generic.IEnumerable{`1})">
             <summary>
             Maps a range of models to new entities
             </summary>
         </member>
-        <member name="T:DotLogix.Architecture.Domain.Mapper.MapperBase`2">
+        <member name="T:DotLogix.Architecture.Domain.Mapper.ProjectionEntityMapper`2">
             <summary>
-            A basic implementation of the <see cref="T:DotLogix.Architecture.Domain.Mapper.IMapper`2"/> for 1:1 mapping of entities to their corresponding model
+            A basic implementation of the <see cref="T:DotLogix.Architecture.Domain.Mapper.IEntityMapper`2"/> using reflection and shallow copying for 1:1 mapping of entities to their corresponding model
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.MapperBase`2.MapEntityToModel(`0,`1)">
-            <inheritdoc />
-        </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.MapperBase`2.MapModelToEntity(`0,`1)">
-            <inheritdoc />
-        </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.MapperBase`2.ToModel(`0)">
-            <inheritdoc />
-        </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.MapperBase`2.ToModel``1(`0)">
-            <inheritdoc />
-        </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.MapperBase`2.ToModels(System.Collections.Generic.IEnumerable{`0})">
-            <inheritdoc />
-        </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.MapperBase`2.ToModels``1(System.Collections.Generic.IEnumerable{`0})">
-            <inheritdoc />
-        </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.MapperBase`2.ToEntity(`1)">
-            <inheritdoc />
-        </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.MapperBase`2.ToEntities(System.Collections.Generic.IEnumerable{`1})">
-            <inheritdoc />
-        </member>
-        <member name="T:DotLogix.Architecture.Domain.Mapper.ProjectionMapper`2">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.ProjectionEntityMapper`2.#ctor(DotLogix.Core.Reflection.Projections.CreateProjectionsCallback)">
             <summary>
-            A basic implementation of the <see cref="T:DotLogix.Architecture.Domain.Mapper.IMapper`2"/> using reflection and shallow copying for 1:1 mapping of entities to their corresponding model
+            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Mapper.ProjectionEntityMapper`2"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.ProjectionMapper`2.#ctor(DotLogix.Core.Reflection.Projections.CreateProjectionsCallback)">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.ProjectionEntityMapper`2.#ctor(DotLogix.Core.Reflection.Projections.IProjectionFactory)">
             <summary>
-            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Mapper.ProjectionMapper`2"/>
+            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Mapper.ProjectionEntityMapper`2"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.ProjectionMapper`2.#ctor(DotLogix.Core.Reflection.Projections.IProjectionFactory)">
-            <summary>
-            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Mapper.ProjectionMapper`2"/>
-            </summary>
-        </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.ProjectionMapper`2.MapEntityToModel(`0,`1)">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.ProjectionEntityMapper`2.MapEntityToModel(`0,`1)">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Mapper.ProjectionMapper`2.MapModelToEntity(`0,`1)">
+        <member name="M:DotLogix.Architecture.Domain.Mapper.ProjectionEntityMapper`2.MapModelToEntity(`0,`1)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Architecture.Domain.Models.Base.InsertOnlyModel">

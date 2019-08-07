@@ -16,7 +16,7 @@ namespace DotLogix.Architecture.Domain.Mapper {
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TModel"></typeparam>
-    public interface IMapper<TEntity, TModel> {
+    public interface IEntityMapper<TEntity, TModel> {
         #region Map
 
         /// <summary>

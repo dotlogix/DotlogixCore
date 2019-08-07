@@ -5,9 +5,9 @@ using DotLogix.Architecture.Domain.Models.Base;
 
 namespace DotLogix.Architecture.Domain.Mapper {
     /// <summary>
-    /// A basic implementation of the <see cref="IMapper{TEntity,TModel}"/> for 1:1 mapping of entities to their corresponding model
+    /// A basic implementation of the <see cref="IEntityMapper{TEntity,TModel}"/> for 1:1 mapping of entities to their corresponding model
     /// </summary>
-    public abstract class MapperBase<TEntity, TModel> : IMapper<TEntity, TModel> where TModel : SimpleModel, new() where TEntity : new()
+    public abstract class EntityMapperBase<TEntity, TModel> : IEntityMapper<TEntity, TModel> where TModel : SimpleModel, new() where TEntity : new()
     {
         #region Map
         /// <inheritdoc />
@@ -53,9 +53,6 @@ namespace DotLogix.Architecture.Domain.Mapper {
         /// <inheritdoc />
         public virtual TEntity ToEntity(TModel source)
         {
-            if (source.Guid == Guid.Empty)
-                source.Guid = Guid.NewGuid();
-
             var entity = new TEntity();
             MapModelToEntity(entity, source);
             return entity;

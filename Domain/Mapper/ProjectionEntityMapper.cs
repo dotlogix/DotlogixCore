@@ -14,22 +14,22 @@ using DotLogix.Core.Reflection.Projections;
 
 namespace DotLogix.Architecture.Domain.Mapper {
     /// <summary>
-    /// A basic implementation of the <see cref="IMapper{TEntity,TModel}"/> using reflection and shallow copying for 1:1 mapping of entities to their corresponding model
+    /// A basic implementation of the <see cref="IEntityMapper{TEntity,TModel}"/> using reflection and shallow copying for 1:1 mapping of entities to their corresponding model
     /// </summary>
-    public class ProjectionMapper<TEntity, TModel> : MapperBase<TEntity, TModel> where TModel : SimpleModel, new() where TEntity : new() {
+    public class ProjectionEntityMapper<TEntity, TModel> : EntityMapperBase<TEntity, TModel> where TModel : SimpleModel, new() where TEntity : new() {
         private readonly TypeProjector _projector;
 
         /// <summary>
-        /// Creates a new instance of <see cref="ProjectionMapper{TEntity, TModel}"/>
+        /// Creates a new instance of <see cref="ProjectionEntityMapper{TEntity,TModel}"/>
         /// </summary>
-        public ProjectionMapper(CreateProjectionsCallback callback) {
+        public ProjectionEntityMapper(CreateProjectionsCallback callback) {
             _projector = TypeProjector.Create<TEntity, TModel>(callback);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="ProjectionMapper{TEntity, TModel}"/>
+        /// Creates a new instance of <see cref="ProjectionEntityMapper{TEntity,TModel}"/>
         /// </summary>
-        public ProjectionMapper(IProjectionFactory factory = null) {
+        public ProjectionEntityMapper(IProjectionFactory factory = null) {
             _projector = TypeProjector.Create<TEntity, TModel>(factory);
         }
 

@@ -7234,6 +7234,144 @@
             </summary>
             <param name="valueInitializer"></param>
         </member>
+        <member name="T:DotLogix.Core.Utils.Mappers.DynamicValueGetter`2">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.DynamicValueGetter`2.#ctor(DotLogix.Core.Reflection.Dynamics.DynamicAccessor)">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.Utils.Mappers.DynamicValueSetter`2">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.DynamicValueSetter`2.#ctor(DotLogix.Core.Reflection.Dynamics.DynamicAccessor)">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.Utils.Mappers.IMapper`2">
+            <summary>
+            An interface representation type mappers
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.IMapper`2.Map(`0,`1)">
+            <summary>
+            Maps a source type to a target type
+            </summary>
+        </member>
+        <member name="T:DotLogix.Core.Utils.Mappers.IValueGetter`2">
+            <summary>
+            An interface representation value resolvers
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.IValueGetter`2.AddPreCondition(System.Func{`0,System.Boolean})">
+            <summary>
+            Add a pre-conditions executed before a value will be resolved
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.IValueGetter`2.AddPostCondition(System.Func{`0,`1,System.Boolean})">
+            <summary>
+            Add a post-conditions executed after a value has been resolved
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.IValueGetter`2.TryGet(`0,`1@)">
+            <summary>
+            Tries to resolve a value
+            </summary>
+        </member>
+        <member name="T:DotLogix.Core.Utils.Mappers.IValueSetter`2">
+            <summary>
+            An interface representation value setters
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.IValueSetter`2.AddPreCondition(System.Func{`0,System.Boolean})">
+            <summary>
+            Add a pre-conditions executed before a value will be set
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.IValueSetter`2.AddPreCondition(System.Func{`0,`1,System.Boolean})">
+            <summary>
+            Add a pre-conditions executed before a value will be set
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.IValueSetter`2.TrySet(`0,`1)">
+            <summary>
+            Tries to set a value
+            </summary>
+        </member>
+        <member name="T:DotLogix.Core.Utils.Mappers.Mappers">
+            <summary>
+            A static class class helping to create type to type mappers
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.Mappers.Map``2(System.Action{DotLogix.Core.Utils.Mappers.MapBuilder{``0,``1}})">
+            <summary>
+            Creates a mapper based on a configuration function
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.Mappers.AutoMap``2(System.Action{DotLogix.Core.Utils.Mappers.MapBuilder{``0,``1}})">
+            <summary>
+            Creates a mapper based on a configuration function auto-maps all supported properties (s.[name] => t.[name])
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.Mappers.Map(System.Type,System.Type,System.Action{DotLogix.Core.Utils.Mappers.MapBuilder{System.Object,System.Object}})">
+            <summary>
+            Creates a mapper based on a configuration function
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.Mappers.AutoMap(System.Type,System.Type,System.Action{DotLogix.Core.Utils.Mappers.MapBuilder{System.Object,System.Object}})">
+            <summary>
+            Creates a mapper based on a configuration function auto-maps all supported properties (s.[name] => t.[name])
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.ValueAutoConvertingMapper`4.#ctor(DotLogix.Core.Utils.Mappers.IValueGetter{`0,`1},DotLogix.Core.Utils.Mappers.IValueSetter{`2,`3})">
+            <summary>
+                Initialisiert eine neue Instanz der <see cref="T:System.Object" />-Klasse.
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.ValueConvertingMapper`4.#ctor(DotLogix.Core.Utils.Mappers.IValueGetter{`0,`1},DotLogix.Core.Utils.Mappers.IValueSetter{`2,`3},System.Func{`1,`3})">
+            <summary>
+                Initialisiert eine neue Instanz der <see cref="T:System.Object" />-Klasse.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:DotLogix.Core.Utils.Mappers.ValueGetterBase`2" -->
+        <member name="P:DotLogix.Core.Utils.Mappers.ValueGetterBase`2.PreConditionFuncs">
+            <summary>
+            A list of pre-conditions executed before a value will be resolved
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Utils.Mappers.ValueGetterBase`2.PostConditionFuncs">
+            <summary>
+            A list of post-conditions executed after a value has been resolved
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.ValueGetterBase`2.AddPreCondition(System.Func{`0,System.Boolean})">
+            <summary>
+            Add a pre-conditions executed before a value will be resolved
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.ValueGetterBase`2.AddPostCondition(System.Func{`0,`1,System.Boolean})">
+            <summary>
+            Add a post-conditions executed after a value has been resolved
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.ValueGetterBase`2.TryGet(`0,`1@)">
+            <summary>
+            Tries to resolve a value
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.ValueGetterBase`2.TryGetValue(`0,`1@)">
+            <summary>
+            Tries to resolve a value
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.ValueGetterBase`2.CheckPreConditions(`0)">
+            <summary>
+            Check if all pre-conditions are fulfilled
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Utils.Mappers.ValueGetterBase`2.CheckPostConditions(`0,`1)">
+            <summary>
+            Check if all post-conditions are fulfilled
+            </summary>
+        </member>
         <member name="T:DotLogix.Core.Utils.Patterns.IRegexPatternType">
             <summary>
             A pattern type to match regex expressions

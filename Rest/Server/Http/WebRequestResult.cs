@@ -43,7 +43,7 @@ namespace DotLogix.Core.Rest.Server.Http {
 
             Handled = true;
             ReturnValue = result;
-            if(ReturnType == null || result.GetType().IsAssignableTo(ReturnType) == false)
+            if(ReturnType == null || result != null && result.GetType().IsAssignableTo(ReturnType) == false)
                 ReturnType = result.GetType();
             return true;
         }

@@ -20,7 +20,7 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DocumentationFile>D:\git\c-sharp\DotLogix\Core\Core\DotLogix.Core.xml</DocumentationFile>
-		<WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
+		<WarningsAsErrors>NU1605;</WarningsAsErrors>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 

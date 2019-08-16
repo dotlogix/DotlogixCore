@@ -51,7 +51,7 @@ namespace DotLogix.Architecture.Domain.Mapper {
             if (autoMap) {
                 foreach (var property in mapBuilder.DynamicSourceType.Properties)
                 {
-                    var targetProperty = mapBuilder.DynamicTargetType.GetPropery(property.Name);
+                    var targetProperty = mapBuilder.DynamicTargetType.GetProperty(property.Name);
                     if (targetProperty == null)
                         continue;
 

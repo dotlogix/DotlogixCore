@@ -100,7 +100,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// If the property can not be found the method returns null
         /// </summary>
         /// <exception cref="ArgumentNullException"></exception>
-        public DynamicProperty GetPropery(string propertyName) {
+        public DynamicProperty GetProperty(string propertyName) {
             if(propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
             return _propertiesDict.TryGetValue(propertyName, out var property) ? property : null;

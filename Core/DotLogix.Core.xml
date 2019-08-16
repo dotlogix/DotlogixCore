@@ -4270,7 +4270,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:DotLogix.Core.Reflection.Dynamics.DynamicType.GetPropery(System.String)">
+        <member name="M:DotLogix.Core.Reflection.Dynamics.DynamicType.GetProperty(System.String)">
             <summary>
             Tries to get a property.<br></br>
             If the property can not be found the method returns null

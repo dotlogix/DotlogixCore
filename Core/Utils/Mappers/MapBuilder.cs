@@ -102,8 +102,8 @@ namespace DotLogix.Core.Utils.Mappers {
             if(targetProperty == null)
                 throw new ArgumentNullException(nameof(targetProperty));
 
-            var sourceAccessor = DynamicSourceType.GetPropery(sourceProperty);
-            var targetAccessor = DynamicTargetType.GetPropery(targetProperty);
+            var sourceAccessor = DynamicSourceType.GetProperty(sourceProperty);
+            var targetAccessor = DynamicTargetType.GetProperty(targetProperty);
 
             if(sourceAccessor == null || targetAccessor == null)
                 return this;

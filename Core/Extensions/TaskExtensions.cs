@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotLogix.Core.Reflection.Delegates;
 using DotLogix.Core.Reflection.Fluent;
@@ -56,7 +57,7 @@ namespace DotLogix.Core.Extensions {
                 throw new InvalidOperationException("Task has to be completed to unpack the result");
             
             var taskType = task.GetType();
-            var accessor = TypeResultAccessors.GetOrAdd(taskType, CreateAcessor);
+            var accessor = TypeResultAccessors.GetOrAdd(taskType, CreateAccessor);
             return accessor?.Invoke(task);
         }
 
@@ -95,9 +96,34 @@ namespace DotLogix.Core.Extensions {
             return tcs.Task;
         }
 
-        private static GetterDelegate CreateAcessor(Type taskType) {
+        private static GetterDelegate CreateAccessor(Type taskType) {
             var propertyInfo = taskType.GetProperty("Result");
             return propertyInfo != null ? FluentIl.CreateGetter(propertyInfo) : null;
+        }
+
+        public static async Task<IEnumerable<T>> WhenAll<T>(this IEnumerable<Task<T>> tasks)
+        {
+            var results = new List<T>();
+            foreach (var valueTask in tasks) {
+                if (valueTask.IsCompleted && valueTask.IsFaulted == false)
+                    results.Add(valueTask.Result);
+                else
+                    results.Add(await valueTask);
+            }
+
+            return results;
+        }
+        public static async ValueTask<IEnumerable<T>> WhenAll<T>(this IEnumerable<ValueTask<T>> tasks)
+        {
+            var results = new List<T>();
+            foreach (var valueTask in tasks) {
+                if (valueTask.IsCompletedSuccessfully)
+                    results.Add(valueTask.Result);
+                else
+                    results.Add(await valueTask);
+            }
+
+            return results;
         }
     }
 }

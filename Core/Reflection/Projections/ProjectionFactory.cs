@@ -43,7 +43,7 @@ namespace DotLogix.Core.Reflection.Projections {
             var dynamicRight = right.CreateDynamicType(MemberTypes.Property);
 
             foreach(var leftProperty in dynamicLeft.Properties) {
-                var rightProperty = dynamicRight.GetPropery(leftProperty.Name);
+                var rightProperty = dynamicRight.GetProperty(leftProperty.Name);
                 if(rightProperty == null)
                     continue;
 

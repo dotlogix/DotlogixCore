@@ -85,21 +85,25 @@ namespace DotLogix.Core.Extensions {
                 }
             }
 
-            var sourceTypeConverter = TypeDescriptor.GetConverter(sourceType);
+            try {
+	            var sourceTypeConverter = TypeDescriptor.GetConverter(sourceType);
 
-            if(sourceTypeConverter.CanConvertTo(targetType)) {
-                target = sourceTypeConverter.ConvertTo(value, targetType);
-                return true;
-            }
+	            if (sourceTypeConverter.CanConvertTo(targetType)) {
+		            target = sourceTypeConverter.ConvertTo(value, targetType);
+		            return true;
+	            }
 
-            var targetTypeConverter = TypeDescriptor.GetConverter(targetType);
-            if(targetTypeConverter.CanConvertFrom(sourceType)) {
-                target = targetTypeConverter.ConvertFrom(value);
-                return true;
-            }
-            target = default;
-            return false;
-        }
+	            var targetTypeConverter = TypeDescriptor.GetConverter(targetType);
+	            if (targetTypeConverter.CanConvertFrom(sourceType)) {
+		            target = targetTypeConverter.ConvertFrom(value);
+		            return true;
+	            }
+            } catch {
+	            // ignored
+						}
+						target = default;
+			            return false;
+				}
 
         /// <summary>
         /// Converts a value to another type using type converters

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using DotLogix.Core.Extensions;
 
-namespace FinanzenNet.Importer.FactSetData.Import.DataTables {
+namespace DotLogix.Core.Collections {
 	public struct DataRow {
 		public object[] Values { get; }
 		public string[] Headers { get; }

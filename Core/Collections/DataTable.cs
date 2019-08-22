@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FinanzenNet.Importer.FactSetData.Import.DataTables {
+namespace DotLogix.Core.Collections {
 	public class DataTable : IEnumerable<DataRow> {
 		private readonly IEnumerable<object[]> _rowValues;
 		public string[] Headers { get; }

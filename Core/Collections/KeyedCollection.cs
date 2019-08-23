@@ -153,12 +153,31 @@ namespace DotLogix.Core.Collections {
         }
 
         /// <summary>
+        /// Tries to add a value to the collection
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public void TryAdd(IEnumerable<TValue> values) {
+            foreach(var value in values)
+                TryAdd(value);
+        }
+
+        /// <summary>
         /// Get the existing item or adds a new one matched by their keys
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public TValue GetOrAdd(TValue value) {
             return InnerDictionary.GetOrAdd(KeySelector.Invoke(value), value);
+        }
+
+        /// <summary>
+        /// Get the existing item or adds a new one matched by their keys
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public IEnumerable<TValue> GetOrAdd(IEnumerable<TValue> values) {
+            return values.Select(GetOrAdd).ToList();
         }
 
         /// <summary>
@@ -171,12 +190,31 @@ namespace DotLogix.Core.Collections {
         }
 
         /// <summary>
+        /// Add or update a value to the collection
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public void AddOrUpdate(IEnumerable<TValue> values) {
+            foreach(var value in values)
+                AddOrUpdate(value);
+        }
+
+        /// <summary>
         /// Tries to remove a value from the collection
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public bool TryRemove(TValue value) {
             return InnerDictionary.TryRemove(KeySelector.Invoke(value), out _);
+        }
+
+        /// <summary>
+        /// Tries to remove a value from the collection
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public bool TryRemove(IEnumerable<TValue> values) {
+            return values.Aggregate(true, (current, value) => current & TryRemove(value));
         }
 
         /// <summary>
@@ -196,6 +234,16 @@ namespace DotLogix.Core.Collections {
         /// <returns></returns>
         public bool TryRemoveKey(TKey key) {
             return InnerDictionary.TryRemove(key, out _);
+        }
+        
+        /// <summary>
+        /// Tries to remove the value with the matching key
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
+        public bool TryRemoveKey(IEnumerable<TKey> keys)
+        {
+            return keys.Aggregate(true, (current, value) => current & TryRemoveKey(value));
         }
 
         /// <summary>

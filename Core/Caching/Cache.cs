@@ -83,8 +83,38 @@ namespace DotLogix.Core.Caching {
         /// <summary>
         ///     Retrieves a value by its key. Returns default if the key is not present
         /// </summary>
-        public TValue Retrieve(TKey key) {
-            return _cacheItems.TryGetValue(key, out var item) ? item.Value : default;
+        public TValue Retrieve(TKey key, TValue defaultValue = default) {
+            return _cacheItems.TryGetValue(key, out var item) ? item.Value : defaultValue;
+        }
+
+        /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        public TValue RetrieveOrCreate(TKey key, Func<TKey, TValue> createFunc, ICachePolicy policy = null, bool updatePolicy = true) {
+            CacheItem<TKey, TValue> AddValueFactory(TKey k) {
+                var value = createFunc.Invoke(k);
+                return new CacheItem<TKey, TValue>(k, value, policy);
+            }
+
+            CacheItem<TKey, TValue> UpdateValueFactory(TKey k, CacheItem<TKey, TValue> existing) {
+                return new CacheItem<TKey, TValue>(k, existing.Value, policy);
+            }
+
+            if (updatePolicy)
+                return _cacheItems.AddOrUpdate(key, AddValueFactory, UpdateValueFactory).Value;
+            return _cacheItems.GetOrAdd(key, AddValueFactory).Value;
+        }
+
+        /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        public TValue RetrieveOrCreate(TKey key, TValue value, ICachePolicy policy = null, bool updatePolicy = true) {
+            CacheItem<TKey, TValue> AddValueFactory(TKey k) { return new CacheItem<TKey, TValue>(k, value, policy); }
+            CacheItem<TKey, TValue> UpdateValueFactory(TKey k, CacheItem<TKey, TValue> existing) { return new CacheItem<TKey, TValue>(k, existing.Value, policy); }
+
+            if (updatePolicy)
+                return _cacheItems.AddOrUpdate(key, AddValueFactory, UpdateValueFactory).Value;
+            return _cacheItems.GetOrAdd(key, AddValueFactory).Value;
         }
 
         /// <summary>
@@ -101,8 +131,8 @@ namespace DotLogix.Core.Caching {
         /// <summary>
         ///     Gets and remove a value by its key. Returns default if the key is not present
         /// </summary>
-        public TValue Pop(TKey key) {
-            return _cacheItems.TryRemove(key, out var item) ? item.Value : default;
+        public TValue Pop(TKey key, TValue defaultValue = default) {
+            return _cacheItems.TryRemove(key, out var item) ? item.Value : defaultValue;
         }
 
         /// <summary>

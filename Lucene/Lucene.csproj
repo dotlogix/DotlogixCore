@@ -2,7 +2,7 @@
 	<UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(MSBuildThisFileFullPath)\..\..\assemblies\BuildTasks\BuildTasks.dll" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
 		<Company>DotLogix</Company>
 		<Product>DotLogix Core</Product>
 		<PackageId>DotLogix.Core.Lucene</PackageId>

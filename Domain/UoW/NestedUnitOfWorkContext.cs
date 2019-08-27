@@ -37,10 +37,14 @@ namespace DotLogix.Architecture.Domain.UoW {
             return ParentContext.UseRepository<TRepo>();
         }
 
-        /// <inheritdoc />
-        public Task CompleteAsync() {
-            return Task.CompletedTask;
-        }
+		/// <inheritdoc />
+		public Task CompleteAsync() {
+#if NET45
+			return Task.FromResult<object>(null);
+#else
+			return Task.CompletedTask;
+#endif
+		}
 
         /// <inheritdoc />
         public void Dispose() { }

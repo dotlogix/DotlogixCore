@@ -33,7 +33,7 @@
 </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>D:\git\c-sharp\DotLogix\Core\Infrastructure.EntityFramework\DotLogix.Infrastructure.EntityFramework.xml</DocumentationFile>
+    <DocumentationFile>..\assemblies\docs\DotLogix.Infrastructure.EntityFramework.xml</DocumentationFile>
     <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>

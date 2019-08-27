@@ -118,7 +118,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
         /// Tries to remove a range of entities by their key and also return all missing keys
         /// </summary>
         public bool TryRemoveRange(IEnumerable<TEntity> entities) {
-            return entities.All(TryRemove);
+            return entities.All(Remove);
         }
         #endregion
 

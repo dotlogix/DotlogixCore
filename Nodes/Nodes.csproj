@@ -19,7 +19,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DocumentationFile>D:\git\c-sharp\DotLogix\Core\Nodes\DotLogix.Nodes.xml</DocumentationFile>
+		<DocumentationFile>..\assemblies\docs\DotLogix.Nodes.xml</DocumentationFile>
 		<WarningsAsErrors>NU1605</WarningsAsErrors>
 	</PropertyGroup>
 

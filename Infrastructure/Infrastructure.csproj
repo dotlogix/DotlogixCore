@@ -19,19 +19,17 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DocumentationFile>D:\git\c-sharp\DotLogix\Core\Infrastructure\DotLogix.Infrastructure.xml</DocumentationFile>
+		<DocumentationFile>..\assemblies\docs\DotLogix.Infrastructure.xml</DocumentationFile>
 		<WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="System.Interactive.Async" Version="3.2.0" />
+	</ItemGroup>
 	
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\Core\Core.csproj" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <Reference Include="System.Interactive.Async">
-	    <HintPath>C:\Users\alexa\.nuget\packages\system.interactive.async\3.2.0\lib\netstandard2.0\System.Interactive.Async.dll</HintPath>
-	  </Reference>
 	</ItemGroup>
   
 	<Target Name="BeforeBuildActions" BeforeTargets="BeforeBuild">

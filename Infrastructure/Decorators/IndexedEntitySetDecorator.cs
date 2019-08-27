@@ -72,8 +72,8 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
 
         /// <inheritdoc />
         public void Remove(TEntity entity) {
-            Index.ById.TryRemove(entity);
-            Index.ByGuid.TryRemove(entity);
+            Index.ById.Remove(entity);
+            Index.ByGuid.Remove(entity);
             _innerEntitySet.Remove(entity);
         }
 

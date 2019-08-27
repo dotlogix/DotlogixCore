@@ -15,11 +15,11 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryType>git</RepositoryType>
 		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<Version>1.4.1</Version>
+		<Version>1.4.2</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DocumentationFile>D:\git\c-sharp\DotLogix\Core\Core\DotLogix.Core.xml</DocumentationFile>
+		<DocumentationFile>..\assemblies\docs\DotLogix.Core.xml</DocumentationFile>
 		<WarningsAsErrors>NU1605;</WarningsAsErrors>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>

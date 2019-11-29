@@ -26,6 +26,7 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
     public class IndexedEntitySetDecorator<TEntity> : IEntitySet<TEntity> where TEntity : class, ISimpleEntity, new() {
         private readonly Func<EntityIndex<TEntity>> _cacheFunc;
         private readonly IEntitySet<TEntity> _innerEntitySet;
+        private readonly Func<TEntity, object> _keySelectorFunc;
         private EntityIndex<TEntity> _index;
 
         /// <summary>
@@ -44,56 +45,109 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
         /// <summary>
         /// Creates a new instance of <see cref="IndexedEntitySetDecorator{TEntity}"/>
         /// </summary>
-        public IndexedEntitySetDecorator(IEntitySet<TEntity> innerEntitySet, Func<EntityIndex<TEntity>> cacheFunc) {
-            _innerEntitySet = innerEntitySet;
-            _cacheFunc = cacheFunc;
+        public IndexedEntitySetDecorator(IEntitySet<TEntity> innerEntitySet, Func<EntityIndex<TEntity>> cacheFunc)
+        {
+	        _innerEntitySet = innerEntitySet;
+	        _cacheFunc = cacheFunc;
+		}
+
+		/// <summary>
+		/// Creates a new instance of <see cref="IndexedEntitySetDecorator{TEntity}"/>
+		/// </summary>
+		public IndexedEntitySetDecorator(IEntitySet<TEntity> innerEntitySet, Func<TEntity, object> keySelectorFunc)
+		{
+			_innerEntitySet = innerEntitySet;
+			_keySelectorFunc = keySelectorFunc;
+		}
+
+
+		/// <inheritdoc />
+		public async ValueTask<TEntity> GetAsync(object key, CancellationToken cancellationToken = default) {
+	        if(Index.TryGet(key, out var entity)) {
+		        return await _innerEntitySet.ReAttachAsync(entity);
+	        }
+
+	        entity = await _innerEntitySet.GetAsync(key, cancellationToken);
+	        if(entity != null) {
+		        Index.AddOrUpdate(entity);
+	        } else
+		        Index.MarkNonPresent(key);
+
+	        return entity;
         }
 
+        /// <inheritdoc />
+        public async ValueTask<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<object> keys, CancellationToken cancellationToken = default) {
+	        var foundAll = Index.TryGetRange(keys, out var foundEntities, out var missingIds);
+	        var list = foundEntities.AsCollection();
+	        await _innerEntitySet.ReAttachRangeAsync(list);
+
+	        if(foundAll)
+		        return list;
+
+	        var missing = missingIds.ToHashSet();
+	        foreach(var entity in await _innerEntitySet.GetRangeAsync(missing, cancellationToken)) {
+		        missing.Remove(entity.Id);
+		        Index.AddOrUpdate(entity);
+		        list.Add(entity);
+	        }
+
+	        Index.MarkRangeNonPresent(missing);
+	        return list;
+        }
 
         /// <inheritdoc />
-        public Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
+        public async ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
+	        var entities = (await _innerEntitySet.GetAllAsync(cancellationToken)).AsCollection();
+	        Index.AddOrUpdateRange(entities);
+	        return entities;
+        }
+
+        /// <inheritdoc />
+        public ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
             return _innerEntitySet.WhereAsync(filterExpression, cancellationToken);
         }
 
         /// <inheritdoc />
-        public void Add(TEntity entity) {
-            Index.ById.AddOrUpdate(entity);
-            Index.ByGuid.AddOrUpdate(entity);
-            _innerEntitySet.Add(entity);
+        public ValueTask<TEntity> AddAsync(TEntity entity) {
+            Index.AddOrUpdate(entity);
+            return _innerEntitySet.AddAsync(entity);
         }
 
         /// <inheritdoc />
-        public void AddRange(IEnumerable<TEntity> entities) {
-            entities = entities.AsCollection();
-            Index.ById.AddOrUpdateRange(entities);
-            Index.ByGuid.AddOrUpdateRange(entities);
-            _innerEntitySet.AddRange(entities);
+        public ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities)
+        {
+	        var collection = entities.AsCollection();
+	        Index.AddOrUpdateRange(collection);
+	        return _innerEntitySet.AddRangeAsync(collection);
+		}
+
+        /// <inheritdoc />
+        public ValueTask<TEntity> RemoveAsync(TEntity entity)
+        {
+	        Index.Remove(entity);
+	        return _innerEntitySet.RemoveAsync(entity);
+		}
+
+        /// <inheritdoc />
+        public ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities) {
+            var collection = entities.AsCollection();
+            Index.RemoveRange(collection);
+            return _innerEntitySet.RemoveRangeAsync(collection);
         }
 
         /// <inheritdoc />
-        public void Remove(TEntity entity) {
-            Index.ById.Remove(entity);
-            Index.ByGuid.Remove(entity);
-            _innerEntitySet.Remove(entity);
-        }
+        public ValueTask<TEntity> ReAttachAsync(TEntity entity)
+        {
+	        Index.AddOrUpdate(entity);
+	        return _innerEntitySet.ReAttachAsync(entity);
+		}
 
         /// <inheritdoc />
-        public void RemoveRange(IEnumerable<TEntity> entities) {
-            entities = entities.AsCollection();
-            Index.ById.TryRemoveRange(entities);
-            Index.ByGuid.TryRemoveRange(entities);
-            _innerEntitySet.RemoveRange(entities);
-        }
-
-        /// <inheritdoc />
-        public void ReAttach(TEntity entity) {
-            _innerEntitySet.ReAttach(entity);
-        }
-
-        /// <inheritdoc />
-        public void ReAttachRange(IEnumerable<TEntity> entities) {
-            entities = entities.AsCollection();
-            _innerEntitySet.ReAttachRange(entities);
+        public ValueTask<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities) {
+            var collection = entities.AsCollection();
+	        Index.AddOrUpdateRange(collection);
+			return _innerEntitySet.ReAttachRangeAsync(collection);
         }
 
         /// <inheritdoc />
@@ -101,13 +155,11 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
             object InterceptQueryResult(object result) {
                 switch(result) {
                     case TEntity entity:
-                        Index.ById.AddOrUpdate(entity);
-                        Index.ByGuid.AddOrUpdate(entity);
+                        Index.AddOrUpdate(entity);
                         break;
                     case IEnumerable<TEntity> entities:
                         entities = entities.AsCollection();
-                        Index.ById.AddOrUpdateRange(entities);
-                        Index.ByGuid.AddOrUpdateRange(entities);
+                        Index.AddOrUpdateRange(entities);
                         break;
                 }
 
@@ -117,96 +169,12 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
             return _innerEntitySet.Query().InterceptQueryResult(InterceptQueryResult);
         }
 
-        /// <inheritdoc />
-        public async Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default) {
-            if(Index.ById.TryGet(id, out var entity)) {
-                _innerEntitySet.ReAttach(entity);
-                return entity;
-            }
-
-            entity = await _innerEntitySet.GetAsync(id, cancellationToken);
-            if(entity != null) {
-                Index.ById.AddOrUpdate(entity);
-                Index.ByGuid.AddOrUpdate(entity);
-            } else
-                Index.ById.MarkNonPresent(id);
-
-            return entity;
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default) {
-            var foundAll = Index.ById.TryGetRange(ids, out var foundEntities, out var missingIds);
-            var list = foundEntities.AsCollection();
-            _innerEntitySet.ReAttachRange(list);
-
-            if(foundAll)
-                return list;
-
-            var missing = missingIds.ToHashSet();
-            foreach(var entity in await _innerEntitySet.GetRangeAsync(missing, cancellationToken)) {
-                missing.Remove(entity.Id);
-                Index.ById.AddOrUpdate(entity);
-                Index.ByGuid.AddOrUpdate(entity);
-                list.Add(entity);
-            }
-
-            Index.ById.MarkRangeNonPresent(missing);
-            return list;
-        }
-
-        /// <inheritdoc />
-        public async Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default) {
-            if(Index.ByGuid.TryGet(guid, out var entity)) {
-                _innerEntitySet.ReAttach(entity);
-                return entity;
-            }
-
-            entity = await _innerEntitySet.GetAsync(guid, cancellationToken);
-            if(entity != null) {
-                Index.ById.AddOrUpdate(entity);
-                Index.ByGuid.AddOrUpdate(entity);
-            } else
-                Index.ByGuid.MarkNonPresent(guid);
-
-            return entity;
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default) {
-            var foundAll = Index.ByGuid.TryGetRange(guids, out var foundEntities, out var missingGuids);
-            var list = foundEntities.AsCollection();
-            _innerEntitySet.ReAttachRange(list);
-
-            if(foundAll)
-                return list;
-
-            var missing = missingGuids.ToHashSet();
-            foreach(var entity in await _innerEntitySet.GetRangeAsync(missing, cancellationToken)) {
-                missing.Remove(entity.Guid);
-                Index.ById.AddOrUpdate(entity);
-                Index.ByGuid.AddOrUpdate(entity);
-                list.Add(entity);
-            }
-
-            Index.ByGuid.MarkRangeNonPresent(missing);
-            return list;
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
-            var entities = (await _innerEntitySet.GetAllAsync(cancellationToken)).AsCollection();
-            Index.ById.AddOrUpdateRange(entities);
-            Index.ByGuid.AddOrUpdateRange(entities);
-            return entities;
-        }
-
         /// <summary>
         /// A callback function to create the underlying entity index
         /// </summary>
         /// <returns></returns>
         protected virtual EntityIndex<TEntity> OnCreateCache() {
-            return _cacheFunc?.Invoke() ?? new EntityIndex<TEntity>();
+            return _cacheFunc?.Invoke() ?? new EntityIndex<TEntity>(_keySelectorFunc);
         }
     }
 }

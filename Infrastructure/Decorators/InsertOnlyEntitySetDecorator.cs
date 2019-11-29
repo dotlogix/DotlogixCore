@@ -9,9 +9,12 @@
 #region
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
+using DotLogix.Core.Extensions;
+
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Decorators {
@@ -26,32 +29,37 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
         public InsertOnlyEntitySetDecorator(IEntitySet<TEntity> baseEntitySet) : base(baseEntitySet) { }
 
         /// <inheritdoc />
-        public override void Add(TEntity entity) {
+        public override ValueTask<TEntity> AddAsync(TEntity entity) {
             entity.IsActive = true;
-            BaseEntitySet.Add(entity);
+            return BaseEntitySet.AddAsync(entity);
         }
 
         /// <inheritdoc />
-        public override void AddRange(IEnumerable<TEntity> entities) {
+        public override ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities) {
             var list = entities.ToList();
             foreach(var entity in list)
                 entity.IsActive = true;
-            BaseEntitySet.AddRange(list);
+            return BaseEntitySet.AddRangeAsync(list);
         }
 
         /// <summary>
         ///     Mark a single entity as deleted by setting its IsActive flag to false
         /// </summary>
-        public override void Remove(TEntity entity) {
+        public override ValueTask<TEntity> RemoveAsync(TEntity entity) {
             entity.IsActive = false;
+            return new ValueTask<TEntity>(entity);
         }
 
         /// <summary>
         ///     Mark a range of entities as deleted by setting their IsActive flag to false
         /// </summary>
-        public override void RemoveRange(IEnumerable<TEntity> entities) {
-            foreach(var entity in entities)
+        public override ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities)
+        {
+	        var collection = entities.AsCollection();
+			foreach(var entity in collection)
                 entity.IsActive = true;
+
+			return new ValueTask<IEnumerable<TEntity>>(collection);
         }
 
         /// <inheritdoc />

@@ -21,7 +21,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
     /// An interface for entity sets
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public interface IEntitySet<TEntity> where TEntity : ISimpleEntity {
+    public interface IEntitySet<TEntity> {
         #region Query
         /// <summary>
         /// Create a linq style query to allow more advanced requests to the entity set
@@ -31,63 +31,55 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
 
         #region Get
         /// <summary>
-        /// Get a single entity by id
+        /// Get a single entity by key
         /// </summary>
-        Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default);
-        /// <summary>
-        /// Get a range of entities by id
-        /// </summary>
-        Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default);
-        /// <summary>
-        /// Get a single entity by guid
-        /// </summary>
-        Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default);
-        /// <summary>
-        /// Get a range of entities by guid
-        /// </summary>
-        Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default);
-        /// <summary>
-        /// Get all entities
-        /// </summary>
-        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
+        ValueTask<TEntity> GetAsync(object key, CancellationToken cancellationToken = default);
+		/// <summary>
+		/// Get a range of entities by id
+		/// </summary>
+		ValueTask<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<object> keys, CancellationToken cancellationToken = default);
+		/// <summary>
+		/// Get all entities
+		/// </summary>
+		ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Get all entities matching an expression
-        /// </summary>
-        Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default);
+		/// <summary>
+		/// Get all entities matching an expression
+		/// </summary>
+		ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default);
         #endregion
 
         #region Add
         /// <summary>
         /// Add a single entity to the set
         /// </summary>
-        void Add(TEntity entity);
-        /// <summary>
-        /// Add a range of entities to the set
-        /// </summary>
-        void AddRange(IEnumerable<TEntity> entities);
-        #endregion
+        ValueTask<TEntity> AddAsync(TEntity entity);
+		/// <summary>
+		/// Add a range of entities to the set
+		/// </summary>
+		ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities);
+		#endregion
 
-        #region Remove
-        /// <summary>
-        /// Remove a single entity from the set
-        /// </summary>
-        void Remove(TEntity entity);
-        /// <summary>
-        /// Remove a range of entities from the set
-        /// </summary>
-        void RemoveRange(IEnumerable<TEntity> entities);
-        #endregion
+		#region Remove
+		/// <summary>
+		/// Remove a single entity from the set
+		/// </summary>
+		ValueTask<TEntity> RemoveAsync(TEntity entity);
+		/// <summary>
+		/// Remove a range of entities from the set
+		/// </summary>
+		ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities);
+		#endregion
 
-        #region ReAttach
-        /// <summary>
-        /// Reattach a single entity to the underlying change tracker
-        /// </summary>
-        void ReAttach(TEntity entity);
-        /// <summary>
-        /// Reattach a range of entities to the underlying change tracker
-        /// </summary>
-        void ReAttachRange(IEnumerable<TEntity> entities);
+		#region ReAttach
+		/// <summary>
+		/// Reattach a single entity to the underlying change tracker
+		/// </summary>
+		ValueTask<TEntity> ReAttachAsync(TEntity entity);
+		/// <summary>
+		/// Reattach a range of entities to the underlying change tracker
+		/// </summary>
+		ValueTask<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities);
         #endregion
     }
 }

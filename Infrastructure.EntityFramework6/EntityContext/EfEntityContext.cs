@@ -8,12 +8,10 @@
 
 #region
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Common.Options;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
-using DotLogix.Core.Extensions;
-using Microsoft.EntityFrameworkCore;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
@@ -47,23 +45,8 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
         }
 
         /// <inheritdoc />
-        public virtual IEntitySet<TEntity> UseSet<TEntity>() where TEntity : class
-        {
-	        var entityType = typeof(TEntity);
-	        var dbSet = DbContext.Set<TEntity>();
-	        if (entityType.IsAssignableTo<IGuid>()){
-		        return typeof(EfGuidEntitySet<>)
-		               .MakeGenericType(entityType)
-		               .Instantiate<IEntitySet<TEntity>>(dbSet);
-	        }
-
-	        if (entityType.IsAssignableTo<IIdentity>()) {
-		        return typeof(EfIdEntitySet<>)
-		               .MakeGenericType(entityType)
-		               .Instantiate<IEntitySet<TEntity>>(dbSet);
-	        }
-
-	        return new EfEntitySet<TEntity>(dbSet);
-		}
+        public virtual IEntitySet<TEntity> UseSet<TEntity>() where TEntity : class, ISimpleEntity {
+            return new EfEntitySet<TEntity>(DbContext.Set<TEntity>());
+        }
     }
 }

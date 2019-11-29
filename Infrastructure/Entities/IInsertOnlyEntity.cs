@@ -21,6 +21,6 @@ namespace DotLogix.Architecture.Infrastructure.Entities {
     /// <summary>
     /// An interface to activate second level caching for <see cref="ISimpleEntity"/>
     /// </summary>
-    [Indexed]
+    [GuidIndexed]
     public interface IGuidIndexedEntity : ISimpleEntity { }
 }

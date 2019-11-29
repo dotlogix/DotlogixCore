@@ -23,6 +23,6 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
         /// <summary>
         /// Creates a modification function which will be applied after a new <see cref="IEntitySet{TEntity}"/> is created
         /// </summary>
-        public abstract Func<IEntitySet<TEntity>, IEntitySet<TEntity>> GetModifierFunc<TEntity>() where TEntity : ISimpleEntity;
+        public abstract Func<IEntitySet<TEntity>, IEntitySet<TEntity>> GetModifierFunc<TEntity>();
     }
 }

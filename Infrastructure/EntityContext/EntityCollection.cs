@@ -13,6 +13,8 @@ using System.Linq;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Core.Collections;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Reflection.Dynamics;
+
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
@@ -20,43 +22,45 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
     /// A simple guid and id indexed entity collection
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class EntityIndex<TEntity> where TEntity : ISimpleEntity {
-        /// <summary>
-        /// The underlying entity collection for id caching
-        /// </summary>
-        public EntityCollection<int, TEntity> ById { get; }
-        /// <summary>
-        /// The underlying entity collection for guid caching
-        /// </summary>
-        public EntityCollection<Guid, TEntity> ByGuid { get; }
+    public class EntityIndex<TEntity> : EntityCollection<object, TEntity> {
+	    /// <inheritdoc />
+	    public EntityIndex(Func<TEntity, object> keySelector) : base(keySelector)
+	    {
+	    }
 
-        /// <summary>
-        /// Creates a new instance of <see cref="EntityIndex{TEntity}"/>
-        /// </summary>
-        public EntityIndex(EntityCollection<int, TEntity> byId, EntityCollection<Guid, TEntity> byGuid) {
-            ById = byId ?? throw new ArgumentNullException(nameof(byId));
-            ByGuid = byGuid ?? throw new ArgumentNullException(nameof(byGuid));
-        }
+	    /// <inheritdoc />
+	    public EntityIndex(Func<TEntity, object> keySelector, IEnumerable<TEntity> values) : base(keySelector, values)
+	    {
+	    }
 
-        /// <summary>
-        /// Creates a new instance of <see cref="EntityIndex{TEntity}"/>
-        /// </summary>
-        public EntityIndex(IEnumerable<TEntity> entities) {
-            if(entities == null)
-                throw new ArgumentNullException(nameof(entities));
-            entities = entities.AsCollection();
-            ById = new EntityCollection<int, TEntity>(e => e.Id, entities);
-            ByGuid = new EntityCollection<Guid, TEntity>(e => e.Guid, entities);
-        }
+	    /// <inheritdoc />
+	    public EntityIndex(Func<TEntity, object> keySelector, IEqualityComparer<object> equalityComparer) : base(keySelector, equalityComparer)
+	    {
+	    }
 
-        /// <summary>
-        /// Creates a new instance of <see cref="EntityIndex{TEntity}"/>
-        /// </summary>
-        public EntityIndex() {
-            ById = new EntityCollection<int, TEntity>(e => e.Id);
-            ByGuid = new EntityCollection<Guid, TEntity>(e => e.Guid);
-        }
-    }
+	    /// <inheritdoc />
+	    public EntityIndex(Func<TEntity, object> keySelector, IEqualityComparer<object> equalityComparer, IEnumerable<TEntity> values) : base(keySelector, equalityComparer, values)
+	    {
+		}       /// <inheritdoc />
+	    public EntityIndex(DynamicAccessor accessor) : base(e => accessor.GetValue(e))
+	    {
+	    }
+
+	    /// <inheritdoc />
+	    public EntityIndex(DynamicProperty accessor, IEnumerable<TEntity> values) : base(e => accessor.GetValue(e), values)
+	    {
+	    }
+
+	    /// <inheritdoc />
+	    public EntityIndex(DynamicProperty accessor, IEqualityComparer<object> equalityComparer) : base(e => accessor.GetValue(e), equalityComparer)
+	    {
+	    }
+
+	    /// <inheritdoc />
+	    public EntityIndex(DynamicProperty accessor, IEqualityComparer<object> equalityComparer, IEnumerable<TEntity> values) : base(e => accessor.GetValue(e), equalityComparer, values)
+	    {
+	    }
+	}
 
 
     /// <summary>
@@ -110,15 +114,6 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
         public void AddOrUpdateRange(IEnumerable<TEntity> entities) {
             foreach(var entity in entities)
                 AddOrUpdate(entity);
-        }
-        #endregion
-
-        #region Remove
-        /// <summary>
-        /// Tries to remove a range of entities by their key and also return all missing keys
-        /// </summary>
-        public bool TryRemoveRange(IEnumerable<TEntity> entities) {
-            return entities.All(Remove);
         }
         #endregion
 

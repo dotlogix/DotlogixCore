@@ -58,53 +58,43 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         }
 
         /// <inheritdoc />
-        public virtual Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default) {
-            return EntitySet.GetAsync(id, cancellationToken);
+        public virtual ValueTask<TEntity> GetAsync(object key, CancellationToken cancellationToken = default) {
+            return EntitySet.GetAsync(key, cancellationToken);
         }
 
         /// <inheritdoc />
-        public virtual Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default) {
-            return EntitySet.GetRangeAsync(ids, cancellationToken);
+        public virtual ValueTask<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<object> keys, CancellationToken cancellationToken = default) {
+            return EntitySet.GetRangeAsync(keys, cancellationToken);
         }
-
+		
         /// <inheritdoc />
-        public virtual Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default) {
-            return EntitySet.GetAsync(guid, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public virtual Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default) {
-            return EntitySet.GetRangeAsync(guids, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public virtual Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
+        public virtual ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
             return EntitySet.GetAllAsync(cancellationToken);
         }
 
         /// <inheritdoc />
-        public virtual Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
-            return EntitySet.Query().Where(filterExpression).ToEnumerableAsync(cancellationToken);
+        public virtual ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
+            return EntitySet.WhereAsync(filterExpression, cancellationToken);
         }
 
         /// <inheritdoc />
-        public virtual void Add(TEntity entity) {
-            EntitySet.Add(entity);
+        public virtual ValueTask<TEntity> AddAsync(TEntity entity) {
+            return EntitySet.AddAsync(entity);
         }
 
         /// <inheritdoc />
-        public virtual void AddRange(IEnumerable<TEntity> entities) {
-            EntitySet.AddRange(entities);
+        public virtual ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities) {
+            return EntitySet.AddRangeAsync(entities);
         }
 
         /// <inheritdoc />
-        public virtual void Remove(TEntity entity) {
-            EntitySet.Remove(entity);
+        public virtual ValueTask<TEntity> RemoveAsync(TEntity entity) {
+            return EntitySet.RemoveAsync(entity);
         }
 
         /// <inheritdoc />
-        public virtual void RemoveRange(IEnumerable<TEntity> entities) {
-            EntitySet.RemoveRange(entities);
+        public virtual ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities) {
+            return EntitySet.RemoveRangeAsync(entities);
         }
 
         /// <summary>

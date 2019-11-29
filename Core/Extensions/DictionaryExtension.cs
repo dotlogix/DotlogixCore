@@ -71,26 +71,17 @@ namespace DotLogix.Core.Extensions {
         ///     Find the the key of an item in the dictionary
         /// </summary>
         public static IDictionary<TKey, TValue> Merge<TKey, TValue>(this IEnumerable<IDictionary<TKey, TValue>> dicts, bool replaceExisting = true, IEqualityComparer<TKey> comparer = null) {
-            Dictionary<TKey, TValue> dictionary = null;
-            var enumerator = dicts.GetEnumerator();
-            try {
-                if(enumerator.MoveNext()) {
-                    dictionary = new Dictionary<TKey, TValue>(enumerator.Current, comparer ?? EqualityComparer<TKey>.Default);
-                    while(enumerator.MoveNext()) {
-                        if(replaceExisting) {
-                            foreach(var kv in enumerator.Current)
-                                dictionary[kv.Key] = kv.Value;
-                        } else {
-                            foreach(var kv in enumerator.Current)
-                                dictionary.TryAdd(kv.Key, kv.Value);
-                        }
-                    }
-                }
-            } finally {
-                enumerator.Dispose();
-            }
-
+            var dictionary = new Dictionary<TKey, TValue>(comparer ?? EqualityComparer<TKey>.Default);
+            Union(dictionary, dicts);
             return dictionary;
+        }
+
+        public static void Union<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEnumerable<IDictionary<TKey, TValue>> dicts) {
+            foreach(var dict in dicts) {
+                foreach(var kv in dict) {
+                    dictionary[kv.Key] = kv.Value;
+                }
+            }
         }
         #endregion
 

@@ -12,30 +12,83 @@ using System.Reflection;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
-    /// <summary>
-    /// A representation of a value accessor
-    /// </summary>
-    public abstract class DynamicAccessor {
+    public abstract class DynamicMember {
+        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        protected DynamicMember(MemberInfo memberInfo) {
+            MemberInfo = memberInfo;
+        }
+
         /// <summary>
         /// The name
         /// </summary>
-        public string Name { get; }
+        public string Name => MemberInfo.Name;
+
         /// <summary>
         /// The declaring type
         /// </summary>
-        public Type DeclaringType { get; }
+        public Type DeclaringType => MemberInfo.DeclaringType;
+
         /// <summary>
         /// The reflected type
         /// </summary>
-        public Type ReflectedType { get; }
-        /// <summary>
-        /// The value type
-        /// </summary>
-        public Type ValueType { get; }
+        public Type ReflectedType => MemberInfo.ReflectedType;
+
         /// <summary>
         /// The original member info
         /// </summary>
         public MemberInfo MemberInfo { get; }
+
+        protected bool Equals(DynamicMember other) {
+            return Equals(MemberInfo, other.MemberInfo);
+        }
+
+        /// <summary>Determines whether the specified object is equal to the current object.</summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns>true if the specified object  is equal to the current object; otherwise, false.</returns>
+        public override bool Equals(object obj) {
+            if(ReferenceEquals(null, obj))
+                return false;
+            if(ReferenceEquals(this, obj))
+                return true;
+            if(obj.GetType() != this.GetType())
+                return false;
+            return Equals((DynamicMember)obj);
+        }
+
+        /// <summary>Serves as the default hash function.</summary>
+        /// <returns>A hash code for the current object.</returns>
+        public override int GetHashCode() {
+            return (MemberInfo != null
+                    ? MemberInfo.GetHashCode()
+                    : 0);
+        }
+
+        /// <summary>Returns a value that indicates whether the values of two <see cref="T:DotLogix.Core.Reflection.Dynamics.DynamicMember" /> objects are equal.</summary>
+        /// <param name="left">The first value to compare.</param>
+        /// <param name="right">The second value to compare.</param>
+        /// <returns>true if the <paramref name="left" /> and <paramref name="right" /> parameters have the same value; otherwise, false.</returns>
+        public static bool operator ==(DynamicMember left, DynamicMember right) {
+            return Equals(left, right);
+        }
+
+        /// <summary>Returns a value that indicates whether two <see cref="T:DotLogix.Core.Reflection.Dynamics.DynamicMember" /> objects have different values.</summary>
+        /// <param name="left">The first value to compare.</param>
+        /// <param name="right">The second value to compare.</param>
+        /// <returns>true if <paramref name="left" /> and <paramref name="right" /> are not equal; otherwise, false.</returns>
+        public static bool operator !=(DynamicMember left, DynamicMember right) {
+            return !Equals(left, right);
+        }
+    }
+
+    /// <summary>
+    /// A representation of a value accessor
+    /// </summary>
+    public abstract class DynamicAccessor : DynamicMember {
+        /// <summary>
+        /// The value type
+        /// </summary>
+        public Type ValueType { get; }
+
         /// <summary>
         /// The accessor type
         /// </summary>
@@ -65,12 +118,8 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <summary>
         /// Creates a new instance of <see cref="DynamicAccessor"/>
         /// </summary>
-        protected DynamicAccessor(MemberInfo memberInfo, DynamicSetter setter, DynamicGetter getter, Type valueType, AccessorTypes accessorType) {
-            MemberInfo = memberInfo ?? throw new ArgumentNullException(nameof(memberInfo));
+        protected DynamicAccessor(MemberInfo memberInfo, DynamicSetter setter, DynamicGetter getter, Type valueType, AccessorTypes accessorType) : base(memberInfo) {
             ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
-            Name = MemberInfo.Name;
-            DeclaringType = memberInfo.DeclaringType;
-            ReflectedType = memberInfo.ReflectedType;
             AccessorType = accessorType;
             var accessMode = ValueAccessModes.None;
             if(getter != null) {

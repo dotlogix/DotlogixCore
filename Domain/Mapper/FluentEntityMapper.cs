@@ -7,6 +7,7 @@
 // ==================================================
 
 using System;
+using DotLogix.Architecture.Domain.Models;
 using DotLogix.Architecture.Domain.Models.Base;
 using DotLogix.Core.Utils.Mappers;
 
@@ -14,7 +15,7 @@ namespace DotLogix.Architecture.Domain.Mapper {
     /// <summary>
     /// A basic implementation of the <see cref="IEntityMapper{TEntity,TModel}"/> using reflection and shallow copying for 1:1 mapping of entities to their corresponding model
     /// </summary>
-    public class FluentEntityMapper<TEntity, TModel> : EntityMapperBase<TEntity, TModel> where TModel : SimpleModel, new() where TEntity : new()
+    public class FluentEntityMapper<TEntity, TModel> : EntityMapperBase<TEntity, TModel> where TModel : ISimpleModel, new() where TEntity : new()
     {
         private readonly IMapper<TEntity, TModel> _entityToModel;
         private readonly IMapper<TModel, TEntity> _modelToEntity;

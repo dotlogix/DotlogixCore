@@ -7,9 +7,11 @@
 // ==================================================
 
 #region
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 #endregion
 
@@ -22,9 +24,26 @@ namespace DotLogix.Core.Tracking.Snapshots {
         /// Create a snapshot
         /// </summary>
         public static ISnapshot CreateSnapshot(object target, AccessorTypes includedAccessors = AccessorTypes.Property) {
-            var dynamicType = target.GetType().CreateDynamicType(includedAccessors.GetMemberTypes());
-            var accessors = dynamicType.GetAccessors(includedAccessors).ToArray();
-            return CreateSnapshot(target, accessors);
+            var dynamicType = target.GetType().CreateDynamicType();
+
+            IEnumerable<DynamicAccessor> accessors;
+            switch (includedAccessors) {
+                case AccessorTypes.None:
+                    accessors = Enumerable.Empty<DynamicAccessor>();
+                    break;
+                case AccessorTypes.Property:
+                    accessors = dynamicType.Properties;
+                    break;
+                case AccessorTypes.Field:
+                    accessors = dynamicType.Fields;
+                    break;
+                case AccessorTypes.Any:
+                    accessors = dynamicType.Accessors;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(includedAccessors), includedAccessors, null);
+            }
+            return CreateSnapshot(target, accessors.AsArray());
         }
         /// <summary>
         /// Create a snapshot

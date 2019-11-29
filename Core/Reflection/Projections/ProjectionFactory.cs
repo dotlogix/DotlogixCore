@@ -39,8 +39,8 @@ namespace DotLogix.Core.Reflection.Projections {
 
         /// <inheritdoc />
         public virtual IEnumerable<IProjection> CreateProjections(Type left, Type right) {
-            var dynamicLeft = left.CreateDynamicType(MemberTypes.Property);
-            var dynamicRight = right.CreateDynamicType(MemberTypes.Property);
+            var dynamicLeft = left.CreateDynamicType();
+            var dynamicRight = right.CreateDynamicType();
 
             foreach(var leftProperty in dynamicLeft.Properties) {
                 var rightProperty = dynamicRight.GetProperty(leftProperty.Name);

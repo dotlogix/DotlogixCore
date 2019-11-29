@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -16,77 +17,82 @@ using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Reflection.Dynamics {
     /// <summary>
-    /// A representation of a type
+    ///     A representation of a type
     /// </summary>
     public class DynamicType {
-        private const BindingFlags AllBindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
+        private const BindingFlags AllBindingFlags = BindingFlags.Instance |
+                                                     BindingFlags.Static |
+                                                     BindingFlags.Public |
                                                      BindingFlags.NonPublic;
 
-        private readonly IReadOnlyDictionary<string, DynamicAccessor> _accessorsDict;
+
+        private readonly ConcurrentDictionary<MemberInfo, object> _memberMap = new ConcurrentDictionary<MemberInfo, object>();
+
+        private DynamicCtor[] _constructors;
 
 
-        private readonly DynamicCtor _defaultCtor;
-        private readonly IReadOnlyDictionary<string, DynamicField> _fieldDict;
-        private readonly IReadOnlyDictionary<string, DynamicProperty> _propertiesDict;
+        private Optional<DynamicCtor> _defaultConstructor;
+        private DynamicField[] _fields;
+        private DynamicInvoke[] _methods;
+        private DynamicProperty[] _properties;
+
+
         /// <summary>
-        /// The original type
+        ///     The original type
         /// </summary>
         public Type Type { get; }
+
         /// <summary>
-        /// The name
+        ///     The name
         /// </summary>
         public string Name { get; }
 
-        /// <summary>
-        /// The constructors
-        /// </summary>
-        public IReadOnlyList<DynamicCtor> Constructors { get; }
-        /// <summary>
-        /// The methods
-        /// </summary>
-        public IReadOnlyList<DynamicInvoke> Methods { get; }
+        public DynamicCtor DefaultConstructor => _defaultConstructor.IsDefined
+                                                 ? _defaultConstructor.Value
+                                                 : (_defaultConstructor = CreateDefaultConstructor()).Value;
+
 
         /// <summary>
-        /// The accessors
+        ///     The constructors
         /// </summary>
-        public IReadOnlyList<DynamicAccessor> Accessors { get; }
+        public IEnumerable<DynamicCtor> Constructors => _constructors ?? (_constructors = CreateConstructors());
 
         /// <summary>
-        /// The properties
+        ///     The methods
         /// </summary>
-        public IReadOnlyList<DynamicProperty> Properties { get; }
+        public IEnumerable<DynamicInvoke> Methods => _methods ?? (_methods = CreateMethods());
 
         /// <summary>
-        /// The fields
+        ///     The accessors
         /// </summary>
-        public IReadOnlyList<DynamicField> Fields { get; }
+        public IEnumerable<DynamicAccessor> Accessors => Properties.Concat<DynamicAccessor>(Fields);
 
         /// <summary>
-        /// Checks if there is a default constructor
+        ///     The properties
         /// </summary>
-        public bool HasDefaultConstructor => _defaultCtor != null;
+        public IEnumerable<DynamicProperty> Properties => _properties ?? (_properties = CreateProperties());
 
         /// <summary>
-        /// Creates a new instance of <see cref="DynamicType"/>
+        ///     The fields
         /// </summary>
-        public DynamicType(Type type, MemberTypes includedMemberTypes = MemberTypes.All) {
+        public IEnumerable<DynamicField> Fields => _fields ?? (_fields = CreateFields());
+
+        /// <summary>
+        ///     Checks if there is a default constructor
+        /// </summary>
+        public bool HasDefaultConstructor => DefaultConstructor != null;
+
+        /// <summary>
+        ///     Creates a new instance of <see cref="DynamicType" />
+        /// </summary>
+        public DynamicType(Type type) {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             Name = type.Name;
-
-            Fields = CreateFields(type, includedMemberTypes)?.ToList();
-            Properties = CreateProperties(type, includedMemberTypes)?.ToList();
-            Accessors = CreateAccessors(Fields, Properties, includedMemberTypes)?.ToList();
-            Methods = CreateMethods(type, includedMemberTypes)?.ToList();
-            Constructors = CreateConstructors(type, out _defaultCtor, includedMemberTypes);
-
-            _propertiesDict = Properties?.ToDictionary(p => p.Name);
-            _fieldDict = Fields?.ToDictionary(f => f.Name);
-            _accessorsDict = Accessors?.ToDictionary(a => a.Name);
         }
 
         #region Object
         /// <summary>
-        /// Returns the name of the type
+        ///     Returns the name of the type
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
@@ -94,193 +100,822 @@ namespace DotLogix.Core.Reflection.Dynamics {
         }
         #endregion
 
-        #region Accessors
+        #region Constructors
         /// <summary>
-        /// Tries to get a property.<br></br>
-        /// If the property can not be found the method returns null
+        ///     When overridden in a derived class, searches for the constructors defined for the current
+        ///     <see cref="T:System.Type"></see>, using the specified BindingFlags.
         /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        public DynamicProperty GetProperty(string propertyName) {
-            if(propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-            return _propertiesDict.TryGetValue(propertyName, out var property) ? property : null;
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <returns>
+        ///     An array of <see cref="T:System.Reflection.ConstructorInfo"></see> objects representing all constructors
+        ///     defined for the current <see cref="T:System.Type"></see> that match the specified binding constraints, including
+        ///     the type initializer if it is defined. Returns an empty array of type
+        ///     <see cref="T:System.Reflection.ConstructorInfo"></see> if no constructors are defined for the current
+        ///     <see cref="T:System.Type"></see>, if none of the defined constructors match the binding constraints, or if the
+        ///     current <see cref="T:System.Type"></see> represents a type parameter in the definition of a generic type or generic
+        ///     method.
+        /// </returns>
+        public IEnumerable<DynamicCtor> GetConstructors(BindingFlags bindingAttr) {
+            var ctors = Type.GetConstructors(bindingAttr);
+            return ctors.Select(RegisterConstructor)
+                        .SkipNull();
         }
 
         /// <summary>
-        /// Tries to get a field.<br></br>
-        /// If the field can not be found the method returns null
+        ///     Searches for a constructor whose parameters match the specified argument types and modifiers, using the
+        ///     specified binding constraints and the specified calling convention.
         /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        public DynamicField GetField(string fieldName) {
-            if(fieldName == null)
-                throw new ArgumentNullException(nameof(fieldName));
-            return _fieldDict.TryGetValue(fieldName, out var field) ? field : null;
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <param name="binder">
+        ///     An object that defines a set of properties and enables binding, which can involve selection of an
+        ///     overloaded method, coercion of argument types, and invocation of a member through reflection.   -or-   A null
+        ///     reference (Nothing in Visual Basic), to use the <see cref="P:System.Type.DefaultBinder"></see>.
+        /// </param>
+        /// <param name="callConvention">
+        ///     The object that specifies the set of rules to use regarding the order and layout of
+        ///     arguments, how the return value is passed, what registers are used for arguments, and the stack is cleaned up.
+        /// </param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the constructor to get.   -or-   An empty array of the type <see cref="T:System.Type"></see>
+        ///     (that is, Type[] types = new Type[0]) to get a constructor that takes no parameters.
+        /// </param>
+        /// <param name="modifiers">
+        ///     An array of <see cref="T:System.Reflection.ParameterModifier"></see> objects representing the
+        ///     attributes associated with the corresponding element in the types array. The default binder does not process this
+        ///     parameter.
+        /// </param>
+        /// <returns>An object representing the constructor that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="types">types</paramref> is null.   -or-   One of the
+        ///     elements in <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///     <paramref name="types">types</paramref> is multidimensional.   -or-
+        ///     <paramref name="modifiers">modifiers</paramref> is multidimensional.   -or-
+        ///     <paramref name="types">types</paramref> and <paramref name="modifiers">modifiers</paramref> do not have the same
+        ///     length.
+        /// </exception>
+        public DynamicCtor GetConstructor(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers) {
+            var ctor = Type.GetConstructor(bindingAttr, binder, callConvention, types, modifiers);
+            return ctor != null
+                   ? RegisterConstructor(ctor)
+                   : null;
         }
 
         /// <summary>
-        /// Tries to get a accessor.<br></br>
-        /// If the accessor can not be found the method returns null
+        ///     Searches for a constructor whose parameters match the specified argument types and modifiers, using the
+        ///     specified binding constraints.
         /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        public DynamicAccessor GetAccessor(string accessorName) {
-            if(accessorName == null)
-                throw new ArgumentNullException(nameof(accessorName));
-            return _accessorsDict.TryGetValue(accessorName, out var accessor) ? accessor : null;
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <param name="binder">
+        ///     An object that defines a set of properties and enables binding, which can involve selection of an
+        ///     overloaded method, coercion of argument types, and invocation of a member through reflection.   -or-   A null
+        ///     reference (Nothing in Visual Basic), to use the <see cref="P:System.Type.DefaultBinder"></see>.
+        /// </param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the constructor to get.   -or-   An empty array of the type <see cref="T:System.Type"></see>
+        ///     (that is, Type[] types = new Type[0]) to get a constructor that takes no parameters.   -or-
+        ///     <see cref="F:System.Type.EmptyTypes"></see>.
+        /// </param>
+        /// <param name="modifiers">
+        ///     An array of <see cref="T:System.Reflection.ParameterModifier"></see> objects representing the
+        ///     attributes associated with the corresponding element in the parameter type array. The default binder does not
+        ///     process this parameter.
+        /// </param>
+        /// <returns>
+        ///     A <see cref="T:System.Reflection.ConstructorInfo"></see> object representing the constructor that matches the
+        ///     specified requirements, if found; otherwise, null.
+        /// </returns>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="types">types</paramref> is null.   -or-   One of the
+        ///     elements in <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///     <paramref name="types">types</paramref> is multidimensional.   -or-
+        ///     <paramref name="modifiers">modifiers</paramref> is multidimensional.   -or-
+        ///     <paramref name="types">types</paramref> and <paramref name="modifiers">modifiers</paramref> do not have the same
+        ///     length.
+        /// </exception>
+        public DynamicCtor GetConstructor(BindingFlags bindingAttr, Binder binder, Type[] types, ParameterModifier[] modifiers) {
+            var ctor = Type.GetConstructor(bindingAttr, binder, types, modifiers);
+            return ctor != null
+                   ? RegisterConstructor(ctor)
+                   : null;
+        }
+
+        /// <summary>Searches for a public instance constructor whose parameters match the types in the specified array.</summary>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the desired constructor.   -or-   An empty array of <see cref="T:System.Type"></see> objects, to
+        ///     get a constructor that takes no parameters. Such an empty array is provided by the static field
+        ///     <see cref="F:System.Type.EmptyTypes"></see>.
+        /// </param>
+        /// <returns>
+        ///     An object representing the instance constructor whose parameters match the types in the parameter type
+        ///     array, if found; otherwise, null.
+        /// </returns>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="types">types</paramref> is null.   -or-   One of the
+        ///     elements in <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException"><paramref name="types">types</paramref> is multidimensional.</exception>
+        public DynamicCtor GetConstructor(params Type[] types) {
+            var ctor = Type.GetConstructor(types);
+            return ctor != null
+                   ? RegisterConstructor(ctor)
+                   : null;
+        }
+        #endregion
+
+        #region Fields
+        /// <summary>
+        ///     Searches for the fields defined for the current
+        /// </summary>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <returns>
+        ///     An array of <see cref="T:System.Reflection.FieldInfo"></see> objects representing all fields defined for the
+        ///     current <see cref="T:System.Type"></see> that match the specified binding constraints.   -or-   An empty array of
+        ///     type <see cref="T:System.Reflection.FieldInfo"></see>, if no fields are defined for the current
+        ///     <see cref="T:System.Type"></see>, or if none of the defined fields match the binding constraints.
+        /// </returns>
+        public IEnumerable<DynamicField> GetFields(BindingFlags bindingAttr) {
+            var fields = Type.GetFields(bindingAttr);
+            return fields.Select(RegisterField)
+                         .SkipNull();
         }
 
         /// <summary>
-        /// Enumerate all accessors of the type
+        /// Searches for the field with the specified name.
         /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        public IEnumerable<DynamicAccessor> GetAccessors(AccessorTypes types = AccessorTypes.Any,
-                                                         ValueAccessModes accessModes = ValueAccessModes.ReadWrite) {
-            IEnumerable<DynamicAccessor> accessors;
-            switch(types) {
-                case AccessorTypes.None:
-                    return Enumerable.Empty<DynamicAccessor>();
-                case AccessorTypes.Property:
-                    accessors = Properties;
-                    break;
-                case AccessorTypes.Field:
-                    accessors = Fields;
-                    break;
-                case AccessorTypes.Any:
-                    accessors = Accessors;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(types), types, null);
-            }
-            return accessors.Where(a => (a.ValueAccessMode & accessModes) == accessModes);
+        /// <param name="name">The string containing the name of the data field to get.</param>
+        /// <returns>An object representing the field with the specified name, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
+        /// <exception cref="T:System.NotSupportedException">
+        ///     This <see cref="T:System.Type"></see> object is a
+        ///     <see cref="T:System.Reflection.Emit.TypeBuilder"></see> whose
+        ///     <see cref="M:System.Reflection.Emit.TypeBuilder.CreateType"></see> method has not yet been called.
+        /// </exception>
+        public DynamicField GetField(string name) {
+            var field = Type.GetField(name);
+            return field != null
+                   ? RegisterField(field)
+                   : null;
+        }
+
+        /// <summary>Searches for the specified field, using the specified binding constraints.</summary>
+        /// <param name="name">The string containing the name of the data field to get.</param>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <returns>An object representing the field that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
+        public DynamicField GetField(string name, BindingFlags bindingAttr) {
+            var field = Type.GetField(name, bindingAttr);
+            return field != null
+                   ? RegisterField(field)
+                   : null;
         }
         #endregion
 
         #region Methods
         /// <summary>
-        /// Tries to get a method.<br></br>
-        /// If the method can not be found the method returns null
+        ///     Searches for the methods defined for the current
+        ///     <see cref="T:System.Type"></see>, using the specified binding constraints.
         /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <returns>
+        ///     An array of <see cref="T:System.Reflection.MethodInfo"></see> objects representing all methods defined for the
+        ///     current <see cref="T:System.Type"></see> that match the specified binding constraints.   -or-   An empty array of
+        ///     type <see cref="T:System.Reflection.MethodInfo"></see>, if no methods are defined for the current
+        ///     <see cref="T:System.Type"></see>, or if none of the defined methods match the binding constraints.
+        /// </returns>
+        public IEnumerable<DynamicInvoke> GetMethods(BindingFlags bindingAttr) {
+            var methods = Type.GetMethods(bindingAttr);
+            return methods.Select(RegisterMethod)
+                          .SkipNull();
+        }
 
-        public DynamicInvoke GetMethod(string methodName) {
-            if(methodName == null)
-                throw new ArgumentNullException(nameof(methodName));
-            var methods = GetMethods(methodName).ToList();
-            if(methods.Count > 1)
-                throw new AmbiguousMatchException("There are multiple methods with this name defined");
-            return methods.Count == 1 ? methods[0] : null;
+        /// <summary>Searches for the method with the specified name.</summary>
+        /// <param name="name">The string containing the name of the method to get.</param>
+        /// <returns>An object that represents the method with the specified name, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">More than one method is found with the specified name.</exception>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
+        public DynamicInvoke GetMethod(string name) {
+            var method = Type.GetMethod(name);
+            return method != null
+                   ? RegisterMethod(method)
+                   : null;
+        }
+
+        /// <summary>Searches for the specified method, using the specified binding constraints.</summary>
+        /// <param name="name">The string containing the name of the method to get.</param>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <returns>An object representing the method that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one method is found with the specified name and
+        ///     matching the specified binding constraints.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
+        public DynamicInvoke GetMethod(string name, BindingFlags bindingAttr) {
+            var method = Type.GetMethod(name, bindingAttr);
+            return method != null
+                   ? RegisterMethod(method)
+                   : null;
         }
 
         /// <summary>
-        /// Tries to get a method.<br></br>
-        /// If the method can not be found the method returns null
+        ///     Searches for the specified method whose parameters match the specified argument types and modifiers, using the
+        ///     specified binding constraints and the specified calling convention.
         /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        public DynamicInvoke GetMethod(string methodName, params Type[] parametersTypes) {
-            if(methodName == null)
-                throw new ArgumentNullException(nameof(methodName));
-            if(parametersTypes == null)
-                throw new ArgumentNullException(nameof(parametersTypes));
-            return Methods.FirstOrDefault(m => (m.Name == methodName) &&
-                                               TypeArrayEquals(m.ParameterTypes, parametersTypes));
+        /// <param name="name">The string containing the name of the method to get.</param>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <param name="binder">
+        ///     An object that defines a set of properties and enables binding, which can involve selection of an
+        ///     overloaded method, coercion of argument types, and invocation of a member through reflection.   -or-   A null
+        ///     reference (Nothing in Visual Basic), to use the <see cref="P:System.Type.DefaultBinder"></see>.
+        /// </param>
+        /// <param name="callConvention">
+        ///     The object that specifies the set of rules to use regarding the order and layout of
+        ///     arguments, how the return value is passed, what registers are used for arguments, and how the stack is cleaned up.
+        /// </param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the method to get.   -or-   An empty array of <see cref="T:System.Type"></see> objects (as
+        ///     provided by the <see cref="F:System.Type.EmptyTypes"></see> field) to get a method that takes no parameters.
+        /// </param>
+        /// <param name="modifiers">
+        ///     An array of <see cref="T:System.Reflection.ParameterModifier"></see> objects representing the
+        ///     attributes associated with the corresponding element in the types array. To be only used when calling through COM
+        ///     interop, and only parameters that are passed by reference are handled. The default binder does not process this
+        ///     parameter.
+        /// </param>
+        /// <returns>An object representing the method that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one method is found with the specified name and
+        ///     matching the specified binding constraints.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null.   -or-
+        ///     <paramref name="types">types</paramref> is null.   -or-   One of the elements in
+        ///     <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///     <paramref name="types">types</paramref> is multidimensional.   -or-
+        ///     <paramref name="modifiers">modifiers</paramref> is multidimensional.
+        /// </exception>
+        public DynamicInvoke GetMethod(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers) {
+            var method = Type.GetMethod(name, bindingAttr, binder, callConvention, types, modifiers);
+            return method != null
+                   ? RegisterMethod(method)
+                   : null;
         }
 
         /// <summary>
-        /// Enumerate all methods
+        ///     Searches for the specified method whose parameters match the specified argument types and modifiers, using the
+        ///     specified binding constraints.
         /// </summary>
-        public IEnumerable<DynamicInvoke> GetMethods(string methodName) {
-            return Methods.Where(m => m.Name == methodName);
+        /// <param name="name">The string containing the name of the method to get.</param>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <param name="binder">
+        ///     An object that defines a set of properties and enables binding, which can involve selection of an
+        ///     overloaded method, coercion of argument types, and invocation of a member through reflection.   -or-   A null
+        ///     reference (Nothing in Visual Basic), to use the <see cref="P:System.Type.DefaultBinder"></see>.
+        /// </param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the method to get.   -or-   An empty array of <see cref="T:System.Type"></see> objects (as
+        ///     provided by the <see cref="F:System.Type.EmptyTypes"></see> field) to get a method that takes no parameters.
+        /// </param>
+        /// <param name="modifiers">
+        ///     An array of <see cref="T:System.Reflection.ParameterModifier"></see> objects representing the
+        ///     attributes associated with the corresponding element in the types array. To be only used when calling through COM
+        ///     interop, and only parameters that are passed by reference are handled. The default binder does not process this
+        ///     parameter.
+        /// </param>
+        /// <returns>An object representing the method that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one method is found with the specified name and
+        ///     matching the specified binding constraints.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null.   -or-
+        ///     <paramref name="types">types</paramref> is null.   -or-   One of the elements in
+        ///     <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///     <paramref name="types">types</paramref> is multidimensional.   -or-
+        ///     <paramref name="modifiers">modifiers</paramref> is multidimensional.
+        /// </exception>
+        public DynamicInvoke GetMethod(
+        string name,
+        BindingFlags bindingAttr,
+        Binder binder,
+        Type[] types,
+        ParameterModifier[] modifiers) {
+            var method = Type.GetMethod(name, bindingAttr, binder, types, modifiers);
+            return method != null
+                   ? RegisterMethod(method)
+                   : null;
+        }
+
+        /// <summary>Searches for the specified public method whose parameters match the specified argument types.</summary>
+        /// <param name="name">The string containing the name of the method to get.</param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the method to get.   -or-   An empty array of <see cref="T:System.Type"></see> objects (as
+        ///     provided by the <see cref="F:System.Type.EmptyTypes"></see> field) to get a method that takes no parameters.
+        /// </param>
+        /// <returns>
+        ///     An object representing the method whose parameters match the specified argument types, if found;
+        ///     otherwise, null.
+        /// </returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one method is found with the specified name and
+        ///     specified parameters.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null.   -or-
+        ///     <paramref name="types">types</paramref> is null.   -or-   One of the elements in
+        ///     <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException"><paramref name="types">types</paramref> is multidimensional.</exception>
+        public DynamicInvoke GetMethod(string name, params Type[] types) {
+            var method = Type.GetMethod(name, types);
+            return method != null
+                   ? RegisterMethod(method)
+                   : null;
+        }
+
+        /// <summary>Searches for the specified public method whose parameters match the specified argument types and modifiers.</summary>
+        /// <param name="name">The string containing the name of the method to get.</param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the method to get.   -or-   An empty array of <see cref="T:System.Type"></see> objects (as
+        ///     provided by the <see cref="F:System.Type.EmptyTypes"></see> field) to get a method that takes no parameters.
+        /// </param>
+        /// <param name="modifiers">
+        ///     An array of <see cref="T:System.Reflection.ParameterModifier"></see> objects representing the
+        ///     attributes associated with the corresponding element in the types array. To be only used when calling through COM
+        ///     interop, and only parameters that are passed by reference are handled. The default binder does not process this
+        ///     parameter.
+        /// </param>
+        /// <returns>An object representing the method that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one method is found with the specified name and
+        ///     specified parameters.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null.   -or-
+        ///     <paramref name="types">types</paramref> is null.   -or-   One of the elements in
+        ///     <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///     <paramref name="types">types</paramref> is multidimensional.   -or-
+        ///     <paramref name="modifiers">modifiers</paramref> is multidimensional.
+        /// </exception>
+        public DynamicInvoke GetMethod(string name, Type[] types, ParameterModifier[] modifiers) {
+            var method = Type.GetMethod(name, types, modifiers);
+            return method != null
+                   ? RegisterMethod(method)
+                   : null;
         }
         #endregion
 
-        #region Ctor
-
+        #region Properties
         /// <summary>
-        /// Tries to get a constructor.<br></br>
-        /// If the constructor can not be found the method returns null
+        ///     When overridden in a derived class, searches for the properties of the current
+        ///     <see cref="T:System.Type"></see>, using the specified binding constraints.
         /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <returns>
+        ///     An array of <see cref="T:System.Reflection.PropertyInfo"></see> objects representing all properties of the
+        ///     current <see cref="T:System.Type"></see> that match the specified binding constraints.   -or-   An empty array of
+        ///     type <see cref="T:System.Reflection.PropertyInfo"></see>, if the current <see cref="T:System.Type"></see> does not
+        ///     have properties, or if none of the properties match the binding constraints.
+        /// </returns>
+        public IEnumerable<DynamicProperty> GetProperties(BindingFlags bindingAttr) {
+            var properties = Type.GetProperties(bindingAttr);
+            return properties.Select(RegisterProperty)
+                             .SkipNull();
+        }
 
-        public DynamicCtor GetConstructor(params Type[] parametersTypes) {
-            if(parametersTypes == null)
-                throw new ArgumentNullException(nameof(parametersTypes));
-            if(parametersTypes.Length == 0)
-                return _defaultCtor;
+        /// <summary>Searches for the property with the specified name.</summary>
+        /// <param name="name">The string containing the name of the property to get.</param>
+        /// <returns>An object representing the property with the specified name, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">More than one property is found with the specified name.</exception>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
+        public DynamicProperty GetProperty(string name) {
+            var property = Type.GetProperty(name);
+            return property != null
+                   ? RegisterProperty(property)
+                   : null;
+        }
 
-            return Constructors.FirstOrDefault(c => TypeArrayEquals(c.ParameterTypes, parametersTypes));
+        /// <summary>Searches for the specified property, using the specified binding constraints.</summary>
+        /// <param name="name">The string containing the name of the property to get.</param>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <returns>An object representing the property that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one property is found with the specified name
+        ///     and matching the specified binding constraints.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
+        public DynamicProperty GetProperty(string name, BindingFlags bindingAttr) {
+            var property = Type.GetProperty(name, bindingAttr);
+            return property != null
+                   ? RegisterProperty(property)
+                   : null;
         }
 
         /// <summary>
-        /// Tries to get a constructor.<br></br>
-        /// If the constructor can not be found the method returns null
+        ///     Searches for the specified property whose parameters match the specified argument types and modifiers, using
+        ///     the specified binding constraints.
         /// </summary>
-        public DynamicCtor GetDefaultConstructor() {
-            return _defaultCtor;
+        /// <param name="name">The string containing the name of the property to get.</param>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <param name="binder">
+        ///     An object that defines a set of properties and enables binding, which can involve selection of an
+        ///     overloaded method, coercion of argument types, and invocation of a member through reflection.   -or-   A null
+        ///     reference (Nothing in Visual Basic), to use the <see cref="P:System.Type.DefaultBinder"></see>.
+        /// </param>
+        /// <param name="returnType">The return type of the property.</param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the indexed property to get.   -or-   An empty array of the type
+        ///     <see cref="T:System.Type"></see> (that is, Type[] types = new Type[0]) to get a property that is not indexed.
+        /// </param>
+        /// <param name="modifiers">
+        ///     An array of <see cref="T:System.Reflection.ParameterModifier"></see> objects representing the
+        ///     attributes associated with the corresponding element in the types array. The default binder does not process this
+        ///     parameter.
+        /// </param>
+        /// <returns>An object representing the property that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one property is found with the specified name
+        ///     and matching the specified binding constraints.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null.   -or-
+        ///     <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///     <paramref name="types">types</paramref> is multidimensional.   -or-
+        ///     <paramref name="modifiers">modifiers</paramref> is multidimensional.   -or-
+        ///     <paramref name="types">types</paramref> and <paramref name="modifiers">modifiers</paramref> do not have the same
+        ///     length.
+        /// </exception>
+        /// <exception cref="T:System.NullReferenceException">An element of <paramref name="types">types</paramref> is null.</exception>
+        public DynamicProperty GetProperty(
+        string name,
+        BindingFlags bindingAttr,
+        Binder binder,
+        Type returnType,
+        Type[] types,
+        ParameterModifier[] modifiers) {
+            var property = Type.GetProperty(name, bindingAttr, binder, returnType, types, modifiers);
+            return property != null
+                   ? RegisterProperty(property)
+                   : null;
         }
+
+        /// <summary>Searches for the property with the specified name and return type.</summary>
+        /// <param name="name">The string containing the name of the property to get.</param>
+        /// <param name="returnType">The return type of the property.</param>
+        /// <returns>An object representing the property with the specified name, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">More than one property is found with the specified name.</exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null, or
+        ///     <paramref name="returnType">returnType</paramref> is null.
+        /// </exception>
+        public DynamicProperty GetProperty(string name, Type returnType) {
+            var property = Type.GetProperty(name, returnType);
+            return property != null
+                   ? RegisterProperty(property)
+                   : null;
+        }
+
+        /// <summary>Searches for the specified public property whose parameters match the specified argument types.</summary>
+        /// <param name="name">The string containing the name of the property to get.</param>
+        /// <param name="returnType">The return type of the property.</param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the indexed property to get.   -or-   An empty array of the type
+        ///     <see cref="T:System.Type"></see> (that is, Type[] types = new Type[0]) to get a property that is not indexed.
+        /// </param>
+        /// <returns>
+        ///     An object representing the property whose parameters match the specified argument types, if found;
+        ///     otherwise, null.
+        /// </returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one property is found with the specified name
+        ///     and matching the specified argument types.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null.   -or-
+        ///     <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException"><paramref name="types">types</paramref> is multidimensional.</exception>
+        /// <exception cref="T:System.NullReferenceException">An element of <paramref name="types">types</paramref> is null.</exception>
+        public DynamicProperty GetProperty(string name, Type returnType, Type[] types) {
+            var property = Type.GetProperty(name, returnType, types);
+            return property != null
+                   ? RegisterProperty(property)
+                   : null;
+        }
+
+        /// <summary>Searches for the specified public property whose parameters match the specified argument types and modifiers.</summary>
+        /// <param name="name">The string containing the name of the property to get.</param>
+        /// <param name="returnType">The return type of the property.</param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the indexed property to get.   -or-   An empty array of the type
+        ///     <see cref="T:System.Type"></see> (that is, Type[] types = new Type[0]) to get a property that is not indexed.
+        /// </param>
+        /// <param name="modifiers">
+        ///     An array of <see cref="T:System.Reflection.ParameterModifier"></see> objects representing the
+        ///     attributes associated with the corresponding element in the types array. The default binder does not process this
+        ///     parameter.
+        /// </param>
+        /// <returns>An object representing the property that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one property is found with the specified name
+        ///     and matching the specified argument types and modifiers.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null.   -or-
+        ///     <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///     <paramref name="types">types</paramref> is multidimensional.   -or-
+        ///     <paramref name="modifiers">modifiers</paramref> is multidimensional.   -or-
+        ///     <paramref name="types">types</paramref> and <paramref name="modifiers">modifiers</paramref> do not have the same
+        ///     length.
+        /// </exception>
+        /// <exception cref="T:System.NullReferenceException">An element of <paramref name="types">types</paramref> is null.</exception>
+        public DynamicProperty GetProperty(
+        string name,
+        Type returnType,
+        Type[] types,
+        ParameterModifier[] modifiers) {
+            var property = Type.GetProperty(name, returnType, types, modifiers);
+            return property != null
+                   ? RegisterProperty(property)
+                   : null;
+        }
+
+        /// <summary>Searches for the specified public property whose parameters match the specified argument types.</summary>
+        /// <param name="name">The string containing the name of the property to get.</param>
+        /// <param name="types">
+        ///     An array of <see cref="T:System.Type"></see> objects representing the number, order, and type of
+        ///     the parameters for the indexed property to get.   -or-   An empty array of the type
+        ///     <see cref="T:System.Type"></see> (that is, Type[] types = new Type[0]) to get a property that is not indexed.
+        /// </param>
+        /// <returns>
+        ///     An object representing the property whose parameters match the specified argument types, if found;
+        ///     otherwise, null.
+        /// </returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one property is found with the specified name
+        ///     and matching the specified argument types.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null.   -or-
+        ///     <paramref name="types">types</paramref> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException"><paramref name="types">types</paramref> is multidimensional.</exception>
+        /// <exception cref="T:System.NullReferenceException">An element of <paramref name="types">types</paramref> is null.</exception>
+        public DynamicProperty GetProperty(string name, params Type[] types) {
+            var property = Type.GetProperty(name, types);
+            return property != null
+                   ? RegisterProperty(property)
+                   : null;
+        }
+        #endregion
+
+
+        #region Accessors
+        /// <summary>
+        ///     When overridden in a derived class, searches for the accessors of the current <see cref="T:System.Type"></see>
+        ///     , using the specified binding constraints.
+        /// </summary>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <returns>
+        ///     An array of <see cref="T:System.Reflection.AccessorInfo"></see> objects representing all accessors of the
+        ///     current <see cref="T:System.Type"></see> that match the specified binding constraints.   -or-   An empty array of
+        ///     type <see cref="T:System.Reflection.AccessorInfo"></see>, if the current <see cref="T:System.Type"></see> does not
+        ///     have accessors, or if none of the accessors match the binding constraints.
+        /// </returns>
+        public IEnumerable<DynamicAccessor> GetAccessors(BindingFlags bindingAttr) {
+            var properties = GetProperties(bindingAttr);
+            var fields = GetFields(bindingAttr);
+
+            return properties.Concat<DynamicAccessor>(fields);
+        }
+
+        /// <summary>Searches for the accessor with the specified name.</summary>
+        /// <param name="name">The string containing the name of the accessor to get.</param>
+        /// <returns>An object representing the accessor with the specified name, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">More than one accessor is found with the specified name.</exception>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
+        public DynamicAccessor GetAccessor(string name) {
+            return (DynamicAccessor)GetProperty(name) ?? GetField(name);
+        }
+
+        /// <summary>Searches for the specified accessor, using the specified binding constraints.</summary>
+        /// <param name="name">The string containing the name of the accessor to get.</param>
+        /// <param name="bindingAttr">
+        ///     A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"></see> that
+        ///     specify how the search is conducted.   -or-   Zero, to return null.
+        /// </param>
+        /// <returns>An object representing the accessor that matches the specified requirements, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">
+        ///     More than one accessor is found with the specified name
+        ///     and matching the specified binding constraints.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
+        public DynamicAccessor GetAccessor(string name, BindingFlags bindingAttr) {
+            return (DynamicAccessor)GetProperty(name, bindingAttr) ?? GetField(name, bindingAttr);
+        }
+
+        /// <summary>Searches for the accessor with the specified name and return type.</summary>
+        /// <param name="name">The string containing the name of the accessor to get.</param>
+        /// <param name="returnType">The return type of the accessor.</param>
+        /// <returns>An object representing the accessor with the specified name, if found; otherwise, null.</returns>
+        /// <exception cref="T:System.Reflection.AmbiguousMatchException">More than one accessor is found with the specified name.</exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="name">name</paramref> is null, or
+        ///     <paramref name="returnType">returnType</paramref> is null.
+        /// </exception>
+        public DynamicAccessor GetAccessor(string name, Type returnType) {
+            var accessor = GetProperty(name, returnType);
+            if(accessor != null)
+                return accessor;
+
+            var field = GetField(name);
+            if(field == null)
+                return null;
+
+            return field.ValueType == returnType
+                   ? field
+                   : null;
+        }
+        #endregion
+
+        #region Resolve
+
+        /// <summary>
+        ///     Tries to resolve the corresponding dynamic constructor
+        /// </summary>
+        public DynamicMember Resolve(MemberInfo memberInfo)
+        {
+            switch(memberInfo) {
+                case ConstructorInfo constructorInfo:
+                    return Resolve(constructorInfo);
+                case FieldInfo fieldInfo:
+                    return Resolve(fieldInfo);
+                case MethodInfo methodInfo:
+                    return Resolve(methodInfo);
+                case PropertyInfo propertyInfo:
+                    return Resolve(propertyInfo);
+            }
+            return null;
+        }
+
+        /// <summary>
+        ///     Tries to resolve the corresponding dynamic constructor
+        /// </summary>
+        public DynamicCtor Resolve(ConstructorInfo ctor)
+        {
+            if (ctor.ReflectedType != Type)
+                throw new ArgumentException("The ctor is reflected by another type");
+            return RegisterConstructor(ctor);
+        }
+
+        /// <summary>
+        ///     Tries to resolve the corresponding dynamic field
+        /// </summary>
+        public DynamicField Resolve(FieldInfo field) {
+            if(field.ReflectedType != Type)
+                throw new ArgumentException("The field is reflected by another type");
+            return RegisterField(field);
+        }
+
+        /// <summary>
+        ///     Tries to resolve the corresponding dynamic property
+        /// </summary>
+        public DynamicProperty Resolve(PropertyInfo property)
+        {
+            if (property.ReflectedType != Type)
+                throw new ArgumentException("The property is reflected by another type");
+            return RegisterProperty(property);
+        }
+
+        /// <summary>
+        ///     Tries to resolve the corresponding dynamic method
+        /// </summary>
+        public DynamicInvoke Resolve(MethodInfo method)
+        {
+            if (method.ReflectedType != Type)
+                throw new ArgumentException("The method is reflected by another type");
+            return RegisterMethod(method);
+        }
+
         #endregion
 
         #region Helper
-        private static List<DynamicCtor> CreateConstructors(Type type, out DynamicCtor defaultCtor,
-                                                            MemberTypes includedMemberTypes) {
-            if((includedMemberTypes & MemberTypes.Constructor) == 0) {
-                defaultCtor = null;
-                return new List<DynamicCtor>();
-            }
-
-            var dynamicCtors = from constructor in type.GetConstructors(AllBindingFlags)
-                               let dynamicCtor = constructor.CreateDynamicCtor()
-                               where dynamicCtor != null
-                               select dynamicCtor;
-            var ctors = dynamicCtors.ToList();
-            defaultCtor = ctors.FirstOrDefault(ctor => ctor.IsDefault);
-            if((defaultCtor != null) || (type.IsValueType == false))
-                return ctors;
-
-            defaultCtor = type.CreateDefaultCtor();
+        public DynamicCtor CreateDefaultConstructor() {
+            var defaultCtor = Type.GetConstructor(Type.EmptyTypes);
             if(defaultCtor != null)
-                ctors.Insert(0, defaultCtor);
-            return ctors;
+                return RegisterConstructor(defaultCtor);
+            return Type.IsValueType
+                   ? Type.CreateDefaultCtor()
+                   : null;
         }
 
-        private static IEnumerable<DynamicInvoke> CreateMethods(Type type, MemberTypes includedMemberTypes) {
-            if((includedMemberTypes & MemberTypes.Method) == 0)
-                return null;
-            var dynamicMethods = from method in type.GetMethods(AllBindingFlags)
-                                 let dynamicMethod = method.CreateDynamicInvoke()
-                                 where dynamicMethod != null
-                                 select dynamicMethod;
-            return dynamicMethods;
+        private DynamicCtor[] CreateConstructors() {
+            var dynamicCtors = Type.GetConstructors(AllBindingFlags)
+                                   .Select(RegisterConstructor)
+                                   .SkipNull()
+                                   .ToList();
+            if(Type.IsValueType && (dynamicCtors.Any(c => c.IsDefault) == false))
+                dynamicCtors.Add(DefaultConstructor);
+            return dynamicCtors.ToArray();
         }
 
-        private static IEnumerable<DynamicField> CreateFields(Type type, MemberTypes includedMemberTypes) {
-            if((includedMemberTypes & MemberTypes.Field) == 0)
-                return Enumerable.Empty<DynamicField>();
-            var dynamicFields = from field in type.GetFields(AllBindingFlags)
-                                let dynamicField = field.CreateDynamicField()
-                                where dynamicField != null
-                                select dynamicField;
-            return dynamicFields;
+        private DynamicInvoke[] CreateMethods() {
+            return Type.GetMethods(AllBindingFlags)
+                       .Select(RegisterMethod)
+                       .SkipNull()
+                       .ToArray();
         }
 
-        private static IEnumerable<DynamicProperty> CreateProperties(Type type, MemberTypes includedMemberTypes) {
-            if((includedMemberTypes & MemberTypes.Property) == 0)
-                return null;
-            var dynamicProperties = from property in type.GetPropertiesByInheritance()
-                                    let dynamicProperty = property.CreateDynamicProperty()
-                                    where dynamicProperty != null
-                                    select dynamicProperty;
-            return dynamicProperties;
+        private DynamicField[] CreateFields() {
+            return Type.GetFields(AllBindingFlags)
+                       .Select(RegisterField)
+                       .SkipNull()
+                       .ToArray();
         }
 
-        private static IEnumerable<DynamicAccessor> CreateAccessors(
-            IEnumerable<DynamicAccessor> dynamicFields, IEnumerable<DynamicAccessor> dynamicProperties,
-            MemberTypes includedMemberTypes) {
-            if(((includedMemberTypes & MemberTypes.Field) | MemberTypes.Property) == 0)
-                return null;
+        private DynamicProperty[] CreateProperties() {
+            return Type.GetProperties(AllBindingFlags)
+                       .Select(RegisterProperty)
+                       .SkipNull()
+                       .ToArray();
+        }
 
-            if(dynamicFields == null)
-                return dynamicProperties;
+        private DynamicCtor RegisterConstructor(ConstructorInfo constructorInfo) {
+            return (DynamicCtor)_memberMap.GetOrAdd(constructorInfo, c => ((ConstructorInfo)c).CreateDynamicCtor());
+        }
 
-            return dynamicProperties != null ? dynamicFields.Concat(dynamicProperties) : dynamicFields;
+        private DynamicInvoke RegisterMethod(MethodInfo methodInfo) {
+            return (DynamicInvoke)_memberMap.GetOrAdd(methodInfo, c => ((MethodInfo)c).CreateDynamicInvoke());
+        }
+
+        private DynamicField RegisterField(FieldInfo fieldInfo) {
+            return (DynamicField)_memberMap.GetOrAdd(fieldInfo, c => ((FieldInfo)c).CreateDynamicField());
+        }
+
+        private DynamicProperty RegisterProperty(PropertyInfo propertyInfo) {
+            return (DynamicProperty)_memberMap.GetOrAdd(propertyInfo, c => ((PropertyInfo)c).CreateDynamicProperty());
         }
 
         private static bool TypeArrayEquals(Type[] left, Type[] right) {
@@ -290,6 +925,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
                 if(left[i] != right[i])
                     return false;
             }
+
             return true;
         }
         #endregion

@@ -22,8 +22,8 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <summary>
         /// Create a dynamic type representation of a system type
         /// </summary>
-        public static DynamicType CreateDynamicType(this Type type, MemberTypes includedMemberTypes = MemberTypes.All) {
-            return new DynamicType(type, includedMemberTypes);
+        public static DynamicType CreateDynamicType(this Type type) {
+            return new DynamicType(type);
         }
         #endregion
 
@@ -161,6 +161,19 @@ namespace DotLogix.Core.Reflection.Dynamics {
         #endregion
 
         #region Accessors
+        /// <summary>
+        /// Create a dynamic type representation of a property
+        /// </summary>
+        public static DynamicAccessor CreateDynamicAccessor(this MemberInfo memberInfo) {
+            switch(memberInfo) {
+                case FieldInfo fieldInfo:
+                    return CreateDynamicField(fieldInfo);
+                case PropertyInfo propertyInfo:
+                    return CreateDynamicProperty(propertyInfo);
+            }
+            return null;
+        }
+        
         /// <summary>
         /// Create a dynamic type representation of a property
         /// </summary>

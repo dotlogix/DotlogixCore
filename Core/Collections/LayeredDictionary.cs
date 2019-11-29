@@ -7,40 +7,51 @@
 // ==================================================
 
 #region
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DotLogix.Core.Extensions;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Collections {
+    public class LayeredDictionary<TKey, TValue> : LayeredDictionary<TKey, TValue, Dictionary<TKey, TValue>> {
+        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        public LayeredDictionary(IEqualityComparer<TKey> equalityComparer) : base((eq) => new Dictionary<TKey, TValue>(eq), equalityComparer) { }
+
+        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        public LayeredDictionary() : this(null) { }
+    }
+
     /// <inheritdoc />
     public class LayeredDictionary<TKey, TValue, TDictionary> : ILayeredDictionary<TKey, TValue, TDictionary> where TDictionary : class, IDictionary<TKey, TValue> {
+        public Func<IEqualityComparer<TKey>, TDictionary> DictionaryFactoryFunc { get; }
+        public IEqualityComparer<TKey> EqualityComparer { get; }
+
         /// <summary>
         /// The internal stack of dictionaries
         /// </summary>
         protected Stack<TDictionary> LayerStack { get; }
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
-        public LayeredDictionary() {
+        public LayeredDictionary(Func<IEqualityComparer<TKey>, TDictionary> dictionaryFactoryFunc, IEqualityComparer<TKey> equalityComparer = null) {
+            DictionaryFactoryFunc = dictionaryFactoryFunc;
+            EqualityComparer = equalityComparer ?? EqualityComparer<TKey>.Default;
             LayerStack = new Stack<TDictionary>();
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
-        public LayeredDictionary(IEnumerable<TDictionary> dictionary) {
-            LayerStack = new Stack<TDictionary>(dictionary);
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
-        public LayeredDictionary(TDictionary dictionary) : this() {
-            PushLayer(dictionary);
+            PushLayer();
         }
 
         /// <summary>Returns an enumerator that iterates through the collection.</summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() {
+            var keySet = new HashSet<TKey>();
+
             foreach(var layer in LayerStack) {
-                foreach(var value in layer)
-                    yield return value;
+                foreach(var kv in layer) {
+                    if(keySet.Add(kv.Key))
+                        yield return kv;
+                }
             }
         }
 
@@ -59,7 +70,9 @@ namespace DotLogix.Core.Collections {
         ///     The <see cref="T:System.Collections.Generic.ICollection`1"></see> is
         ///     read-only.
         /// </exception>
-        void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item) { }
+        void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item) {
+            CurrentLayer.Add(item);
+        }
 
         /// <summary>Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"></see>.</summary>
         /// <exception cref="T:System.NotSupportedException">
@@ -68,6 +81,7 @@ namespace DotLogix.Core.Collections {
         /// </exception>
         public void Clear() {
             LayerStack.Clear();
+            PushLayer();
         }
 
         /// <summary>
@@ -105,10 +119,7 @@ namespace DotLogix.Core.Collections {
         ///     <paramref name="array">array</paramref>.
         /// </exception>
         void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) {
-            foreach(var layer in LayerStack) {
-                layer.CopyTo(array, arrayIndex);
-                arrayIndex += layer.Count;
-            }
+            this.ToList().CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -132,7 +143,7 @@ namespace DotLogix.Core.Collections {
 
         /// <summary>Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"></see>.</summary>
         /// <returns>The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"></see>.</returns>
-        public int Count => LayerStack.Sum(l => l.Count);
+        public int Count => Keys.Count;
 
         /// <summary>
         ///     Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"></see> is
@@ -147,9 +158,10 @@ namespace DotLogix.Core.Collections {
         /// <inheritdoc />
         public TDictionary CurrentLayer => LayerStack.Count > 0 ? LayerStack.Peek() : default;
 
+
         /// <inheritdoc />
-        public void PushLayer(TDictionary collection) {
-            LayerStack.Push(collection);
+        public void PushLayer() {
+            LayerStack.Push(CreateDictionary());
         }
 
         /// <inheritdoc />
@@ -197,23 +209,28 @@ namespace DotLogix.Core.Collections {
         }
 
         /// <inheritdoc />
-        public ICollection<TKey> Keys => LayerStack.SelectMany(l => l.Keys).ToList();
+        public ICollection<TKey> Keys => LayerStack.SelectMany(l => l.Keys).ToHashSet(EqualityComparer);
 
         /// <inheritdoc />
-        public ICollection<TValue> Values => LayerStack.SelectMany(l => l.Values).ToList();
+        public ICollection<TValue> Values => this.Select(kv => kv.Value).ToList();
+
+        /// <summary>
+        /// Merges all layers to a new dictionary
+        /// </summary>
+        /// <returns></returns>
+        public TDictionary Reduce() {
+            return Reduce(CreateDictionary());
+        }
 
         /// <summary>
         /// Merges all layers to the target dictionary
         /// </summary>
-        /// <param name="targetDictionary"></param>
         /// <returns></returns>
         public TDictionary Reduce(TDictionary targetDictionary) {
-            foreach(var layer in LayerStack) {
-                foreach(var value in layer)
-                    targetDictionary[value.Key] = value.Value;
-            }
-
+            targetDictionary.Union(LayerStack);
             return targetDictionary;
         }
+
+        protected TDictionary CreateDictionary() => DictionaryFactoryFunc.Invoke(EqualityComparer);
     }
 }

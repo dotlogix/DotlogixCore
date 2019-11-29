@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DotLogix.Architecture.Domain.Models;
 using DotLogix.Architecture.Domain.Models.Base;
 
 namespace DotLogix.Architecture.Domain.Mapper {
     /// <summary>
     /// A basic implementation of the <see cref="IEntityMapper{TEntity,TModel}"/> for 1:1 mapping of entities to their corresponding model
     /// </summary>
-    public abstract class EntityMapperBase<TEntity, TModel> : IEntityMapper<TEntity, TModel> where TModel : SimpleModel, new() where TEntity : new()
+    public abstract class EntityMapperBase<TEntity, TModel> : IEntityMapper<TEntity, TModel> where TModel : ISimpleModel, new() where TEntity : new()
     {
         #region Map
         /// <inheritdoc />

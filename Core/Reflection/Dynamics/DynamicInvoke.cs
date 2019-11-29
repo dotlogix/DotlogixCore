@@ -17,11 +17,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
     /// <summary>
     /// A representation of a method
     /// </summary>
-    public class DynamicInvoke {
-        /// <summary>
-        /// The original method info
-        /// </summary>
-        public MethodInfo MethodInfo { get; }
+    public class DynamicInvoke  : DynamicMember{
         /// <summary>
         /// The access modifiers
         /// </summary>
@@ -31,13 +27,14 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </summary>
         public VisibilityModifiers Visibility { get; }
         /// <summary>
+        /// The original method info
+        /// </summary>
+        public MethodInfo MethodInfo { get; }
+
+        /// <summary>
         /// The invocation delegate
         /// </summary>
         public InvokeDelegate InvokeDelegate { get; }
-        /// <summary>
-        /// The declaring type
-        /// </summary>
-        public Type DeclaringType { get; }
         /// <summary>
         /// The return type
         /// </summary>
@@ -54,19 +51,12 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// The parameter count
         /// </summary>
         public int ParameterCount => Parameters.Length;
-        /// <summary>
-        /// The name
-        /// </summary>
-        public string Name { get; set; }
-
         internal DynamicInvoke(MethodInfo methodInfo, AccessModifiers access, VisibilityModifiers visibility,
-                               InvokeDelegate invokeDelegate) {
-            MethodInfo = methodInfo ?? throw new ArgumentNullException(nameof(methodInfo));
+                               InvokeDelegate invokeDelegate) : base(methodInfo) {
+            MethodInfo = methodInfo;
             InvokeDelegate = invokeDelegate ?? throw new ArgumentNullException(nameof(invokeDelegate));
-            Name = methodInfo.Name;
             Access = access;
             Visibility = visibility;
-            DeclaringType = methodInfo.DeclaringType;
             Parameters = methodInfo.GetParameters();
             ParameterTypes = Parameters.Select(p => p.ParameterType).ToArray();
             ReturnType = methodInfo.ReturnType;

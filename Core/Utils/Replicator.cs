@@ -20,7 +20,7 @@ namespace DotLogix.Core.Utils {
         /// Create a shallow copy of an object
         /// </summary>
         public T FlatClone<T>(T value) where T:new() {
-            return (T)FlatClone(typeof(T), value, new T());
+            return  (T)FlatClone(typeof(T), value, new T());
         }
 
         /// <summary>
@@ -34,11 +34,8 @@ namespace DotLogix.Core.Utils {
         /// <summary>
         /// Create a shallow copy of an object
         /// </summary>
-        private object FlatClone(Type type, object source, object target)
-        {
-            if(_replicatorCache.TryRetrieve(type, out var properties) == false)
-                properties = CreateMapping(type);
-            _replicatorCache.Store(type, properties, TimeSpan.FromMinutes(15));
+        private object FlatClone(Type type, object source, object target) {
+            var properties = _replicatorCache.RetrieveOrCreate(type, CreateMapping, TimeSpan.FromMinutes(15));
 
             foreach (var dynamicProperty in properties)
                 dynamicProperty.SetValue(target, dynamicProperty.GetValue(source));
@@ -46,7 +43,7 @@ namespace DotLogix.Core.Utils {
         }
 
         private IReadOnlyList<DynamicProperty> CreateMapping(Type type) {
-            return type.CreateDynamicType(MemberTypes.Property).Properties;
+            return type.CreateDynamicType().Properties.AsArray();
         }
     }
 }

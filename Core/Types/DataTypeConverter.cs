@@ -43,22 +43,23 @@ namespace DotLogix.Core.Types {
         }
 
         private DataType CreateDataType(Type type) {
-            DataType dataType;
             if(type.IsEnumerable(out var elementType))
-                dataType = new DataType(DataTypeFlags.Collection, type, elementType: elementType);
-            else {
-                var underlyingType = Nullable.GetUnderlyingType(type);
-                if(underlyingType == null) {
-                    var flags = type.IsEnum
-                                    ? DataTypeFlags.Primitive | DataTypeFlags.Enum
-                                    : DataTypeFlags.Complex | DataTypeFlags.Object;
-                    dataType = new DataType(flags, type);
-                } else {
-                    var underlayingDataType = GetDataType(underlyingType);
-                    dataType = new DataType(DataTypeFlags.Nullable | underlayingDataType.Flags, type, underlyingType);
-                }
+                return new DataType(DataTypeFlags.Collection, type, elementType: elementType);
+
+            var underlyingType = Nullable.GetUnderlyingType(type);
+            if(underlyingType != null) {
+                var underlyingDataType = GetDataType(underlyingType);
+                return new DataType(DataTypeFlags.Nullable | underlyingDataType.Flags, type, underlyingType);
             }
-            return dataType;
+
+            DataTypeFlags flags;
+            if(type.IsEnum) {
+                flags = DataTypeFlags.Primitive | DataTypeFlags.Enum;
+                underlyingType = Enum.GetUnderlyingType(type);
+            } else {
+                flags = DataTypeFlags.Complex | DataTypeFlags.Object;
+            }
+            return new DataType(flags, type, underlyingType);
         }
 
         private static ConcurrentDictionary<Type, DataType> CreatePrimitiveTypes() {

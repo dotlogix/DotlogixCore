@@ -17,7 +17,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
     /// <summary>
     /// A representation of a constructor
     /// </summary>
-    public class DynamicCtor {
+    public class DynamicCtor : DynamicMember{
         /// <summary>
         /// The original constructor info
         /// </summary>
@@ -37,11 +37,6 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// The constructor delegate
         /// </summary>
         public CtorDelegate CtorDelegate { get; }
-
-        /// <summary>
-        /// The declaring type
-        /// </summary>
-        public Type DeclaringType { get; }
 
         /// <summary>
         /// The parameters
@@ -64,8 +59,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
 
         internal DynamicCtor(Type declaringType, ConstructorInfo constructorInfo, AccessModifiers access,
                              VisibilityModifiers visibility,
-                             CtorDelegate ctorDelegate) {
-            DeclaringType = declaringType ?? throw new ArgumentNullException(nameof(declaringType));
+                             CtorDelegate ctorDelegate) : base(constructorInfo) {
             CtorDelegate = ctorDelegate ?? throw new ArgumentNullException(nameof(ctorDelegate));
             ConstructorInfo = constructorInfo;
             Access = access;

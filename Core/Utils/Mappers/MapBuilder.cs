@@ -64,8 +64,8 @@ namespace DotLogix.Core.Utils.Mappers {
             SourceType = sourceType ?? typeof(TSource);
             TargetType = sourceType ?? typeof(TTarget);
 
-            DynamicSourceType = SourceType.CreateDynamicType(MemberTypes.Property);
-            DynamicTargetType = TargetType.CreateDynamicType(MemberTypes.Property);
+            DynamicSourceType = SourceType.CreateDynamicType();
+            DynamicTargetType = TargetType.CreateDynamicType();
         }
 
         public MapBuilder<TSource, TTarget> Map(string sourceProperty, string targetProperty, Action<ValueMapBuilder<TSource, object, TTarget, object>> configure = null) {

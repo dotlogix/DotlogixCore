@@ -7,41 +7,41 @@
 // ==================================================
 
 #region
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Collections {
+    public class LayeredCollection<TValue> : LayeredCollection<TValue, List<TValue>> {
+        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        public LayeredCollection() : base(()=>new List<TValue>()) { }
+    }
+
+
     /// <inheritdoc />
     public class LayeredCollection<TValue, TCollection> : ILayeredCollection<TValue, TCollection> where TCollection : ICollection<TValue> {
+        private readonly Func<TCollection> _createCollectionFunc;
+
         /// <summary>
         /// The internal stack of collections
         /// </summary>
         protected Stack<TCollection> LayerStack { get; }
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
-        public LayeredCollection() {
+        public LayeredCollection(Func<TCollection> createCollectionFunc) {
+            _createCollectionFunc = createCollectionFunc;
             LayerStack = new Stack<TCollection>();
+            PushLayer();
         }
 
-        /// <summary>Initializes a new instance of the <see cref="LayeredCollection{TValue,TCollection}"></see> class.</summary>
-        public LayeredCollection(IEnumerable<TCollection> layers) {
-            LayerStack = new Stack<TCollection>(layers);
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="LayeredCollection{TValue,TCollection}"></see> class.</summary>
-        public LayeredCollection(TCollection layer) : this() {
-            PushLayer(layer);
-        }
 
         /// <summary>Returns an enumerator that iterates through the collection.</summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<TValue> GetEnumerator() {
-            foreach(var layer in LayerStack) {
-                foreach(var value in layer)
-                    yield return value;
-            }
+            return LayerStack.Concat<TValue, TCollection>().GetEnumerator();
         }
 
         /// <summary>Returns an enumerator that iterates through a collection.</summary>
@@ -150,17 +150,17 @@ namespace DotLogix.Core.Collections {
         public TCollection CurrentLayer => LayerStack.Count > 0 ? LayerStack.Peek() : default;
 
         /// <inheritdoc />
-        public void PushLayer(TCollection collection) {
-            LayerStack.Push(collection);
+        public void PushLayer() {
+            LayerStack.Push(_createCollectionFunc.Invoke());
         }
 
         /// <inheritdoc />
-        public TCollection PopLayer() {
+        public virtual TCollection PopLayer() {
             return LayerStack.Pop();
         }
 
         /// <inheritdoc />
-        public TCollection PeekLayer() {
+        public virtual TCollection PeekLayer() {
             return LayerStack.Peek();
         }
     }

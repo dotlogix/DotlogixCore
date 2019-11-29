@@ -7,6 +7,9 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using DotLogix.Core.Nodes.Converters;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
@@ -18,14 +21,23 @@ namespace DotLogix.Core.Nodes.Factories {
     /// </summary>
     public class ObjectNodeConverterFactory : NodeConverterFactoryBase {
         /// <inheritdoc />
-        public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
+        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter) {
             converter = null;
-            if(nodeType != NodeTypes.Map)
+            if(typeSettings.NodeType != NodeTypes.Map)
                 return false;
-            if((dataType.Flags & DataTypeFlags.CategoryMask) != DataTypeFlags.Complex)
+            if((typeSettings.DataType.Flags & DataTypeFlags.CategoryMask) != DataTypeFlags.Complex)
                 return false;
 
-            converter = new ObjectNodeConverter(dataType, AccessorTypes.Property, true);
+            var memberSettings = new List<MemberSettings>();
+            foreach(var dynamicProperty in typeSettings.DynamicType.Properties) {
+                if(dynamicProperty.PropertyInfo.IsDefined(typeof(IgnoreMemberAttribute)))
+
+                if(resolver.TryResolve(typeSettings, dynamicProperty, out var memberSetting))
+                    memberSettings.Add(memberSetting);
+                else
+                    return false;
+            }
+            converter = new ObjectNodeConverter(typeSettings, memberSettings);
             return true;
         }
     }

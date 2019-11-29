@@ -161,8 +161,6 @@ namespace DotLogix.Core.Nodes.Processor {
         private void AppendName(string name) {
             _builder.Append('"');
 
-            if(_formatterSettings.NamingStrategy != null)
-                name = _formatterSettings.NamingStrategy.TransformName(name);
             JsonStrings.AppendJsonString(_builder, name);
 
             _builder.Append("\":");

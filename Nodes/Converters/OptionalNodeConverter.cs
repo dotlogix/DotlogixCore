@@ -7,6 +7,7 @@
 // ==================================================
 
 #region
+using System;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
@@ -21,12 +22,20 @@ namespace DotLogix.Core.Nodes.Converters {
         /// <summary>
         /// Creates a new instance of <see cref="OptionalNodeConverter{TValue}"/>
         /// </summary>
-        public OptionalNodeConverter(DataType dataType) : base(dataType) { }
+        public OptionalNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings) {
             var opt = (Optional<TValue>)instance;
-            return opt.IsDefined ? Nodes.WriteToAsync(rootName, opt.Value, typeof(TValue), writer, settings) : default;
+            if(opt.IsDefined == false || TypeSettings.ShouldEmitValue(opt.Value, settings) == false)
+                return default;
+            if(settings.Resolver.TryResolve(typeof(TValue), out var optionalTypeSettings)) {
+                optionalTypeSettings.Converter.WriteAsync(opt.Value, name, writer, settings);
+            } else {
+                throw new NotSupportedException($"Can not resolve a converter for optional value type {typeof(TValue).Name}");
+            }
+
+            return default;
         }
 
         /// <inheritdoc />
@@ -34,8 +43,35 @@ namespace DotLogix.Core.Nodes.Converters {
             if(node.Type == NodeTypes.Empty)
                 return new Optional<TValue>(default);
 
-            var value = Nodes.ToObject<TValue>(node);
-            return new Optional<TValue>(value);
+            if(settings.Resolver.TryResolve(typeof(TValue), out var optionalTypeSettings) == false)
+                throw new NotSupportedException($"Can not resolve a converter for optional value type {typeof(TValue).Name}");
+
+
+            var optionalValue = optionalTypeSettings.Converter.ConvertToObject(node, settings);
+            return new Optional<TValue>((TValue)optionalValue);
+
+        }
+    }
+    
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to node values
+    /// </summary>
+    public class NodeToNodeConverter : NodeConverter {
+        /// <summary>
+        /// Creates a new instance of <see cref="OptionalNodeConverter{TValue}"/>
+        /// </summary>
+        public NodeToNodeConverter(TypeSettings typeSettings, bool dynamic = false) : base(typeSettings) { }
+
+        /// <inheritdoc />
+        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings) {
+            var reader = new NodeReader((Node)instance);
+            return reader.CopyToAsync(writer);
+        }
+
+        /// <inheritdoc />
+        public override object ConvertToObject(Node node, ConverterSettings settings) {
+            return node;
+
         }
     }
 }

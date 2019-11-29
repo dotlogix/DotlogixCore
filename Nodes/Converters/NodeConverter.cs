@@ -21,9 +21,10 @@ namespace DotLogix.Core.Nodes.Converters {
         /// <summary>
         /// Creates a new instance of <see cref="NodeConverter"/>
         /// </summary>
-        protected NodeConverter(DataType dataType) {
-            DataType = dataType;
-            Type = dataType.Type;
+        protected NodeConverter(TypeSettings typeSettings) {
+            TypeSettings = typeSettings;
+            DataType = typeSettings.DataType;
+            Type = typeSettings.DataType.Type;
         }
 
         /// <inheritdoc />
@@ -31,10 +32,16 @@ namespace DotLogix.Core.Nodes.Converters {
         /// <inheritdoc />
         public DataType DataType { get; }
         /// <inheritdoc />
-        public abstract ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings);
+        public TypeSettings TypeSettings { get; }
+
+        /// <inheritdoc />
+        public abstract ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings);
 
         /// <inheritdoc />
         public abstract object ConvertToObject(Node node, ConverterSettings settings);
 
+        protected static string GetMemberName(MemberSettings member, ConverterSettings settings) {
+            return member.Name ?? (member.NamingStrategy ?? settings.NamingStrategy)?.TransformName(member.Accessor.Name) ?? member.Accessor.Name;
+        }
     }
 }

@@ -17,13 +17,13 @@ namespace DotLogix.Core.Nodes.Factories {
     /// </summary>
     public class ValueNodeConverterFactory : NodeConverterFactoryBase {
         /// <inheritdoc />
-        public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
+        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter) {
             converter = null;
-            if(nodeType != NodeTypes.Value)
+            if(typeSettings.NodeType != NodeTypes.Value)
                 return false;
-            if((dataType.Flags & DataTypeFlags.CategoryMask) != DataTypeFlags.Primitive)
+            if((typeSettings.DataType.Flags & DataTypeFlags.CategoryMask) != DataTypeFlags.Primitive)
                 return false;
-            converter = new ValueNodeConverter(dataType);
+            converter = new ValueNodeConverter(typeSettings);
             return true;
         }
     }

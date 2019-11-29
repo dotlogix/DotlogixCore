@@ -22,11 +22,11 @@ namespace DotLogix.Core.Nodes.Converters {
         /// <summary>
         /// Creates a new instance of <see cref="ValueNodeConverter"/>
         /// </summary>
-        public ValueNodeConverter(DataType dynamicType) : base(dynamicType) { }
+        public ValueNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings) {
-            return writer.WriteValueAsync(rootName, instance);
+        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings) {
+            return writer.WriteValueAsync(name, instance);
         }
 
         /// <inheritdoc />

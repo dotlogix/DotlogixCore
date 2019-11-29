@@ -8,6 +8,8 @@
 
 #region
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Nodes.Processor;
@@ -80,17 +82,27 @@ namespace TestApp {
 
     internal class Program {
         public class Person {
+            [NodeProperty(Name = "test")]
             public string FirstName { get; set; }
+            [NodeProperty(NamingStrategy = typeof(SnakeCaseNamingStrategy))]
             public string LastName { get; set; }
+            [NodeChild(EmitMode = EmitMode.IgnoreDefault)]
+            public IEnumerable<int> Enumerable { get; set; }
+            [NodeProperty(EmitMode = EmitMode.IgnoreDefault)]
+            public int DefaultInt { get; set; }
+
+            [NodeProperty(EmitMode = EmitMode.IgnoreDefault)]
+            public string DefaultString { get; set; }
         }
 
         private static async Task Main(string[] args) {
-            var json = "{\"name\":\"Alex\",\"id\":1,\"guid\":\"605f282d-f216-4588-bede-512753ffc0cb\"}";
-            var node = JsonNodes.ToNode<NodeMap>(json);
-            node.AddChild("person", Nodes.ToNode(new Person{FirstName="Alex", LastName = "Schill"}));
-            node.GetChild<NodeMap>("person").AddChild("childPerson", Nodes.ToNode(new Person { FirstName = "Alex", LastName = "Schill" }));
-            var flat = node.Flatten();
-            Console.WriteLine(JsonNodes.ToJson(flat, JsonFormatterSettings.Idented));
+            var person = new Person {FirstName = "Alex", LastName = "Schill", Enumerable = new []{0, 1,2,0,3,4}};
+
+
+            var json = JsonNodes.ToJson(person);
+            Console.WriteLine(json);
+
+            var deserializedPerson = JsonNodes.FromJson<Person>(json);
 
             Console.Read();
         }

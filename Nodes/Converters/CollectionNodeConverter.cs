@@ -24,37 +24,39 @@ namespace DotLogix.Core.Nodes.Converters {
     /// <typeparam name="T"></typeparam>
     public class CollectionNodeConverter<T> : NodeConverter {
         private readonly DynamicCtor _ctor;
-        private readonly Type _elementType = typeof(T);
-        private readonly bool _isDefaultCtor;
 
         /// <summary>
         /// Creates a new instance of <see cref="CollectionNodeConverter{T}"/>
         /// </summary>
-        public CollectionNodeConverter(DataType dataType) : base(dataType) {
+        public CollectionNodeConverter(TypeSettings typeSettings) : base(typeSettings) {
             var enumerableType = typeof(IEnumerable<T>);
-            var dynamicType = Type.CreateDynamicType(MemberTypes.Constructor);
+            var dynamicType = typeSettings.DynamicType;
             _ctor = dynamicType.GetConstructor(enumerableType);
             if(_ctor != null)
                 return;
 
-            _ctor = dynamicType.GetDefaultConstructor();
-            if(_ctor != null) {
-                _isDefaultCtor = true;
-                return;
-            }
+            _ctor = dynamicType.DefaultConstructor;
+            if(_ctor == null)
+                throw new InvalidOperationException($"Collection type has to define an empty constructor or one with single argument {enumerableType.FullName}");
 
-            throw new InvalidOperationException($"Collection type has to define an empty constructor or one with single argument {enumerableType.FullName}");
         }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings) {
-            if(!(instance is IEnumerable<T> values))
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings) {
+            if (!(instance is IEnumerable<T> values))
                 throw new ArgumentException("Instance is not type of IEnumerable<T>");
-            var task = writer.BeginListAsync(rootName);
+            var task = writer.BeginListAsync(name);
             if(task.IsCompletedSuccessfully == false)
                 await task;
+
+            if(settings.Resolver.TryResolve(typeof(T), out var valueTypeSettings) == false)
+                throw new NotSupportedException($"Can not resolve a converter for element type {typeof(T).Name}");
+
             foreach(var value in values) {
-                task = Nodes.WriteToAsync(null, value, _elementType, writer, settings);
+                if (valueTypeSettings.ShouldEmitValue(instance, settings) == false)
+                    return;
+
+                task = valueTypeSettings.Converter.WriteAsync(value, null, writer, settings);
                 if(task.IsCompletedSuccessfully == false)
                     await task;
             }
@@ -66,15 +68,23 @@ namespace DotLogix.Core.Nodes.Converters {
 
         /// <inheritdoc />
         public override object ConvertToObject(Node node, ConverterSettings settings) {
-            if(!(node is NodeList nodeList))
+            if (node.Type == NodeTypes.Empty)
+                return default;
+
+            if (!(node is NodeList nodeList))
                 throw new ArgumentException("Node is not a NodeList");
+
+            if (settings.Resolver.TryResolve(typeof(T), out var valueTypeSettings) == false)
+                throw new NotSupportedException($"Can not resolve a converter for element type {typeof(T).Name}");
+
+
             var children = nodeList.Children().ToArray();
             var childCount = children.Length;
             var array = new T[childCount];
             for(var i = 0; i < childCount; i++)
-                array[i] = (T)Nodes.ToObject(children[i], _elementType, settings);
+                array[i] = (T)valueTypeSettings.Converter.ConvertToObject(children[i], settings);
 
-            if(_isDefaultCtor == false)
+            if(_ctor.IsDefault == false)
                 return _ctor.Invoke((IEnumerable<T>)array);
 
             var collection = (ICollection<T>)_ctor.Invoke();

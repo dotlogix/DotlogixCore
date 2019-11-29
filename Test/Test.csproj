@@ -52,10 +52,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColorEnum.cs" />
     <Compile Include="EncryptionTest.cs" />
-    <Compile Include="EnumTest.cs" />
-    <Compile Include="FlagsEnumTest.cs" />
     <Compile Include="FluentIlDynamicsTest.cs" />
     <Compile Include="FluentIlGetSetTest.cs" />
     <Compile Include="ListTest.cs" />

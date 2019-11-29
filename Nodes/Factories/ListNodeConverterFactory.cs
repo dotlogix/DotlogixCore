@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Converters;
+using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
 #endregion
 
@@ -41,17 +42,17 @@ namespace DotLogix.Core.Nodes.Factories {
                                                                                        };
 
         /// <inheritdoc />
-        public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
+        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter) {
             converter = null;
-            if(nodeType != NodeTypes.List)
+            if(typeSettings.NodeType != NodeTypes.List)
                 return false;
 
-            if((dataType.Flags & DataTypeFlags.CategoryMask) != DataTypeFlags.Collection)
+            if((typeSettings.DataType.Flags & DataTypeFlags.CategoryMask) != DataTypeFlags.Collection)
                 return false;
 
-            var type = dataType.Type;
+            var type = typeSettings.DataType.Type;
             if(type.IsArray)
-                converter = CreateArrayConverter(dataType);
+                converter = CreateArrayConverter(typeSettings);
             else if(type.IsGenericType) {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
                 if (type.IsInterface) {
@@ -59,11 +60,13 @@ namespace DotLogix.Core.Nodes.Factories {
                         return false;
                     var genericArguments = type.GetGenericArguments();
                     type = mappedType.MakeGenericType(genericArguments);
-                    dataType = type.ToDataType();
+
+                    typeSettings.DynamicType = type.CreateDynamicType();
+                    typeSettings.DataType = type.ToDataType();
                 }
 
                 if(StandardOpenGenerics.Contains(genericTypeDefinition) || type.IsAssignableToOpenGeneric(typeof(ICollection<>)))
-                    converter = CreateCollectionConverter(dataType);
+                    converter = CreateCollectionConverter(typeSettings);
                 else
                     return false;
             } else
@@ -72,14 +75,14 @@ namespace DotLogix.Core.Nodes.Factories {
             return true;
         }
 
-        private static IAsyncNodeConverter CreateCollectionConverter(DataType dataType) {
-            var collectionConverterType = typeof(CollectionNodeConverter<>).MakeGenericType(dataType.ElementType);
-            return (IAsyncNodeConverter)Activator.CreateInstance(collectionConverterType, dataType);
+        private static IAsyncNodeConverter CreateCollectionConverter(TypeSettings typeSettings) {
+            var collectionConverterType = typeof(CollectionNodeConverter<>).MakeGenericType(typeSettings.DataType.ElementType);
+            return (IAsyncNodeConverter)Activator.CreateInstance(collectionConverterType, typeSettings);
         }
 
-        private static IAsyncNodeConverter CreateArrayConverter(DataType dataType) {
-            var arrayConverterType = typeof(ArrayNodeConverter<>).MakeGenericType(dataType.ElementType);
-            return (IAsyncNodeConverter)Activator.CreateInstance(arrayConverterType, dataType);
+        private static IAsyncNodeConverter CreateArrayConverter(TypeSettings typeSettings) {
+            var arrayConverterType = typeof(ArrayNodeConverter<>).MakeGenericType(typeSettings.DataType.ElementType);
+            return (IAsyncNodeConverter)Activator.CreateInstance(arrayConverterType, typeSettings);
         }
     }
 }

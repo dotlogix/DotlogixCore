@@ -27,9 +27,14 @@ namespace DotLogix.Core.Nodes.Converters {
         /// </summary>
         DataType DataType { get; }
         /// <summary>
+        /// The type settings
+        /// </summary>
+        TypeSettings TypeSettings { get; }
+
+        /// <summary>
         /// Write the value to the node writer
         /// </summary>
-        ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings);
+        ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings);
 
         /// <summary>
         /// Convert the node to an object of the target type

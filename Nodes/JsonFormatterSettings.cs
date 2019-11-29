@@ -11,34 +11,36 @@
 
 namespace DotLogix.Core.Nodes {
     /// <summary>
-    /// Basic node converter settings for json data
+    ///     Basic node converter settings for json data
     /// </summary>
-    public class JsonFormatterSettings : ConverterSettings{
+    public class JsonFormatterSettings : ConverterSettings {
+
         /// <summary>
-        /// Creates new json settings with ident
+        ///     Creates new json settings with ident
         /// </summary>
-        public static JsonFormatterSettings Idented => new JsonFormatterSettings{Ident = true};
+        public static JsonFormatterSettings Idented => new JsonFormatterSettings {Ident = true};
+
         /// <summary>
-        /// Creates new json settings
+        ///     Creates new json settings
         /// </summary>
         public new static JsonFormatterSettings Default => new JsonFormatterSettings();
 
-        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
-        public JsonFormatterSettings() { }
-
-        /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
-        public JsonFormatterSettings(JsonFormatterSettings template) : base(template) {
-            Ident = template.Ident;
-            IdentSize = template.IdentSize;
-        }
-
         /// <summary>
-        /// Determines if the json text should be idented
+        ///     Determines if the json text should be idented
         /// </summary>
         public bool Ident { get; set; }
+
         /// <summary>
-        /// The amount of spaces to insert for ident (4 by default)
+        ///     The amount of spaces to insert for ident (4 by default)
         /// </summary>
-        public int IdentSize { get; set; } = 4;
+        public int IdentSize { get; set; }
+
+        public override void Apply(IConverterSettings settings) {
+            base.Apply(settings);
+            if (settings is JsonFormatterSettings jsonSettings) {
+                Ident = jsonSettings.Ident;
+                IdentSize = jsonSettings.IdentSize;
+            }
+        }
     }
 }

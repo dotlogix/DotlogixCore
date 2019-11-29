@@ -21,23 +21,37 @@ namespace DotLogix.Core.Nodes.Converters {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class ArrayNodeConverter<T> : NodeConverter {
-        private readonly Type _elementType = typeof(T);
         /// <summary>
         /// Creates a new instance of <see cref="ArrayNodeConverter{T}"/>
         /// </summary>
-        public ArrayNodeConverter(DataType type) : base(type) { }
+        public ArrayNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings) {
+            if(TypeSettings.ShouldEmitValue(instance, settings) == false)
+                return;
+
             if(!(instance is IEnumerable<T> values))
                 throw new ArgumentException("Instance is not type of IEnumerable<T>");
 
-            var task = writer.BeginListAsync(rootName);
+            var task = writer.BeginListAsync(name);
             if(task.IsCompletedSuccessfully == false)
                 await task;
-            foreach(var value in values) {
-                task = Nodes.WriteToAsync(null, value, _elementType, writer, settings);
-                if(task.IsCompletedSuccessfully == false)
+
+
+            var elementType = typeof(T);
+            settings.Resolver.TryResolve(elementType, out var valueTypeSettings);
+
+            foreach (var value in values) {
+                var type = value?.GetType() ?? elementType;
+
+                if(value?.GetType() == elementType) {
+                    task = valueTypeSettings.Converter.WriteAsync(value, null, writer, settings);
+                } else {
+
+                }
+
+                if (task.IsCompletedSuccessfully == false)
                     await task;
             }
 
@@ -48,14 +62,21 @@ namespace DotLogix.Core.Nodes.Converters {
 
         /// <inheritdoc />
         public override object ConvertToObject(Node node, ConverterSettings settings) {
-            if(!(node is NodeList nodeList))
+            if (node.Type == NodeTypes.Empty)
+                return default;
+
+            if (!(node is NodeList nodeList))
                 throw new ArgumentException("Node is not a NodeList");
+
+            if (settings.Resolver.TryResolve(typeof(T), out var valueTypeSettings) == false)
+                throw new NotSupportedException($"Can not resolve a converter for element type {typeof(T).Name}");
+
 
             var children = nodeList.Children().ToArray();
             var childCount = children.Length;
             var array = new T[childCount];
-            for(var i = 0; i < childCount; i++)
-                array[i] = (T)Nodes.ToObject(children[i], _elementType, settings);
+            for (var i = 0; i < childCount; i++)
+                array[i] = (T)valueTypeSettings.Converter.ConvertToObject(children[i], settings);
 
             return array;
         }

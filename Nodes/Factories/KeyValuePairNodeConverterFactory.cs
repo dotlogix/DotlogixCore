@@ -18,17 +18,22 @@ namespace DotLogix.Core.Nodes.Factories {
     /// </summary>
     public class KeyValuePairNodeConverterFactory : NodeConverterFactoryBase {
         /// <inheritdoc />
-        public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter) {
+        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter) {
             converter = null;
 
-            if(nodeType != NodeTypes.Map)
+            if(typeSettings.NodeType != NodeTypes.Map)
                 return false;
 
-            var type = dataType.Type;
+            var type = typeSettings.DataType.Type;
             if((type.IsGenericType == false) || (type.GetGenericTypeDefinition() != typeof(KeyValuePair<,>)))
                 return false;
 
-            converter = new KeyValuePairNodeConverter(dataType);
+            if(resolver.TryResolve(typeSettings, typeSettings.DynamicType.GetField("key"), out var keySettings) == false)
+                return false;
+            if(resolver.TryResolve(typeSettings, typeSettings.DynamicType.GetField("value"), out var valueSettings) == false)
+                return false;
+
+            converter = new KeyValuePairNodeConverter(typeSettings, keySettings, valueSettings);
             return true;
         }
     }

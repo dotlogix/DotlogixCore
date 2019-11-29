@@ -181,7 +181,7 @@ namespace DotLogix.Core.Nodes {
                 var nodeReader = new NodeReader(node);
                 task = nodeReader.CopyToAsync(nodeWriter);
             } else {
-                task = Nodes.WriteToAsync(null, value, instanceType, nodeWriter, formatterSettings);
+                task = Nodes.WriteToAsync(null, value, instanceType, nodeWriter, formatterSettings ?? JsonFormatterSettings.Default);
             }
             if(task.IsCompletedSuccessfully == false)
                 await task;

@@ -32,9 +32,40 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
         }
 
         #region To
+
         /// <inheritdoc />
-        public IAsyncEnumerable<T> ToAsyncEnumerable() {
-            return _innerQueryable.ToAsyncEnumerable();
+        public Task<List<T>> ToListAsync(CancellationToken cancellationToken = default) {
+            return Task.FromResult(_innerQueryable.ToList());
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<T>> ToEnumerableAsync(CancellationToken cancellationToken = default) {
+            return Task.FromResult(_innerQueryable.ToList().AsEnumerable());
+        }
+
+        /// <inheritdoc />
+        public Task<T[]> ToArrayAsync(CancellationToken cancellationToken = default) {
+            return Task.FromResult(_innerQueryable.ToArray());
+        }
+
+        /// <inheritdoc />
+        public Task<Dictionary<TKey, T>> ToDictionaryAsync<TKey>(Func<T, TKey> keySelector, CancellationToken cancellationToken = default) {
+            return Task.FromResult(_innerQueryable.ToDictionary(keySelector));
+        }
+
+        /// <inheritdoc />
+        public Task<Dictionary<TKey, T>> ToDictionaryAsync<TKey>(Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default) {
+            return Task.FromResult(_innerQueryable.ToDictionary(keySelector, comparer));
+        }
+
+        /// <inheritdoc />
+        public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TKey, TElement>(Func<T, TKey> keySelector, Func<T, TElement> elementSelector, CancellationToken cancellationToken = default) {
+            return Task.FromResult(_innerQueryable.ToDictionary(keySelector, elementSelector));
+        }
+
+        /// <inheritdoc />
+        public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TKey, TElement>(Func<T, TKey> keySelector, Func<T, TElement> elementSelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default) {
+            return Task.FromResult(_innerQueryable.ToDictionary(keySelector, elementSelector, comparer));
         }
 
         /// <inheritdoc />

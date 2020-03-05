@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DotLogix.Core.Collections;
 using DotLogix.Core.Utils;
 #endregion
@@ -111,35 +112,65 @@ namespace DotLogix.Core.Extensions {
             return Initialize(new T[count], value);
         }
 
-		/// <summary>
-		///     Creates a <see cref="List{T}"></see> by repeating the value n times
-		/// </summary>
-		/// <param name="value">The value</param>
-		/// <param name="count">The amount of elements in the list</param>
-		/// <returns></returns>
+        /// <summary>
+        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="count">The amount of elements in the list</param>
+        /// <returns></returns>
+        public static Task<T[]> CreateArray<T>(this Task<T> value, int count = 1) {
+            return value.ConvertResult(v => v.CreateArray(count));
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="List{T}"></see> by repeating the value n times
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="count">The amount of elements in the list</param>
+        /// <returns></returns>
         public static List<T> CreateList<T>(this T value, int count = 1) {
             return CreateArray(value, count)
             .ToList();
         }
+        
+        /// <summary>
+        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="count">The amount of elements in the list</param>
+        /// <returns></returns>
+        public static Task<List<T>> CreateList<T>(this Task<T> value, int count = 1) {
+            return value.ConvertResult(v => v.CreateList(count));
+        }
 
-		/// <summary>
-		///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
-		/// </summary>
-		/// <param name="value">The value</param>
-		/// <param name="count">The amount of elements in the list</param>
-		/// <returns></returns>
-		public static IEnumerable<T> CreateEnumerable<T>(this T value, int count = 1) {
-			for (var i = 0; i < count; i++)
-				yield return value;
-		}
+        /// <summary>
+        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="count">The amount of elements in the list</param>
+        /// <returns></returns>
+        public static IEnumerable<T> CreateEnumerable<T>(this T value, int count = 1) {
+            for (var i = 0; i < count; i++)
+                yield return value;
+        }
 
-		/// <summary>
-		///     Intercepts an enumerable and calling a method for each of the items
-		/// </summary>
-		/// <param name="source">The source enumerable</param>
-		/// <param name="interceptFunc">The interception method</param>
-		/// <returns></returns>
-		public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Func<T, T> interceptFunc) {
+        /// <summary>
+        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="count">The amount of elements in the list</param>
+        /// <returns></returns>
+        public static Task<IEnumerable<T>> CreateEnumerable<T>(this Task<T> value, int count = 1) {
+            return value.ConvertResult(v => v.CreateEnumerable(count));
+        }
+
+        /// <summary>
+        ///     Intercepts an enumerable and calling a method for each of the items
+        /// </summary>
+        /// <param name="source">The source enumerable</param>
+        /// <param name="interceptFunc">The interception method</param>
+        /// <returns></returns>
+        public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Func<T, T> interceptFunc) {
 			return source.Select(interceptFunc);
 		}
 

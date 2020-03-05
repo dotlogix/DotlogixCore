@@ -15,12 +15,12 @@ using System.Threading.Tasks;
 namespace DotLogix.Core.Nodes.Processor {
     public abstract class NodeWriterBase : IAsyncNodeWriter {
         protected readonly Stack<NodeContainerType> ContainerStack = new Stack<NodeContainerType>();
-        protected NodeWriterBase(IConverterSettings converterSettings = null) {
-            ConverterSettings = converterSettings ?? Core.Nodes.ConverterSettings.Default;
+        protected NodeWriterBase(ConverterSettings converterSettings = null) {  
+            ConverterSettings = converterSettings ?? ConverterSettings.Default;
         }
         protected NodeContainerType CurrentContainer => ContainerStack.Count > 0 ? ContainerStack.Peek() : NodeContainerType.None;
         protected int ContainerCount => ContainerStack.Count;
-        protected IConverterSettings ConverterSettings { get; }
+        protected ConverterSettings ConverterSettings { get; }
 
         public virtual ValueTask BeginMapAsync() => BeginMapAsync(null);
         public abstract ValueTask BeginMapAsync(string name);

@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -22,6 +23,8 @@ namespace DotLogix.Core.Extensions {
     /// A static class providing extension methods for <see cref="Type"/>
     /// </summary>
     public static class TypeExtension {
+        private static readonly ConcurrentDictionary<Type, object> _defaultValues = new ConcurrentDictionary<Type, object>();
+
         /// <summary>
         ///     Gets the properties of a type ordered by the inheritance level (deepest first)
         /// </summary>
@@ -109,7 +112,9 @@ namespace DotLogix.Core.Extensions {
         /// <param name="type">The type</param>
         /// <returns></returns>
         public static object GetDefaultValue(this Type type) {
-            return type.IsValueType ? type.CreateDefaultCtor()?.Invoke() : null;
+            object CreateDefaultValue(Type t) => t.IsValueType ? t.CreateDefaultCtor()?.Invoke() : null;
+
+            return _defaultValues.GetOrAdd(type, CreateDefaultValue);
         }
 
         #region TypeCheck

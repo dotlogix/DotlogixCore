@@ -25,7 +25,7 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
     /// A decorator for <see cref="IEntitySet{TEntity}"/> to intercept requests
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public abstract class EntitySetDecoratorBase<TEntity> : IEntitySet<TEntity> where TEntity : ISimpleEntity {
+    public abstract class EntitySetDecoratorBase<TEntity> : IEntitySet<TEntity> where TEntity : class, new() {
         /// <summary>
         /// The internal base entity set
         /// </summary>
@@ -36,32 +36,6 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
         /// </summary>
         protected EntitySetDecoratorBase(IEntitySet<TEntity> baseEntitySet) {
 	        BaseEntitySet = baseEntitySet;
-        }
-
-        /// <inheritdoc />
-        public virtual ValueTask<TEntity> GetAsync(object key, CancellationToken cancellationToken = default)
-        {
-	        return BaseEntitySet.GetAsync(key, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<object> keys,
-	        CancellationToken cancellationToken = default)
-        {
-	        return BaseEntitySet.GetRangeAsync(keys, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-	        return BaseEntitySet.GetAllAsync(cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression,
-	        CancellationToken cancellationToken = default)
-        {
-	        return BaseEntitySet.WhereAsync(filterExpression, cancellationToken);
         }
 
         /// <inheritdoc />

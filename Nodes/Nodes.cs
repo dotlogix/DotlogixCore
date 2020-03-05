@@ -22,14 +22,20 @@ using DotLogix.Core.Types;
 namespace DotLogix.Core.Nodes {
     public static class Nodes {
         public static INodeConverterResolver DefaultResolver { get; } = new NodeConverterResolver();
+        public static INodeConverterResolver DefaultJsonResolver { get; } = new NodeConverterResolver();
 
         static Nodes() {
             DefaultResolver.Register(new ObjectNodeConverterFactory());
             DefaultResolver.Register(new OptionalNodeConverterFactory());
             DefaultResolver.Register(new ListNodeConverterFactory());
             DefaultResolver.Register(new KeyValuePairNodeConverterFactory());
-            DefaultResolver.Register(new ValueNodeConverterFactory());
-            //DefaultResolver.Register(new NodeToNodeConverter())
+            DefaultResolver.Register(new ValueNodeConverterFactory(false));
+
+            DefaultJsonResolver.Register(new ObjectNodeConverterFactory());
+            DefaultJsonResolver.Register(new OptionalNodeConverterFactory());
+            DefaultJsonResolver.Register(new ListNodeConverterFactory());
+            DefaultJsonResolver.Register(new KeyValuePairNodeConverterFactory());
+            DefaultJsonResolver.Register(new ValueNodeConverterFactory(true));
         }
 
         #region NodeTypes
@@ -134,33 +140,12 @@ namespace DotLogix.Core.Nodes {
             if(type == typeof(object))
                 return DynamicNode.From(node);
 
-            return TryResolve(type, out var typeSettings)
-                       ? typeSettings.Converter.ConvertToObject(node, settings ?? ConverterSettings.Default)
+            if(settings == null)
+                settings = JsonFormatterSettings.Idented;
+
+            return settings.Resolver.TryResolve(type, out var typeSettings)
+                       ? typeSettings.Converter.ConvertToObject(node, settings)
                        : type.GetDefaultValue();
-        }
-        #endregion
-
-        #region NodeConverter
-        public static void RegisterFactory<TFactory>() where TFactory : INodeConverterFactory, new() {
-            RegisterFactory(new TFactory());
-        }
-
-        public static void RegisterFactory(INodeConverterFactory factory) {
-            DefaultResolver.Register(factory);
-        }
-
-        public static bool RegisterConverter(IAsyncNodeConverter converter, bool replaceIfExists = false) {
-            if(replaceIfExists == false)
-                return DefaultResolver.Register(converter);
-
-            DefaultResolver.Replace(converter);
-            return true;
-
-        }
-
-
-        public static bool TryResolve(Type instanceType, out TypeSettings settings) {
-            return DefaultResolver.TryResolve(instanceType, out settings);
         }
         #endregion
     }

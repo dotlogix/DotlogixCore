@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using DotLogix.Architecture.Infrastructure.Attributes;
 using DotLogix.Architecture.Infrastructure.Decorators;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
@@ -26,24 +27,13 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
     /// <summary>
     ///     A basic generic repository providing crud functionality
     /// </summary>
-    public abstract class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class, ISimpleEntity, new() {
+    public abstract class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class, new() {
         private IEntitySet<TEntity> _entitySet;
-        private IEntitySet<TEntity> _originalEntitySet;
-
-        /// <summary>
-        ///     The cached list of entity set modifiers
-        /// </summary>
-        protected static IEnumerable<Func<IEntitySet<TEntity>, IEntitySet<TEntity>>> ModifyEntitySetAttributeCache { get; set; }
-
-        /// <summary>
-        ///     The internal entity set
-        /// </summary>
-        protected IEntitySet<TEntity> EntitySet => _entitySet ?? (_entitySet = OnModifyEntitySet(OriginalEntitySet));
 
         /// <summary>
         ///     The undecorated and unmodified entity set
         /// </summary>
-        public IEntitySet<TEntity> OriginalEntitySet => _originalEntitySet ?? (_originalEntitySet = EntitySetProvider.UseSet<TEntity>());
+        public IEntitySet<TEntity> EntitySet => _entitySet ?? (_entitySet = EntitySetProvider.UseSet<TEntity>());
 
         /// <summary>
         ///     The internal entity set provider
@@ -58,23 +48,15 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<TEntity> GetAsync(object key, CancellationToken cancellationToken = default) {
-            return EntitySet.GetAsync(key, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<object> keys, CancellationToken cancellationToken = default) {
-            return EntitySet.GetRangeAsync(keys, cancellationToken);
-        }
-		
-        /// <inheritdoc />
         public virtual ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
-            return EntitySet.GetAllAsync(cancellationToken);
+            var task = Query().ToEnumerableAsync(cancellationToken);
+            return new ValueTask<IEnumerable<TEntity>>(task);
         }
 
         /// <inheritdoc />
         public virtual ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
-            return EntitySet.WhereAsync(filterExpression, cancellationToken);
+            var task = Query().Where(filterExpression).ToEnumerableAsync(cancellationToken);
+            return new ValueTask<IEnumerable<TEntity>>(task);
         }
 
         /// <inheritdoc />
@@ -97,33 +79,12 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
             return EntitySet.RemoveRangeAsync(entities);
         }
 
-        /// <summary>
-        ///     A callback method to apply the entity set modifiers
-        /// </summary>
-        protected virtual IEntitySet<TEntity> OnModifyEntitySet(IEntitySet<TEntity> set) {
-            if(ModifyEntitySetAttributeCache == null)
-                ModifyEntitySetAttributeCache = CreateEntitySetModifiers().ToList();
-
-            return ModifyEntitySetAttributeCache.Aggregate(set, (current, func) => func.Invoke(current));
-        }
 
         /// <summary>
-        ///     A callback method to create the entity set modifiers
+        /// Create a linq style query to allow more advanced requests to the entity set
         /// </summary>
-        protected virtual IEnumerable<Func<IEntitySet<TEntity>, IEntitySet<TEntity>>> CreateEntitySetModifiers() {
-            var entityType = typeof(TEntity);
-            var repoType = GetType();
-
-            var types = new List<Type>();
-            types.Add(repoType);
-            types.AddRange(repoType.GetTypesAssignableTo());
-            types.Add(entityType);
-            types.AddRange(entityType.GetTypesAssignableTo());
-
-            var decoratorAttributes = types.SelectMany(t => t.GetCustomAttributes<EntitySetModifierAttribute>());
-
-            var decorators = decoratorAttributes.Distinct().OrderBy(d => d.Priority);
-            return decorators.Select(d => d.GetModifierFunc<TEntity>());
+        protected virtual IQuery<TEntity> Query() {
+            return EntitySet.Query();
         }
     }
 }

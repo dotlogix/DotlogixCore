@@ -7,8 +7,10 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.Processors.Json;
 using DotLogix.Core.Rest.Services.Writer;
 #endregion
 

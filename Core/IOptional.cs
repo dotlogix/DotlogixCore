@@ -7,6 +7,12 @@
         /// Checks if there is a value available
         /// </summary>
         bool IsDefined { get; }
+
+        /// <summary>
+        /// Checks if there is no value available
+        /// </summary>
+        bool IsUndefined { get; }
+
         /// <summary>
         /// Checks if the value is equal to the types default value
         /// </summary>
@@ -16,6 +22,7 @@
         /// Checks if the value undefined or is equal to the types default value
         /// </summary>
         bool IsUndefinedOrDefault { get; }
+
         /// <summary>
         /// Checks if the value is equal to the types default value
         /// </summary>

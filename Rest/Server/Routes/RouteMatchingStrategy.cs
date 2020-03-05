@@ -7,7 +7,7 @@
 // ==================================================
 
 namespace DotLogix.Core.Rest.Server.Routes {
-    public enum RouteType {
+    public enum RouteMatchingStrategy {
         Equals,
         StartsWith,
         EndsWith,

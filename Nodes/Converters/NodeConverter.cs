@@ -8,9 +8,12 @@
 
 #region
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
@@ -35,13 +38,13 @@ namespace DotLogix.Core.Nodes.Converters {
         public TypeSettings TypeSettings { get; }
 
         /// <inheritdoc />
-        public abstract ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings);
+        public abstract ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings);
 
         /// <inheritdoc />
-        public abstract object ConvertToObject(Node node, ConverterSettings settings);
+        public abstract object ConvertToObject(Node node, IConverterSettings settings);
 
-        protected static string GetMemberName(MemberSettings member, ConverterSettings settings) {
-            return member.Name ?? (member.NamingStrategy ?? settings.NamingStrategy)?.TransformName(member.Accessor.Name) ?? member.Accessor.Name;
+        protected static string GetMemberName(MemberSettings member, IConverterSettings settings) {
+            return member.Name ?? settings.NamingStrategy?.TransformName(member.Accessor.Name) ?? member.Accessor.Name;
         }
     }
 }

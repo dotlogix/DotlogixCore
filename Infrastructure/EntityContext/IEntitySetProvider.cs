@@ -18,6 +18,6 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
         /// <summary>
         /// Get or create an <see cref="IEntitySet{TEntity}"/>
         /// </summary>
-        IEntitySet<TEntity> UseSet<TEntity>() where TEntity : class;
+        IEntitySet<TEntity> UseSet<TEntity>() where TEntity : class, new();
     }
 }

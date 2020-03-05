@@ -6,6 +6,8 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
+using DotLogix.Architecture.Common.Options;
+
 namespace DotLogix.Architecture.Infrastructure.Entities.Base {
     /// <summary>
     /// A simple entity implementing the <see cref="ISimpleEntity"/> and the <see cref="IInsertOnlyEntity"/> interface

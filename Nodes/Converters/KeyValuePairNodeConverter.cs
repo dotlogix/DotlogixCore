@@ -36,7 +36,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
             var keyFieldValue = _keySettings.Accessor.GetValue(instance);
             var valueFieldValue = _valueSettings.Accessor.GetValue(instance);
 
@@ -58,9 +58,9 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override object ConvertToObject(Node node, ConverterSettings settings) {
+        public override object ConvertToObject(Node node, IConverterSettings settings) {
             if(!(node is NodeMap nodeMap))
-                throw new ArgumentException("Node is not a NodeMap");
+                throw new ArgumentException($"Expected node of type \"NodeMap\" got \"{node.Type}\"");
 
             var keyNode = nodeMap.GetChild(GetMemberName(_keySettings, settings));
             if(keyNode == null)

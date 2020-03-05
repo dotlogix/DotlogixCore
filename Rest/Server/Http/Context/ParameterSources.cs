@@ -17,7 +17,8 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         Header = 1 << 0,
         Query = 1 << 1,
         Url = 1 << 2,
-        UserDefined = 1 << 3,
-        Any = Header | Query | Url | UserDefined
+        Body = 1 << 3,
+        Custom = 1 << 4,
+        Any = Header | Query | Url | Body | Custom
     }
 }

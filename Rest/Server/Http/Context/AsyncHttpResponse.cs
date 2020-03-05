@@ -13,6 +13,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.Parameters;
 using DotLogix.Core.Rest.Server.Http.State;
@@ -23,6 +24,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
     public class AsyncHttpResponse : IAsyncHttpResponse {
         public const int DefaultChunkSize = 2_097_152; // 2MiB;
         private readonly IParameterParser _parameterParser;
+        public HttpListenerResponse OriginalResponse { get; }
 
         private AsyncHttpResponse(HttpListenerResponse originalResponse, IParameterParser parameterParser) {
             _parameterParser = parameterParser;
@@ -47,7 +49,6 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         public Encoding ContentEncoding { get; set; }
         public HttpStatusCode StatusCode { get; set; }
         public Stream OutputStream { get; }
-        public HttpListenerResponse OriginalResponse { get; }
 
         public async Task WriteToResponseStreamAsync(byte[] data, int offset, int count) {
             await OutputStream.WriteAsync(data, offset, count);
@@ -59,40 +60,55 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         }
 
         public async Task CompleteChunksAsync() {
-            if(TransferState == TransferState.Completed)
+            if (TransferState == TransferState.Completed)
                 throw new InvalidOperationException("Sending is not possible if the transfer has been completed already");
 
-            if(TransferState == TransferState.None) {
-                OriginalResponse.SendChunked = true;
-                EnsurePrepared();
-            }
-
-            if(OutputStream.Length > 0) {
-                OutputStream.Seek(0, SeekOrigin.Begin);
-                await OutputStream.CopyToAsync(OriginalResponse.OutputStream, ChunkSize);
+            try {
+                if (TransferState == TransferState.None) {
+                    OriginalResponse.SendChunked = true;
+                    EnsurePrepared();
+                }
+                TransferState = TransferState.Started;
+                if (OutputStream.Length > 0) {
+                    OutputStream.Seek(0, SeekOrigin.Begin);
+                    await OutputStream.CopyToAsync(OriginalResponse.OutputStream, 81920);
+                }
                 OutputStream.SetLength(0);
+            } catch (HttpListenerException httpEx) {
+                if (httpEx.ErrorCode != 64 && httpEx.ErrorCode != 1229) {
+                    throw;
+                }
+                TransferState = TransferState.Completed;
             }
-            TransferState = TransferState.Started;
         }
 
         public async Task CompleteAsync() {
             if(TransferState == TransferState.Completed)
                 throw new InvalidOperationException("Sending is not possible if the transfer has been completed already");
 
-            if(OriginalResponse.SendChunked)
-                await CompleteChunksAsync();
-            else {
+            try {
                 if(TransferState == TransferState.None)
                     EnsurePrepared();
+
+                TransferState = TransferState.Started;
                 if(OutputStream.Length > 0) {
                     OutputStream.Seek(0, SeekOrigin.Begin);
                     await OutputStream.CopyToAsync(OriginalResponse.OutputStream, 81920);
                 }
-            }
 
-            OutputStream.Dispose();
-            OriginalResponse.OutputStream.Close();
-            TransferState = TransferState.Completed;
+            } catch(HttpListenerException httpEx) {
+                if(httpEx.ErrorCode != 64 && httpEx.ErrorCode != 1229) {
+                    throw;
+                }
+            } finally {
+                try {
+                    OutputStream.Dispose();
+                    OriginalResponse.OutputStream.Close();
+                } catch {
+                    // ignored
+                }
+                TransferState = TransferState.Completed;
+            }
         }
 
         private void PrepareHeaders() {

@@ -167,7 +167,7 @@ namespace DotLogix.Core.Nodes.Processor {
                                 break;
                             }
 
-                            vTask = nodeWriter.WriteValueAsync(name, str);
+                            vTask = nodeWriter.WriteValueAsync(name, new JsonPrimitive(JsonPrimitiveType.String, str));
                             if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
                             name = null;
@@ -201,33 +201,19 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
-        private static bool TryGetValueFromString(string valueStr, out object value) {
+        private static bool TryGetValueFromString(string valueStr, out JsonPrimitive value) {
             switch(valueStr) {
                 case "null":
-                    value = null;
+                    value = JsonPrimitive.Null;
                     return true;
                 case "true":
-                    value = true;
+                    value = JsonPrimitive.True;
                     return true;
                 case "false":
-                    value = false;
+                    value = JsonPrimitive.False;
                     return true;
                 default:
-                    if(double.TryParse(valueStr, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign | NumberStyles.AllowExponent, NumberFormatInfo.InvariantInfo, out var number) == false) {
-                        value = null;
-                        return false;
-                    }
-
-                    // calculate if number is an integer
-                    if((number <= int.MaxValue) && (number >= int.MinValue)) {
-                        var truncated = Math.Truncate(number);
-                        if(Math.Abs(number - truncated) <= Epsilon) {
-                            value = (int)number;
-                            return true;
-                        }
-                    }
-
-                    value = number;
+                    value = new JsonPrimitive(JsonPrimitiveType.Number, valueStr);
                     return true;
             }
         }

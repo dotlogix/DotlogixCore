@@ -16,7 +16,7 @@ namespace DotLogix.Core.Collections {
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
     /// <typeparam name="TCollection"></typeparam>
-    public interface ILayeredCollection<TValue, out TCollection> : ICollection<TValue> where TCollection : ICollection<TValue> {
+    public interface ILayeredCollection<TValue, TCollection> : ICollection<TValue> where TCollection : ICollection<TValue> {
         /// <summary>
         /// The layers of collections
         /// </summary>
@@ -29,7 +29,13 @@ namespace DotLogix.Core.Collections {
         /// <summary>
         /// Add a new layer to the collection
         /// </summary>
-        void PushLayer();
+        TCollection PushLayer();
+
+        /// <summary>
+        /// Add a layer to the collection
+        /// </summary>
+        TCollection PushLayer(TCollection collection);
+
         /// <summary>
         /// Removes the topmost layer from the stack
         /// </summary>

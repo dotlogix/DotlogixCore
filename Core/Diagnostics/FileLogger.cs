@@ -17,8 +17,6 @@ namespace DotLogix.Core.Diagnostics {
     /// </summary>
     public class FileLogger : LoggerBase {
         private readonly DateTime _dateTime = DateTime.Now;
-        private readonly TextLogMessageFormatter _formatter = new TextLogMessageFormatter();
-
 
         private bool _isErrorLog;
         private string _logFileName;
@@ -72,9 +70,13 @@ namespace DotLogix.Core.Diagnostics {
         public override bool Log(LogMessage message) {
             if((_isErrorLog == false) && (message.LogLevel >= LogLevels.Error))
                 ToErrorLogFile();
-            var msg = _formatter.Format(message);
-            _logFileWriter.WriteLine(msg);
-            return true;
+
+            try {
+                return LogMessageFormatter.Default.Format(message, _logFileWriter);
+            } catch {
+                // omit any errors while logging
+                return false;
+            }
         }
 
         private void ToErrorLogFile() {

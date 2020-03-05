@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using DotLogix.Core.Types;
 #endregion
@@ -444,11 +445,11 @@ namespace DotLogix.Core.Extensions {
         public static bool TryParseTo(this string value, Type targetType, out object target) {
             target = null;
             var dataType = targetType.ToDataType();
-            if((dataType.Flags & DataTypeFlags.Primitive) == 0)
+            if ((dataType.Flags & DataTypeFlags.Primitive) == 0)
                 return false;
 
             bool result;
-            switch(dataType.Flags & DataTypeFlags.PrimitiveMask) {
+            switch (dataType.Flags & DataTypeFlags.PrimitiveMask) {
                 case DataTypeFlags.Guid:
                     result = Guid.TryParse(value, out var guid);
                     target = guid;

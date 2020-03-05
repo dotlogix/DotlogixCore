@@ -226,21 +226,21 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
         /// <summary>
         /// Create a new <see cref="IQuery{T}"/> using the internal <see cref="IQueryableQueryFactory"/>
         /// </summary>
-        protected IQuery<T> CreateQuery<T>(IQueryable<T> queryable) {
+        public IQuery<T> CreateQuery<T>(IQueryable<T> queryable) {
             return _factory.CreateQuery(queryable, InterceptorList);
         }
 
         /// <summary>
         /// Create a new <see cref="IOrderedQuery{T}"/> using the internal <see cref="IQueryableQueryFactory"/>
         /// </summary>
-        protected IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable) {
+        public IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable) {
             return _factory.CreateQuery(queryable, InterceptorList);
         }
 
         /// <summary>
         /// Create a new <see cref="IQueryExecutor{T}"/> using the internal <see cref="IQueryableQueryFactory"/>
         /// </summary>
-        protected IQueryExecutor<TValue> CreateExecutor() {
+        public IQueryExecutor<TValue> CreateExecutor() {
             return _factory.CreateExecutor(this);
         }
         #endregion

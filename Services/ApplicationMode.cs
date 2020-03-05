@@ -6,13 +6,13 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Core.WindowsServices {
+namespace DotLogix.Core.Services {
     /// <summary>
     /// Application modes
     /// </summary>
     public enum ApplicationMode {
         /// <summary>
-        /// Windows Service
+        /// Service
         /// </summary>
         Service,
         /// <summary>

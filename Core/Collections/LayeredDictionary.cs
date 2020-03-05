@@ -160,8 +160,16 @@ namespace DotLogix.Core.Collections {
 
 
         /// <inheritdoc />
-        public void PushLayer() {
-            LayerStack.Push(CreateDictionary());
+        public TDictionary PushLayer() {
+            var dictionary = CreateDictionary();
+            LayerStack.Push(dictionary);
+            return dictionary;
+        }
+
+        /// <inheritdoc />
+        public TDictionary PushLayer(TDictionary dictionary) {
+            LayerStack.Push(dictionary);
+            return dictionary;
         }
 
         /// <inheritdoc />

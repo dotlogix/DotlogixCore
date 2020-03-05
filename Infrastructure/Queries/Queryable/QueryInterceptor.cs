@@ -13,25 +13,30 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     /// An interceptor for <see cref="IQuery{T}"/>
     /// </summary>
     public class QueryInterceptor : IQueryInterceptor {
-        private Func<object, object> BeforeExecuteFunc { get; }
-        private Func<object, object> AfterExecuteFunc { get; }
+        private readonly Func<IQueryInterceptionContext, bool> _beforeExecuteFunc;
+        private readonly Func<IQueryInterceptionContext, bool> _afterExecuteFunc;
+        private readonly Func<IQueryInterceptionContext, bool> _onErrorFunc;
 
-        /// <summary>
-        /// Creates a new instance of <see cref="QueryInterceptor"/>
-        /// </summary>
-        public QueryInterceptor(Func<object, object> beforeExecuteFunc, Func<object, object> afterExecuteFunc) {
-            BeforeExecuteFunc = beforeExecuteFunc;
-            AfterExecuteFunc = afterExecuteFunc;
+        /// <inheritdoc />
+        public QueryInterceptor(Func<IQueryInterceptionContext, bool> beforeExecuteFunc = null, Func<IQueryInterceptionContext, bool> afterExecuteFunc = null, Func<IQueryInterceptionContext, bool> onErrorFunc = null) {
+            _beforeExecuteFunc = beforeExecuteFunc;
+            _afterExecuteFunc = afterExecuteFunc;
+            _onErrorFunc = onErrorFunc;
         }
 
         /// <inheritdoc />
-        public IQuery<TValue> BeforeExecute<TValue>(IQuery<TValue> query) {
-            return BeforeExecuteFunc != null ? (IQuery<TValue>)BeforeExecuteFunc(query) : query;
+        public bool BeforeExecute(IQueryInterceptionContext context) {
+            return _beforeExecuteFunc?.Invoke(context) ?? true;
         }
 
         /// <inheritdoc />
-        public TResult AfterExecute<TResult>(TResult result) {
-            return AfterExecuteFunc != null ? (TResult)AfterExecuteFunc(result) : result;
+        public bool AfterExecute(IQueryInterceptionContext context) {
+            return _afterExecuteFunc?.Invoke(context) ?? true;
+        }
+
+        /// <inheritdoc />
+        public bool HandleError(IQueryInterceptionContext context) {
+            return _onErrorFunc?.Invoke(context) ?? true;
         }
     }
 }

@@ -22,7 +22,7 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
     ///     A entity set decorator to disable deletion of entities instead manage existence with the is active flag
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class InsertOnlyEntitySetDecorator<TEntity> : EntitySetDecoratorBase<TEntity> where TEntity : class, IInsertOnlyEntity {
+    public class InsertOnlyEntitySetDecorator<TEntity> : EntitySetDecoratorBase<TEntity> where TEntity : class, IInsertOnlyEntity, new() {
         /// <summary>
         ///     Creates a new instance of <see cref="InsertOnlyEntitySetDecorator{TEntity}" />
         /// </summary>
@@ -36,10 +36,10 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
 
         /// <inheritdoc />
         public override ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities) {
-            var list = entities.ToList();
-            foreach(var entity in list)
+            var collection = entities.AsCollection();
+            foreach(var entity in collection)
                 entity.IsActive = true;
-            return BaseEntitySet.AddRangeAsync(list);
+            return BaseEntitySet.AddRangeAsync(collection);
         }
 
         /// <summary>

@@ -36,28 +36,27 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
                 return Task.CompletedTask;
 
             var request = context.HttpRequest;
-            var result = context.RequestResult;
             var headerParameters = request.HeaderParameters;
 
             if(headerParameters.TryGetValueAs(AuthorizationParameterName, out string authParameter) == false) {
-                SetInvalidFormatException(result);
+                SetInvalidFormatException(context);
                 return Task.CompletedTask;
             }
 
             var authValue = authParameter.Split();
             if((authValue.Length != 2) || (_authorizationMethods.TryGetValue(authValue[0], out var authMethod) == false)) {
-                SetInvalidFormatException(result);
+                SetInvalidFormatException(context);
                 return Task.CompletedTask;
             }
 
-            return authMethod.AuthenticateAsync(result, authValue[1]);
+            return authMethod.AuthenticateAsync(context, authValue[1]);
         }
 
-        protected void SetUnauthorizedException(WebRequestResult webRequestResult, string message) {
-            webRequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));
+        protected void SetUnauthorizedException(WebServiceContext context, string message) {
+            context.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));
         }
 
-        protected void SetInvalidFormatException(WebRequestResult webRequestResult) {
+        protected void SetInvalidFormatException(WebServiceContext context) {
             var messageBuilder = new StringBuilder();
             messageBuilder.AppendLine("The data you provided for authorization is in an invalid format.");
             messageBuilder.Append("Supported formats are:");
@@ -67,7 +66,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
                     messageBuilder.Append($"\n\t{authorizationMethod.Name} {supportedDataFormat}");
             }
 
-            SetUnauthorizedException(webRequestResult, messageBuilder.ToString());
+            SetUnauthorizedException(context, messageBuilder.ToString());
         }
     }
 }

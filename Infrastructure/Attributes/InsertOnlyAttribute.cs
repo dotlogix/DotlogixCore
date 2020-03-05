@@ -1,4 +1,6 @@
-﻿namespace DotLogix.Architecture.Infrastructure.Decorators {
+﻿using DotLogix.Architecture.Infrastructure.Decorators;
+
+namespace DotLogix.Architecture.Infrastructure.Attributes {
     /// <summary>
     /// An <see cref="EntitySetDecoratorAttribute"/> to apply an <see cref="InsertOnlyEntitySetDecorator{TEntity}"/> to applied class
     /// </summary>

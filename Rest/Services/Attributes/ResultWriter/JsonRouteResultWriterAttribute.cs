@@ -12,6 +12,6 @@ using DotLogix.Core.Rest.Services.Writer;
 
 namespace DotLogix.Core.Rest.Services.Attributes.ResultWriter {
     public class JsonRouteResultWriterAttribute : RouteResultWriterAttribute {
-        public JsonRouteResultWriterAttribute() : base(()=> new WebRequestResultJsonWriter()) { }
+        public JsonRouteResultWriterAttribute() : base(() => WebRequestResultJsonWriter.Instance) { }
     }
 }

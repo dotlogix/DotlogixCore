@@ -15,6 +15,7 @@ using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Server.Routes;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.Processors.Json;
 using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
@@ -31,7 +32,7 @@ namespace DotLogix.Core.Rest.Server.Http {
 
         public int RegisteredRoutesCount => ServerRoutes.Count;
 
-        public IAsyncWebRequestResultWriter DefaultResultWriter { get; set; } = new WebRequestResultJsonWriter();
+        public IAsyncWebRequestResultWriter DefaultResultWriter { get; set; } = WebRequestResultJsonWriter.Instance;
 
         #region Helper
         private static async Task ExecuteProcessorsAsync(WebServiceContext webServiceContext, IEnumerable<IWebRequestProcessor> requestProcessors) {
@@ -68,14 +69,16 @@ namespace DotLogix.Core.Rest.Server.Http {
         }
 
         public async Task HandleAsync(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route) {
-            using(var webServiceContext = new WebServiceContext(asyncHttpContext, route)) {
+            var parameterProviders = new List<IParameterProvider>(ParameterProviders.Http) { ParameterProviders.Variables };
+
+            using (var webServiceContext = new WebServiceContext(asyncHttpContext, route, parameterProviders)) {
                 // start of processing
                 await ProcessRequest(webServiceContext);
                 // end of processing
 
                 var writer = route.WebRequestResultWriter ?? DefaultResultWriter;
                 if(asyncHttpContext.Response.IsCompleted == false)
-                    await writer.WriteAsync(webServiceContext.RequestResult);
+                    await writer.WriteAsync(webServiceContext);
             }
         }
 

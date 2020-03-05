@@ -42,21 +42,31 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
+
+            if (scopedSettings.ShouldEmitValue(instance) == false)
+                return;
+
+            ValueTask task;
+            if (instance == null) {
+                task = writer.WriteValueAsync(name, null);
+                if (task.IsCompletedSuccessfully == false)
+                    await task;
+                return;
+            }
+
+
             if (!(instance is IEnumerable<T> values))
-                throw new ArgumentException("Instance is not type of IEnumerable<T>");
-            var task = writer.BeginListAsync(name);
+                throw new ArgumentException($"Expected instance of type \"IEnumerable<T>\" got \"{instance.GetType()}\"");
+
+            task = writer.BeginListAsync(name);
             if(task.IsCompletedSuccessfully == false)
                 await task;
 
-            if(settings.Resolver.TryResolve(typeof(T), out var valueTypeSettings) == false)
-                throw new NotSupportedException($"Can not resolve a converter for element type {typeof(T).Name}");
-
-            foreach(var value in values) {
-                if (valueTypeSettings.ShouldEmitValue(instance, settings) == false)
-                    return;
-
-                task = valueTypeSettings.Converter.WriteAsync(value, null, writer, settings);
+            foreach (var value in values) {
+                task = childConverter.WriteAsync(value, null, writer, scopedSettings.ChildSettings);
                 if(task.IsCompletedSuccessfully == false)
                     await task;
             }
@@ -67,22 +77,21 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override object ConvertToObject(Node node, ConverterSettings settings) {
+        public override object ConvertToObject(Node node, IConverterSettings settings) {
             if (node.Type == NodeTypes.Empty)
                 return default;
 
             if (!(node is NodeList nodeList))
-                throw new ArgumentException("Node is not a NodeList");
+                throw new ArgumentException($"Expected node of type \"NodeList\" got \"{node.Type}\"");
 
-            if (settings.Resolver.TryResolve(typeof(T), out var valueTypeSettings) == false)
-                throw new NotSupportedException($"Can not resolve a converter for element type {typeof(T).Name}");
-
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
 
             var children = nodeList.Children().ToArray();
             var childCount = children.Length;
             var array = new T[childCount];
             for(var i = 0; i < childCount; i++)
-                array[i] = (T)valueTypeSettings.Converter.ConvertToObject(children[i], settings);
+                array[i] = (T)childConverter.ConvertToObject(children[i], scopedSettings.ChildSettings);
 
             if(_ctor.IsDefault == false)
                 return _ctor.Invoke((IEnumerable<T>)array);

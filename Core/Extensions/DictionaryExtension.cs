@@ -61,14 +61,14 @@ namespace DotLogix.Core.Extensions {
 
         #region Merge
         /// <summary>
-        ///     Find the the key of an item in the dictionary
+        ///     Merges two dictionaries and return the result
         /// </summary>
         public static IDictionary<TKey, TValue> Merge<TKey, TValue>(this IDictionary<TKey, TValue> dict, IDictionary<TKey, TValue> other, bool replaceExisting = true, IEqualityComparer<TKey> comparer = null) {
             return Merge(new[] {dict, other}, replaceExisting, comparer);
         }
 
         /// <summary>
-        ///     Find the the key of an item in the dictionary
+        ///     Merges a collection of dictionaries and return the result
         /// </summary>
         public static IDictionary<TKey, TValue> Merge<TKey, TValue>(this IEnumerable<IDictionary<TKey, TValue>> dicts, bool replaceExisting = true, IEqualityComparer<TKey> comparer = null) {
             var dictionary = new Dictionary<TKey, TValue>(comparer ?? EqualityComparer<TKey>.Default);
@@ -76,11 +76,28 @@ namespace DotLogix.Core.Extensions {
             return dictionary;
         }
 
-        public static void Union<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEnumerable<IDictionary<TKey, TValue>> dicts) {
-            foreach(var dict in dicts) {
-                foreach(var kv in dict) {
+        /// <summary>
+        ///     Merges all keys of the other dictionary to the current dictionary
+        /// </summary>
+        public static void Union<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEnumerable<KeyValuePair<TKey, TValue>> pairs, bool replaceExisting = true) {
+            if(replaceExisting) {
+                foreach (var kv in pairs) {
                     dictionary[kv.Key] = kv.Value;
                 }
+            } else {
+                foreach (var kv in pairs) {
+                    if(dictionary.ContainsKey(kv.Key) == false)
+                        dictionary[kv.Key] = kv.Value;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Merges all keys of the other dictionary to the current dictionary
+        /// </summary>
+        public static void Union<TKey, TValue, TEnumerable>(this IDictionary<TKey, TValue> dictionary, IEnumerable<TEnumerable> pairs, bool replaceExisting = true) where TEnumerable : IEnumerable<KeyValuePair<TKey, TValue>> {
+            foreach(var values in pairs) {
+                Union(dictionary, values);
             }
         }
         #endregion

@@ -31,11 +31,12 @@ namespace DotLogix.Core.Nodes.Factories {
             var memberSettings = new List<MemberSettings>();
             foreach(var dynamicProperty in typeSettings.DynamicType.Properties) {
                 if(dynamicProperty.PropertyInfo.IsDefined(typeof(IgnoreMemberAttribute)))
+                    continue;
 
-                if(resolver.TryResolve(typeSettings, dynamicProperty, out var memberSetting))
-                    memberSettings.Add(memberSetting);
-                else
+                if(resolver.TryResolve(typeSettings, dynamicProperty, out var memberSetting) == false)
                     return false;
+                
+                memberSettings.Add(memberSetting);
             }
             converter = new ObjectNodeConverter(typeSettings, memberSettings);
             return true;

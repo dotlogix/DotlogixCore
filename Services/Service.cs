@@ -9,22 +9,20 @@
 #region
 using System;
 using System.Collections.Generic;
-using System.Configuration.Install;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.ServiceProcess;
 using System.Text.RegularExpressions;
 using DotLogix.Core.Collections;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 #endregion
 
-namespace DotLogix.Core.WindowsServices {
+namespace DotLogix.Core.Services {
     /// <summary>
     ///     A base for windows services
     /// </summary>
-    public class WindowsService {
+    public class Service {
         /// <summary>
         ///     The application mode
         /// </summary>
@@ -51,12 +49,11 @@ namespace DotLogix.Core.WindowsServices {
         public KeyedCollection<string, ConsoleCommand> Commands { get; } = new KeyedCollection<string, ConsoleCommand>(c => c.Name);
 
         /// <summary>
-        ///     Creates a new instance of <see cref="WindowsService" />
+        ///     Creates a new instance of <see cref="Service" />
         /// </summary>
-        public WindowsService(string serviceName, string logDirectory) {
+        public Service(string serviceName, string logDirectory) {
             ProgramExecutable = Assembly.GetEntryAssembly()?.Location;
             LogDirectory = logDirectory;
-            Mode = Environment.UserInteractive ? ApplicationMode.UserInteractive : ApplicationMode.Service;
             ServiceName = serviceName;
 
             bool NoArgs(ConsoleCommand cmd, CommandArgs args) => args.IsEmpty;
@@ -81,34 +78,25 @@ namespace DotLogix.Core.WindowsServices {
         /// <summary>
         ///     Start the service loop
         /// </summary>
-        public void Run(string[] args) {
-            switch(Mode) {
-                case ApplicationMode.UserInteractive:
-                    OnConfiguration(args, null);
-                    UserInteractiveStartup(args);
-                    break;
-                case ApplicationMode.Service:
-                    var serviceBase = new ServiceWrapper(this, ServiceName);
-                    OnConfiguration(args, serviceBase.EventLog);
-                    ServiceBase.Run(serviceBase);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+        public virtual void Run(string[] args) {
+            OnConfiguration(args);
+
+            if(Mode == ApplicationMode.UserInteractive)
+                UserInteractiveStartup(args);
+            else
+                ServiceStartup(args);
         }
 
         /// <summary>
         ///     Create the required loggers
         /// </summary>
-        protected virtual void InitializeLoggers(EventLog eventLog) {
+        protected virtual void InitializeLoggers(string[] args) {
             var loggers = new List<ILogger>();
             if(LogDirectory != null)
                 loggers.Add(new FileLogger(LogDirectory));
 
-            if(Mode == ApplicationMode.UserInteractive)
+            if(Mode == ApplicationMode.UserInteractive && args.Contains("--no-console-log") == false)
                 loggers.Add(new ConsoleLogger(150, 30));
-            else if(eventLog != null)
-                loggers.Add(new EventLogLogger(eventLog));
 
             if(loggers.Count > 0) {
                 Log.LogLevel = LogLevels.Trace;
@@ -120,16 +108,21 @@ namespace DotLogix.Core.WindowsServices {
         /// <summary>
         ///     A callback to configure the service
         /// </summary>
-        protected virtual void OnConfiguration(string[] args, EventLog eventLog) {
-            InitializeLoggers(eventLog);
+        protected virtual void OnConfiguration(string[] args) {
+            if(Environment.UserInteractive == false || args.Contains("--service"))
+                Mode = ApplicationMode.Service;
+            else
+                Mode = ApplicationMode.UserInteractive;
+            
+            InitializeLoggers(args);
         }
 
-        private void UserInteractiveStartup(string[] args) {
-            if(args.Length > 0) {
-                switch(args[0].ToLower()) {
+        protected virtual void UserInteractiveStartup(string[] args) {
+            if (args.Length > 0) {
+                switch (args[0].ToLower()) {
                     case "--install":
                     case "--i":
-                        if(InstallService()) {
+                        if (OnCommand_Install()) {
                             Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("Service installation successful");
                         } else {
@@ -143,7 +136,7 @@ namespace DotLogix.Core.WindowsServices {
                         return;
                     case "--uninstall":
                     case "--u":
-                        if(UninstallService()) {
+                        if (OnCommand_Uninstall()) {
                             Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("Service uninstallation successful");
                         } else {
@@ -160,93 +153,65 @@ namespace DotLogix.Core.WindowsServices {
 
             try {
                 OnStart(args);
-
-                var commandResult = ConsoleCommandResult.Continue;
-                var commandParserRegex = new Regex("\\s(?:(?<name>\\w+)[=:])\\s*(?:(?<value>(?:\\w+)|(?:\"([^\"]+?)\")))");
-                do {
-                    var line = Console.ReadLine();
-                    if(line == null)
-                        continue;
-
-                    var commandName = line.SubstringUntil(' ');
-
-                    var commandArgs = new Dictionary<string, string>();
-                    var unnamedCommandArgs = new List<string>();
-                    if(commandName.Length > line.Length) {
-                        var argsMatches = commandParserRegex.Matches(line, commandName.Length);
-
-                        foreach(Match match in argsMatches) {
-                            if(!match.Success)
-                                continue;
-
-                            var name = match.Groups["name"].GetValueOrDefault();
-                            var value = match.Groups["value"].GetValueOrDefault();
-
-                            if(name == null)
-                                unnamedCommandArgs.Add(value);
-                            else
-                                commandArgs[name] = value;
-                        }
-                    }
-
-                    commandResult = OnCommand(commandName, new CommandArgs(commandArgs, unnamedCommandArgs));
-                } while(commandResult.Exit == false);
-
-                Environment.ExitCode = commandResult.ExitCode;
-            } catch(Exception e) {
+                Environment.ExitCode = ProcessUserInput();
+            } catch (Exception e) {
                 Log.Critical(e);
-            }
-
-            OnStop();
-        }
-
-        private class ServiceWrapper : ServiceBase {
-            private readonly WindowsService _app;
-
-            public ServiceWrapper(WindowsService app, string serviceName) {
-                _app = app;
-                ServiceName = serviceName;
-            }
-
-            protected override void OnStart(string[] args) {
-                _app.OnStart(args);
-                base.OnStart(args);
-            }
-
-            protected override void OnStop() {
-                _app.OnStop();
-                base.OnStop();
+                Environment.ExitCode = e.HResult; // error code
+            } finally {
+                OnStop();
             }
         }
 
-        #region Install
-        /// <summary>
-        ///     A callback to install the service
-        /// </summary>
-        protected virtual bool InstallService() {
+        protected virtual void ServiceStartup(string[] args) {
             try {
-                ManagedInstallerClass.InstallHelper(new[] {"/i", ProgramExecutable});
-                return true;
-            } catch(Exception e) {
-                Console.WriteLine(e);
-                return false;
+                OnStart(args);
+                Console.ReadLine();
+
+                Environment.ExitCode = 0; // success
+            } catch (Exception e) {
+                Log.Critical(e);
+                Environment.ExitCode = e.HResult; // error code
+            } finally {
+                OnStop();
             }
         }
 
+        protected virtual int ProcessUserInput() {
+            var commandResult = ConsoleCommandResult.Continue;
+            var commandParserRegex = new Regex("\\s(?:(?<name>\\w+)\\s*[=:])?\\s*(?:(?:\\\"(?<value>[^\\\"]+)\\\")|(?<value>[^\\\"\\s]+))");
+            do {
+                var line = Console.ReadLine();
+                if(line == null)
+                    continue;
 
-        /// <summary>
-        ///     A callback to uninstall the service
-        /// </summary>
-        protected virtual bool UninstallService() {
-            try {
-                ManagedInstallerClass.InstallHelper(new[] {"/u", ProgramExecutable});
-                return true;
-            } catch(Exception e) {
-                Console.WriteLine(e);
-                return false;
-            }
+                var commandName = line.SubstringUntil(' ');
+
+                var commandArgs = new Dictionary<string, string>();
+                var unnamedCommandArgs = new List<string>();
+                if(commandName.Length < line.Length) {
+                    var argsMatches = commandParserRegex.Matches(line, commandName.Length);
+
+                    foreach(Match match in argsMatches) {
+                        if(!match.Success)
+                            continue;
+
+                        var name = match.Groups["name"]
+                                        .GetValueOrDefault();
+                        var value = match.Groups["value"]
+                                         .GetValueOrDefault();
+
+                        if(name == null)
+                            unnamedCommandArgs.Add(value);
+                        else
+                            commandArgs[name] = value;
+                    }
+                }
+
+                commandResult = OnCommand(commandName, new CommandArgs(commandArgs, unnamedCommandArgs));
+            } while(commandResult.Exit == false);
+
+            return commandResult.ExitCode;
         }
-        #endregion
 
         #region OnCommand
         /// <summary>
@@ -273,17 +238,32 @@ namespace DotLogix.Core.WindowsServices {
             return ConsoleCommandResult.Continue;
         }
 
-        private ConsoleCommandResult OnCommand_Exit() {
+        protected virtual ConsoleCommandResult OnCommand_Exit() {
             return ConsoleCommandResult.ExitNoError;
         }
 
-        private void OnCommand_Help() {
+        protected virtual void OnCommand_Help() {
             foreach(var consoleCommand in Commands.OrderBy(c => c.Name))
                 Console.WriteLine(consoleCommand.Description);
         }
 
-        private void OnCommand_Clear() {
+        protected virtual void OnCommand_Clear() {
             Console.Clear();
+        }
+
+        /// <summary>
+        ///     A callback to install the service
+        /// </summary>
+        protected virtual bool OnCommand_Install() {
+            return false;
+        }
+
+
+        /// <summary>
+        ///     A callback to uninstall the service
+        /// </summary>
+        protected virtual bool OnCommand_Uninstall() {
+            return false;
         }
         #endregion
     }

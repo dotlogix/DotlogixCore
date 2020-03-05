@@ -8,7 +8,7 @@
 
 #region
 using DotLogix.Architecture.Common.Options;
-using DotLogix.Architecture.Infrastructure.Decorators;
+using DotLogix.Architecture.Infrastructure.Attributes;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Entities {
@@ -17,10 +17,4 @@ namespace DotLogix.Architecture.Infrastructure.Entities {
     /// </summary>
     [InsertOnly]
     public interface IInsertOnlyEntity : ISimpleEntity, IInsertOnly { }
-
-    /// <summary>
-    /// An interface to activate second level caching for <see cref="ISimpleEntity"/>
-    /// </summary>
-    [GuidIndexed]
-    public interface IGuidIndexedEntity : ISimpleEntity { }
 }

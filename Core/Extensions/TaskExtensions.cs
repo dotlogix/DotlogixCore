@@ -40,10 +40,10 @@ namespace DotLogix.Core.Extensions {
 
             var tcs = new TaskCompletionSource<object>();
 
-            task.ContinueWith(t => tcs.SetResult(UnpackResult(t)), TaskContinuationOptions.OnlyOnRanToCompletion);
+            task.ContinueWith(t => tcs.SetResult(UnpackResult(t)), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously);
             // ReSharper disable once PossibleNullReferenceException
-            task.ContinueWith(t => tcs.SetException(t.Exception.InnerExceptions), TaskContinuationOptions.OnlyOnFaulted);
-            task.ContinueWith(t => tcs.SetCanceled(), TaskContinuationOptions.OnlyOnCanceled);
+            task.ContinueWith(t => tcs.SetException(t.Exception.InnerExceptions), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+            task.ContinueWith(t => tcs.SetCanceled(), TaskContinuationOptions.OnlyOnCanceled | TaskContinuationOptions.ExecuteSynchronously);
             return tcs.Task;
         }
 
@@ -69,13 +69,10 @@ namespace DotLogix.Core.Extensions {
         /// <param name="task">The task</param>
         /// <returns></returns>
         public static Task<TBase> ConvertResult<TBase, TDerived>(this Task<TDerived> task) where TDerived : TBase {
-            var tcs = new TaskCompletionSource<TBase>();
-
-            task.ContinueWith(t => tcs.SetResult(t.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
-            // ReSharper disable once PossibleNullReferenceException
-            task.ContinueWith(t => tcs.SetException(t.Exception.InnerExceptions), TaskContinuationOptions.OnlyOnFaulted);
-            task.ContinueWith(t => tcs.SetCanceled(), TaskContinuationOptions.OnlyOnCanceled);
-            return tcs.Task;
+            return task.ContinueWith(
+                                     t => (TBase)t.Result,
+                                     TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnRanToCompletion
+                                    );
         }
 
         /// <summary>
@@ -87,13 +84,10 @@ namespace DotLogix.Core.Extensions {
         /// <param name="task">The task</param>
         /// <returns></returns>
         public static Task<TResult> ConvertResult<TSource, TResult>(this Task<TSource> task, Func<TSource, TResult> selectorFunc) {
-            var tcs = new TaskCompletionSource<TResult>();
-
-            task.ContinueWith(t => tcs.SetResult(selectorFunc.Invoke(t.Result)), TaskContinuationOptions.OnlyOnRanToCompletion);
-            // ReSharper disable once PossibleNullReferenceException
-            task.ContinueWith(t => tcs.SetException(t.Exception.InnerExceptions), TaskContinuationOptions.OnlyOnFaulted);
-            task.ContinueWith(t => tcs.SetCanceled(), TaskContinuationOptions.OnlyOnCanceled);
-            return tcs.Task;
+            return task.ContinueWith(
+                                     (t) => selectorFunc.Invoke(t.Result), 
+                                     TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnRanToCompletion
+                                     );
         }
 
         private static GetterDelegate CreateAccessor(Type taskType) {

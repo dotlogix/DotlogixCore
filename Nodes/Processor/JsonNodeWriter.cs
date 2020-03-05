@@ -148,10 +148,9 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         private void WriteIdentAsync() {
-            if(ContainerCount == 0)
-                return;
-
             _builder.AppendLine();
+            if (ContainerCount == 0)
+                return;
 
             var identCount = ContainerCount * _formatterSettings.IdentSize;
             if(identCount > 0)
@@ -171,52 +170,23 @@ namespace DotLogix.Core.Nodes.Processor {
                 _builder.Append("null");
                 return;
             }
-            var dataType = value.GetDataType();
-            var flags = dataType.Flags & DataTypeFlags.PrimitiveMask;
-            switch(flags) {
-                case DataTypeFlags.Bool:
-                    _builder.Append((bool)value ? "true" : "false");
-                    break;
-                case DataTypeFlags.Guid:
-                    _builder.Append('\"');
-                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.GuidFormat, _formatterSettings.FormatProvider));
-                    _builder.Append('\"');
-                    break;
-                case DataTypeFlags.Enum:
-                    _builder.Append('\"');
-                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.EnumFormat, _formatterSettings.FormatProvider));
-                    _builder.Append('\"');
-                    break;
-                case DataTypeFlags.Char:
-                    value = new string((char)value, 1);
-                    goto case DataTypeFlags.String;
-                case DataTypeFlags.SByte:
-                case DataTypeFlags.Byte:
-                case DataTypeFlags.Short:
-                case DataTypeFlags.UShort:
-                case DataTypeFlags.Int:
-                case DataTypeFlags.UInt:
-                case DataTypeFlags.Long:
-                case DataTypeFlags.ULong:
-                case DataTypeFlags.Float:
-                case DataTypeFlags.Double:
-                case DataTypeFlags.Decimal:
-                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.NumberFormat, _formatterSettings.FormatProvider));
-                    break;
-                case DataTypeFlags.DateTime:
-                case DataTypeFlags.DateTimeOffset:
-                case DataTypeFlags.TimeSpan:
-                    _builder.Append('\"');
-                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.TimeFormat, _formatterSettings.FormatProvider));
-                    _builder.Append('\"');
-                    break;
-                case DataTypeFlags.String:
-                    JsonStrings.AppendJsonString(_builder, (string)value, true);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
 
+            if(value is JsonPrimitive primitive) {
+                switch(primitive.Type) {
+                    case JsonPrimitiveType.Null:
+                    case JsonPrimitiveType.Number:
+                    case JsonPrimitiveType.Boolean:
+                        _builder.Append(primitive.Json);
+                        return;
+                    case JsonPrimitiveType.String:
+                        JsonStrings.AppendJsonString(_builder, primitive.Json, true);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            } else {
+                JsonStrings.AppendJsonString(_builder, value.ToString(), true);
+            }
         }
 
         private void CheckName(string name, out bool appendName) {

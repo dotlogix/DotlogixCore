@@ -10,8 +10,9 @@
 using System;
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Services.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Token {
-    public delegate Task ValidateTokenAsyncCallback(TokenAuthenticationMethod authenticationMethod, WebRequestResult webRequestResult, Guid token);
+    public delegate Task ValidateTokenAsyncCallback(TokenAuthenticationMethod authenticationMethod, WebServiceContext context, Guid token);
 }

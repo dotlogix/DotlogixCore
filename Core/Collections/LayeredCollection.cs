@@ -150,8 +150,16 @@ namespace DotLogix.Core.Collections {
         public TCollection CurrentLayer => LayerStack.Count > 0 ? LayerStack.Peek() : default;
 
         /// <inheritdoc />
-        public void PushLayer() {
-            LayerStack.Push(_createCollectionFunc.Invoke());
+        public TCollection PushLayer() {
+            var collection = _createCollectionFunc.Invoke();
+            LayerStack.Push(collection);
+            return collection;
+        }
+
+        /// <inheritdoc />
+        public TCollection PushLayer(TCollection collection) {
+            LayerStack.Push(collection);
+            return collection;
         }
 
         /// <inheritdoc />

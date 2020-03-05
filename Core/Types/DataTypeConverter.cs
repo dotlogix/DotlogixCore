@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using DotLogix.Core.Extensions;
 #endregion
 
@@ -24,8 +25,12 @@ namespace DotLogix.Core.Types {
         /// </summary>
         public static DataTypeConverter Instance { get; } = new DataTypeConverter();
 
+        public IReadOnlyDictionary<Type, DataType> Primitives { get; }
+
         private DataTypeConverter() {
-            _cachedDataTypes = CreatePrimitiveTypes();
+            var primitives = CreatePrimitiveTypes();
+            _cachedDataTypes = new ConcurrentDictionary<Type, DataType>(primitives);
+            Primitives = primitives;
         }
 
         /// <summary>
@@ -62,8 +67,8 @@ namespace DotLogix.Core.Types {
             return new DataType(flags, type, underlyingType);
         }
 
-        private static ConcurrentDictionary<Type, DataType> CreatePrimitiveTypes() {
-            var primitives = new ConcurrentDictionary<Type, DataType>();
+        private static Dictionary<Type, DataType> CreatePrimitiveTypes() {
+            var primitives = new Dictionary<Type, DataType>();
 
             void AddPrimitiveType(Type type, DataTypeFlags flags) {
                 primitives.TryAdd(type, new DataType(flags, type));

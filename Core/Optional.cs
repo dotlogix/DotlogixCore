@@ -22,6 +22,9 @@ namespace DotLogix.Core {
         public static Optional<TValue> Undefined => new Optional<TValue>();
         /// <inheritdoc />
         public bool IsDefined { get; }
+
+        /// <inheritdoc />
+        public bool IsUndefined => IsDefined == false;
         /// <inheritdoc />
         public bool IsDefault => IsDefined && Equals(Value, default(TValue));
         /// <inheritdoc />

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -11,71 +13,59 @@ using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Caching.Memory;
+using Z.EntityFramework.Plus;
+
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Linq;
+using System.Text;
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
     /// <summary>
     /// An implementation of the <see cref="IEntitySet{TEntity}"/> interface for entity framework
     /// </summary>
-    public class EfEntitySet<TEntity> : IEntitySet<TEntity> where TEntity : class
-    {
-        private readonly DbSet<TEntity> _dbSet;
+    public class EfEntitySet<TEntity> : IEntitySet<TEntity> where TEntity : class, new() {
+        /// <summary>
+        /// The inner DbSet
+        /// </summary>
+        protected DbSet<TEntity> DbSet { get; }
 
         /// <summary>
         /// Create a new instance of <see cref="EfEntitySet{TEntity}"/>
         /// </summary>
         public EfEntitySet(DbSet<TEntity> dbSet) {
-            _dbSet = dbSet;
+            DbSet = dbSet;
         }
-
+        
         /// <inheritdoc />
-        public virtual ValueTask<TEntity> GetAsync(object key, CancellationToken cancellationToken = default) {
-	        throw new NotSupportedException();
-        }
-
-        /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<object> keys, CancellationToken cancellationToken = default) {
-	        throw new NotSupportedException();
-
-		}
-
-		/// <inheritdoc />
-		public virtual ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-	        var asyncResult = Query()
-	                          .ToEnumerableAsync(cancellationToken);
-	        return new ValueTask<IEnumerable<TEntity>>(asyncResult);
-		}
-
-        /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default)
-        {
-	        var asyncResult = Query()
-	                          .Where(filterExpression)
-	                          .ToEnumerableAsync(cancellationToken);
-	        return new ValueTask<IEnumerable<TEntity>>(asyncResult);
-        }
-
-        /// <inheritdoc />
-        public virtual ValueTask<TEntity> AddAsync(TEntity entity)
-        {
-	        var asyncResult = _dbSet.AddAsync(entity)
-	                                .ContinueWith(e => e.Result.Entity, TaskContinuationOptions.OnlyOnRanToCompletion);
-			return new ValueTask<TEntity>(asyncResult);
+        public virtual async ValueTask<TEntity> AddAsync(TEntity entity) {
+            var asyncResult = DbSet.AddAsync(entity);
+            if(asyncResult.IsCompletedSuccessfully == false)
+                await asyncResult;
+            return asyncResult.Result.Entity;
         }
 
         /// <inheritdoc />
         public virtual ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities)
         {
 	        var collection = entities.AsCollection();
-			var asyncResult = _dbSet.AddRangeAsync(collection)
-			                        .ContinueWith(e => collection.AsEnumerable(), TaskContinuationOptions.OnlyOnRanToCompletion);
+			var asyncResult = DbSet.AddRangeAsync(collection)
+			                        .ContinueWith(e => collection.AsEnumerable(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously);
 			return new ValueTask<IEnumerable<TEntity>>(asyncResult);
 		}
 
         /// <inheritdoc />
         public virtual ValueTask<TEntity> RemoveAsync(TEntity entity)
         {
-	        var entry = _dbSet.Remove(entity);
+	        var entry = DbSet.Remove(entity);
 			return new ValueTask<TEntity>(entry.Entity);
 		}
 
@@ -83,26 +73,26 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
         public virtual ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities)
         {
 	        var collection = entities.AsCollection();
-			_dbSet.RemoveRange(collection);
+			DbSet.RemoveRange(collection);
             return new ValueTask<IEnumerable<TEntity>>(collection);
 		}
 
         /// <inheritdoc />
         public virtual ValueTask<TEntity> ReAttachAsync(TEntity entity) {
-            var  entry = _dbSet.Attach(entity);
+            var  entry = DbSet.Attach(entity);
             return new ValueTask<TEntity>(entry.Entity);
 		}
 
         /// <inheritdoc />
         public virtual ValueTask<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities) {
             var collection = entities.AsCollection();
-            _dbSet.AttachRange(collection);
+            DbSet.AttachRange(collection);
             return new ValueTask<IEnumerable<TEntity>>(collection);
 		}
 
         /// <inheritdoc />
         public virtual IQuery<TEntity> Query() {
-            return EfQueryableQueryFactory.Instance.CreateQuery(_dbSet);
+            return EfQueryableQueryFactory.Instance.CreateQuery(DbSet);
         }
     }
 }

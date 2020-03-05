@@ -11,6 +11,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Attributes;
@@ -18,10 +19,25 @@ using DotLogix.Core.Rest.Services.Attributes.Descriptors;
 using DotLogix.Core.Rest.Services.Attributes.Events;
 using DotLogix.Core.Rest.Services.Attributes.ResultWriter;
 using DotLogix.Core.Rest.Services.Attributes.Routes;
+using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services.Descriptors;
+using DotLogix.Core.Rest.Services.Processors.Json;
+using DotLogix.Core.Rest.Services.Writer;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
+    public static class WebServiceHostExtensions {
+        public static WebServiceHost UseJson(this WebServiceHost host, JsonFormatterSettings settings) {
+            host.Settings.Set(WebServiceSettings.JsonFormatterSettings, settings);
+            host.Router.DefaultResultWriter = WebRequestResultJsonWriter.Instance;
+            host.GlobalPreProcessors.Add(ParseJsonBodyPreProcessor.Instance);
+            return host;
+        }
+    }
+
     public class WebServiceHost {
+        public ISettings Settings { get; } = new Settings();
         public AsyncWebRequestRouter Router { get; }
         private int _currentRouteIndex;
         public IAsyncHttpServer Server { get; }
@@ -78,7 +94,7 @@ namespace DotLogix.Core.Rest.Services {
                 if(serviceRoute == null)
                     continue;
 
-                foreach(var preProcessorAttribute in methodInfo.GetCustomAttributes<PreProcessorAttribute>())
+                foreach (var preProcessorAttribute in methodInfo.GetCustomAttributes<PreProcessorAttribute>())
                     serviceRoute.PreProcessors.Add(preProcessorAttribute.CreateProcessor());
 
                 foreach(var postProcessorAttribute in methodInfo.GetCustomAttributes<PostProcessorAttribute>())
@@ -86,13 +102,15 @@ namespace DotLogix.Core.Rest.Services {
 
                 foreach(var descriptorAttribute in methodInfo.GetCustomAttributes<DescriptorAttribute>())
                     serviceRoute.RequestProcessor.Descriptors.Add(descriptorAttribute.CreateDescriptor());
+                
+                serviceRoute.RequestProcessor.Descriptors.Add(new SettingsDescriptor(Settings));
 
                 var resultWriterAttribute = methodInfo.GetCustomAttribute<RouteResultWriterAttribute>();
                 if(resultWriterAttribute != null)
                     serviceRoute.WebRequestResultWriter = resultWriterAttribute.CreateResultWriter();
 
 
-                Router.ServerRoutes.Add(serviceInstance.RoutePrefix ?? "",serviceRoute);
+                Router.ServerRoutes.Add(serviceRoute, serviceInstance.RoutePrefix ?? "");
                 count++;
             }
             if(count > 0)
@@ -125,5 +143,12 @@ namespace DotLogix.Core.Rest.Services {
             RegisterService(new TService());
         }
         #endregion
+    }
+
+    public class SettingsDescriptor : WebRequestProcessorDescriptorBase {
+        public IReadOnlySettings Settings { get; }
+        public SettingsDescriptor(IReadOnlySettings settings) {
+            Settings = settings;
+        }
     }
 }

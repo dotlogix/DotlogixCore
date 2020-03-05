@@ -18,7 +18,7 @@ namespace DotLogix.Architecture.Domain.UoW {
     /// </summary>
     public interface IUnitOfWorkContext : IUnitOfWorkContextFactory, IDisposable {
         /// <summary>
-        /// Get or create an instance of <see cref="IRepository{TEntity}"/>
+        /// Get or create an instance of <see cref="IRepository{TEntity, TKey}"/>
         /// </summary>
         TRepo UseRepository<TRepo>() where TRepo : IRepository;
 

@@ -10,6 +10,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 #endregion
@@ -29,21 +31,19 @@ namespace DotLogix.Core.Extensions {
         public static IEnumerable<ValueTask<char>> AsAsyncSequence(this TextReader reader, int bufferSize, Action<char> action = null) {
             var buffer = new char[bufferSize];
             var count = 0;
-            async Task<char> ReadFirstCharAsync() {
-                count = await reader.ReadAsync(buffer, 0, buffer.Length);
-
-
-                if(count == 0)
-                    return '\0';
-
-                var chr = buffer[0];
-                action?.Invoke(chr);
-                return chr;
-
-            }
 
             do {
-                var firstCharAsync = ReadFirstCharAsync();
+                var firstCharAsync = reader.ReadAsync(buffer, 0, buffer.Length)
+                                           .ContinueWith(task => {
+                                                             count = task.Result;
+
+                                                             if (count == 0)
+                                                                 return '\0';
+
+                                                             var chr = buffer[0];
+                                                             action?.Invoke(chr);
+                                                             return chr;
+                                                         }, TaskContinuationOptions.ExecuteSynchronously);
                 if(firstCharAsync.IsCompleted) {
                     if(count == 0)
                         yield break;

@@ -9,8 +9,14 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Running;
+using Benchmarks.Serializers;
+using DotLogix.Core;
+using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Nodes.Processor;
 #endregion
@@ -84,28 +90,99 @@ namespace TestApp {
         public class Person {
             [NodeProperty(Name = "test")]
             public string FirstName { get; set; }
+
+
+
             [NodeProperty(NamingStrategy = typeof(SnakeCaseNamingStrategy))]
             public string LastName { get; set; }
+
+
+
             [NodeChild(EmitMode = EmitMode.IgnoreDefault)]
             public IEnumerable<int> Enumerable { get; set; }
-            [NodeProperty(EmitMode = EmitMode.IgnoreDefault)]
-            public int DefaultInt { get; set; }
+
+
+            [NodeProperty(EmitMode = EmitMode.IgnoreDefault, NumberFormat = "X8")]
+            public int DefaultInt { get; set; } = 255;
+
+
 
             [NodeProperty(EmitMode = EmitMode.IgnoreDefault)]
             public string DefaultString { get; set; }
+
+
+            [NodeProperty(EmitMode = EmitMode.IgnoreDefault, NumberFormat = "P")]
+            public double PerctDouble { get; set; } = 0.85;
+
+
+
+            [NodeProperty(EmitMode = EmitMode.IgnoreNull)]
+            public Optional<string> DefaultOptionalString { get; set; }
+        }
+
+        public class PersonPlain {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public IEnumerable<int> Enumerable { get; set; }
+            public int DefaultInt { get; set; }
+            public string DefaultString { get; set; }
+            public Optional<string> DefaultOptionalString { get; set; }
         }
 
         private static async Task Main(string[] args) {
-            var person = new Person {FirstName = "Alex", LastName = "Schill", Enumerable = new []{0, 1,2,0,3,4}};
+            Log.LogLevel = LogLevels.Trace;
+            Log.AttachLoggers(new ConsoleLogger(120, 100));
+            Log.Initialize();
 
 
-            var json = JsonNodes.ToJson(person);
-            Console.WriteLine(json);
+            Log.Info("Test");
+            try {
+                throw new Exception("error 1234");
+            } catch(Exception e) {
+                Log.Error(e);
+            }
 
-            var deserializedPerson = JsonNodes.FromJson<Person>(json);
+            Console.ReadLine();
 
-            Console.Read();
+
+            //var config = new DebugBuildConfig();
+            //BenchmarkRunner.Run<SerializeToString<Models.SmallClass>>();
+            //BenchmarkRunner.Run<SerializeToString<Models.ThousandSmallClassDictionary>>();
+            //BenchmarkRunner.Run<DeserializeFromString<Models.ThousandSmallClassDictionary>>();
+
+            //var model = new Models.ThousandSmallClassDictionary();
+
+            //Benchmark(model, 1);
+
+
+            //Benchmark(person, 100_000);
+
+            Console.ReadLine();
         }
 
+        private static void Benchmark<T>(T person, int iterations) {
+            // Warmup
+            string json = JsonNodes.ToJson(person);
+            T result = JsonNodes.FromJson<T>(json);
+
+            Console.WriteLine($"Benchmark: {typeof(T).Name}");
+
+            var watch = new Stopwatch();
+
+            watch.Start();
+            for (int i = 0; i < iterations; i++)
+                json = JsonNodes.ToJson(person);
+            watch.Stop();
+            Console.WriteLine($"Serialization: {watch.Elapsed.TotalMilliseconds}ms");
+
+            watch.Restart();
+            for (int i = 0; i < iterations; i++)
+                result = JsonNodes.FromJson<T>(json);
+            watch.Stop();
+            Console.WriteLine($"Deserialization: {watch.Elapsed.TotalMilliseconds}ms");
+
+            Console.Write(json);
+            Console.Write(result);
+        }
     }
 }

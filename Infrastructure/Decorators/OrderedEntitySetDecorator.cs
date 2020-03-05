@@ -19,6 +19,7 @@ using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Decorators {
@@ -26,60 +27,36 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
     /// A decorator to force ordered results after querying
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class OrderedEntitySetDecorator<TEntity> : EntitySetDecoratorBase<TEntity> where TEntity : ISimpleEntity, IOrdered {
+    public class OrderedEntitySetDecorator<TEntity> : EntitySetDecoratorBase<TEntity> where TEntity : class, IOrdered, new() {
         /// <summary>
-        /// Creates a new instance eof <see cref="OrderedEntitySetDecorator{TEnity}"/>
+        /// Creates a new instance eof <see cref="OrderedEntitySetDecorator{TEntity}"/>
         /// </summary>
         public OrderedEntitySetDecorator(IEntitySet<TEntity> baseEntitySet) : base(baseEntitySet) { }
 
-        #region Overrides of EntitySetDecoratorBase<TEntity>
-
-        /// <inheritdoc />
-        public override async ValueTask<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<object> keys,
-	        CancellationToken cancellationToken = default)
-        {
-	        var asyncResult = BaseEntitySet.GetRangeAsync(keys, cancellationToken);
-	        if (!asyncResult.IsCompletedSuccessfully)
-		        await asyncResult;
-			return asyncResult.Result.OrderBy(e => e.Order);
-        }
-
-        /// <inheritdoc />
-        public override async ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-	        var asyncResult = BaseEntitySet.GetAllAsync(cancellationToken);
-	        if(!asyncResult.IsCompletedSuccessfully)
-		        await asyncResult;
-	        return asyncResult.Result.OrderBy(e => e.Order);
-		}
-
-        /// <inheritdoc />
-        public override async ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression,
-	        CancellationToken cancellationToken = default)
-        {
-	        var asyncResult = BaseEntitySet.WhereAsync(filterExpression, cancellationToken);
-	        if(!asyncResult.IsCompletedSuccessfully)
-		        await asyncResult;
-	        return asyncResult.Result.OrderBy(e => e.Order);
-		}
-
-        #endregion
-
         /// <inheritdoc />
         public override IQuery<TEntity> Query() {
-	        object InterceptQueryResult(object result)
-	        {
-		        switch(result)
-		        {
-			        case IEnumerable<TEntity> entities:
-				        return entities.OrderBy(e => e.Order);
-		        }
+            bool InterceptQueryResult(IQueryInterceptionContext queryInterceptionContext) {
+                if(queryInterceptionContext.Result.IsUndefined)
+                    return true;
 
-		        return result;
+		        switch(queryInterceptionContext.Result.Value)
+		        {
+                    case List<TEntity> entities:
+                        entities.Sort(new SelectorComparer<TEntity,int>(e => e.Order));
+                        break;
+                    case TEntity[] entities:
+                        Array.Sort(entities, new SelectorComparer<TEntity, int>(e => e.Order));
+                        break;
+                    case IEnumerable<TEntity> entities:
+                        if(queryInterceptionContext.ResultType == typeof(IEnumerable<TEntity>))
+                            queryInterceptionContext.Result = (object)entities.OrderBy(e => e.Order);
+                        break;
+                }
+
+		        return true;
 	        }
 
-			return BaseEntitySet.Query()
-	                            .InterceptQueryResult(InterceptQueryResult);
+			return BaseEntitySet.Query().InterceptQueryResult(InterceptQueryResult);
         }
     }
 }

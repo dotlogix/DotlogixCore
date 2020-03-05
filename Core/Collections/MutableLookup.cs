@@ -53,7 +53,7 @@ namespace DotLogix.Core.Collections {
         ///     The <see cref="T:System.Collections.Generic.IEnumerable`1"></see> sequence of values indexed by the specified
         ///     key.
         /// </returns>
-        private TCollection this[TKey key] => _innerDictionary[key];
+        public TCollection this[TKey key] => _innerDictionary[key];
 
         /// <summary>
         /// Creates a new instance of <see cref="MutableLookup{TKey,TValue,TCollection}"/>

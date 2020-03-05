@@ -25,52 +25,33 @@ namespace DotLogix.Core.Nodes.Converters {
         public OptionalNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings) {
-            var opt = (Optional<TValue>)instance;
-            if(opt.IsDefined == false || TypeSettings.ShouldEmitValue(opt.Value, settings) == false)
+        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+            if(!(instance is Optional<TValue> opt))
                 return default;
-            if(settings.Resolver.TryResolve(typeof(TValue), out var optionalTypeSettings)) {
-                optionalTypeSettings.Converter.WriteAsync(opt.Value, name, writer, settings);
-            } else {
-                throw new NotSupportedException($"Can not resolve a converter for optional value type {typeof(TValue).Name}");
-            }
 
-            return default;
+            if (opt.IsDefined == false)
+                return default;
+
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
+
+            if (scopedSettings.ShouldEmitValue(opt.Value) == false)
+                return default;
+
+            return childConverter.WriteAsync(opt.Value, name, writer, scopedSettings.ChildSettings);
         }
 
         /// <inheritdoc />
-        public override object ConvertToObject(Node node, ConverterSettings settings) {
+        public override object ConvertToObject(Node node, IConverterSettings settings) {
             if(node.Type == NodeTypes.Empty)
                 return new Optional<TValue>(default);
 
-            if(settings.Resolver.TryResolve(typeof(TValue), out var optionalTypeSettings) == false)
-                throw new NotSupportedException($"Can not resolve a converter for optional value type {typeof(TValue).Name}");
 
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
 
-            var optionalValue = optionalTypeSettings.Converter.ConvertToObject(node, settings);
+            var optionalValue = childConverter.ConvertToObject(node, scopedSettings.ChildSettings);
             return new Optional<TValue>((TValue)optionalValue);
-
-        }
-    }
-    
-    /// <summary>
-    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to node values
-    /// </summary>
-    public class NodeToNodeConverter : NodeConverter {
-        /// <summary>
-        /// Creates a new instance of <see cref="OptionalNodeConverter{TValue}"/>
-        /// </summary>
-        public NodeToNodeConverter(TypeSettings typeSettings, bool dynamic = false) : base(typeSettings) { }
-
-        /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings) {
-            var reader = new NodeReader((Node)instance);
-            return reader.CopyToAsync(writer);
-        }
-
-        /// <inheritdoc />
-        public override object ConvertToObject(Node node, ConverterSettings settings) {
-            return node;
 
         }
     }

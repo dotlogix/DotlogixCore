@@ -7,10 +7,11 @@
 // ==================================================
 
 using System;
+using DotLogix.Architecture.Infrastructure.Decorators;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Core.Reflection.Dynamics;
 
-namespace DotLogix.Architecture.Infrastructure.Decorators {
+namespace DotLogix.Architecture.Infrastructure.Attributes {
     /// <summary>
     /// An attribute to describe an <see cref="EntitySetDecoratorBase{TEntity}"/> which should be applied to this class
     /// </summary>

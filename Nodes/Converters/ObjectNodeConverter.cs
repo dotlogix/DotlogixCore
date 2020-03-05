@@ -64,26 +64,28 @@ namespace DotLogix.Core.Nodes.Converters
         }
 
         /// <inheritdoc/>
-        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, ConverterSettings settings)
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings)
         {
-            var task = writer.BeginMapAsync(name);
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            if (scopedSettings.ShouldEmitValue(instance) == false)
+                return;
+
+            ValueTask task;
+            if(instance == null) {
+                task = writer.WriteValueAsync(name, null);
+                if (task.IsCompletedSuccessfully == false)
+                    await task;
+                return;
+            }
+
+            task = writer.BeginMapAsync(name);
             if (task.IsCompletedSuccessfully == false)
                 await task;
-            foreach (var member in MembersToSerialize)
-            {
+            foreach (var member in MembersToSerialize) {
+                var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: member);
+
                 var memberValue = member.Accessor.GetValue(instance);
-                if (member.ShouldEmitValue(memberValue, settings) == false)
-                    continue;
-
-                var converter = member.Converter;
-                if (converter == null)
-                {
-                    if (settings.Resolver.TryResolve(member.DataType.Type, out var typeSettings) == false)
-                        throw new NotSupportedException($"Can not resolve a converter for {member.Accessor.DeclaringType.Name}.{member.Accessor.Name} of type {member.DataType.Type}");
-                    converter = typeSettings.Converter;
-                }
-
-                task = converter.WriteAsync(memberValue, GetMemberName(member, settings), writer, settings);
+                task = member.Converter.WriteAsync(memberValue, GetMemberName(member, scopedMemberSettings), writer, scopedMemberSettings);
 
                 if (task.IsCompletedSuccessfully == false)
                     await task;
@@ -94,27 +96,32 @@ namespace DotLogix.Core.Nodes.Converters
         }
 
         /// <inheritdoc/>
-        public override object ConvertToObject(Node node, ConverterSettings settings)
+        public override object ConvertToObject(Node node, IConverterSettings settings)
         {
             if (node.Type == NodeTypes.Empty)
                 return default;
 
             if (!(node is NodeMap nodeMap))
-                throw new ArgumentException("Node is not a NodeMap");
+                throw new ArgumentException($"Expected node of type \"NodeMap\" got \"{node.Type}\"");
 
+            var scopedSettings = settings.GetScoped(TypeSettings);
             object instance;
             if (Ctor.IsDefault)
                 instance = Ctor.Invoke();
-            else if (TryConstructWith(Ctor, nodeMap, settings, out instance) == false)
+            else if (TryConstructWith(Ctor, nodeMap, scopedSettings, out instance) == false)
                 throw new InvalidOperationException("Object can not be constructed with the given nodes");
 
-            foreach (var member in MembersToDeserialize)
+            foreach (var memberSettings in MembersToDeserialize)
             {
-                var memberNode = nodeMap.GetChild(GetMemberName(member, settings));
+                var scopedMemberSettings = scopedSettings.GetScoped(memberSettings);
+
+                var memberNode = nodeMap.GetChild(GetMemberName(memberSettings, scopedMemberSettings));
                 if (memberNode == null)
                     continue;
-                var memberValue = member.Converter.ConvertToObject(memberNode, settings);
-                member.Accessor.SetValue(instance, memberValue);
+
+                
+                var memberValue = memberSettings.Converter.ConvertToObject(memberNode, scopedMemberSettings);
+                memberSettings.Accessor.SetValue(instance, memberValue);
             }
             return instance;
         }
@@ -137,7 +144,7 @@ namespace DotLogix.Core.Nodes.Converters
             return true;
         }
 
-        private bool TryConstructWith(DynamicCtor ctor, NodeMap nodeMap, ConverterSettings settings, out object instance)
+        private bool TryConstructWith(DynamicCtor ctor, NodeMap nodeMap, IReadOnlyConverterSettings settings, out object instance)
         {
             instance = null;
 
@@ -145,11 +152,12 @@ namespace DotLogix.Core.Nodes.Converters
             var parametersForCtor = new object[parameterCount];
             for (var i = 0; i < MembersForCtor.Length; i++)
             {
-                var member = MembersForCtor[i];
-                var memberNode = nodeMap.GetChild(GetMemberName(member, settings));
+                var memberSettings = MembersForCtor[i];
+                var scopedMemberSettings = settings.GetScoped(memberSettings);
+                var memberNode = nodeMap.GetChild(GetMemberName(memberSettings, scopedMemberSettings));
                 if (memberNode == null)
                     continue;
-                parametersForCtor[i] = member.Converter.ConvertToObject(memberNode, settings);
+                parametersForCtor[i] = memberSettings.Converter.ConvertToObject(memberNode, scopedMemberSettings);
             }
 
             instance = ctor.Invoke(parametersForCtor);

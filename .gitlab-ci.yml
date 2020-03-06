@@ -5,11 +5,12 @@ stages:
     - test
 
 variables:
+    solution: "Core.sln"
 
 before_script:
-    - "dotnet restore"
+    - "dotnet restore $solution"
 
 build:
     stage: build
     script:
-        - "dotnet build"
+        - "dotnet build $solution"

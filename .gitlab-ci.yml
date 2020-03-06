@@ -18,3 +18,7 @@ build:
         - nuget
     script:
         - "dotnet build $solution -c $configuration -f $framework -p:Version=$version"
+list:
+    stage: list
+    script:
+        - "ls -l"

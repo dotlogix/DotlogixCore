@@ -14,7 +14,12 @@
 		<RepositoryType>git</RepositoryType>
 		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
 		<Version>2.1.20</Version>
+		<Configurations>Debug;Release;Gitlab</Configurations>
 	</PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Gitlab|AnyCPU'">
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DocumentationFile>..\assemblies\docs\DotLogix.Infrastructure.xml</DocumentationFile>

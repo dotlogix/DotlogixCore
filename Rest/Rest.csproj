@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(MSBuildThisFileFullPath)\..\..\assemblies\BuildTasks\BuildTasks.dll" />
-
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<Company>DotLogix</Company>
@@ -31,19 +29,6 @@
 		<ProjectReference Include="..\Core\Core.csproj" />
 		<ProjectReference Include="..\Nodes\Nodes.csproj" />
 	</ItemGroup>
-  
-	<Target Name="BeforeBuildActions" BeforeTargets="BeforeBuild">
-		<GetCurrentBuildVersion BaseVersion="$(Version)" PackageId="$(PackageId)">
-			<Output TaskParameter="BuildVersion" PropertyName="CurrentBuildVersion" />
-			<Output TaskParameter="PackageVersion" PropertyName="CurrentPackageVersion" />
-		</GetCurrentBuildVersion>
-		<PropertyGroup>
-		  <PackageVersion>$(CurrentPackageVersion)</PackageVersion>
-		  <AssemblyVersion>$(CurrentBuildVersion)</AssemblyVersion>
-		  <FileVersion>$(CurrentBuildVersion)</FileVersion>
-		  <Version>$(CurrentBuildVersion)</Version>
-		</PropertyGroup>
-	</Target>
 
   <Target Name="CopyPackage" AfterTargets="Pack">
     <ItemGroup>

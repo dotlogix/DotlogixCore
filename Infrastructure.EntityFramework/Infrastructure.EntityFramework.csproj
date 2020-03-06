@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	  <TargetFrameworks>netstandard2.0</TargetFrameworks>
+	<TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>DotLogix.Infrastructure.EntityFramework</AssemblyName>
     <RootNamespace>DotLogix.Architecture.Infrastructure.EntityFramework</RootNamespace>
     <Company>DotLogix</Company>
@@ -16,16 +16,13 @@
 	<AssemblyVersion>1.1</AssemblyVersion>
     <FileVersion>1.1</FileVersion>
     <Version>2.0.14</Version>
-		<Configurations>Debug;Release;Gitlab</Configurations>
+		<Configurations>Debug;Release;</Configurations>
 	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Gitlab|AnyCPU'">
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>..\assemblies\docs\DotLogix.Infrastructure.EntityFramework.xml</DocumentationFile>
-    <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
+    <WarningsAsErrors>NU1605;</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />

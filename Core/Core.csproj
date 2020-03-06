@@ -1,35 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-		<Company>DotLogix</Company>
-		<Product>DotLogix Core</Product>
-		<PackageId>DotLogix.Core</PackageId>
-		<Authors>DotLogix</Authors>
-		<AssemblyName>DotLogix.Core</AssemblyName>
-		<RootNamespace>DotLogix.Core</RootNamespace>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<RepositoryType>git</RepositoryType>
-		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<Version>2.0.7</Version>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <Company>DotLogix</Company>
+    <Product>DotLogix Core</Product>
+    <PackageId>DotLogix.Core</PackageId>
+    <Authors>DotLogix</Authors>
+    <AssemblyName>DotLogix.Core</AssemblyName>
+    <RootNamespace>DotLogix.Core</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Copyright (c) 2018 DotLogix</Copyright>
+    <Version>2.0.7</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Configurations>Debug;Release;Gitlab</Configurations>
-	</PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Gitlab|AnyCPU'">
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <Configurations>Debug;Release;</Configurations>
   </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DocumentationFile></DocumentationFile>
-		<WarningsAsErrors>NU1605;</WarningsAsErrors>
-	</PropertyGroup>
+  <PropertyGroup>
+    <DocumentationFile>..\assemblies\docs\$(AssemblyName).xml</DocumentationFile>
+    <WarningsAsErrors>NU1605;</WarningsAsErrors>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	</PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Utils\CommandLineParser.cs" />
+  </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
+  </ItemGroup>
 
   <Target Name="CopyPackage" AfterTargets="Pack">
     <ItemGroup>
@@ -39,22 +42,4 @@
     <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
     <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />
   </Target>
-
-	<ItemGroup>
-		<Compile Remove="Utils\CommandLineParser.cs" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net45'">
-		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
-		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
-	</ItemGroup>
 </Project>

@@ -14,16 +14,12 @@
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright (c) 2018 DotLogix</Copyright>
     <Version>2.0.8</Version>
-		<Configurations>Debug;Release;Gitlab</Configurations>
+		<Configurations>Debug;Release;</Configurations>
 	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Gitlab|AnyCPU'">
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>..\assemblies\docs\DotLogix.Services.xml</DocumentationFile>
-    <WarningsAsErrors>NU1605</WarningsAsErrors>
+  <PropertyGroup>
+    <DocumentationFile>..\assemblies\docs\$(AssemblyName).xml</DocumentationFile>
+    <WarningsAsErrors>NU1605;</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

@@ -18,7 +18,7 @@ namespace DotLogix.Core.Nodes {
 
         public IAsyncNodeConverter Converter { get; set; }
 
-        public TypeSettings ChildSettings {
+        public new TypeSettings ChildSettings {
             get => GetWithMemberName<TypeSettings>();
             set => SetWithMemberName(value);
         }

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<Company>DotLogix</Company>
 		<Product>DotLogix Core</Product>
 		<PackageId>DotLogix.Core.Lucene</PackageId>
@@ -14,17 +14,13 @@
 		<RepositoryType>git</RepositoryType>
 		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
 		<Version>2.0.1</Version>
-		<Configurations>Debug;Release;Gitlab</Configurations>
+		<Configurations>Debug;Release;</Configurations>
 	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Gitlab|AnyCPU'">
-    <TargetFramework>netstandard2.0</TargetFramework>
+  <PropertyGroup>
+    <DocumentationFile>..\assemblies\docs\$(AssemblyName).xml</DocumentationFile>
+    <WarningsAsErrors>NU1605;</WarningsAsErrors>
   </PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DocumentationFile>..\assemblies\docs\DotLogix.Lucene.xml</DocumentationFile>
-		<WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
-	</PropertyGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="Lucene.Net" Version="4.8.0-beta00005" />

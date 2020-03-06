@@ -7,14 +7,12 @@ stages:
 variables:
     solution: "Core.sln"
     configuration: "Release"
-    framework: "netstandard2.0"
     version: "1.0.0"
 
 build:
     stage: build
     artifacts:
         paths:
-        - assemblies
         - nuget
     script:
         - "dotnet build $solution -c $configuration -p:Version=$version"

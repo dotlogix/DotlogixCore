@@ -8,12 +8,9 @@
 
 #region
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
-using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {

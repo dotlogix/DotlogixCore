@@ -36,12 +36,6 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Z.EntityFramework.Plus.EFCore">
-      <HintPath>..\..\..\..\..\..\Desktop\Z.EntityFramework.Plus.EFCore.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 
   <Target Name="CopyPackage" AfterTargets="Pack">
     <ItemGroup>

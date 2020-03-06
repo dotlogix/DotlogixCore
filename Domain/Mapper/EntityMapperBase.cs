@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DotLogix.Architecture.Domain.Models;
-using DotLogix.Architecture.Domain.Models.Base;
 
 namespace DotLogix.Architecture.Domain.Mapper {
     /// <summary>

@@ -7,11 +7,7 @@
 // ==================================================
 
 #region
-using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {

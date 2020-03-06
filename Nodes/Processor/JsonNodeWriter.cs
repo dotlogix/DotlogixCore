@@ -11,8 +11,6 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Extensions;
-using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {

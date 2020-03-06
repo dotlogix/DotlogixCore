@@ -6,9 +6,6 @@
 // LastEdited:  06.06.2019
 // ==================================================
 
-using System.Threading.Tasks;
-using DotLogix.Core.Extensions;
-
 namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     /// <summary>
     ///     An interface to represent an interceptor of a query

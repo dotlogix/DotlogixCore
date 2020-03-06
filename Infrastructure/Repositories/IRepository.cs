@@ -12,9 +12,6 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Common.Options;
-using DotLogix.Architecture.Infrastructure.Entities;
-using DotLogix.Architecture.Infrastructure.Queries;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {

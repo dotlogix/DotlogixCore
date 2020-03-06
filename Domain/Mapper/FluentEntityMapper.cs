@@ -8,7 +8,6 @@
 
 using System;
 using DotLogix.Architecture.Domain.Models;
-using DotLogix.Architecture.Domain.Models.Base;
 using DotLogix.Core.Utils.Mappers;
 
 namespace DotLogix.Architecture.Domain.Mapper {

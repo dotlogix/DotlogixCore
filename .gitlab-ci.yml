@@ -12,5 +12,9 @@ variables:
 
 build:
     stage: build
+    artifacts:
+        paths:
+        - assemblies
+        - nuget
     script:
         - "dotnet build $solution -c $configuration -f $framework -p:Version=$version"

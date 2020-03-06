@@ -1,8 +1,0 @@
-language: csharp
-solution: Core.sln
-install:
-  - nuget restore Core.sln
-script:
-  - msbuild /p:Configuration=Release Core.sln
-  - nuget.exe setApiKey $NUGET_API_KEY -Verbosity quiet
-  - nuget.exe push ./nuget/*.nupkg

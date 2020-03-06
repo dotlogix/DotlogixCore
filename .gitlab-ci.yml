@@ -13,4 +13,4 @@ before_script:
 build:
     stage: build
     script:
-        - "dotnet build $solution Gitlab"
+        - "dotnet build $solution --configuration Gitlab"

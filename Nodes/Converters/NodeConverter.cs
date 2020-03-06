@@ -8,23 +8,43 @@
 
 #region
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// A base class for node converters
+    /// </summary>
     public abstract class NodeConverter : IAsyncNodeConverter {
-        protected NodeConverter(DataType dataType) {
-            DataType = dataType;
-            Type = dataType.Type;
+        /// <summary>
+        /// Creates a new instance of <see cref="NodeConverter"/>
+        /// </summary>
+        protected NodeConverter(TypeSettings typeSettings) {
+            TypeSettings = typeSettings;
+            DataType = typeSettings.DataType;
+            Type = typeSettings.DataType.Type;
         }
 
+        /// <inheritdoc />
         public Type Type { get; }
+        /// <inheritdoc />
         public DataType DataType { get; }
+        /// <inheritdoc />
+        public TypeSettings TypeSettings { get; }
 
-        public abstract ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer);
+        /// <inheritdoc />
+        public abstract ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings);
 
-        public abstract object ConvertToObject(Node node, ConverterSettings settings);
+        /// <inheritdoc />
+        public abstract object ConvertToObject(Node node, IConverterSettings settings);
+
+        protected static string GetMemberName(MemberSettings member, IConverterSettings settings) {
+            return member.Name ?? settings.NamingStrategy?.TransformName(member.Accessor.Name) ?? member.Accessor.Name;
+        }
     }
 }

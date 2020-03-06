@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace DotLogix.Core.Nodes.Processor {
     public abstract class NodeWriterBase : IAsyncNodeWriter {
         protected readonly Stack<NodeContainerType> ContainerStack = new Stack<NodeContainerType>();
-        protected NodeWriterBase(ConverterSettings converterSettings = null) {
+        protected NodeWriterBase(ConverterSettings converterSettings = null) {  
             ConverterSettings = converterSettings ?? ConverterSettings.Default;
         }
         protected NodeContainerType CurrentContainer => ContainerStack.Count > 0 ? ContainerStack.Peek() : NodeContainerType.None;
@@ -47,7 +47,7 @@ namespace DotLogix.Core.Nodes.Processor {
                         throw new ArgumentOutOfRangeException();
                 }
 
-                if(task.IsCompleted == false)
+                if(task.IsCompletedSuccessfully == false)
                     await task;
             }
         }

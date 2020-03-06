@@ -29,8 +29,13 @@ namespace DotLogix.Core.Collections {
         /// <summary>
         /// Add a new layer to the collection
         /// </summary>
-        /// <param name="collection"></param>
-        void PushLayer(TCollection collection);
+        TCollection PushLayer();
+
+        /// <summary>
+        /// Add a layer to the collection
+        /// </summary>
+        TCollection PushLayer(TCollection collection);
+
         /// <summary>
         /// Removes the topmost layer from the stack
         /// </summary>

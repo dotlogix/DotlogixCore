@@ -10,13 +10,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Authentication.Jwt.Algorithms;
 using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Services;
+using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Jwt {
@@ -31,11 +33,13 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
             _signingAlgorithms = algorithms.ToDictionary(a => a.Name, StringComparer.OrdinalIgnoreCase);
         }
 
-        public override Task AuthenticateAsync(WebRequestResult webRequestResult, string data) {
-            var result = JsonWebTokens.TryDeserialize<TPayload>(data, out var token, name => _signingAlgorithms.GetValue(name, default(ISigningAlgorithm)));
+        public override Task AuthenticateAsync(WebServiceContext context, string data) {
+            var formatterSettings = context.Settings.Get(WebServiceSettings.JsonFormatterSettings, JsonFormatterSettings.Idented);
+
+            var result = JsonWebTokens.TryDeserialize<TPayload>(data, out var token, name => _signingAlgorithms.GetValue(name), formatterSettings);
             if(result == JsonWebTokenResult.Success)
-                return _callbackAsync.Invoke(this, webRequestResult, token.Payload);
-            SetUnauthorizedException(webRequestResult, $"Token could not be validated ({result})");
+                return _callbackAsync.Invoke(this, context, token.Payload);
+            SetUnauthorizedException(context, $"Token could not be validated ({result})");
             return Task.CompletedTask;
         }
     }

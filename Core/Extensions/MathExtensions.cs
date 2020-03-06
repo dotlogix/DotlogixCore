@@ -7,6 +7,7 @@
 // ==================================================
 
 using System;
+using DotLogix.Core.Utils.Patterns;
 
 namespace DotLogix.Core.Extensions {
     /// <summary>
@@ -40,6 +41,20 @@ namespace DotLogix.Core.Extensions {
         /// <returns></returns>
         public static bool LaysBetween<T>(this T value, T min, T max) where T : IComparable<T> {
             return value.CompareTo(min) >= 0 && value.CompareTo(max) <= 0;
+        }
+
+        /// <summary>
+        ///     Checks if a value is between min and max value
+        /// </summary>
+        /// <param name="value">The value to check</param>
+        /// <param name="range">The range</param>
+        /// <returns></returns>
+        public static bool LaysBetween(this int value, Range range) {
+            if(range.Min.HasValue && value < range.Min.Value)
+                return false;
+            if (range.Max.HasValue && value > range.Max.Value)
+                return false;
+            return true;
         }
         #endregion
 

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
+using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
 #endregion
 
@@ -23,13 +24,13 @@ namespace DotLogix.Core.Rest.Authentication.Base {
 
         public string Name { get; }
         public string[] SupportedDataFormats { get; }
-        public abstract Task AuthenticateAsync(WebRequestResult webRequestResult, string data);
+        public abstract Task AuthenticateAsync(WebServiceContext context, string data);
 
-        public void SetUnauthorizedException(WebRequestResult webRequestResult, string message) {
-            webRequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));
+        public void SetUnauthorizedException(WebServiceContext context, string message) {
+            context.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));
         }
 
-        public void SetInvalidFormatException(WebRequestResult webRequestResult) {
+        public void SetInvalidFormatException(WebServiceContext context) {
             var messageBuilder = new StringBuilder();
             messageBuilder.AppendLine("The data you provided for authorization is in an invalid format.");
             messageBuilder.Append(SupportedDataFormats.Length != 1 ? "Supported formats are:" : "The supported format is:");
@@ -37,7 +38,7 @@ namespace DotLogix.Core.Rest.Authentication.Base {
             foreach(var supportedDataFormat in SupportedDataFormats)
                 messageBuilder.Append($"\n\t{Name} {supportedDataFormat}");
 
-            SetUnauthorizedException(webRequestResult, messageBuilder.ToString());
+            SetUnauthorizedException(context, messageBuilder.ToString());
         }
     }
 }

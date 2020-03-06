@@ -10,5 +10,8 @@
 #endregion
 
 namespace DotLogix.Architecture.Domain.UoW {
+    /// <summary>
+    /// An interface to represent a unit of work
+    /// </summary>
     public interface IUnitOfWork : IUnitOfWorkContextFactory { }
 }

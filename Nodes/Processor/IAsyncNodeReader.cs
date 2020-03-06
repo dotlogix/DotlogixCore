@@ -13,8 +13,17 @@ using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
+    /// <summary>
+    /// An interface to represent node readers
+    /// </summary>
     public interface IAsyncNodeReader : IDisposable {
+        /// <summary>
+        /// Copies all nodes to a node writer
+        /// </summary>
         ValueTask CopyToAsync(IAsyncNodeWriter writer);
+        /// <summary>
+        /// Read the nodes as node operations
+        /// </summary>
         ValueTask<IEnumerable<NodeOperation>> ReadAsync();
     }
 }

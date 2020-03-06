@@ -11,8 +11,6 @@ using System.Reflection;
 using System.Text;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
-using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;

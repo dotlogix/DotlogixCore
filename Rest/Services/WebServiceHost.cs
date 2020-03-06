@@ -11,6 +11,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
+using DotLogix.Core.Nodes;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Attributes;
@@ -18,21 +19,35 @@ using DotLogix.Core.Rest.Services.Attributes.Descriptors;
 using DotLogix.Core.Rest.Services.Attributes.Events;
 using DotLogix.Core.Rest.Services.Attributes.ResultWriter;
 using DotLogix.Core.Rest.Services.Attributes.Routes;
+using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services.Descriptors;
+using DotLogix.Core.Rest.Services.Processors.Json;
 using DotLogix.Core.Rest.Services.Writer;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
+    public static class WebServiceHostExtensions {
+        public static WebServiceHost UseJson(this WebServiceHost host, JsonFormatterSettings settings) {
+            host.Settings.Set(WebServiceSettings.JsonFormatterSettings, settings);
+            host.Router.DefaultResultWriter = WebRequestResultJsonWriter.Instance;
+            host.GlobalPreProcessors.Add(ParseJsonBodyPreProcessor.Instance);
+            return host;
+        }
+    }
+
     public class WebServiceHost {
-        private readonly AsyncWebRequestRouter _router;
+        public ISettings Settings { get; } = new Settings();
+        public AsyncWebRequestRouter Router { get; }
         private int _currentRouteIndex;
         public IAsyncHttpServer Server { get; }
-        public WebRequestProcessorCollection GlobalPreProcessors => _router.GlobalPreProcessors;
-        public WebRequestProcessorCollection GlobalPostProcessors => _router.GlobalPostProcessors;
-        public WebServiceEventCollection ServerEvents => _router.ServerEvents;
+        public WebRequestProcessorCollection GlobalPreProcessors => Router.GlobalPreProcessors;
+        public WebRequestProcessorCollection GlobalPostProcessors => Router.GlobalPostProcessors;
+        public WebServiceEventCollection ServerEvents => Router.ServerEvents;
 
         public WebServiceHost(Configuration configuration = null) {
-            _router = new AsyncWebRequestRouter();
-            Server = new AsyncHttpServer(_router, configuration);
+            Router = new AsyncWebRequestRouter();
+            Server = new AsyncHttpServer(Router, configuration);
         }
 
         public WebServiceHost(string urlPrefix, Configuration configuration = null) : this(configuration) {
@@ -44,7 +59,7 @@ namespace DotLogix.Core.Rest.Services {
         }
 
         public void Start() {
-            Log.Info($"HttpServer started with {_router.RegisteredRoutesCount} routes");
+            Log.Info($"HttpServer started with {Router.RegisteredRoutesCount} routes");
             Server.Start();
         }
 
@@ -53,14 +68,10 @@ namespace DotLogix.Core.Rest.Services {
             Server.Stop();
         }
 
-        public void SetDefaultResultWriter(IAsyncWebRequestResultWriter writer) {
-            _router.DefaultResultWriter = writer;
-        }
-
 
         #region Events
         public Task TriggerEventAsync(string name, WebServiceEventArgs eventArgs) {
-            if(_router.ServerEvents.TryGet(name, out var webServiceEvent) == false)
+            if(Router.ServerEvents.TryGet(name, out var webServiceEvent) == false)
                 throw new ArgumentException($"Event {name} is not defined", nameof(name));
 
             return webServiceEvent.TriggerAsync(this, eventArgs);
@@ -83,7 +94,7 @@ namespace DotLogix.Core.Rest.Services {
                 if(serviceRoute == null)
                     continue;
 
-                foreach(var preProcessorAttribute in methodInfo.GetCustomAttributes<PreProcessorAttribute>())
+                foreach (var preProcessorAttribute in methodInfo.GetCustomAttributes<PreProcessorAttribute>())
                     serviceRoute.PreProcessors.Add(preProcessorAttribute.CreateProcessor());
 
                 foreach(var postProcessorAttribute in methodInfo.GetCustomAttributes<PostProcessorAttribute>())
@@ -91,13 +102,15 @@ namespace DotLogix.Core.Rest.Services {
 
                 foreach(var descriptorAttribute in methodInfo.GetCustomAttributes<DescriptorAttribute>())
                     serviceRoute.RequestProcessor.Descriptors.Add(descriptorAttribute.CreateDescriptor());
+                
+                serviceRoute.RequestProcessor.Descriptors.Add(new SettingsDescriptor(Settings));
 
                 var resultWriterAttribute = methodInfo.GetCustomAttribute<RouteResultWriterAttribute>();
                 if(resultWriterAttribute != null)
                     serviceRoute.WebRequestResultWriter = resultWriterAttribute.CreateResultWriter();
 
 
-                _router.ServerRoutes.Add(serviceInstance.RoutePrefix ?? "",serviceRoute);
+                Router.ServerRoutes.Add(serviceRoute, serviceInstance.RoutePrefix ?? "");
                 count++;
             }
             if(count > 0)
@@ -113,7 +126,7 @@ namespace DotLogix.Core.Rest.Services {
 
                 var serviceEvent = eventAttribute.CreateEvent();
 
-                if(_router.ServerEvents.TryAdd(serviceEvent) == false)
+                if(Router.ServerEvents.TryAdd(serviceEvent) == false)
                     throw new InvalidOperationException($"An event with name {serviceEvent.Name} is already defined");
 
                 async void TriggerEvent(object sender, WebServiceEventArgs args) => await serviceEvent.TriggerAsync(sender, args);
@@ -130,5 +143,12 @@ namespace DotLogix.Core.Rest.Services {
             RegisterService(new TService());
         }
         #endregion
+    }
+
+    public class SettingsDescriptor : WebRequestProcessorDescriptorBase {
+        public IReadOnlySettings Settings { get; }
+        public SettingsDescriptor(IReadOnlySettings settings) {
+            Settings = settings;
+        }
     }
 }

@@ -11,8 +11,17 @@ using System;
 #endregion
 
 namespace DotLogix.Architecture.Common.Options {
+    /// <summary>
+    /// An interface to represent durations
+    /// </summary>
     public interface IDuration {
+        /// <summary>
+        /// The start of the duration in universal time
+        /// </summary>
         DateTime FromUtc { get; set; }
+        /// <summary>
+        /// The end of the duration in universal time
+        /// </summary>
         DateTime? UntilUtc { get; set; }
     }
 }

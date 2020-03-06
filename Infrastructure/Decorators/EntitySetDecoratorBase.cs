@@ -7,46 +7,72 @@
 // ==================================================
 
 #region
+
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
+using DotLogix.Core;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Decorators {
-    public abstract class EntitySetDecoratorBase<TEntity> : EntitySetBase<TEntity>, IEntitySet<TEntity> where TEntity : ISimpleEntity {
+    /// <summary>
+    /// A decorator for <see cref="IEntitySet{TEntity}"/> to intercept requests
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    public abstract class EntitySetDecoratorBase<TEntity> : IEntitySet<TEntity> where TEntity : class, new() {
+        /// <summary>
+        /// The internal base entity set
+        /// </summary>
         protected IEntitySet<TEntity> BaseEntitySet { get; }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="EntitySetDecoratorBase{TEntity}"/>
+        /// </summary>
         protected EntitySetDecoratorBase(IEntitySet<TEntity> baseEntitySet) {
-            BaseEntitySet = baseEntitySet;
+	        BaseEntitySet = baseEntitySet;
         }
 
-        public override IQuery<TEntity> Query() {
-            return BaseEntitySet.Query();
+        /// <inheritdoc />
+		public virtual ValueTask<TEntity> AddAsync(TEntity entity) {
+            return BaseEntitySet.AddAsync(entity);
         }
 
-        public override void Add(TEntity entity) {
-            BaseEntitySet.Add(entity);
+        /// <inheritdoc />
+        public virtual ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities) {
+            return BaseEntitySet.AddRangeAsync(entities);
         }
 
-        public override void AddRange(IEnumerable<TEntity> entities) {
-            BaseEntitySet.AddRange(entities);
+        /// <inheritdoc />
+        public virtual ValueTask<TEntity> RemoveAsync(TEntity entity) {
+            return BaseEntitySet.RemoveAsync(entity);
         }
 
-        public override void Remove(TEntity entity) {
-            BaseEntitySet.Remove(entity);
+        /// <inheritdoc />
+        public virtual ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities) {
+            return BaseEntitySet.RemoveRangeAsync(entities);
         }
 
-        public override void RemoveRange(IEnumerable<TEntity> entities) {
-            BaseEntitySet.RemoveRange(entities);
+        /// <inheritdoc />
+        public virtual ValueTask<TEntity> ReAttachAsync(TEntity entity) {
+            return BaseEntitySet.ReAttachAsync(entity);
         }
 
-        public override void ReAttach(TEntity entity) {
-            BaseEntitySet.ReAttach(entity);
+        /// <inheritdoc />
+        public virtual ValueTask<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities) {
+            return BaseEntitySet.ReAttachRangeAsync(entities);
         }
 
-        public override void ReAttachRange(IEnumerable<TEntity> entities) {
-            BaseEntitySet.ReAttachRange(entities);
+        /// <inheritdoc />
+        public virtual IQuery<TEntity> Query()
+        {
+	        var query = BaseEntitySet.Query();
+	        return query;
         }
     }
 }

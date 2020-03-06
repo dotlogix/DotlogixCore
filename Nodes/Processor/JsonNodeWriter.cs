@@ -8,7 +8,6 @@
 
 #region
 using System;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +16,9 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeWriter"/> interface to write json text
+    /// </summary>
     public class JsonNodeWriter : NodeWriterBase {
         private readonly StringBuilder _builder;
         private readonly TextWriter _writer;
@@ -24,6 +26,9 @@ namespace DotLogix.Core.Nodes.Processor {
         private readonly JsonFormatterSettings _formatterSettings;
         private bool _isFirstChild = true;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonNodeReader"/>
+        /// </summary>
         public JsonNodeWriter(TextWriter writer, JsonFormatterSettings formatterSettings = null, int bufferSize = 100) : base(formatterSettings ?? JsonFormatterSettings.Default) {
             _writer = writer;
             _bufferSize = bufferSize;
@@ -32,6 +37,7 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
 
+        /// <inheritdoc />
         public override async ValueTask BeginMapAsync(string name) {
             CheckName(name, out var appendName);
 
@@ -51,12 +57,13 @@ namespace DotLogix.Core.Nodes.Processor {
 
             if(_builder.Length >= _bufferSize) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }
         }
 
+        /// <inheritdoc />
         public override async ValueTask EndMapAsync() {
             PopExpectedContainer(NodeContainerType.Map);
             _isFirstChild = false;
@@ -67,12 +74,13 @@ namespace DotLogix.Core.Nodes.Processor {
             
             if(_builder.Length >= _bufferSize || ContainerCount == 0) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }
         }
 
+        /// <inheritdoc />
         public override async ValueTask BeginListAsync(string name) {
             CheckName(name, out var appendName);
 
@@ -92,12 +100,13 @@ namespace DotLogix.Core.Nodes.Processor {
 
             if(_builder.Length >= _bufferSize) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }
         }
 
+        /// <inheritdoc />
         public override async ValueTask EndListAsync() {
             PopExpectedContainer(NodeContainerType.List);
             _isFirstChild = false;
@@ -108,12 +117,13 @@ namespace DotLogix.Core.Nodes.Processor {
             
             if(_builder.Length >= _bufferSize || ContainerCount == 0) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }
         }
 
+        /// <inheritdoc />
         public override async ValueTask WriteValueAsync(string name, object value) {
             CheckName(name, out var appendName);
 
@@ -131,17 +141,16 @@ namespace DotLogix.Core.Nodes.Processor {
 
             if(_builder.Length >= _bufferSize || ContainerCount == 0) {
                 var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false)
+                if(task.IsCompleted == false || task.IsFaulted)
                     await task;
                 _builder.Clear();
             }
         }
 
         private void WriteIdentAsync() {
-            if(ContainerCount == 0)
-                return;
-
             _builder.AppendLine();
+            if (ContainerCount == 0)
+                return;
 
             var identCount = ContainerCount * _formatterSettings.IdentSize;
             if(identCount > 0)
@@ -151,8 +160,6 @@ namespace DotLogix.Core.Nodes.Processor {
         private void AppendName(string name) {
             _builder.Append('"');
 
-            if(_formatterSettings.NamingStrategy != null)
-                name = _formatterSettings.NamingStrategy.TransformName(name);
             JsonStrings.AppendJsonString(_builder, name);
 
             _builder.Append("\":");
@@ -163,52 +170,23 @@ namespace DotLogix.Core.Nodes.Processor {
                 _builder.Append("null");
                 return;
             }
-            var dataType = value.GetDataType();
-            var flags = dataType.Flags & DataTypeFlags.PrimitiveMask;
-            switch(flags) {
-                case DataTypeFlags.Bool:
-                    _builder.Append((bool)value ? "true" : "false");
-                    break;
-                case DataTypeFlags.Guid:
-                    _builder.Append('\"');
-                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.GuidFormat, _formatterSettings.FormatProvider));
-                    _builder.Append('\"');
-                    break;
-                case DataTypeFlags.Enum:
-                    _builder.Append('\"');
-                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.EnumFormat, _formatterSettings.FormatProvider));
-                    _builder.Append('\"');
-                    break;
-                case DataTypeFlags.Char:
-                    value = new string((char)value, 1);
-                    goto case DataTypeFlags.String;
-                case DataTypeFlags.SByte:
-                case DataTypeFlags.Byte:
-                case DataTypeFlags.Short:
-                case DataTypeFlags.UShort:
-                case DataTypeFlags.Int:
-                case DataTypeFlags.UInt:
-                case DataTypeFlags.Long:
-                case DataTypeFlags.ULong:
-                case DataTypeFlags.Float:
-                case DataTypeFlags.Double:
-                case DataTypeFlags.Decimal:
-                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.NumberFormat, _formatterSettings.FormatProvider));
-                    break;
-                case DataTypeFlags.DateTime:
-                case DataTypeFlags.DateTimeOffset:
-                case DataTypeFlags.TimeSpan:
-                    _builder.Append('\"');
-                    _builder.Append(((IFormattable)value).ToString(_formatterSettings.TimeFormat, _formatterSettings.FormatProvider));
-                    _builder.Append('\"');
-                    break;
-                case DataTypeFlags.String:
-                    JsonStrings.AppendJsonString(_builder, (string)value, true);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
 
+            if(value is JsonPrimitive primitive) {
+                switch(primitive.Type) {
+                    case JsonPrimitiveType.Null:
+                    case JsonPrimitiveType.Number:
+                    case JsonPrimitiveType.Boolean:
+                        _builder.Append(primitive.Json);
+                        return;
+                    case JsonPrimitiveType.String:
+                        JsonStrings.AppendJsonString(_builder, primitive.Json, true);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            } else {
+                JsonStrings.AppendJsonString(_builder, value.ToString(), true);
+            }
         }
 
         private void CheckName(string name, out bool appendName) {

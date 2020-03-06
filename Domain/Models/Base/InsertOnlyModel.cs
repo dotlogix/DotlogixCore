@@ -7,7 +7,11 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Domain.Models.Base {
+    /// <summary>
+    /// An implementation of the <see cref="IInsertOnlyModel"/> interface
+    /// </summary>
     public abstract class InsertOnlyModel : SimpleModel, IInsertOnlyModel {
+        /// <inheritdoc />
         public bool IsActive { get; set; }
     }
 }

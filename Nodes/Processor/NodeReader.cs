@@ -28,40 +28,40 @@ namespace DotLogix.Core.Nodes.Processor {
             switch(node.Type) {
                 case NodeTypes.Empty:
                     task = writer.WriteValueAsync(node.Name, null);
-                    if(task.IsCompleted == false)
+                    if(task.IsCompletedSuccessfully == false)
                         await task;
                     break;
                 case NodeTypes.Value:
                     task = writer.WriteValueAsync(node.Name, ((NodeValue)node).Value);
-                    if(task.IsCompleted == false)
+                    if(task.IsCompletedSuccessfully == false)
                         await task;
                     break;
                 case NodeTypes.List:
                     task = writer.BeginListAsync(node.Name);
-                    if(task.IsCompleted == false)
+                    if(task.IsCompletedSuccessfully == false)
                         await task;
 
                     foreach(var child in ((NodeList)node).Children()) {
                         task = CopyToRecursiveAsync(child, writer);
-                        if(task.IsCompleted == false)
+                        if(task.IsCompletedSuccessfully == false)
                             await task;
                     }
                     task = writer.EndListAsync();
-                    if(task.IsCompleted == false)
+                    if(task.IsCompletedSuccessfully == false)
                         await task;
                     break;
                 case NodeTypes.Map:
                     task = writer.BeginMapAsync(node.Name);
-                    if(task.IsCompleted == false)
+                    if(task.IsCompletedSuccessfully == false)
                         await task;
 
                     foreach(var child in ((NodeMap)node).Children()) {
                         task = CopyToRecursiveAsync(child, writer);
-                        if(task.IsCompleted == false)
+                        if(task.IsCompletedSuccessfully == false)
                             await task;
                     }
                     task = writer.EndMapAsync();
-                    if(task.IsCompleted == false)
+                    if(task.IsCompletedSuccessfully == false)
                         await task;
                     break;
                 default:

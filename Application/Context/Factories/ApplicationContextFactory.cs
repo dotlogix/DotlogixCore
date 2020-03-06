@@ -12,15 +12,21 @@ using DotLogix.Architecture.Domain.UoW;
 #endregion
 
 namespace DotLogix.Architecture.Application.Context.Factories {
+    /// <summary>
+    /// An implementation of the <see cref="IApplicationContextFactory"/> interface
+    /// </summary>
     public class ApplicationContextFactory : IApplicationContextFactory {
         private readonly IDomainContextFactory _domainContextFactory;
         private readonly IUnitOfWorkFactory _unitOfWorkFactory;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="ApplicationContextFactory"/>
+        /// </summary>
         public ApplicationContextFactory(IDomainContextFactory domainContextFactory, IUnitOfWorkFactory unitOfWorkFactory) {
             _domainContextFactory = domainContextFactory;
             _unitOfWorkFactory = unitOfWorkFactory;
         }
-
+        ///<inheritdoc/>
         public IApplicationContext Create() {
             return new ApplicationContext(_domainContextFactory.Create(), _unitOfWorkFactory.Create());
         }

@@ -4,5 +4,108 @@
         <name>DotLogix.Config</name>
     </assembly>
     <members>
+        <member name="T:DotLogix.Core.Config.ConfigurationFileBase`1">
+            <summary>
+            An implementation of the <see cref="T:DotLogix.Core.Config.IConfigurationFile`1"/> interface
+            </summary>
+            <typeparam name="TConfig"></typeparam>
+        </member>
+        <member name="F:DotLogix.Core.Config.ConfigurationFileBase`1.ConfigChanged">
+            <summary>
+            An event to receive a notification as soon as the file system detects a change in the config file
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Config.ConfigurationFileBase`1.AutoReload">
+            <summary>
+            A flag to auto reload the config file on change
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Config.ConfigurationFileBase`1.HasChanged">
+            <summary>
+            A flag to check if the file has changed since the last load
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Config.ConfigurationFileBase`1.EnableFileWatching">
+            <summary>
+            A flag to enable or disable file system watching
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Config.ConfigurationFileBase`1.#ctor(System.String,System.String,System.Boolean)">
+            <summary>
+            Creates a new instance of <see cref="T:DotLogix.Core.Config.ConfigurationFileBase`1"/>
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Config.ConfigurationFileBase`1.FileName">
+            <inheritdoc />
+        </member>
+        <member name="P:DotLogix.Core.Config.ConfigurationFileBase`1.Directory">
+            <inheritdoc />
+        </member>
+        <member name="P:DotLogix.Core.Config.ConfigurationFileBase`1.AbsolutePath">
+            <inheritdoc />
+        </member>
+        <member name="P:DotLogix.Core.Config.ConfigurationFileBase`1.CurrentConfig">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Config.ConfigurationFileBase`1.TryLoad">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Config.ConfigurationFileBase`1.TrySave">
+            <inheritdoc />
+        </member>
+        <member name="T:DotLogix.Core.Config.IConfigurationFile`1">
+            <summary>
+            An interface to represent configuration files
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Config.IConfigurationFile`1.FileName">
+            <summary>
+            The file name
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Config.IConfigurationFile`1.Directory">
+            <summary>
+            The parent directory
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Config.IConfigurationFile`1.AbsolutePath">
+            <summary>
+            The absolute path of the config file
+            </summary>
+        </member>
+        <member name="P:DotLogix.Core.Config.IConfigurationFile`1.CurrentConfig">
+            <summary>
+            The current configuration instance
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Config.IConfigurationFile`1.TryLoad">
+            <summary>
+            Tries to load the config file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DotLogix.Core.Config.IConfigurationFile`1.TrySave">
+            <summary>
+            Tries to save the config file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DotLogix.Core.Config.JsonConfigurationFile`1">
+            <summary>
+                An implementation of the <see cref="T:DotLogix.Core.Config.IConfigurationFile`1" /> interface to load json files
+            </summary>
+            <typeparam name="TConfig"></typeparam>
+        </member>
+        <member name="M:DotLogix.Core.Config.JsonConfigurationFile`1.#ctor(System.String,System.String,System.Boolean)">
+            <summary>
+                Creates a new instance of <see cref="T:DotLogix.Core.Config.JsonConfigurationFile`1" />
+            </summary>
+        </member>
+        <member name="M:DotLogix.Core.Config.JsonConfigurationFile`1.TryLoad">
+            <inheritdoc />
+        </member>
+        <member name="M:DotLogix.Core.Config.JsonConfigurationFile`1.TrySave">
+            <inheritdoc />
+        </member>
     </members>
 </doc>

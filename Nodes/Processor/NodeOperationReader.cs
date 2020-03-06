@@ -23,7 +23,7 @@ namespace DotLogix.Core.Nodes.Processor {
         public async ValueTask CopyToAsync(IAsyncNodeWriter writer) {
             foreach(var nodeOperation in Operations) {
                 var task = writer.ExecuteAsync(nodeOperation);
-                if(task.IsCompleted)
+                if(task.IsCompletedSuccessfully)
                     await task;
             }
                 

@@ -16,7 +16,10 @@ namespace BuildTasks {
         public string PackageId { get; set; }
 
         public override bool Execute() {
-            var originalVersion = Version.Parse(BaseVersion ?? "1.0.0");
+            PackageVersion = BaseVersion;
+            BuildVersion = BaseVersion;
+
+            //var originalVersion = Version.Parse(BaseVersion ?? "1.0.0");
             //if(PackageId != null) {
             //    var solutionDir = typeof(GetCurrentBuildVersion).Assembly.Location;
             //    for (var i = 0; i < 3; i++)
@@ -36,8 +39,8 @@ namespace BuildTasks {
             //    }
             //}
 
-            PackageVersion = originalVersion.ToString();
-            BuildVersion = GetCurrentBuildVersionString(originalVersion).ToString();
+            //PackageVersion = originalVersion.ToString();
+            //BuildVersion = GetCurrentBuildVersionString(originalVersion).ToString();
             return true;
         }
 

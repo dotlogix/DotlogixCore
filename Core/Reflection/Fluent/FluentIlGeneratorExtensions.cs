@@ -10,9 +10,13 @@
 using System;
 using System.Reflection;
 using DotLogix.Core.Reflection.Fluent.Generator;
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Core.Reflection.Fluent {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="FluentIlGenerator"/>
+    /// </summary>
     public static class FluentIlGeneratorExtensions {
         #region Integer
         public static FluentIlGenerator Ldc_I4_Auto(this FluentIlGenerator fluentIlGenerator, int value) {

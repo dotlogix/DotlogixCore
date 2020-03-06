@@ -10,6 +10,7 @@
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Services.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Bearer {
@@ -24,8 +25,8 @@ namespace DotLogix.Core.Rest.Authentication.Bearer {
         public BearerAuthenticationMethod(ValidateBearerAsyncCallback callbackAsync) : this(callbackAsync, "[token]") { }
 
 
-        public override Task AuthenticateAsync(WebRequestResult webRequestResult, string data) {
-            return _callbackAsync.Invoke(this, webRequestResult, data);
+        public override Task AuthenticateAsync(WebServiceContext context, string data) {
+            return _callbackAsync.Invoke(this, context, data);
         }
     }
 }

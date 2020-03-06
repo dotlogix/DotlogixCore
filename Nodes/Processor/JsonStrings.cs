@@ -7,18 +7,25 @@
 // ==================================================
 
 #region
-using System;
-using System.Runtime.CompilerServices;
 using System.Text;
 using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
-    public class JsonStrings {
+    /// <summary>
+    /// A static class providing extension methods for json strings
+    /// </summary>
+    public static class JsonStrings {
+        /// <summary>
+        /// Unescapes a json formatted string
+        /// </summary>
         public static string UnescapeJsonString(string value, bool removeQuotes = false) {
             return UnescapeJsonString(value.ToCharArray(), 0, value.Length, removeQuotes);
         }
 
+        /// <summary>
+        /// Unescapes a json formatted string
+        /// </summary>
         public static string UnescapeJsonString(char[] json, int startIndex, int count, bool removeQuotes = false) {
             var sb = new StringBuilder();
             var safeCharactersStart = -1;
@@ -86,12 +93,18 @@ namespace DotLogix.Core.Nodes.Processor {
                        : sb.Append(json, safeCharactersStart, safeCharactersCount).ToString();
         }
 
+        /// <summary>
+        /// Escapes a json formatted string
+        /// </summary>
         public static string EscapeJsonString(string value, bool addQuotes = false) {
             var sb = new StringBuilder();
             AppendJsonString(sb, value, addQuotes);
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Escapes a json formatted string and append it to a string builder
+        /// </summary>
         public static void AppendJsonString(StringBuilder builder, string value, bool addQuotes = false) {
             if(addQuotes)
                 builder.Append("\"");
@@ -153,6 +166,9 @@ namespace DotLogix.Core.Nodes.Processor {
                 builder.Append("\"");
         }
 
+        /// <summary>
+        /// Creates a hex encoded version for a unicode character
+        /// </summary>
         public static string ToCharAsUnicode(int chr)
         {
             var unicodeBuffer = new char[6];
@@ -160,6 +176,9 @@ namespace DotLogix.Core.Nodes.Processor {
             return new string(unicodeBuffer);
         }
 
+        /// <summary>
+        /// Creates a hex encoded version for a unicode character
+        /// </summary>
         public static void ToCharAsUnicode(int chr, char[] buffer) {
             buffer[0] = '\\';
             buffer[1] = 'u';
@@ -169,7 +188,10 @@ namespace DotLogix.Core.Nodes.Processor {
                 chr >>= 4;
             }
         }
-        
+
+        /// <summary>
+        /// Creates a hex encoded version for a unicode character
+        /// </summary>
         public static void ToCharAsUnicode(int chr, ref char[] buffer) {
             if(buffer == null)
                 buffer = new char[6];
@@ -182,6 +204,9 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
+        /// <summary>
+        /// Parses a hex encoded version of a unicode character
+        /// </summary>
         public static char FromCharAsUnicode(char[] buffer, int startIndex) {
             var chr = HexToInt(buffer[startIndex]);
             for(var i = startIndex + 1; i < (startIndex + 4); i++)
@@ -189,54 +214,31 @@ namespace DotLogix.Core.Nodes.Processor {
             return (char)chr;
         }
 
+        /// <summary>
+        /// Quick conversion of an int to a hex character
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
         private static char IntToHex(int number) {
             if(number <= 9)
                 return (char)(number + 48); // + '0'
             return (char)(number + 87); // - 10 + 'a'
         }
 
+        /// <summary>
+        /// Quick conversion of an hex character to an int
+        /// </summary>
         private static int HexToInt(int hex) {
             if(hex <= 57) // <= '9'
                 return hex - 48; // - '0'
             return hex - 87; // - 10 + 'a'
         }
 
+        /// <summary>
+        /// Check if an integer is a hex value (0-15)
+        /// </summary>
         public static bool IsHex(int hex) {
             return HexToInt(hex).LaysBetween(0, 15);
-        }
-
-        public static char[] QuickFormatDateTime(DateTime dt)
-        {
-            char[] chars = new char[22];
-            Write2Chars(chars, 0, dt.Day);
-            chars[2] = '.';
-            Write2Chars(chars, 3, dt.Month);
-            chars[5] = '.';
-            Write2Chars(chars, 6, dt.Year % 100);
-            chars[8] = ' ';
-            Write2Chars(chars, 9, dt.Hour);
-            chars[11] = ' ';
-            Write2Chars(chars, 12, dt.Minute);
-            chars[14] = ' ';
-            Write2Chars(chars, 15, dt.Second);
-            chars[17] = ' ';
-            Write2Chars(chars, 18, dt.Millisecond / 10);
-            chars[20] = Digit(dt.Millisecond % 10);
-            chars[21] = 'z';
-            return chars;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Write2Chars(char[] chars, int offset, int value)
-        {
-            chars[offset] = Digit(value / 10);
-            chars[offset+1] = Digit(value % 10);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static char Digit(int value)
-        {
-            return (char) (value + '0');
         }
     }
 }

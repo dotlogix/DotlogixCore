@@ -21,15 +21,33 @@ namespace DotLogix.Core.Plugins {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class PluginAssembly<T> {
+        /// <summary>
+        /// The loading state of the assembly
+        /// </summary>
         public PluginState PluginState { get; private set; }
+        /// <summary>
+        /// The assembly file
+        /// </summary>
         public string File { get; }
+        /// <summary>
+        /// The parent directory of the assembly file
+        /// </summary>
         public string Directory { get; }
+        /// <summary>
+        /// The assembly
+        /// </summary>
         public Assembly Assembly { get; private set; }
+        /// <summary>
+        /// The containing instances of the plugin type
+        /// </summary>
         public T[] Instances { get; private set; }
+        /// <summary>
+        /// The aggregated error occurred while loading the assembly
+        /// </summary>
         public Exception LastError { get; private set; }
 
         /// <summary>
-        /// Creates an instance of <see cref="PluginAssembly{T}"/>
+        /// Creates a new instance of <see cref="PluginAssembly{T}"/>
         /// </summary>
         /// <param name="file"></param>
         public PluginAssembly(string file) {

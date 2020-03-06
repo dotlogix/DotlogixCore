@@ -7,20 +7,30 @@
 // ==================================================
 
 using System;
+using DotLogix.Architecture.Infrastructure.Decorators;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Core.Reflection.Dynamics;
 
-namespace DotLogix.Architecture.Infrastructure.Decorators {
+namespace DotLogix.Architecture.Infrastructure.Attributes {
+    /// <summary>
+    /// An attribute to describe an <see cref="EntitySetDecoratorBase{TEntity}"/> which should be applied to this class
+    /// </summary>
     public class EntitySetDecoratorAttribute : EntitySetModifierAttribute
     {
+        /// <summary>
+        /// The decorator type
+        /// </summary>
         public Type DecoratorType { get; }
 
-        /// <summary>Initializes a new instance of the <see cref="T:System.Attribute"></see> class.</summary>
+        /// <summary>
+        /// Creates a new instance of <see cref="EntitySetDecoratorBase{TEntity}"/>
+        /// </summary>
         public EntitySetDecoratorAttribute(Type decoratorType, int priority) : base(priority)
         {
             DecoratorType = decoratorType;
         }
 
+        /// <inheritdoc />
         public override Func<IEntitySet<TEntity>, IEntitySet<TEntity>> GetModifierFunc<TEntity>()
         {
             var entitySetType = typeof(IEntitySet<TEntity>);

@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
@@ -53,5 +54,10 @@ namespace DotLogix.Core.Diagnostics {
         /// The message
         /// </summary>
         public string Message { get; set; }
+
+        /// <summary>
+        /// The Context
+        /// </summary>
+        public List<KeyValuePair<string, string>> Context { get; set; }
     }
 }

@@ -9,6 +9,7 @@
 #region
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Services.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Base {
@@ -16,6 +17,6 @@ namespace DotLogix.Core.Rest.Authentication.Base {
         string Name { get; }
         string[] SupportedDataFormats { get; }
 
-        Task AuthenticateAsync(WebRequestResult webRequestResult, string authorizationData);
+        Task AuthenticateAsync(WebServiceContext context, string authorizationData);
     }
 }

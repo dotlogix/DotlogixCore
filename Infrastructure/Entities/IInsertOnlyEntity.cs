@@ -8,13 +8,13 @@
 
 #region
 using DotLogix.Architecture.Common.Options;
-using DotLogix.Architecture.Infrastructure.Decorators;
+using DotLogix.Architecture.Infrastructure.Attributes;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Entities {
+    /// <summary>
+    /// An interface combining <see cref="ISimpleEntity"/> and <see cref="IInsertOnly"/> interface
+    /// </summary>
     [InsertOnly]
     public interface IInsertOnlyEntity : ISimpleEntity, IInsertOnly { }
-
-    [Indexed]
-    public interface IGuidIndexedEntity : ISimpleEntity { }
 }

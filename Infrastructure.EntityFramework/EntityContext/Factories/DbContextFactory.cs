@@ -12,13 +12,20 @@ using Microsoft.EntityFrameworkCore;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Factories {
+    /// <summary>
+    ///     An implementation of the <see cref="IDbContextFactory" /> interface for entity framework
+    /// </summary>
     public class DbContextFactory : IDbContextFactory {
         private readonly Func<DbContext> _createDbContext;
 
+        /// <summary>
+        ///     Create a new instance of <see cref="DbContextFactory" />
+        /// </summary>
         public DbContextFactory(Func<DbContext> createDbContext) {
             _createDbContext = createDbContext;
         }
 
+        /// <inheritdoc />
         public virtual DbContext Create() {
             return _createDbContext.Invoke();
         }

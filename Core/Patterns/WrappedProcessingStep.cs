@@ -23,7 +23,7 @@ namespace DotLogix.Core.Patterns {
         private readonly ProcessingStep<TInTail, TNext, TResult> _tail;
 
         /// <summary>
-        /// Creates an instance of <see cref="WrappedProcessingStep{TIn,TInTail,TNext,TResult}"/>
+        /// Creates a new instance of <see cref="WrappedProcessingStep{TIn,TInTail,TNext,TResult}"/>
         /// </summary>
         /// <param name="head"></param>
         /// <param name="tail"></param>

@@ -14,21 +14,52 @@ using DotLogix.Core.Reflection.Delegates;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
-    public class DynamicCtor {
+    /// <summary>
+    /// A representation of a constructor
+    /// </summary>
+    public class DynamicCtor : DynamicMember{
+        /// <summary>
+        /// The original constructor info
+        /// </summary>
         public ConstructorInfo ConstructorInfo { get; }
+
+        /// <summary>
+        /// The access modifiers
+        /// </summary>
         public AccessModifiers Access { get; }
+
+        /// <summary>
+        /// The visibility modifiers
+        /// </summary>
         public VisibilityModifiers Visibility { get; }
+
+        /// <summary>
+        /// The constructor delegate
+        /// </summary>
         public CtorDelegate CtorDelegate { get; }
-        public Type DeclaringType { get; }
+
+        /// <summary>
+        /// The parameters
+        /// </summary>
         public ParameterInfo[] Parameters { get; }
+        /// <summary>
+        /// The parameter types
+        /// </summary>
         public Type[] ParameterTypes { get; }
+
+        /// <summary>
+        /// The parameter count
+        /// </summary>
         public int ParameterCount => Parameters.Length;
+
+        /// <summary>
+        /// The constructor does not require arguments
+        /// </summary>
         public bool IsDefault => ParameterCount == 0;
 
         internal DynamicCtor(Type declaringType, ConstructorInfo constructorInfo, AccessModifiers access,
                              VisibilityModifiers visibility,
-                             CtorDelegate ctorDelegate) {
-            DeclaringType = declaringType ?? throw new ArgumentNullException(nameof(declaringType));
+                             CtorDelegate ctorDelegate) : base(constructorInfo) {
             CtorDelegate = ctorDelegate ?? throw new ArgumentNullException(nameof(ctorDelegate));
             ConstructorInfo = constructorInfo;
             Access = access;
@@ -42,6 +73,10 @@ namespace DotLogix.Core.Reflection.Dynamics {
             }
         }
 
+        /// <summary>
+        /// Invoke the constructor and create a new instance
+        /// </summary>
+        /// <exception cref="ArgumentException"></exception>
         public object Invoke(params object[] parameters) {
             var parameterCount = ParameterCount;
             if(parameters.Length >= parameterCount)
@@ -59,6 +94,10 @@ namespace DotLogix.Core.Reflection.Dynamics {
             return CtorDelegate.Invoke(parameters);
         }
 
+        /// <summary>
+        /// Returns a representation of the constructor with its parameter type names
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() {
             return $"Ctor<{DeclaringType.Name}>({string.Join(", ", ParameterTypes.Select(t => t.Name))})";
         }

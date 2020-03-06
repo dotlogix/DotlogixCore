@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
@@ -16,32 +17,59 @@ using DotLogix.Architecture.Infrastructure.Queries;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
-    public interface IEntitySet<TEntity> where TEntity : ISimpleEntity {
-        #region Query
-        IQuery<TEntity> Query();
-        #endregion
 
-        #region Get
-        Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default);
-        Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
-        #endregion
-
+    /// <summary>
+    /// An interface for entity sets
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    public interface IEntitySet<TEntity> where TEntity : class, new() {
         #region Add
-        void Add(TEntity entity);
-        void AddRange(IEnumerable<TEntity> entities);
+
+        /// <summary>
+        /// Add a single entity to the set
+        /// </summary>
+        ValueTask<TEntity> AddAsync(TEntity entity);
+
+        /// <summary>
+        /// Add a range of entities to the set
+        /// </summary>
+        ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities);
+
         #endregion
 
         #region Remove
-        void Remove(TEntity entity);
-        void RemoveRange(IEnumerable<TEntity> entities);
+
+        /// <summary>
+        /// Remove a single entity from the set
+        /// </summary>
+        ValueTask<TEntity> RemoveAsync(TEntity entity);
+
+        /// <summary>
+        /// Remove a range of entities from the set
+        /// </summary>
+        ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities);
+
         #endregion
 
         #region ReAttach
-        void ReAttach(TEntity entity);
-        void ReAttachRange(IEnumerable<TEntity> entities);
+
+        /// <summary>
+        /// Reattach a single entity to the underlying change tracker
+        /// </summary>
+        ValueTask<TEntity> ReAttachAsync(TEntity entity);
+
+        /// <summary>
+        /// Reattach a range of entities to the underlying change tracker
+        /// </summary>
+        ValueTask<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities);
+
+        #endregion
+
+        #region Query
+        /// <summary>
+        /// Create a linq style query to allow more advanced requests to the entity set
+        /// </summary>
+        IQuery<TEntity> Query();
         #endregion
     }
 }

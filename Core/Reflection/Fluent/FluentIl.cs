@@ -14,8 +14,14 @@ using DotLogix.Core.Reflection.Delegates;
 #endregion
 
 namespace DotLogix.Core.Reflection.Fluent {
+    /// <summary>
+    ///     A static class to create delegates
+    /// </summary>
     public static class FluentIl {
         #region Calls
+        /// <summary>
+        ///     Creates a dynamic method to call a reflected method info with minimum overhead
+        /// </summary>
         public static InvokeDelegate CreateInvoke(MethodInfo methodInfo, bool allowNonPublic = true) {
             if(methodInfo == null)
                 throw new ArgumentNullException(nameof(methodInfo));
@@ -38,6 +44,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                 else
                     paramTypes[i] = ps[i].ParameterType;
             }
+
             var locals = new LocalBuilder[paramTypes.Length];
 
             for(var i = 0; i < paramTypes.Length; i++)
@@ -50,16 +57,19 @@ namespace DotLogix.Core.Reflection.Fluent {
                 Unbox_AnyOrCast(paramTypes[i]).
                 Stloc(locals[i]);
             }
+
             if(!methodInfo.IsStatic) {
                 ilGen.Ldarg_0().
                       UnboxOrCast(methodInfo.DeclaringType);
             }
+
             for(var i = 0; i < paramTypes.Length; i++) {
                 if(ps[i].ParameterType.IsByRef)
                     ilGen.Ldloca_S(locals[i]);
                 else
                     ilGen.Ldloc(locals[i]);
             }
+
             ilGen.CallOrVirt(methodInfo, null);
             if(methodInfo.ReturnType == typeof(void))
                 ilGen.Ldnull();
@@ -83,6 +93,9 @@ namespace DotLogix.Core.Reflection.Fluent {
         #endregion
 
         #region Constructor
+        /// <summary>
+        ///     Creates a dynamic method to call a reflected constructor info with minimum overhead
+        /// </summary>
         public static CtorDelegate CreateConstructor(Type declaringType, ConstructorInfo constructorInfo,
                                                      bool allowNonPublic = true) {
             if(declaringType == null)
@@ -110,8 +123,8 @@ namespace DotLogix.Core.Reflection.Fluent {
                 module = constructorInfo.Module;
                 parameters = constructorInfo.GetParameters();
                 ctorName = declaringType.IsArray
-                               ? $"{declaringType.GetElementType()?.Name}Array{parameters.Length}d"
-                               : declaringType.Name;
+                           ? $"{declaringType.GetElementType()?.Name}Array{parameters.Length}d"
+                           : declaringType.Name;
             }
 
             var dynamicMethod = new DynamicMethod($"DynamicCtor{ctorName}", typeof(object),
@@ -133,6 +146,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                     else
                         paramTypes[i] = parameters[i].ParameterType;
                 }
+
                 var locals = new LocalBuilder[paramTypes.Length];
 
                 for(var i = 0; i < paramTypes.Length; i++)
@@ -145,12 +159,14 @@ namespace DotLogix.Core.Reflection.Fluent {
                     Unbox_AnyOrCast(paramTypes[i]).
                     Stloc(locals[i]);
                 }
+
                 for(var i = 0; i < paramTypes.Length; i++) {
                     if(parameters[i].ParameterType.IsByRef)
                         ilGen.Ldloca_S(locals[i]);
                     else
                         ilGen.Ldloc(locals[i]);
                 }
+
                 ilGen.Newobj(constructorInfo);
 
                 for(var i = 0; i < paramTypes.Length; i++) {
@@ -171,6 +187,9 @@ namespace DotLogix.Core.Reflection.Fluent {
         #endregion
 
         #region Members
+        /// <summary>
+        ///     Creates a dynamic method to call a getter of a property info with minimum overhead
+        /// </summary>
         public static GetterDelegate CreateGetter(PropertyInfo propertyInfo, bool allowNonPublic = true) {
             if(propertyInfo == null)
                 throw new ArgumentNullException(nameof(propertyInfo));
@@ -192,6 +211,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                 Ldarg_0().
                 UnboxOrCast(declaringType);
             }
+
             ilGen.
             CallOrVirt(getMethod).
             BoxOrCast(propertyType).
@@ -199,6 +219,9 @@ namespace DotLogix.Core.Reflection.Fluent {
             return (GetterDelegate)dynamicMethod.CreateDelegate(typeof(GetterDelegate));
         }
 
+        /// <summary>
+        ///     Creates a dynamic method to call a setter of a property info with minimum overhead
+        /// </summary>
         public static SetterDelegate CreateSetter(PropertyInfo propertyInfo, bool allowNonPublic = true) {
             if(propertyInfo == null)
                 throw new ArgumentNullException(nameof(propertyInfo));
@@ -220,6 +243,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                 Ldarg_0().
                 UnboxOrCast(declaringType);
             }
+
             ilGen.
             Ldarg_1().
             Unbox_AnyOrCast(propertyType).
@@ -228,8 +252,10 @@ namespace DotLogix.Core.Reflection.Fluent {
             return (SetterDelegate)dynamicMethod.CreateDelegate(typeof(SetterDelegate));
         }
 
-        public static GetterDelegate<TInstance, TProperty>
-        CreateGetter<TInstance, TProperty>(PropertyInfo propertyInfo, bool allowNonPublic = true) {
+        /// <summary>
+        ///     Creates a dynamic method to call a getter of a property info with minimum overhead
+        /// </summary>
+        public static GetterDelegate<TInstance, TProperty> CreateGetter<TInstance, TProperty>(PropertyInfo propertyInfo, bool allowNonPublic = true) {
             if(propertyInfo == null)
                 throw new ArgumentNullException(nameof(propertyInfo));
             if((propertyInfo.CanRead == false) || propertyInfo.IsIndexerProperty())
@@ -255,8 +281,10 @@ namespace DotLogix.Core.Reflection.Fluent {
             dynamicMethod.CreateDelegate(typeof(GetterDelegate<TInstance, TProperty>));
         }
 
-        public static SetterDelegate<TInstance, TProperty>
-        CreateSetter<TInstance, TProperty>(PropertyInfo propertyInfo, bool allowNonPublic = true) {
+        /// <summary>
+        ///     Creates a dynamic method to call a setter of a property info with minimum overhead
+        /// </summary>
+        public static SetterDelegate<TInstance, TProperty> CreateSetter<TInstance, TProperty>(PropertyInfo propertyInfo, bool allowNonPublic = true) {
             if(propertyInfo == null)
                 throw new ArgumentNullException(nameof(propertyInfo));
             if((propertyInfo.CanWrite == false) || propertyInfo.IsIndexerProperty())
@@ -284,6 +312,9 @@ namespace DotLogix.Core.Reflection.Fluent {
         #endregion
 
         #region Fields
+        /// <summary>
+        ///     Creates a dynamic method to call a getter of a field info with minimum overhead
+        /// </summary>
         public static GetterDelegate CreateGetter(FieldInfo fieldInfo, bool allowNonPublic = true) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
@@ -314,6 +345,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                     throw new
                     NotSupportedException($"Creating a FieldGetter for type: {fieldType.Name} is unsupported.");
                 }
+
                 ilGen.Ret();
             } else if(fieldInfo.IsStatic) {
                 ilGen.Ldsfld(fieldInfo).
@@ -331,6 +363,9 @@ namespace DotLogix.Core.Reflection.Fluent {
             return (GetterDelegate)dynamicMethod.CreateDelegate(typeof(GetterDelegate));
         }
 
+        /// <summary>
+        ///     Creates a dynamic method to call a setter of a field info with minimum overhead
+        /// </summary>
         public static SetterDelegate CreateSetter(FieldInfo fieldInfo, bool allowNonPublic = true) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
@@ -364,8 +399,11 @@ namespace DotLogix.Core.Reflection.Fluent {
             return (SetterDelegate)dynamicMethod.CreateDelegate(typeof(SetterDelegate));
         }
 
+        /// <summary>
+        ///     Creates a dynamic method to call a getter of a field info with minimum overhead
+        /// </summary>
         public static GetterDelegate<TInstance, TField> CreateGetter<TInstance, TField>(
-            FieldInfo fieldInfo, bool allowNonPublic = true) {
+        FieldInfo fieldInfo, bool allowNonPublic = true) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
             if(fieldInfo.IsPrivate && (allowNonPublic == false))
@@ -395,6 +433,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                     throw new
                     NotSupportedException($"Creating a FieldGetter for type: {fieldType.Name} is unsupported.");
                 }
+
                 ilGen.Ret();
             } else if(fieldInfo.IsStatic) {
                 ilGen.Ldsfld(fieldInfo).
@@ -405,12 +444,16 @@ namespace DotLogix.Core.Reflection.Fluent {
                 Ldfld(fieldInfo).
                 Ret();
             }
+
             return (GetterDelegate<TInstance, TField>)
             dynamicMethod.CreateDelegate(typeof(GetterDelegate<TInstance, TField>));
         }
 
+        /// <summary>
+        ///     Creates a dynamic method to call a setter of a field info with minimum overhead
+        /// </summary>
         public static SetterDelegate<TInstance, TField> CreateSetter<TInstance, TField>(
-            FieldInfo fieldInfo, bool allowNonPublic = true) {
+        FieldInfo fieldInfo, bool allowNonPublic = true) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
             if(fieldInfo.IsInitOnly || fieldInfo.IsLiteral)

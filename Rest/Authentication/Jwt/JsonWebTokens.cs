@@ -12,19 +12,18 @@ using System.Linq;
 using System.Text;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
-using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Rest.Authentication.Jwt.Algorithms;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Jwt {
     public static class JsonWebTokens {
-        public static string Serialize<TPayload>(this JsonWebToken<TPayload> token, ISigningAlgorithm signingAlgorithm) {
+        public static string Serialize<TPayload>(this JsonWebToken<TPayload> token, ISigningAlgorithm signingAlgorithm, JsonFormatterSettings formatterSettings = null) {
             var header = token.Header.Clone();
             header.AddOrReplaceChild("alg", new NodeValue(signingAlgorithm.Name.ToUpper()));
             header.AddOrReplaceChild("typ", new NodeValue("JWT"));
 
             var headerStr = StringExtensions.EncodeBase64Url(header.ToJson());
-            var payloadStr = StringExtensions.EncodeBase64Url(JsonNodes.ToJson(token.Payload, JsonFormatterSettings.Default));
+            var payloadStr = StringExtensions.EncodeBase64Url(JsonNodes.ToJson(token.Payload, formatterSettings));
             var tokenStr = string.Concat(headerStr, ".", payloadStr);
 
             var signatureStr = StringExtensions.EncodeBase64Url(signingAlgorithm.CalculateSignature(Encoding.UTF8.GetBytes(tokenStr)));
@@ -35,9 +34,12 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
         public static JsonWebToken<TPayload> Deserialize<TPayload>(string data, params ISigningAlgorithm[] signingAlgorithms) {
             return Deserialize<TPayload>(data, name => FindAlgorithm(name, signingAlgorithms));
         }
+        public static JsonWebToken<TPayload> Deserialize<TPayload>(string data, JsonFormatterSettings formatterSettings, params ISigningAlgorithm[] signingAlgorithms) {
+            return Deserialize<TPayload>(data, name => FindAlgorithm(name, signingAlgorithms), formatterSettings);
+        }
 
-        public static JsonWebToken<TPayload> Deserialize<TPayload>(string data, Func<string, ISigningAlgorithm> resolveAlgorithmFunc) {
-            var result = TryDeserialize<TPayload>(data, out var token, resolveAlgorithmFunc);
+        public static JsonWebToken<TPayload> Deserialize<TPayload>(string data, Func<string, ISigningAlgorithm> resolveAlgorithmFunc, JsonFormatterSettings formatterSettings = null) {
+            var result = TryDeserialize<TPayload>(data, out var token, resolveAlgorithmFunc, formatterSettings);
             if(result == JsonWebTokenResult.Success)
                 return token;
             throw new JsonWebTokenException("The provided token is not valid, see result for more information", result);
@@ -46,8 +48,11 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
         public static JsonWebTokenResult TryDeserialize<TPayload>(string data, out JsonWebToken<TPayload> token, params ISigningAlgorithm[] signingAlgorithms) {
             return TryDeserialize(data, out token, name => FindAlgorithm(name, signingAlgorithms));
         }
+        public static JsonWebTokenResult TryDeserialize<TPayload>(string data, out JsonWebToken<TPayload> token, JsonFormatterSettings formatterSettings, params ISigningAlgorithm[] signingAlgorithms) {
+            return TryDeserialize(data, out token, name => FindAlgorithm(name, signingAlgorithms), formatterSettings);
+        }
 
-        public static JsonWebTokenResult TryDeserialize<TPayload>(string data, out JsonWebToken<TPayload> token, Func<string, ISigningAlgorithm> resolveAlgorithmFunc) {
+        public static JsonWebTokenResult TryDeserialize<TPayload>(string data, out JsonWebToken<TPayload> token, Func<string, ISigningAlgorithm> resolveAlgorithmFunc, JsonFormatterSettings formatterSettings = null) {
             token = null;
             var split = data.Split('.');
 
@@ -71,7 +76,7 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
             if(signingAlgorithm.ValidateSignature(unsignedData, signature) == false)
                 return JsonWebTokenResult.InvalidSignature;
 
-            token = new JsonWebToken<TPayload>(headerNode, JsonNodes.FromJson<TPayload>(StringExtensions.DecodeBase64Url(payloadStr)));
+            token = new JsonWebToken<TPayload>(headerNode, JsonNodes.FromJson<TPayload>(StringExtensions.DecodeBase64Url(payloadStr), formatterSettings));
             return JsonWebTokenResult.Success;
         }
 

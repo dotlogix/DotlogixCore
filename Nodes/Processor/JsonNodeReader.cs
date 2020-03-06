@@ -18,18 +18,54 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeReader"/> interface to read json text
+    /// </summary>
     public class JsonNodeReader : NodeReaderBase {
+        /// <summary>
+        /// A json instruction character
+        /// </summary>
         [Flags]
         public enum JsonCharacter {
+            /// <summary>
+            /// None
+            /// </summary>
             None = 0,
+            /// <summary>
+            /// The end of the character stream
+            /// </summary>
             End = 1 << 0,
+            /// <summary>
+            /// The open object character {
+            /// </summary>
             OpenObject = 1 << 1,
+            /// <summary>
+            /// The close object character }
+            /// </summary>
             CloseObject = 1 << 2,
+            /// <summary>
+            /// The open list character [
+            /// </summary>
             OpenList = 1 << 3,
+            /// <summary>
+            /// The close list character ]
+            /// </summary>
             CloseList = 1 << 4,
+            /// <summary>
+            /// The begin of a string "
+            /// </summary>
             String = 1 << 5,
+            /// <summary>
+            /// The value assignment character :
+            /// </summary>
             ValueAssignment = 1 << 6,
+            /// <summary>
+            /// The value delimiter character ,
+            /// </summary>
             ValueDelimiter = 1 << 7,
+            /// <summary>
+            /// Another unknown character
+            /// </summary>
             Other = 1 << 8
         }
         private readonly char[] _unicodeBuffer = new char[4];
@@ -44,21 +80,28 @@ namespace DotLogix.Core.Nodes.Processor {
         private int _position;
         private string Near => new string(_nearQueue.ToArray());
 
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonNodeReader"/>
+        /// </summary>
         public JsonNodeReader(string json) {
             _jsonChars = json.Select(c => {
                                          ProcessChar(c);
                                          return new ValueTask<char>(c);
                                      }).GetEnumerator();
         }
-
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonNodeReader"/>
+        /// </summary>
         public JsonNodeReader(TextReader reader) {
             _jsonChars = reader.AsAsyncSequence(1024, ProcessChar).GetEnumerator();
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing) {
             _jsonChars?.Dispose();
         }
 
+        /// <inheritdoc />
         public override async ValueTask CopyToAsync(IAsyncNodeWriter nodeWriter) {
             var enumerator = _jsonChars;
             using(enumerator) {
@@ -71,7 +114,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 ValueTask vTask;
                 do {
                     var charTask = NextJsonCharacterAsync(enumerator);
-                    var nextCharacter = charTask.IsCompleted ? charTask.Result : await charTask;
+                    var nextCharacter = charTask.IsCompletedSuccessfully ? charTask.Result : await charTask;
 
                     if((allowedCharacters & nextCharacter) == 0) {
                         if(allowedCharacters == JsonCharacter.None || allowedCharacters == JsonCharacter.End)
@@ -85,7 +128,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             break;
                         case JsonCharacter.OpenObject:
                             vTask = nodeWriter.BeginMapAsync(name);
-                            if(vTask.IsCompleted == false)
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
                             name = null;
 
@@ -96,7 +139,7 @@ namespace DotLogix.Core.Nodes.Processor {
                         case JsonCharacter.CloseObject:
                         case JsonCharacter.CloseList:
                             vTask = stateStack.Pop() == NodeContainerType.Map ? nodeWriter.EndMapAsync() : nodeWriter.EndListAsync();
-                            if(vTask.IsCompleted == false)
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
 
                             if(stateStack.Count == 0) {
@@ -108,7 +151,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             break;
                         case JsonCharacter.OpenList:
                             vTask = nodeWriter.BeginListAsync(name);
-                            if(vTask.IsCompleted == false)
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
                             name = null;
 
@@ -117,15 +160,15 @@ namespace DotLogix.Core.Nodes.Processor {
                             break;
                         case JsonCharacter.String:
                             var strTask = NextJsonStringAsync(enumerator);
-                            var str = strTask.IsCompleted ? strTask.Result : await strTask;
+                            var str = strTask.IsCompletedSuccessfully ? strTask.Result : await strTask;
                             if((stateStack.Count > 0) && (stateStack.Peek() == NodeContainerType.Map) && (name == null)) {
                                 name = str;
                                 allowedCharacters = JsonCharacter.ValueAssignment;
                                 break;
                             }
 
-                            vTask = nodeWriter.WriteValueAsync(name, str);
-                            if(vTask.IsCompleted == false)
+                            vTask = nodeWriter.WriteValueAsync(name, new JsonPrimitive(JsonPrimitiveType.String, str));
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
                             name = null;
                             allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject, JsonCharacter.ValueDelimiter | JsonCharacter.CloseList);
@@ -138,9 +181,9 @@ namespace DotLogix.Core.Nodes.Processor {
                             break;
                         case JsonCharacter.Other:
                             var valueTask = NextJsonValueAsync(enumerator);
-                            var value = valueTask.IsCompleted ? valueTask.Result : await valueTask;
+                            var value = valueTask.IsCompletedSuccessfully ? valueTask.Result : await valueTask;
                             vTask = nodeWriter.WriteValueAsync(name, value);
-                            if(vTask.IsCompleted == false)
+                            if(vTask.IsCompletedSuccessfully == false)
                                 await vTask;
                             name = null;
                             allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.CloseObject, JsonCharacter.ValueDelimiter | JsonCharacter.CloseList);
@@ -158,33 +201,19 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
-        private static bool TryGetValueFromString(string valueStr, out object value) {
+        private static bool TryGetValueFromString(string valueStr, out JsonPrimitive value) {
             switch(valueStr) {
                 case "null":
-                    value = null;
+                    value = JsonPrimitive.Null;
                     return true;
                 case "true":
-                    value = true;
+                    value = JsonPrimitive.True;
                     return true;
                 case "false":
-                    value = false;
+                    value = JsonPrimitive.False;
                     return true;
                 default:
-                    if(double.TryParse(valueStr, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign | NumberStyles.AllowExponent, NumberFormatInfo.InvariantInfo, out var number) == false) {
-                        value = null;
-                        return false;
-                    }
-
-                    // calculate if number is an integer
-                    if((number <= int.MaxValue) && (number >= int.MinValue)) {
-                        var truncated = Math.Truncate(number);
-                        if(Math.Abs(number - truncated) <= Epsilon) {
-                            value = (int)number;
-                            return true;
-                        }
-                    }
-
-                    value = number;
+                    value = new JsonPrimitive(JsonPrimitiveType.Number, valueStr);
                     return true;
             }
         }
@@ -193,7 +222,7 @@ namespace DotLogix.Core.Nodes.Processor {
             var builder = new StringBuilder();
             while(enumerator.MoveNext()) {
                 var task = enumerator.Current;
-                var current = task.IsCompleted ? task.Result : await task;
+                var current = task.IsCompletedSuccessfully ? task.Result : await task;
                 switch(current) {
                     case '\"':
                         return builder.ToString();
@@ -202,7 +231,7 @@ namespace DotLogix.Core.Nodes.Processor {
                         if(enumerator.MoveNext() == false)
                             throw new JsonParsingException("The escape sequence '\\' requires at least one following character to be valid.", _position, _line, _position - _lineStart, Near);
                         task = enumerator.Current;
-                        current = task.IsCompleted ? task.Result : await task;
+                        current = task.IsCompletedSuccessfully ? task.Result : await task;
 
                         switch(current) {
                             case '\\':
@@ -230,7 +259,7 @@ namespace DotLogix.Core.Nodes.Processor {
                                     if(enumerator.MoveNext() == false)
                                         throw new JsonParsingException("The escape sequence '\\u' requires 4 following hex digits to be valid.", _position, _line, _position - _lineStart, Near);
                                     task = enumerator.Current;
-                                    current = task.IsCompleted ? task.Result : await task;
+                                    current = task.IsCompletedSuccessfully ? task.Result : await task;
 
                                     if(JsonStrings.IsHex(current) == false)
                                         throw new JsonParsingException($"The character '{current}' is not a valid hex character.", _position, _line, _position - _lineStart, Near);
@@ -270,7 +299,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
             do {
                 var task = enumerator.Current;
-                var current = task.IsCompleted ? task.Result : await task;
+                var current = task.IsCompletedSuccessfully ? task.Result : await task;
                 switch(current) {
                     case ' ':
                     case '\t':
@@ -293,7 +322,7 @@ namespace DotLogix.Core.Nodes.Processor {
             do
             {
                 var task = enumerator.Current;
-                var current = task.IsCompleted ? task.Result : await task;
+                var current = task.IsCompletedSuccessfully ? task.Result : await task;
                 switch (current)
                 {
                     case ' ':

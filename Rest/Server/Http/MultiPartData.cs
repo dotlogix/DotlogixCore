@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
-using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Rest.Server.Http
 {

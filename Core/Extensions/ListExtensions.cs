@@ -122,10 +122,11 @@ namespace DotLogix.Core.Extensions {
         ///     Adds the elements of the specified collection to the end of the
         ///     <see cref="T:System.Collections.Generic.ICollection`1" />.
         /// </summary>
+        /// <param name="list">The list</param>
         /// <param name="collection">
         ///     The collection whose elements should be added to the end of the
         ///     <see cref="T:System.Collections.Generic.ICollection`1" />. The collection itself cannot be <see langword="null" />,
-        ///     but it can contain elements that are <see langword="null" />, if type <paramref name="T" /> is a reference type.
+        ///     but it can contain elements that are <see langword="null" />, if type <typeparam name="T" /> is a reference type.
         /// </param>
         /// <exception cref="T:System.ArgumentNullException">
         ///     <paramref name="collection" /> is <see langword="null" />.
@@ -138,6 +139,24 @@ namespace DotLogix.Core.Extensions {
 
             foreach(var value in collection)
                 list.Add(value);
+        }
+
+        /// <summary>
+        ///     Adds the elements of the specified collection to the end of the
+        ///     <see cref="T:System.Collections.Generic.ICollection`1" />.
+        /// </summary>
+        /// <param name="list">The list</param>
+        /// <param name="collection">
+        ///     The collection whose elements should be added to the end of the
+        ///     <see cref="T:System.Collections.Generic.ICollection`1" />. The collection itself cannot be <see langword="null" />,
+        ///     but it can contain elements that are <see langword="null" />, if type <typeparam name="T" /> is a reference type.
+        /// </param>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///     <paramref name="collection" /> is <see langword="null" />.
+        /// </exception>
+        public static void RemoveRange<T>(this ICollection<T> list, IEnumerable<T> collection) {
+            foreach(var value in collection)
+                list.Remove(value);
         }
     }
 }

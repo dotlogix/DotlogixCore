@@ -12,7 +12,14 @@ using System.Reflection;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="AccessorTypes"/>
+    /// </summary>
     public static class AccessorTypesExtension {
+        /// <summary>
+        /// Get the internal representation of member types
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public static MemberTypes GetMemberTypes(this AccessorTypes accessorTypes) {
             MemberTypes memberTypes;
             switch(accessorTypes) {

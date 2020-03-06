@@ -7,7 +7,13 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Common.Options {
+    /// <summary>
+    /// An interface to force a name
+    /// </summary>
     public interface INamed {
+        /// <summary>
+        /// The name
+        /// </summary>
         string Name { get; set; }
     }
 }

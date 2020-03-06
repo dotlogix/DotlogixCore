@@ -1,145 +1,163 @@
-// ==================================================
-// Copyright 2018(C) , DotLogix
+// ================================================== Copyright 2018(C) , DotLogix
 // File:  ObjectNodeConverter.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
-// LastEdited:  01.08.2018
-// ==================================================
+// LastEdited:  01.08.2018 ==================================================
 
 #region
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
-using DotLogix.Core.Types;
+using DotLogix.Core.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
 #endregion
 
-namespace DotLogix.Core.Nodes.Converters {
-    public class ObjectNodeConverter : NodeConverter {
-        private readonly DynamicAccessor[] _accessorsToRead;
-        private readonly DynamicAccessor[] _accessorsToWrite;
-        private readonly DynamicCtor _ctor;
-        private readonly bool _isDefaultCtor;
-        public DynamicType DynamicType { get; }
+namespace DotLogix.Core.Nodes.Converters
+{
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert objects
+    /// </summary>
+    public class ObjectNodeConverter : NodeConverter
+    {
+        private static readonly SelectorEqualityComparer<MemberSettings, DynamicAccessor> SettingsEqualityComparer = new SelectorEqualityComparer<MemberSettings, DynamicAccessor>(s => s.Accessor);
+        private static readonly SelectorComparer<MemberSettings, int> SettingsOrderComparer = new SelectorComparer<MemberSettings, int>(s => s.Order ?? int.MaxValue);
 
-        public ObjectNodeConverter(DataType dataType, AccessorTypes accessorTypes,
-                                   bool useReadonly) : base(dataType) {
-            var accessorMemberTypes = GetAccessorMemberTypes(accessorTypes);
-            var dynamicType = Type.CreateDynamicType(MemberTypes.Constructor | accessorMemberTypes);
+        public DynamicCtor Ctor { get; }
+        public MemberSettings[] MemberSettings { get; }
 
-            DynamicType = dynamicType;
-            var readAccessModes = useReadonly ? ValueAccessModes.Read : ValueAccessModes.ReadWrite;
-            _accessorsToRead = dynamicType.GetAccessors(accessorTypes, readAccessModes).ToArray();
-            _accessorsToWrite = dynamicType.GetAccessors(accessorTypes).ToArray();
+        public MemberSettings[] MembersToSerialize { get; }
+        public MemberSettings[] MembersToDeserialize { get; }
+        public MemberSettings[] MembersForCtor { get; }
 
-            _isDefaultCtor = dynamicType.HasDefaultConstructor;
-            if(_isDefaultCtor) {
-                _ctor = dynamicType.GetDefaultConstructor();
+        /// <summary>
+        /// Creates a new instance of <see cref="ObjectNodeConverter"/>
+        /// </summary>
+        public ObjectNodeConverter(TypeSettings typeSettings, IEnumerable<MemberSettings> memberSettings) : base(typeSettings)
+        {
+            MemberSettings = memberSettings.AsArray();
+
+            Array.Sort(MemberSettings, SettingsOrderComparer);
+
+            MembersToSerialize = MemberSettings.Where(a => a.Accessor.CanRead).ToArray();
+
+            var dynamicType = typeSettings.DynamicType;
+            if (dynamicType.HasDefaultConstructor)
+            {
+                Ctor = dynamicType.DefaultConstructor;
+                MembersToDeserialize = MemberSettings.Where(a => a.Accessor.CanWrite).ToArray();
                 return;
             }
 
-            foreach(var ctor in dynamicType.Constructors) {
-                if(CanConstructWith(ctor, _accessorsToRead, out var neededAccessors)) {
-                    _ctor = ctor;
-                    _accessorsToWrite = _accessorsToWrite.Except(neededAccessors).ToArray();
-                    return;
-                }
-            }
-
-            if(_ctor == null) {
-                throw new
-                InvalidOperationException($"Can not find any usable constructor for type {dynamicType.Type.FullName}");
+            foreach (var ctor in dynamicType.Constructors)
+            {
+                if (CanConstructWith(ctor, MemberSettings, out var neededMembers) == false)
+                    continue;
+                Ctor = ctor;
+                MembersToDeserialize = MemberSettings.Where(a => a.Accessor.CanWrite).Except(neededMembers, SettingsEqualityComparer).ToArray();
+                MembersForCtor = neededMembers;
             }
         }
 
-        private static MemberTypes GetAccessorMemberTypes(AccessorTypes accessorTypes) {
-            MemberTypes memberTypes;
-            switch(accessorTypes) {
-                case AccessorTypes.None:
-                    memberTypes = 0;
-                    break;
-                case AccessorTypes.Property:
-                    memberTypes = MemberTypes.Property;
-                    break;
-                case AccessorTypes.Field:
-                    memberTypes = MemberTypes.Field;
-                    break;
-                case AccessorTypes.Any:
-                    memberTypes = MemberTypes.Property | MemberTypes.Field;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(accessorTypes), accessorTypes, null);
-            }
-            return memberTypes;
-        }
+        /// <inheritdoc/>
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings)
+        {
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            if (scopedSettings.ShouldEmitValue(instance) == false)
+                return;
 
-        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
-            var task = writer.BeginMapAsync(rootName);
-            if(task.IsCompleted == false)
+            ValueTask task;
+            if(instance == null) {
+                task = writer.WriteValueAsync(name, null);
+                if (task.IsCompletedSuccessfully == false)
+                    await task;
+                return;
+            }
+
+            task = writer.BeginMapAsync(name);
+            if (task.IsCompletedSuccessfully == false)
                 await task;
-            foreach(var accessor in _accessorsToRead) {
-                task = Nodes.WriteToAsync(accessor.Name, accessor.GetValue(instance), accessor.ValueType, writer);
-                if(task.IsCompleted == false)
+            foreach (var member in MembersToSerialize) {
+                var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: member);
+
+                var memberValue = member.Accessor.GetValue(instance);
+                task = member.Converter.WriteAsync(memberValue, GetMemberName(member, scopedMemberSettings), writer, scopedMemberSettings);
+
+                if (task.IsCompletedSuccessfully == false)
                     await task;
             }
             task = writer.EndMapAsync();
-            if(task.IsCompleted == false)
+            if (task.IsCompletedSuccessfully == false)
                 await task;
         }
 
-        public override object ConvertToObject(Node node, ConverterSettings settings) {
-            if(!(node is NodeMap nodeMap))
-                throw new ArgumentException("Node is not a NodeMap");
+        /// <inheritdoc/>
+        public override object ConvertToObject(Node node, IConverterSettings settings)
+        {
+            if (node.Type == NodeTypes.Empty)
+                return default;
 
+            if (!(node is NodeMap nodeMap))
+                throw new ArgumentException($"Expected node of type \"NodeMap\" got \"{node.Type}\"");
+
+            var scopedSettings = settings.GetScoped(TypeSettings);
             object instance;
-            if(_isDefaultCtor)
-                instance = _ctor.Invoke();
-            else if(TryConstructWith(_ctor, nodeMap, settings, out instance) == false)
+            if (Ctor.IsDefault)
+                instance = Ctor.Invoke();
+            else if (TryConstructWith(Ctor, nodeMap, scopedSettings, out instance) == false)
                 throw new InvalidOperationException("Object can not be constructed with the given nodes");
 
-            foreach(var accessor in _accessorsToWrite) {
-                var accessorNode = nodeMap.GetChild(settings.NamingStrategy?.TransformName(accessor.Name) ?? accessor.Name);
-                if(accessorNode == null)
+            foreach (var memberSettings in MembersToDeserialize)
+            {
+                var scopedMemberSettings = scopedSettings.GetScoped(memberSettings);
+
+                var memberNode = nodeMap.GetChild(GetMemberName(memberSettings, scopedMemberSettings));
+                if (memberNode == null)
                     continue;
-                var accessorValue = Nodes.ToObject(accessorNode, accessor.ValueType, settings);
-                accessor.SetValue(instance, accessorValue);
+
+                
+                var memberValue = memberSettings.Converter.ConvertToObject(memberNode, scopedMemberSettings);
+                memberSettings.Accessor.SetValue(instance, memberValue);
             }
             return instance;
         }
 
-        private bool CanConstructWith(DynamicCtor ctor, DynamicAccessor[] accessorsToRead,
-                                      out DynamicAccessor[] neededAccessors) {
+        private bool CanConstructWith(DynamicCtor ctor, MemberSettings[] readableMembers, out MemberSettings[] neededAccessors)
+        {
             neededAccessors = null;
             var parameters = ctor.Parameters;
             var parameterCount = parameters.Length;
-            var accessors = new DynamicAccessor[parameterCount];
-            for(var i = 0; i < parameterCount; i++) {
+            var members = new MemberSettings[parameterCount];
+            for (var i = 0; i < parameterCount; i++)
+            {
                 var parameter = parameters[i];
-                var accessor =
-                accessorsToRead.FirstOrDefault(a => a.Name.Equals(parameter.Name, StringComparison.OrdinalIgnoreCase));
-                if(accessor == null)
+                var member = readableMembers.FirstOrDefault(a => a.Name.Equals(parameter.Name, StringComparison.OrdinalIgnoreCase));
+                if (member == null)
                     return false;
-                accessors[i] = accessor;
+                members[i] = member;
             }
-            neededAccessors = accessors;
+            neededAccessors = members;
             return true;
         }
 
-        private bool TryConstructWith(DynamicCtor ctor, NodeMap nodeMap, ConverterSettings settings, out object instance) {
+        private bool TryConstructWith(DynamicCtor ctor, NodeMap nodeMap, IReadOnlyConverterSettings settings, out object instance)
+        {
             instance = null;
 
-            var parameters = ctor.Parameters;
-            var parameterCount = parameters.Length;
+            var parameterCount = MembersForCtor.Length;
             var parametersForCtor = new object[parameterCount];
-            for(var i = 0; i < parameterCount; i++) {
-                var parameter = parameters[i];
-                var parameterNode = nodeMap.GetChild(settings.NamingStrategy?.TransformName(parameter.Name) ?? parameter.Name);
-                if(parameterNode == null)
-                    return false;
-
-                parametersForCtor[i] = Nodes.ToObject(parameterNode, parameter.ParameterType, settings);
+            for (var i = 0; i < MembersForCtor.Length; i++)
+            {
+                var memberSettings = MembersForCtor[i];
+                var scopedMemberSettings = settings.GetScoped(memberSettings);
+                var memberNode = nodeMap.GetChild(GetMemberName(memberSettings, scopedMemberSettings));
+                if (memberNode == null)
+                    continue;
+                parametersForCtor[i] = memberSettings.Converter.ConvertToObject(memberNode, scopedMemberSettings);
             }
 
             instance = ctor.Invoke(parametersForCtor);

@@ -9,48 +9,66 @@
 #region
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Types {
+    /// <summary>
+    /// A singleton DataTypeConverter
+    /// </summary>
     public class DataTypeConverter {
         private readonly ConcurrentDictionary<Type, DataType> _cachedDataTypes;
 
+        /// <summary>
+        /// The static singleton instance
+        /// </summary>
         public static DataTypeConverter Instance { get; } = new DataTypeConverter();
 
+        public IReadOnlyDictionary<Type, DataType> Primitives { get; }
+
         private DataTypeConverter() {
-            _cachedDataTypes = CreatePrimitiveTypes();
+            var primitives = CreatePrimitiveTypes();
+            _cachedDataTypes = new ConcurrentDictionary<Type, DataType>(primitives);
+            Primitives = primitives;
         }
 
+        /// <summary>
+        /// Get a data type of a new instance
+        /// </summary>
         public DataType GetDataType(object instance) {
             return GetDataType(instance?.GetType());
         }
 
+        /// <summary>
+        /// Get a data type of a type
+        /// </summary>
         public DataType GetDataType(Type type) {
             return type == null ? DataType.EmptyType : _cachedDataTypes.GetOrAdd(type, CreateDataType);
         }
 
         private DataType CreateDataType(Type type) {
-            DataType dataType;
             if(type.IsEnumerable(out var elementType))
-                dataType = new DataType(DataTypeFlags.Collection, type, elementType: elementType);
-            else {
-                var underlyingType = Nullable.GetUnderlyingType(type);
-                if(underlyingType == null) {
-                    var flags = type.IsEnum
-                                    ? DataTypeFlags.Primitive | DataTypeFlags.Enum
-                                    : DataTypeFlags.Complex | DataTypeFlags.Object;
-                    dataType = new DataType(flags, type);
-                } else {
-                    var underlayingDataType = GetDataType(underlyingType);
-                    dataType = new DataType(DataTypeFlags.Nullable | underlayingDataType.Flags, type, underlyingType);
-                }
+                return new DataType(DataTypeFlags.Collection, type, elementType: elementType);
+
+            var underlyingType = Nullable.GetUnderlyingType(type);
+            if(underlyingType != null) {
+                var underlyingDataType = GetDataType(underlyingType);
+                return new DataType(DataTypeFlags.Nullable | underlyingDataType.Flags, type, underlyingType);
             }
-            return dataType;
+
+            DataTypeFlags flags;
+            if(type.IsEnum) {
+                flags = DataTypeFlags.Primitive | DataTypeFlags.Enum;
+                underlyingType = Enum.GetUnderlyingType(type);
+            } else {
+                flags = DataTypeFlags.Complex | DataTypeFlags.Object;
+            }
+            return new DataType(flags, type, underlyingType);
         }
 
-        private static ConcurrentDictionary<Type, DataType> CreatePrimitiveTypes() {
-            var primitives = new ConcurrentDictionary<Type, DataType>();
+        private static Dictionary<Type, DataType> CreatePrimitiveTypes() {
+            var primitives = new Dictionary<Type, DataType>();
 
             void AddPrimitiveType(Type type, DataTypeFlags flags) {
                 primitives.TryAdd(type, new DataType(flags, type));

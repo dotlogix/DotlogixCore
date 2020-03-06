@@ -10,7 +10,13 @@
 #endregion
 
 namespace DotLogix.Architecture.Common.Options {
+    /// <summary>
+    /// An interface to force an id
+    /// </summary>
     public interface IIdentity {
+        /// <summary>
+        /// The id
+        /// </summary>
         int Id { get; set; }
     }
 }

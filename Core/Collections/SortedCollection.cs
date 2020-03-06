@@ -23,6 +23,10 @@ namespace DotLogix.Core.Collections {
         private readonly List<T> _itemList = new List<T>();
         private readonly object _lock = new object();
 
+        /// <summary>
+        /// Get an item by index
+        /// </summary>
+        /// <param name="index"></param>
         public T this[int index] {
             get {
                 lock(_lock)
@@ -107,7 +111,9 @@ namespace DotLogix.Core.Collections {
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// The element count
+        /// </summary>
         public int Count {
             get {
                 lock(_lock)

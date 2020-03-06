@@ -223,7 +223,7 @@ namespace DotLogix.Core.Nodes {
             var reader = new NodeReader(node);
             var writer = new NodeWriter();
             var task = reader.CopyToAsync(writer);
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 task.ConfigureAwait(false).GetAwaiter().GetResult();
             return writer.Root;
         }

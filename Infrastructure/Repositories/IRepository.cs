@@ -12,30 +12,67 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using DotLogix.Architecture.Common.Options;
 using DotLogix.Architecture.Infrastructure.Entities;
+using DotLogix.Architecture.Infrastructure.Queries;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {
-    public interface IRepository { }
+	/// <summary>
+	/// A non generic marker interface for repository types
+	/// </summary>
+	public interface IRepository
+	{
 
-    public interface IRepository<TEntity> : IRepository where TEntity : class, ISimpleEntity {
-        #region Get
-        Task<TEntity> GetAsync(int id, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default);
-        Task<TEntity> GetAsync(Guid guid, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> FilterAllAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default);
-        #endregion
+	}
 
-        #region Add
-        void Add(TEntity entity);
-        void AddRange(IEnumerable<TEntity> entities);
-        #endregion
+    /// <summary>
+    /// A non generic marker interface for repository types
+    /// </summary>
+    public interface IRepository<TEntity> : IRepository where TEntity : class, new() {
+        /// <summary>
+        /// Get all entities
+        /// </summary>
+        ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
 
-        #region Remove
-        void Remove(TEntity entity);
-        void RemoveRange(IEnumerable<TEntity> entities);
-        #endregion
+        /// <summary>
+        /// Get all entities matching an expression
+        /// </summary>
+        ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Add a single entity to the set
+        /// </summary>
+        ValueTask<TEntity> AddAsync(TEntity entity);
+
+        /// <summary>
+        /// Add a range of entities to the set
+        /// </summary>
+        ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities);
+
+        /// <summary>
+        /// Remove a single entity from the set
+        /// </summary>
+        ValueTask<TEntity> RemoveAsync(TEntity entity);
+
+        /// <summary>
+        /// Remove a range of entities from the set
+        /// </summary>
+        ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities);
+    }
+
+    /// <summary>
+    /// A generic basic interface for repository types with strongly typed key
+	/// </summary>
+	public interface IRepository<in TKey, TEntity> : IRepository<TEntity> where TEntity : class, new() {
+		/// <summary>
+		/// Get a single entity by key
+		/// </summary>
+		ValueTask<TEntity> GetAsync(TKey key, CancellationToken cancellationToken = default);
+
+		/// <summary>
+		/// Get a range of entities by key
+		/// </summary>
+		ValueTask<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<TKey> keys, CancellationToken cancellationToken = default);
     }
 }

@@ -14,20 +14,23 @@ using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
+using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {
     public class WebRequestResultWriterBase : IAsyncWebRequestResultWriter {
-        public async Task WriteAsync(WebRequestResult requestResult) {
-            var response = requestResult.HttpContext.Response;
+        public async Task WriteAsync(WebServiceContext context) {
+            var response = context.HttpResponse;
             if(response.IsCompleted)
                 return;
 
+            var requestResult = context.RequestResult;
+
             if(requestResult.Succeed)
-                await WriteResultAsync(response, requestResult);
+                await WriteResultAsync(context);
             else
-                await WriteExceptionAsync(response, requestResult);
+                await WriteExceptionAsync(context);
 
             if(requestResult.CustomStatusCode != null)
                 response.StatusCode = requestResult.CustomStatusCode;
@@ -35,15 +38,18 @@ namespace DotLogix.Core.Rest.Services.Writer {
             await response.CompleteAsync();
         }
 
-        protected virtual Task WriteExceptionAsync(IAsyncHttpResponse asyncHttpResponse, WebRequestResult webRequestResult) {
+        protected virtual Task WriteExceptionAsync(WebServiceContext context) {
+            var httpResponse = context.HttpResponse;
+            var webRequestResult = context.RequestResult;
+
             var restException = GetRestExceptionRecursive(webRequestResult.Exception);
-            if(asyncHttpResponse.StatusCode == HttpStatusCodes.Success.Ok) {
-                asyncHttpResponse.StatusCode = restException != null
+            if(httpResponse.StatusCode == HttpStatusCodes.Success.Ok) {
+                httpResponse.StatusCode = restException != null
                                                    ? restException.ErrorCode
                                                    : HttpStatusCodes.ServerError.InternalServerError;
             }
 
-            asyncHttpResponse.ContentType = MimeTypes.Text.Plain;
+            httpResponse.ContentType = MimeTypes.Text.Plain;
             string message;
             if(restException != null) {
                 var sb = new StringBuilder();
@@ -53,17 +59,20 @@ namespace DotLogix.Core.Rest.Services.Writer {
                 message = sb.ToString();
             } else
                 message = webRequestResult.Exception.ToString();
-            return asyncHttpResponse.WriteToResponseStreamAsync(message);
+            return httpResponse.WriteToResponseStreamAsync(message);
         }
 
-        protected virtual Task WriteResultAsync(IAsyncHttpResponse asyncHttpResponse, WebRequestResult webRequestResult) {
-            if(webRequestResult.ReturnValue == null) {
-                asyncHttpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
+        protected virtual Task WriteResultAsync(WebServiceContext context) {
+            var httpResponse = context.HttpResponse;
+            var webRequestResult = context.RequestResult;
+
+            if (webRequestResult.ReturnValue == null) {
+                httpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
                 return Task.CompletedTask;
             }
 
-            asyncHttpResponse.ContentType = MimeTypes.Text.Plain;
-            return asyncHttpResponse.WriteToResponseStreamAsync(webRequestResult.ReturnValue.ToString());
+            httpResponse.ContentType = MimeTypes.Text.Plain;
+            return httpResponse.WriteToResponseStreamAsync(webRequestResult.ReturnValue.ToString());
         }
 
 

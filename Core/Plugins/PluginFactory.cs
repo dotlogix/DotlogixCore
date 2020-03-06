@@ -18,7 +18,7 @@ namespace DotLogix.Core.Plugins {
     /// </summary>
     public static class PluginFactory {
         /// <summary>
-        /// Load all matching plugin types and create an instance of the matching types
+        /// Load all matching plugin types and create a new instance of the matching types
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -30,7 +30,7 @@ namespace DotLogix.Core.Plugins {
         }
 
         /// <summary>
-        /// Load all matching plugin types and create an instance of the matching types
+        /// Load all matching plugin types and create a new instance of the matching types
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>

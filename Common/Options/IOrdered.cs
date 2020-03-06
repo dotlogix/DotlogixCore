@@ -7,7 +7,13 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Common.Options {
+    /// <summary>
+    /// An interface to force an order value
+    /// </summary>
     public interface IOrdered {
+        /// <summary>
+        /// The order priority
+        /// </summary>
         int Order { get; set; }
     }
 }

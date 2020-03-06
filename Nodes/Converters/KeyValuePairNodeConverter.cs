@@ -16,60 +16,66 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert key value pairs
+    /// </summary>
     public class KeyValuePairNodeConverter : NodeConverter {
+        private readonly MemberSettings _keySettings;
+        private readonly MemberSettings _valueSettings;
         private const string KeyNodeName = "Key";
         private const string ValueNodeName = "Value";
 
         private readonly DynamicCtor _defaultCtor;
-        private readonly DynamicField _keyField;
-        private readonly DynamicField _valueField;
-
-        public KeyValuePairNodeConverter(DataType type) : base(type) {
-            var dynamicType = Type.CreateDynamicType(MemberTypes.Field | MemberTypes.Constructor);
-            _defaultCtor = dynamicType.GetDefaultConstructor();
-            _keyField = dynamicType.GetField("key");
-            _valueField = dynamicType.GetField("value");
+        /// <summary>
+        /// Creates a new instance of <see cref="KeyValuePairNodeConverter"/>
+        /// </summary>
+        public KeyValuePairNodeConverter(TypeSettings typeSettings, MemberSettings keySettings, MemberSettings valueSettings) : base(typeSettings) {
+            _defaultCtor = typeSettings.DynamicType.DefaultConstructor;
+            _keySettings = keySettings;
+            _valueSettings = valueSettings;
         }
 
-        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
-            var keyFieldValue = _keyField.GetValue(instance);
-            var valueFieldValue = _valueField.GetValue(instance);
+        /// <inheritdoc />
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+            var keyFieldValue = _keySettings.Accessor.GetValue(instance);
+            var valueFieldValue = _valueSettings.Accessor.GetValue(instance);
 
-            var task = writer.BeginMapAsync(rootName);
-            if(task.IsCompleted == false)
+            var task = writer.BeginMapAsync(name);
+            if(task.IsCompletedSuccessfully == false)
                 await task;
 
-            task = Nodes.WriteToAsync(KeyNodeName, keyFieldValue, _keyField.ValueType, writer);
-            if(task.IsCompleted == false)
+            task = _keySettings.Converter.WriteAsync(keyFieldValue, GetMemberName(_keySettings, settings), writer, settings);
+            if(task.IsCompletedSuccessfully == false)
                 await task;
 
-            task = Nodes.WriteToAsync(ValueNodeName, valueFieldValue, _valueField.ValueType, writer);
-            if(task.IsCompleted == false)
+            task = _valueSettings.Converter.WriteAsync(valueFieldValue, GetMemberName(_valueSettings, settings), writer, settings);
+            if (task.IsCompletedSuccessfully == false)
                 await task;
 
             task = writer.EndMapAsync();
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 await task;
         }
 
-        public override object ConvertToObject(Node node, ConverterSettings settings) {
+        /// <inheritdoc />
+        public override object ConvertToObject(Node node, IConverterSettings settings) {
             if(!(node is NodeMap nodeMap))
-                throw new ArgumentException("Node is not a NodeMap");
+                throw new ArgumentException($"Expected node of type \"NodeMap\" got \"{node.Type}\"");
 
-            var keyNode = nodeMap.GetChild(settings.NamingStrategy?.TransformName(KeyNodeName) ?? KeyNodeName);
+            var keyNode = nodeMap.GetChild(GetMemberName(_keySettings, settings));
             if(keyNode == null)
                 throw new ArgumentException("KeyNode is not defined");
 
-            var valueNode = nodeMap.GetChild(settings.NamingStrategy?.TransformName(ValueNodeName) ?? ValueNodeName);
+            var valueNode = nodeMap.GetChild(GetMemberName(_valueSettings, settings));
             if(valueNode == null)
                 throw new ArgumentException("ValueNode is not defined");
 
-            var keyFieldValue = Nodes.ToObject(keyNode, _keyField.ValueType, settings);
-            var valueFieldValue = Nodes.ToObject(valueNode, _valueField.ValueType, settings);
+            var keyFieldValue = _keySettings.Converter.ConvertToObject(keyNode, settings);
+            var valueFieldValue = _valueSettings.Converter.ConvertToObject(valueNode, settings);
 
             var instance = _defaultCtor.Invoke();
-            _keyField.SetValue(instance, keyFieldValue);
-            _valueField.SetValue(instance, valueFieldValue);
+            _keySettings.Accessor.SetValue(instance, keyFieldValue);
+            _valueSettings.Accessor.SetValue(instance, valueFieldValue);
             return instance;
         }
     }

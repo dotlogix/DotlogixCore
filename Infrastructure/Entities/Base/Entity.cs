@@ -7,7 +7,11 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Infrastructure.Entities.Base {
+    /// <summary>
+    /// A simple entity implementing the <see cref="IEntity"/> interface
+    /// </summary>
     public abstract class Entity : InsertOnlyEntity, IEntity {
+        /// <inheritdoc />
         public int Order { get; set; }
     }
 }

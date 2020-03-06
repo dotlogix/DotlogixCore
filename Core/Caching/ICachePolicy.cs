@@ -16,7 +16,7 @@ namespace DotLogix.Core.Caching {
     /// </summary>
     public interface ICachePolicy {
         /// <summary>
-        /// A callback function to check if an item should be dropped
+        /// A callback method to check if an item should be dropped
         /// </summary>
         /// <param name="timeStampUtc">The timestamp when the check is happening</param>
         /// <returns></returns>

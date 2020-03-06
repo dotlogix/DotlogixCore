@@ -13,13 +13,13 @@ using DotLogix.Core.Utils;
 
 namespace DotLogix.Core.Attributes {
     /// <summary>
-    /// An attribute to create an instance of <see cref="Instantiator"/>
+    /// An attribute to create a new instance of <see cref="Instantiator"/>
     /// </summary>
     public class InstantiatorAttribute : Attribute {
         private readonly IInstantiator _instantiator;
 
         /// <summary>
-        /// Creates an instance of <see cref="InstantiatorAttribute"/> using an existing <see cref="IInstantiator"/>
+        /// Creates a new instance of <see cref="InstantiatorAttribute"/> using an existing <see cref="IInstantiator"/>
         /// </summary>
         /// <param name="instantiator">The instance</param>
         public InstantiatorAttribute(IInstantiator instantiator) {
@@ -27,7 +27,7 @@ namespace DotLogix.Core.Attributes {
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="InstantiatorAttribute"/> using a static property of another type
+        /// Creates a new instance of <see cref="InstantiatorAttribute"/> using a static property of another type
         /// </summary>
         /// <param name="singletonType">The type containing the property</param>
         /// <param name="propertyName">The property name</param>
@@ -35,20 +35,20 @@ namespace DotLogix.Core.Attributes {
         public InstantiatorAttribute(Type singletonType, string propertyName, Type constraintType = null) : this(Instantiator.UseSingletonProperty(singletonType, propertyName, constraintType)) { }
 
         /// <summary>
-        /// Creates an instance of <see cref="InstantiatorAttribute"/> using the default constructor of another type
+        /// Creates a new instance of <see cref="InstantiatorAttribute"/> using the default constructor of another type
         /// </summary>
         /// <param name="type">The type</param>
         /// <param name="constraintType">An optional constraint type to ensure type compatibility</param>
         protected InstantiatorAttribute(Type type, Type constraintType = null) : this(Instantiator.UseDefaultCtor(type, constraintType)) { }
 
         /// <summary>
-        /// Creates an instance of <see cref="InstantiatorAttribute"/> using a delegate function
+        /// Creates a new instance of <see cref="InstantiatorAttribute"/> using a delegate method
         /// </summary>
-        /// <param name="instantiateFunc">The factory function</param>
+        /// <param name="instantiateFunc">The factory method</param>
         protected InstantiatorAttribute(Func<object> instantiateFunc) : this(Instantiator.UseDelegate(instantiateFunc)) { }
 
         /// <summary>
-        /// Get or create an instance using the configured method
+        /// Get or create a new instance using the configured method
         /// </summary>
         /// <returns></returns>
         protected object GetInstance() {
@@ -56,7 +56,7 @@ namespace DotLogix.Core.Attributes {
         }
 
         /// <summary>
-        /// Get or create an instance as a specific type using the configured method
+        /// Get or create a new instance as a specific type using the configured method
         /// </summary>
         /// <typeparam name="TInstance">The target type</typeparam>
         /// <returns>The instance if the provided type is compatible, otherwise <value>default</value></returns>
@@ -66,14 +66,14 @@ namespace DotLogix.Core.Attributes {
     }
 
     /// <summary>
-    /// An attribute to create an instance of <see cref="IArgsInstantiator"/>
+    /// An attribute to create a new instance of <see cref="IArgsInstantiator"/>
     /// </summary>
     public class ArgsInstantiatorAttribute : Attribute
     {
         private readonly IArgsInstantiator _instantiator;
 
         /// <summary>
-        /// Creates an instance of <see cref="ArgsInstantiatorAttribute"/> using an existing <see cref="IInstantiator"/>
+        /// Creates a new instance of <see cref="ArgsInstantiatorAttribute"/> using an existing <see cref="IInstantiator"/>
         /// </summary>
         /// <param name="instantiator">The instance</param>
         public ArgsInstantiatorAttribute(IArgsInstantiator instantiator)
@@ -82,7 +82,7 @@ namespace DotLogix.Core.Attributes {
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="InstantiatorAttribute"/> using a constructor with the specified type arguments
+        /// Creates a new instance of <see cref="InstantiatorAttribute"/> using a constructor with the specified type arguments
         /// </summary>
         /// <param name="type">The type</param>
         /// <param name="parameterTypes">The parameter types used by the constructor</param>
@@ -90,15 +90,15 @@ namespace DotLogix.Core.Attributes {
         protected ArgsInstantiatorAttribute(Type type, Type[] parameterTypes, Type constraintType = null) : this(Instantiator.UseCtor(type, parameterTypes, constraintType)) { }
 
         /// <summary>
-        /// Creates an instance of <see cref="InstantiatorAttribute"/> using a delegate function
+        /// Creates a new instance of <see cref="InstantiatorAttribute"/> using a delegate method
         /// </summary>
-        /// <param name="instantiateFunc">The factory function</param>
+        /// <param name="instantiateFunc">The factory method</param>
         protected ArgsInstantiatorAttribute(Func<object[], object> instantiateFunc) : this(Instantiator.UseDelegate(instantiateFunc)) { }
 
         /// <summary>
-        /// Get or create an instance using the configured method
+        /// Get or create a new instance using the configured method
         /// </summary>
-        /// <param name="args">The arguments to create an instance</param>
+        /// <param name="args">The arguments to create a new instance</param>
         /// <returns></returns>
         protected object GetInstance(params object[] args)
         {
@@ -106,9 +106,9 @@ namespace DotLogix.Core.Attributes {
         }
 
         /// <summary>
-        /// Get or create an instance as a specific type using the configured method
+        /// Get or create a new instance as a specific type using the configured method
         /// </summary>
-        /// <param name="args">The arguments to create an instance</param>
+        /// <param name="args">The arguments to create a new instance</param>
         /// <typeparam name="TInstance">The target type</typeparam>
         /// <returns>The instance if the provided type is compatible, otherwise <value>default</value></returns>
         protected TInstance GetInstance<TInstance>(params object[] args)

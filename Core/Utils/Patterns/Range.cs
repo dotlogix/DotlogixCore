@@ -12,27 +12,50 @@ using System.Text.RegularExpressions;
 #endregion
 
 namespace DotLogix.Core.Utils.Patterns {
+    /// <summary>
+    /// A Range
+    /// </summary>
     public struct Range {
         private static readonly char[] Enclosures = {'(', '[', '{', ')', ']', '}'};
         private static readonly Regex RangeRegex = new Regex("^(?:(?<exact>-?\\d+)|(?<min>-?\\d)?\\.\\.(?<max>-?\\d))?$", RegexOptions.Compiled);
+
+        /// <summary>
+        /// The min value
+        /// </summary>
         public int? Min;
+
+        /// <summary>
+        /// Tha max value
+        /// </summary>
         public int? Max;
 
+        /// <summary>
+        /// Creates a new <see cref="Range"/>
+        /// </summary>
         public Range(int? min = null, int? max = null) {
             Min = min;
             Max = max;
         }
 
-        public string ToRegexRange(bool atLeastOne) {
+        /// <summary>
+        /// Creates a regex range statement
+        /// </summary>
+        /// <param name="onAny"></param>
+        /// <returns></returns>
+        public string ToRegexRange(string onAny = "*") {
             if(Max.HasValue && Min.HasValue)
                 return Max.Value == Min.Value ? $"{{{Min.Value}}}" : $"{{{Min.Value},{Max.Value}}}";
             if(Max.HasValue)
                 return $"{{0,{Max.Value}}}";
             if(Min.HasValue)
                 return $"{{{Min.Value},}}";
-            return "*";
+            return onAny;
         }
 
+        /// <summary>
+        /// Creates a parseable representation of the range
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() {
             if(Max.HasValue && Min.HasValue)
                 return $"({Max.Value}..{Min.Value})";
@@ -43,12 +66,21 @@ namespace DotLogix.Core.Utils.Patterns {
             return "(..)";
         }
 
+        /// <summary>
+        /// Parse
+        /// </summary>
         public static Range Parse(string value) {
             if(TryParse(value, out var range))
                 return range;
             throw new ArgumentException("Value is not a valid range statement", nameof(value));
         }
 
+        /// <summary>
+        /// Try to parse a range
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
         public static bool TryParse(string value, out Range range) {
             range = default;
             if(string.IsNullOrWhiteSpace(value))

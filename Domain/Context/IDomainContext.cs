@@ -13,8 +13,17 @@ using DotLogix.Architecture.Domain.UoW;
 #endregion
 
 namespace DotLogix.Architecture.Domain.Context {
+    /// <summary>
+    /// An interface to represent a domain context
+    /// </summary>
     public interface IDomainContext {
+        /// <summary>
+        /// The context variables
+        /// </summary>
         IDictionary<string, object> Variables { get; }
+        /// <summary>
+        /// Get or create a service
+        /// </summary>
         TService UseService<TService>(IUnitOfWorkContextFactory contextFactory) where TService : class, IDomainService;
     }
 }

@@ -99,7 +99,7 @@
             <returns>true if the specified object  is equal to the current object; otherwise, false.</returns>
         </member>
         <member name="M:DotLogix.Core.Rest.Server.Http.WebServiceEventSubscription.GetHashCode">
-            <summary>Serves as the default hash function.</summary>
+            <summary>Serves as the default hash method.</summary>
             <returns>A hash code for the current object.</returns>
         </member>
         <member name="M:DotLogix.Core.Rest.Server.Http.WebServiceEventSubscription.op_Equality(DotLogix.Core.Rest.Server.Http.WebServiceEventSubscription,DotLogix.Core.Rest.Server.Http.WebServiceEventSubscription)">

@@ -16,37 +16,69 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert arrays
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ArrayNodeConverter<T> : NodeConverter {
-        private readonly Type _elementType = typeof(T);
-        public ArrayNodeConverter(DataType type) : base(type) { }
+        /// <summary>
+        /// Creates a new instance of <see cref="ArrayNodeConverter{T}"/>
+        /// </summary>
+        public ArrayNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
-        public override async ValueTask WriteAsync(object instance, string rootName, IAsyncNodeWriter writer) {
-            if(!(instance is IEnumerable<T> values))
-                throw new ArgumentException("Instance is not type of IEnumerable<T>");
+        /// <inheritdoc />
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
+            
 
-            var task = writer.BeginListAsync(rootName);
-            if(task.IsCompleted == false)
+            if (scopedSettings.ShouldEmitValue(instance) == false)
+                return;
+
+            ValueTask task;
+            if (instance == null) {
+                task = writer.WriteValueAsync(name, null);
+                if (task.IsCompletedSuccessfully == false)
+                    await task;
+                return;
+            }
+
+            if (!(instance is IEnumerable<T> values))
+                throw new ArgumentException($"Expected instance of type \"IEnumerable<T>\" got \"{instance.GetType()}\"");
+
+            task = writer.BeginListAsync(name);
+            if(task.IsCompletedSuccessfully == false)
                 await task;
-            foreach(var value in values) {
-                task = Nodes.WriteToAsync(null, value, _elementType, writer);
-                if(task.IsCompleted == false)
+
+            foreach (var value in values) {
+                task = childConverter.WriteAsync(value, null, writer, scopedSettings.ChildSettings);
+
+                if (task.IsCompletedSuccessfully == false)
                     await task;
             }
 
             task = writer.EndListAsync();
-            if(task.IsCompleted == false)
+            if(task.IsCompletedSuccessfully == false)
                 await task;
         }
 
-        public override object ConvertToObject(Node node, ConverterSettings settings) {
-            if(!(node is NodeList nodeList))
-                throw new ArgumentException("Node is not a NodeList");
+        /// <inheritdoc />
+        public override object ConvertToObject(Node node, IConverterSettings settings) {
+            if (node.Type == NodeTypes.Empty)
+                return default;
+
+            if (!(node is NodeList nodeList))
+                throw new ArgumentException($"Expected node of type \"NodeList\" got \"{node.Type}\"");
+
+
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
 
             var children = nodeList.Children().ToArray();
             var childCount = children.Length;
             var array = new T[childCount];
-            for(var i = 0; i < childCount; i++)
-                array[i] = (T)Nodes.ToObject(children[i], _elementType, settings);
+            for (var i = 0; i < childCount; i++)
+                array[i] = (T)childConverter.ConvertToObject(children[i], scopedSettings.ChildSettings);
 
             return array;
         }

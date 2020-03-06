@@ -17,19 +17,55 @@ using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Extensions.Internal;
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
+    /// <summary>
+    /// An implementation of the <see cref="IQueryExecutor{T}"/> for entity framework
+    /// </summary>
     public class EfQueryExecutor<T> : IQueryExecutor<T> {
         private readonly IQueryable<T> _innerQueryable;
-
+        /// <summary>
+        /// Create a new instance of <see cref="EfQueryExecutor{T}"/>
+        /// </summary>
         public EfQueryExecutor(IQuery<T> query) {
             _innerQueryable = (query as QueryableQuery<T>)?.InnerQueryable ?? throw new ArgumentException($"Query can not be converted to type {typeof(QueryableQuery<>).GetFriendlyName()}");
         }
 
-        public IAsyncEnumerable<T> ToAsyncEnumerable() {
-            return _innerQueryable.AsAsyncEnumerable();
+        /// <inheritdoc />
+        public Task<List<T>> ToListAsync(CancellationToken cancellationToken = default) {
+            return _innerQueryable.ToListAsync(cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<T>> ToEnumerableAsync(CancellationToken cancellationToken = default) {
+            return _innerQueryable.ToListAsync(cancellationToken).ConvertResult(list => list.AsEnumerable());
+        }
+
+        /// <inheritdoc />
+        public Task<T[]> ToArrayAsync(CancellationToken cancellationToken = default) {
+            return _innerQueryable.ToArrayAsync(cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<Dictionary<TKey, T>> ToDictionaryAsync<TKey>(Func<T, TKey> keySelector, CancellationToken cancellationToken = default) {
+            return _innerQueryable.ToDictionaryAsync(keySelector, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<Dictionary<TKey, T>> ToDictionaryAsync<TKey>(Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default) {
+            return _innerQueryable.ToDictionaryAsync(keySelector, comparer, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TKey, TElement>(Func<T, TKey> keySelector, Func<T, TElement> elementSelector, CancellationToken cancellationToken = default) {
+            return _innerQueryable.ToDictionaryAsync(keySelector, elementSelector, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TKey, TElement>(Func<T, TKey> keySelector, Func<T, TElement> elementSelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default) {
+            return _innerQueryable.ToDictionaryAsync(keySelector, elementSelector, comparer, cancellationToken);
         }
 
         public IQueryable<T> ToQueryable() {

@@ -7,7 +7,13 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Common.Options {
+    /// <summary>
+    /// An interface to represent insert only objects
+    /// </summary>
     public interface IInsertOnly {
+        /// <summary>
+        /// A value to check if this object is active or not
+        /// </summary>
         bool IsActive { get; set; }
     }
 }

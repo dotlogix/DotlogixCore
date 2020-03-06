@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(MSBuildThisFileFullPath)\..\..\assemblies\BuildTasks\BuildTasks.dll" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<Company>DotLogix</Company>
 		<Product>DotLogix Core</Product>
 		<PackageId>DotLogix.Core.Rest</PackageId>
@@ -15,13 +15,17 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryType>git</RepositoryType>
 		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<Version>1.2</Version>
+		<Version>2.1.19</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DocumentationFile>D:\git\c-sharp\DotLogix\Core\Rest\DotLogix.Rest.xml</DocumentationFile>
+		<DocumentationFile>..\assemblies\docs\DotLogix.Rest.xml</DocumentationFile>
 		<WarningsAsErrors>NU1605</WarningsAsErrors>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.0" />
+	</ItemGroup>
 	
 	<ItemGroup>
 		<ProjectReference Include="..\Core\Core.csproj" />
@@ -40,13 +44,13 @@
 		  <Version>$(CurrentBuildVersion)</Version>
 		</PropertyGroup>
 	</Target>
-  
-	<Target Name="CopyPackage" AfterTargets="Pack">
-		<ItemGroup>
-			<PackageFiles Include="bin\$(Configuration)\*.nupkg" />
-			<AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
-		</ItemGroup>
-		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="..\assemblies\$(Configuration)" /> 
-		<Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
-	</Target>
+
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <ItemGroup>
+      <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+      <AssemblyFiles Include="bin\$(Configuration)\**\*.*" Exclude="**\*.deps.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+    <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />
+  </Target>
 </Project>

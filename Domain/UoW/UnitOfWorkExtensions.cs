@@ -17,44 +17,59 @@ using DotLogix.Architecture.Infrastructure.Repositories;
 #endregion
 
 namespace DotLogix.Architecture.Domain.UoW {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="IUnitOfWork"/>
+    /// </summary>
     public static class UnitOfWorkExtensions {
         #region Get
-
-        public static Task<TEntity> GetAsync<TEntity, TRepo>(this IUnitOfWorkContext context, Guid guid) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity {
-            var repository = context.UseRepository<TRepo>();
-            return repository.GetAsync(guid);
+        /// <summary>
+        /// Get a single entity by key
+        /// </summary>
+        public static ValueTask<TEntity> GetAsync<TKey, TEntity>(this IUnitOfWorkContext context, TKey key) where TEntity : class, new() {
+            var repository = context.UseRepository<IRepository<TKey, TEntity>>();
+            return repository.GetAsync(key);
         }
 
-        public static Task<IEnumerable<TEntity>> GetAllAsync<TEntity, TRepo>(this IUnitOfWorkContext context) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity {
-            var repository = context.UseRepository<TRepo>();
+        /// <summary>
+        /// Get a range of entities by key
+        /// </summary>
+        public static ValueTask<IEnumerable<TEntity>> GetRangeAsync<TKey, TEntity>(this IUnitOfWorkContext context, IEnumerable<TKey> keys) where TEntity : class, new() {
+	        var repository = context.UseRepository<IRepository<TKey, TEntity>>();
+	        return repository.GetRangeAsync(keys);
+        }
+
+        /// <summary>
+        /// Get all entities
+        /// </summary>
+        public static ValueTask<IEnumerable<TEntity>> GetAllAsync<TEntity>(this IUnitOfWorkContext context) where TEntity : class, new() {
+            var repository = context.UseRepository<IRepository<TEntity>>();
             return repository.GetAllAsync();
         }
-
-        public static Task<IEnumerable<TEntity>> FilterAllAsync<TEntity, TRepo>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity {
-            var repository = context.UseRepository<TRepo>();
-            return repository.FilterAllAsync(filterExpression);
-        }
-
-        public static Task<IEnumerable<TEntity>> GetRangeAsync<TEntity, TRepo>(this IUnitOfWorkContext context, IEnumerable<Guid> guids) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity {
-            var repository = context.UseRepository<TRepo>();
-            return repository.GetRangeAsync(guids);
-        }
+        /// <summary>
+        /// Get all entities matching an expression
+        /// </summary>
+        public static ValueTask<IEnumerable<TEntity>> WhereAsync<TEntity>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TEntity : class, new() {
+            var repository = context.UseRepository<IRepository<TEntity>>();
+            return repository.WhereAsync(filterExpression);
+		}
 
         #endregion
 
-        #region Remove
-
-        public static void Add<TEntity, TRepo>(this IUnitOfWorkContext context, TEntity entity) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity
-        {
-            var repository = context.UseRepository<TRepo>();
-            repository.Add(entity);
+		#region Remove
+		/// <summary>
+		/// Add a single entity to the set
+		/// </summary>
+		public static ValueTask<TEntity> AddAsync<TEntity>(this IUnitOfWorkContext context, TEntity entity) where TEntity : class, new() {
+            var repository = context.UseRepository<IRepository<TEntity>>();
+            return repository.AddAsync(entity);
             
         }
-
-        public static void AddRange<TEntity, TRepo>(this IUnitOfWorkContext context, IEnumerable<TEntity> entities) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity
-        {
-            var repository = context.UseRepository<TRepo>();
-            repository.AddRange(entities);
+        /// <summary>
+        /// Add a range of entities to the set
+        /// </summary>
+        public static ValueTask<IEnumerable<TEntity>> AddRangeAsync<TEntity>(this IUnitOfWorkContext context, IEnumerable<TEntity> entities) where TEntity : class, new() {
+            var repository = context.UseRepository<IRepository<TEntity>>();
+            return repository.AddRangeAsync(entities);
         }
 
         #endregion
@@ -62,29 +77,28 @@ namespace DotLogix.Architecture.Domain.UoW {
 
         #region Remove
 
-        public static async Task RemoveAsync<TEntity, TRepo>(this IUnitOfWorkContext context, Guid guid) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity
-        {
-            var repository = context.UseRepository<TRepo>();
-            var entity = await repository.GetAsync(guid);
-            if (entity == null)
-                return;
-
-            repository.Remove(entity);
+        /// <summary>
+        /// Queries the matching entity and remove it
+        /// </summary>
+        public static ValueTask<TEntity> RemoveAsync<TKey, TEntity>(this IUnitOfWorkContext context, TKey key) where TEntity : class, ISimpleEntity, new() {
+	        var repository = context.UseRepository<IRepository<TKey, TEntity>>();
+	        return repository.RemoveByKeyAsync(key);
         }
 
-        public static async Task RemoveWhereAsync<TEntity, TRepo>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity
-        {
-            var repository = context.UseRepository<TRepo>();
-            var entities = await repository.FilterAllAsync(filterExpression);
-            if (entities == null)
-                return;
+        /// <summary>
+        /// Queries the matching entity and remove it
+        /// </summary>
+        public static ValueTask<IEnumerable<TEntity>> RemoveRangeAsync<TKey, TEntity>(this IUnitOfWorkContext context, IEnumerable<TKey> keys) where TEntity : class, new() {
+			var repository = context.UseRepository<IRepository<TKey, TEntity>>();
+			return repository.RemoveByKeyAsync(keys);
+		}
 
-            repository.RemoveRange(entities);
-        }
-
-        public static Task RemoveRangeAsync<TEntity, TRepo>(this IUnitOfWorkContext context, IEnumerable<Guid> guids) where TRepo : IRepository<TEntity> where TEntity : class, ISimpleEntity
-        {
-            return RemoveWhereAsync<TEntity, TRepo>(context, e => guids.Contains(e.Guid));
+        /// <summary>
+        /// Queries the matching entities and remove them
+        /// </summary>
+        public static ValueTask<IEnumerable<TEntity>> RemoveWhereAsync<TEntity>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TEntity : class, ISimpleEntity, new() {
+	        var repository = context.UseRepository<IRepository<TEntity>>();
+	        return repository.RemoveWhereAsync(filterExpression);
         }
 
         #endregion

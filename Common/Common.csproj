@@ -2,7 +2,7 @@
 	<UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(MSBuildThisFileFullPath)\..\..\assemblies\BuildTasks\BuildTasks.dll" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
 		<Company>DotLogix</Company>
 		<Product>DotLogix Architecture</Product>
 		<PackageId>DotLogix.Architecture.Common</PackageId>
@@ -15,12 +15,12 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryType>git</RepositoryType>
 		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<Version>1.2</Version>
+		<Version>2.0.1</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DocumentationFile>D:\git\c-sharp\DotLogix\Core\Application\DotLogix.Application.xml</DocumentationFile>
-		<WarningsAsErrors>NU1605</WarningsAsErrors>
+		<DocumentationFile>..\assemblies\docs\DotLogix.Common.xml</DocumentationFile>
+		<WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
 	</PropertyGroup>
 	
 	<ItemGroup>
@@ -39,13 +39,13 @@
 		  <Version>$(CurrentBuildVersion)</Version>
 		</PropertyGroup>
 	</Target>
-  
-	<Target Name="CopyPackage" AfterTargets="Pack">
-		<ItemGroup>
-			<PackageFiles Include="bin\$(Configuration)\*.nupkg" />
-			<AssemblyFiles Include="bin\$(Configuration)\*\$(TargetName).*" Exclude="**\*.deps.json" />
-		</ItemGroup>
-		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="..\assemblies\$(Configuration)" /> 
-		<Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />    
-	</Target>
+
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <ItemGroup>
+      <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+      <AssemblyFiles Include="bin\$(Configuration)\**\*.*" Exclude="**\*.deps.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+    <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />
+  </Target>
 </Project>

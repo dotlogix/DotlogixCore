@@ -14,10 +14,14 @@ using DotLogix.Core.Reflection.Dynamics;
 #endregion
 
 namespace DotLogix.Core.Tracking.Snapshots {
+    /// <inheritdoc />
     public class PropertyChangedSnapshot : ISnapshot {
         private readonly Dictionary<string, TrackedValue> _changedValues = new Dictionary<string, TrackedValue>();
         private readonly Dictionary<string, TrackedValue> _trackedValues;
 
+        /// <summary>
+        /// The target value
+        /// </summary>
         public INotifyPropertyChanged Target { get; }
 
         /// <summary>Initialisiert eine neue Instanz der <see cref="T:System.Object" />-Klasse.</summary>
@@ -29,21 +33,27 @@ namespace DotLogix.Core.Tracking.Snapshots {
         }
 
         object ISnapshot.Target => Target;
+        /// <inheritdoc />
         public IReadOnlyDictionary<string, object> OldValues => _trackedValues.ToDictionary(kv => kv.Key, kv => kv.Value.OldValue);
+        /// <inheritdoc />
         public IReadOnlyDictionary<string, object> CurrentValues => _trackedValues.ToDictionary(kv => kv.Key, kv => kv.Value.NewValue);
+        /// <inheritdoc />
         public IReadOnlyDictionary<string, object> ChangedValues => _changedValues.ToDictionary(kv => kv.Key, kv => kv.Value.NewValue);
 
 
+        /// <inheritdoc />
         public bool DetectChanges() {
             return _changedValues.Count > 0;
         }
 
+        /// <inheritdoc />
         public void AcceptChanges() {
             foreach(var value in _changedValues.Values)
                 value.AcceptChanges();
             _changedValues.Clear();
         }
 
+        /// <inheritdoc />
         public void RevertChanges() {
             Target.PropertyChanged -= Target_PropertyChanged;
 

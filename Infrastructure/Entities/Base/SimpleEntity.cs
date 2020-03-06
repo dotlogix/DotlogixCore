@@ -11,8 +11,14 @@ using System;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Entities.Base {
+    /// <summary>
+    /// A simple entity implementing the <see cref="ISimpleEntity"/> interface
+    /// </summary>
     public abstract class SimpleEntity : ISimpleEntity {
+        /// <inheritdoc />
         public int Id { get; set; }
+
+        /// <inheritdoc />
         public Guid Guid { get; set; }
     }
 }

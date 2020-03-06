@@ -12,8 +12,17 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Factories {
+    /// <summary>
+    /// An interface representing a factory to create node converters
+    /// </summary>
     public interface INodeConverterFactory {
-        IAsyncNodeConverter CreateConverter(NodeTypes nodeType, DataType dataType);
-        bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out IAsyncNodeConverter converter);
+        /// <summary>
+        /// Create a new node converter
+        /// </summary>
+        IAsyncNodeConverter CreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings);
+        /// <summary>
+        /// Try to create a new node converter
+        /// </summary>
+        bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter);
     }
 }

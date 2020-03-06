@@ -21,6 +21,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
     public class ParseJsonBodyPreProcessor : WebRequestProcessorBase {
         public const string JsonDataParamName = "$jsonData";
         public static IWebRequestProcessor Instance { get; } = new ParseJsonBodyPreProcessor();
+        
         private ParseJsonBodyPreProcessor() : base(int.MaxValue) { }
 
         public override async Task ProcessAsync(WebServiceContext context) {
@@ -33,8 +34,9 @@ namespace DotLogix.Core.Rest.Services.Processors.Json {
                 try {
                     var jsonData = JsonNodes.ToNode(json);
                     context.Variables.Add(JsonDataParamName, jsonData);
+                    context.ParameterProviders.Add(new JsonParameterProvider());
                 } catch(Exception e) {
-                    Log.Error(e);
+                    Log.Warn(e);
                     context.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
                 }
             }

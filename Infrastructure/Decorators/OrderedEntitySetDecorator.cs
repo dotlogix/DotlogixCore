@@ -10,33 +10,53 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Common.Options;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Decorators {
-    public class OrderedEntitySetDecorator<TEnity> : EntitySetDecoratorBase<TEnity> where TEnity : ISimpleEntity, IOrdered {
-        public OrderedEntitySetDecorator(IEntitySet<TEnity> baseEntitySet) : base(baseEntitySet) { }
+    /// <summary>
+    /// A decorator to force ordered results after querying
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    public class OrderedEntitySetDecorator<TEntity> : EntitySetDecoratorBase<TEntity> where TEntity : class, IOrdered, new() {
+        /// <summary>
+        /// Creates a new instance eof <see cref="OrderedEntitySetDecorator{TEntity}"/>
+        /// </summary>
+        public OrderedEntitySetDecorator(IEntitySet<TEntity> baseEntitySet) : base(baseEntitySet) { }
 
-        public override IQuery<TEnity> Query() {
-            return BaseEntitySet.Query().OrderBy(e => e.Order);
-        }
+        /// <inheritdoc />
+        public override IQuery<TEntity> Query() {
+            bool InterceptQueryResult(IQueryInterceptionContext queryInterceptionContext) {
+                if(queryInterceptionContext.Result.IsUndefined)
+                    return true;
 
-        public override Task<IEnumerable<TEnity>> GetRangeAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default) {
-            return BaseEntitySet.GetRangeAsync(ids, cancellationToken).ConvertResult(r => (IEnumerable<TEnity>)r.OrderBy(e => e.Order));
-        }
+		        switch(queryInterceptionContext.Result.Value)
+		        {
+                    case List<TEntity> entities:
+                        entities.Sort(new SelectorComparer<TEntity,int>(e => e.Order));
+                        break;
+                    case TEntity[] entities:
+                        Array.Sort(entities, new SelectorComparer<TEntity, int>(e => e.Order));
+                        break;
+                    case IEnumerable<TEntity> entities:
+                        if(queryInterceptionContext.ResultType == typeof(IEnumerable<TEntity>))
+                            queryInterceptionContext.Result = (object)entities.OrderBy(e => e.Order);
+                        break;
+                }
 
-        public override Task<IEnumerable<TEnity>> GetRangeAsync(IEnumerable<Guid> guids, CancellationToken cancellationToken = default) {
-            return BaseEntitySet.GetRangeAsync(guids, cancellationToken).ConvertResult(r => (IEnumerable<TEnity>)r.OrderBy(e => e.Order));
-        }
+		        return true;
+	        }
 
-        public override Task<IEnumerable<TEnity>> GetAllAsync(CancellationToken cancellationToken = default) {
-            return BaseEntitySet.GetAllAsync(cancellationToken).ConvertResult(r => (IEnumerable<TEnity>)r.OrderBy(e => e.Order));
+			return BaseEntitySet.Query().InterceptQueryResult(InterceptQueryResult);
         }
     }
 }

@@ -21,8 +21,8 @@ namespace DotLogix.Core.Rest.Server.Http {
         public IWebServiceRoute Route { get; }
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
-        public PrefixedRoute(string prefix, IWebServiceRoute route) {
-            Prefix = prefix;
+        public PrefixedRoute(IWebServiceRoute route, string prefix = null) {
+            Prefix = route.IsRooted ? null : prefix;
             Route = route;
         }
     }
@@ -34,7 +34,7 @@ namespace DotLogix.Core.Rest.Server.Http {
         /// <summary>Returns an enumerator that iterates through the collection.</summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<PrefixedRoute> GetEnumerator() {
-            return _prefixedRoutes.SelectMany(r => r.Value.Select(v => new PrefixedRoute(r.Key, v))).GetEnumerator();
+            return _prefixedRoutes.SelectMany(r => r.Value.Select(v => new PrefixedRoute(v, r.Key))).GetEnumerator();
         }
 
         /// <summary>Returns an enumerator that iterates through a collection.</summary>
@@ -46,16 +46,16 @@ namespace DotLogix.Core.Rest.Server.Http {
         /// <summary>Adds a route to the collection</summary>
         /// <param name="route">The route to add</param>
         void ICollection<PrefixedRoute>.Add(PrefixedRoute route) {
-            Add(route.Prefix, route.Route);
+            Add(route.Route, route.Prefix ?? string.Empty);
         }
-        
+
         /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"></see>.</summary>
-        /// <param name="prefix">The prefix</param>
         /// <param name="route">The route to add</param>
-        public void Add(string prefix, IWebServiceRoute route) {
+        /// <param name="prefix">The prefix</param>
+        public void Add(IWebServiceRoute route, string prefix = null) {
             Count++;
-            if(_prefixedRoutes.TryGetValue(prefix, out var list) ==false)
-                _prefixedRoutes.Add(prefix,(list = new SortedCollection<IWebServiceRoute>(WebServiceRouteComparer.Instance)));
+            if(_prefixedRoutes.TryGetValue(prefix ?? string.Empty, out var list) ==false)
+                _prefixedRoutes.Add(prefix ?? string.Empty, (list = new SortedCollection<IWebServiceRoute>(WebServiceRouteComparer.Instance)));
             list.Add(route);
         }
 
@@ -70,12 +70,12 @@ namespace DotLogix.Core.Rest.Server.Http {
         /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"></see>.</param>
         /// <returns>true if <paramref name="item">item</paramref> is found in the <see cref="T:System.Collections.Generic.ICollection`1"></see>; otherwise, false.</returns>
         bool ICollection<PrefixedRoute>.Contains(PrefixedRoute item) {
-            return Contains(item.Prefix, item.Route);
+            return Contains(item.Route, item.Prefix);
         }
 
 
-        private bool Contains(string prefix, IWebServiceRoute route) {
-            return _prefixedRoutes.TryGetValue(prefix, out var list) && list.Contains(route);
+        private bool Contains(IWebServiceRoute route, string prefix = null) {
+            return _prefixedRoutes.TryGetValue(prefix ?? string.Empty, out var list) && list.Contains(route);
         }
 
         /// <summary>Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"></see> to an <see cref="T:System.Array"></see>, starting at a particular <see cref="T:System.Array"></see> index.</summary>
@@ -92,7 +92,7 @@ namespace DotLogix.Core.Rest.Server.Http {
 
             foreach(var prefixedRoute in _prefixedRoutes) {
                 foreach(var route in prefixedRoute.Value) {
-                    array[arrayIndex++] = new PrefixedRoute(prefixedRoute.Key, route);
+                    array[arrayIndex++] = new PrefixedRoute(route, prefixedRoute.Key);
                 }
             }
         }
@@ -111,44 +111,45 @@ namespace DotLogix.Core.Rest.Server.Http {
         }
 
         public RouteMatch FindBestMatch(HttpMethods httpMethod, string path, out IWebServiceRoute route) {
-            var bestPrefixLength = int.MinValue;
+            var bestMatchTotalLength = int.MinValue;
             RouteMatch bestMatch = null;
             IWebServiceRoute bestRoute = null;
 
             foreach(var prefixedRoute in _prefixedRoutes) {
-                var prefixLength = prefixedRoute.Key.Length;
-                if(bestPrefixLength > prefixLength)
-                    continue;
+                string unprefixedPath;
+                var matchLength = 0;
 
-                if(path.StartsWith(prefixedRoute.Key) == false)
-                    continue;
-                var unprefixedPath = path.Substring(prefixLength);
-                var overwrite = bestPrefixLength < prefixLength;
-                foreach(var webServiceRoute in prefixedRoute.Value) {
-                    if((webServiceRoute.AcceptedRequests & httpMethod) == 0)
+                if(string.IsNullOrEmpty(prefixedRoute.Key)) {
+                    unprefixedPath = path;
+                } else if(path.StartsWith(prefixedRoute.Key)) {
+                    unprefixedPath = path.Substring(prefixedRoute.Key.Length);
+                    matchLength = prefixedRoute.Key.Length;
+                } else continue;
+
+                foreach (var webServiceRoute in prefixedRoute.Value) {
+                    if ((webServiceRoute.AcceptedRequests & httpMethod) == 0)
                         continue;
 
-                    if(bestRoute != null) {
-                        if(bestRoute.Priority > webServiceRoute.Priority)
+                    var overwrite = false;
+                    if (bestRoute != null) {
+                        if (bestRoute.Priority > webServiceRoute.Priority)
                             continue;
                         overwrite |= bestRoute.Priority < webServiceRoute.Priority;
                     }
 
                     var match = webServiceRoute.Match(httpMethod, unprefixedPath);
-                    if(match.Success == false)
+                    if (match.Success == false)
                         continue;
-                    
-                    if(bestMatch != null) {
-                        if(bestMatch.Length > match.Length)
-                            continue;
-                        overwrite |= bestMatch.Length < match.Length;
-                    }
 
-                    if(overwrite) {
-                        bestPrefixLength = prefixLength;
-                        bestMatch = match;
-                        bestRoute = webServiceRoute;
-                    }
+                    matchLength += match.Length;
+                    overwrite |= bestMatchTotalLength < matchLength;
+
+                    if (overwrite == false)
+                        continue;
+
+                    bestMatchTotalLength = matchLength;
+                    bestMatch = match;
+                    bestRoute = webServiceRoute;
                 }
             }
 

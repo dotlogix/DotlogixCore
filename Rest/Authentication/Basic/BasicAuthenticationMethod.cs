@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Services.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Basic {
@@ -22,12 +23,12 @@ namespace DotLogix.Core.Rest.Authentication.Basic {
             _callbackAsync = callbackAsync;
         }
 
-        public override Task AuthenticateAsync(WebRequestResult webRequestResult, string data) {
+        public override Task AuthenticateAsync(WebServiceContext context, string data) {
             var dataSplit = StringExtensions.DecodeBase64(data).Split(':');
             if(dataSplit.Length == 2)
-                return _callbackAsync.Invoke(this, webRequestResult, dataSplit[0], dataSplit[1]);
+                return _callbackAsync.Invoke(this, context, dataSplit[0], dataSplit[1]);
 
-            SetInvalidFormatException(webRequestResult);
+            SetInvalidFormatException(context);
             return Task.CompletedTask;
         }
     }

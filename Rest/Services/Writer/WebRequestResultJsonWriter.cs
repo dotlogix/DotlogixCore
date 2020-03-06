@@ -13,22 +13,32 @@ using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
+using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services.Processors.Json;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {
     public class WebRequestResultJsonWriter : WebRequestResultWriterBase {
         public static IAsyncWebRequestResultWriter Instance { get; } = new WebRequestResultJsonWriter();
-        private WebRequestResultJsonWriter() { }
+        protected WebRequestResultJsonWriter() { }
 
+        protected override Task WriteResultAsync(WebServiceContext context) {
+            var formatterSettings = context.Settings.Get(WebServiceSettings.JsonFormatterSettings, JsonFormatterSettings.Idented);
 
-        protected override Task WriteResultAsync(IAsyncHttpResponse asyncHttpResponse, WebRequestResult webRequestResult) {
+            var webRequestResult = context.RequestResult;
+            var httpResponse = context.HttpResponse;
+
             if(webRequestResult.ReturnValue == null) {
-                asyncHttpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
+                httpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
                 return Task.CompletedTask;
             }
 
-            asyncHttpResponse.ContentType = MimeTypes.Application.Json;
-            return asyncHttpResponse.WriteToResponseStreamAsync(JsonNodes.ToJson(webRequestResult.ReturnValue));
+            httpResponse.ContentType = MimeTypes.Application.Json;
+            return httpResponse.WriteToResponseStreamAsync(JsonNodes.ToJson(webRequestResult.ReturnValue, webRequestResult.ReturnType, formatterSettings));
         }
+    }
+
+    public static class WebServiceSettings {
+        public const string JsonFormatterSettings = "jsonFormatterSettings";
     }
 }

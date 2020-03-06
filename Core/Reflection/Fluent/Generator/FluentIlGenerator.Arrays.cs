@@ -12,6 +12,9 @@ using System.Reflection.Emit;
 #endregion
 
 namespace DotLogix.Core.Reflection.Fluent.Generator {
+    /// <summary>
+    /// A fluent il generator
+    /// </summary>
     public partial class FluentIlGenerator {
         /// <summary>
         ///     Pushes an object reference to a new zero-based, one-dimensional array whose elements are of a specific type
@@ -137,7 +140,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         /// <summary>
         ///     Loads the address of the array element at a specified array index onto the top of the evaluation stack as type
-        ///     &(managed pointer).
+        ///     &amp;(managed pointer).
         /// </summary>
         public FluentIlGenerator Ldelema(Type type) {
             IlGenerator.Emit(OpCodes.Ldelema, type);

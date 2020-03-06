@@ -169,9 +169,29 @@ namespace DotLogix.Core.Diagnostics {
         /// Writes a warning message to the loggers
         /// </summary>
         public static void Warn(string message) {
-            if(Logger.IsLoggingDisabled(LogLevels.Warning))
+            if (Logger.IsLoggingDisabled(LogLevels.Warning))
                 return;
             var logMessage = CreateLogMessage(LogLevels.Warning, message, 2);
+            Logger.Log(logMessage);
+        }
+
+        /// <summary>
+        /// Writes a warning message to the loggers
+        /// </summary>
+        public static void Warn(Exception exception) {
+            if (Logger.IsLoggingDisabled(LogLevels.Warning))
+                return;
+
+            if (exception is AggregateException ae) {
+                foreach (var inner in ae.InnerExceptions)
+                    Warn(inner);
+            } else if (exception.InnerException != null)
+                Warn(exception.InnerException);
+
+
+            var message = exception.Message + "\n" + exception.StackTrace;
+
+            var logMessage = CreateLogMessage(LogLevels.Warning, message, exception.TargetSite);
             Logger.Log(logMessage);
         }
 

@@ -1,20 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(MSBuildThisFileFullPath)\..\..\assemblies\BuildTasks\BuildTasks.dll" />
-  
-	<Target Name="BeforeBuildActions" BeforeTargets="BeforeBuild">
-		<GetCurrentBuildVersion BaseVersion="$(Version)" PackageId="$(PackageId)">
-			<Output TaskParameter="BuildVersion" PropertyName="CurrentBuildVersion" />
-			<Output TaskParameter="PackageVersion" PropertyName="CurrentPackageVersion" />
-		</GetCurrentBuildVersion>
-		<PropertyGroup>
-		  <PackageVersion>$(CurrentPackageVersion)</PackageVersion>
-		  <AssemblyVersion>$(CurrentBuildVersion)</AssemblyVersion>
-		  <FileVersion>$(CurrentBuildVersion)</FileVersion>
-		  <Version>$(CurrentBuildVersion)</Version>
-		</PropertyGroup>
-	</Target>
   <PropertyGroup>
-	  <TargetFrameworks>net45</TargetFrameworks>
+	<TargetFrameworks>net45</TargetFrameworks>
     <AssemblyName>DotLogix.Infrastructure.EntityFramework6</AssemblyName>
     <RootNamespace>DotLogix.Architecture.Infrastructure.EntityFramework</RootNamespace>
     <Company>DotLogix</Company>

@@ -14,5 +14,5 @@ using DotLogix.Core.Rest.Services.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Token {
-    public delegate Task ValidateTokenAsyncCallback(TokenAuthenticationMethod authenticationMethod, WebServiceContext context, Guid token);
+    public delegate Task ValidateTokenAsyncCallback(TokenAuthenticationMethod authenticationMethod, WebRequestContext context, Guid token);
 }

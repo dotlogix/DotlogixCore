@@ -33,8 +33,8 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
             _signingAlgorithms = algorithms.ToDictionary(a => a.Name, StringComparer.OrdinalIgnoreCase);
         }
 
-        public override Task AuthenticateAsync(WebServiceContext context, string data) {
-            var formatterSettings = context.Settings.Get(WebServiceSettings.JsonFormatterSettings, JsonFormatterSettings.Idented);
+        public override Task AuthenticateAsync(WebRequestContext context, string data) {
+            var formatterSettings = context.Settings.Get(WebServiceSettings.JsonNodesFormatterSettings, JsonFormatterSettings.Idented);
 
             var result = JsonWebTokens.TryDeserialize<TPayload>(data, out var token, name => _signingAlgorithms.GetValue(name), formatterSettings);
             if(result == JsonWebTokenResult.Success)

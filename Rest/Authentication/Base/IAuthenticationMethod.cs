@@ -16,6 +16,6 @@ namespace DotLogix.Core.Rest.Authentication.Base {
         string Name { get; }
         string[] SupportedDataFormats { get; }
 
-        Task AuthenticateAsync(WebServiceContext context, string authorizationData);
+        Task AuthenticateAsync(WebRequestContext context, string authorizationData);
     }
 }

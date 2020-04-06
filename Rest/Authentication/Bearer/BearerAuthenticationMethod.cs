@@ -25,7 +25,7 @@ namespace DotLogix.Core.Rest.Authentication.Bearer {
         public BearerAuthenticationMethod(ValidateBearerAsyncCallback callbackAsync) : this(callbackAsync, "[token]") { }
 
 
-        public override Task AuthenticateAsync(WebServiceContext context, string data) {
+        public override Task AuthenticateAsync(WebRequestContext context, string data) {
             return _callbackAsync.Invoke(this, context, data);
         }
     }

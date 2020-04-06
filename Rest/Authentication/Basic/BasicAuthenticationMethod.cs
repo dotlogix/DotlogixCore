@@ -23,7 +23,7 @@ namespace DotLogix.Core.Rest.Authentication.Basic {
             _callbackAsync = callbackAsync;
         }
 
-        public override Task AuthenticateAsync(WebServiceContext context, string data) {
+        public override Task AuthenticateAsync(WebRequestContext context, string data) {
             var dataSplit = StringExtensions.DecodeBase64(data).Split(':');
             if(dataSplit.Length == 2)
                 return _callbackAsync.Invoke(this, context, dataSplit[0], dataSplit[1]);

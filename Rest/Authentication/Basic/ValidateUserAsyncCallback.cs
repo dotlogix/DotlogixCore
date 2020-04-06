@@ -13,5 +13,5 @@ using DotLogix.Core.Rest.Services.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Basic {
-    public delegate Task ValidateUserAsyncCallback(BasicAuthenticationMethod authenticationMethod, WebServiceContext context, string username, string password);
+    public delegate Task ValidateUserAsyncCallback(BasicAuthenticationMethod authenticationMethod, WebRequestContext context, string username, string password);
 }

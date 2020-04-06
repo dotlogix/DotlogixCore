@@ -22,7 +22,7 @@ namespace DotLogix.Core.Rest.Authentication.Token {
             _callbackAsync = callbackAsync;
         }
 
-        public override Task AuthenticateAsync(WebServiceContext context, string data) {
+        public override Task AuthenticateAsync(WebRequestContext context, string data) {
             if(Guid.TryParseExact(data, "D", out var token))
                 return _callbackAsync.Invoke(this, context, token);
 

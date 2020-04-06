@@ -24,13 +24,14 @@ namespace DotLogix.Core.Rest.Authentication.Base {
 
         public string Name { get; }
         public string[] SupportedDataFormats { get; }
-        public abstract Task AuthenticateAsync(WebServiceContext context, string data);
+        public abstract Task AuthenticateAsync(WebRequestContext context, string data);
 
-        public void SetUnauthorizedException(WebServiceContext context, string message) {
-            context.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));
+        public void SetUnauthorizedException(WebRequestContext context, string message) {
+            var exception = new RestException(HttpStatusCodes.ClientError.Unauthorized, message);
+            context.SetException(exception, HttpStatusCodes.ClientError.Unauthorized);
         }
 
-        public void SetInvalidFormatException(WebServiceContext context) {
+        public void SetInvalidFormatException(WebRequestContext context) {
             var messageBuilder = new StringBuilder();
             messageBuilder.AppendLine("The data you provided for authorization is in an invalid format.");
             messageBuilder.Append(SupportedDataFormats.Length != 1 ? "Supported formats are:" : "The supported format is:");

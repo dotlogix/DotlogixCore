@@ -13,5 +13,5 @@ using DotLogix.Core.Rest.Services.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Bearer {
-    public delegate Task ValidateBearerAsyncCallback(BearerAuthenticationMethod authenticationMethod, WebServiceContext context, string token);
+    public delegate Task ValidateBearerAsyncCallback(BearerAuthenticationMethod authenticationMethod, WebRequestContext context, string token);
 }

@@ -77,7 +77,7 @@ namespace DotLogix.Core.Extensions {
             return Retrieve<object, T>(cache, key);
         }
 
-        /// <summary>Trys to retrieve a value by its key.</summary>
+        /// <summary>Tries to retrieve a value by its key.</summary>
         public static bool TryRetrieve<T>(this ICache<object, object> cache, object key, out T value)
         {
             return TryRetrieve<object, T>(cache, key, out value);
@@ -111,7 +111,7 @@ namespace DotLogix.Core.Extensions {
             return cache.Retrieve(key) is TValue value ? value : default;
         }
 
-        /// <summary>Trys to retrieve a value by its key.</summary>
+        /// <summary>Tries to retrieve a value by its key.</summary>
         public static bool TryRetrieve<TKey, TValue>(this ICache<TKey, object> cache, TKey key, out TValue value)
         {
             if (cache.TryRetrieve(key, out var objValue) && objValue is TValue typedValue)

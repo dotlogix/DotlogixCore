@@ -52,7 +52,9 @@ namespace DotLogix.Core.Caching {
         ///     The policy used to check if the value exceed, or null to keep the value until the cache is
         ///     disposed
         /// </param>
-        void Store(TKey key, TValue value, ICachePolicy policy = null);
+        /// <param name="preserveContext">Determines if dependencies and associations should be preserved</param>
+        CacheItem<TKey, TValue> Store(TKey key, TValue value, ICachePolicy policy = null, bool preserveContext = true);
+
 
         /// <summary>
         ///     Retrieves a value by its key. Returns default if the key is not present
@@ -60,9 +62,19 @@ namespace DotLogix.Core.Caching {
         TValue Retrieve(TKey key, TValue defaultValue = default);
 
         /// <summary>
-        ///     Trys to retrieve a value by its key.
+        ///     Tries to retrieve a value by its key.
         /// </summary>
         bool TryRetrieve(TKey key, out TValue value);
+
+        /// <summary>
+        ///     Retrieves a cache item by its key. Returns null if the key is not present
+        /// </summary>
+        CacheItem<TKey, TValue> RetrieveItem(TKey key);
+
+        /// <summary>
+        ///     Tries to retrieve a cache item by its key.
+        /// </summary>
+        bool TryRetrieveItem(TKey key, out CacheItem<TKey, TValue> item);
 
         /// <summary>
         ///     Retrieves a value by its key. Creates one if the key is not present
@@ -90,7 +102,7 @@ namespace DotLogix.Core.Caching {
         bool Discard(TKey key);
 
         /// <summary>
-        ///     Forces a revalidation of all items in the cache and removes exeeded items
+        ///     Forces a re validation of all items in the cache and removes exceeded items
         /// </summary>
         void Cleanup();
 
@@ -103,5 +115,20 @@ namespace DotLogix.Core.Caching {
         ///     Occures when items are discarded in the cache
         /// </summary>
         event EventHandler<CacheItemsDiscardedEventArgs<TKey, TValue>> ItemsDiscarded;
+
+        /// <summary>
+        ///     Removes a value by its key
+        /// </summary>
+        bool DiscardChildren(TKey key);
+
+        /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        CacheItem<TKey, TValue> RetrieveOrCreateItem(TKey key, Func<TKey, TValue> createFunc, ICachePolicy policy = null, bool updatePolicy = true);
+
+        /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        CacheItem<TKey, TValue> RetrieveOrCreateItem(TKey key, TValue value, ICachePolicy policy = null, bool updatePolicy = true);
     }
 }

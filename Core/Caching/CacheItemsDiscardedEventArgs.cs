@@ -7,27 +7,35 @@
 // ==================================================
 
 #region
+using System;
 using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Caching {
     /// <summary>
-    /// An event args with the discarded items
+    /// EventArgs used for discarded cache items
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     public class CacheItemsDiscardedEventArgs<TKey, TValue> {
         /// <summary>
+        /// The reason why the cache items were discarded
+        /// </summary>
+        public CacheItemDiscardReason Reason { get; }
+
+        /// <summary>
         /// The discarded items
         /// </summary>
-        public IReadOnlyList<CacheItem<TKey, TValue>> DiscardedItems { get; }
+        public IReadOnlyList<CacheItemDiscardedEventArgs<TKey, TValue>> DiscardedItems { get; }
 
         /// <summary>
         /// Creates a new instance of <see cref="CacheItemsDiscardedEventArgs{TKey,TValue}"/>
         /// </summary>
         /// <param name="discardedItems"></param>
-        public CacheItemsDiscardedEventArgs(IReadOnlyList<CacheItem<TKey, TValue>> discardedItems) {
+        /// <param name="reason"></param>
+        public CacheItemsDiscardedEventArgs(IReadOnlyList<CacheItemDiscardedEventArgs<TKey, TValue>> discardedItems, CacheItemDiscardReason reason = CacheItemDiscardReason.Expired) {
             DiscardedItems = discardedItems;
+            Reason = reason;
         }
     }
 }

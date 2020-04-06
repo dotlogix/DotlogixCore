@@ -7,12 +7,12 @@
 // ==================================================
 
 namespace DotLogix.Core.Rest.Services.Descriptors {
-    public abstract class WebRequestProcessorDescriptorBase : IWebRequestProcessorDescriptor {
-        protected WebRequestProcessorDescriptorBase(string name) {
+    public abstract class RouteDescriptorBase : IRouteDescriptor {
+        protected RouteDescriptorBase(string name) {
             Name = name;
         }
 
-        protected WebRequestProcessorDescriptorBase() {
+        protected RouteDescriptorBase() {
             Name = GetType().Name;
         }
 

@@ -19,30 +19,36 @@ using DotLogix.Core.Rest.Services.Exceptions;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {
-    public class WebRequestResultWriterBase : IAsyncWebRequestResultWriter {
-        public async Task WriteAsync(WebServiceContext context) {
+    public class WebRequestResultWriter : IAsyncWebRequestResultWriter {
+        public static IAsyncWebRequestResultWriter Instance { get; } = new WebRequestResultWriter();
+
+        /// <inheritdoc />
+        protected WebRequestResultWriter() { }
+
+        public virtual async Task WriteAsync(WebRequestContext context) {
             var response = context.HttpResponse;
-            if(response.IsCompleted)
+            if (response.IsCompleted)
                 return;
 
-            var requestResult = context.RequestResult;
+            var requestResult = context.RequestResult as IWebRequestObjectResult;
+            if(requestResult == null)
+                throw new ArgumentException($"This result writer accepts only values of type \"{nameof(IWebRequestObjectResult)}\"");
 
-            if(requestResult.Succeed)
-                await WriteResultAsync(context);
-            else
-                await WriteExceptionAsync(context);
-
-            if(requestResult.CustomStatusCode != null)
-                response.StatusCode = requestResult.CustomStatusCode;
+            if (requestResult.Exception.IsDefined) {
+                await WriteExceptionAsync(context, requestResult.Exception.Value);
+            } else if(requestResult.ReturnValue.IsDefined) {
+                await WriteResultAsync(context, requestResult.ReturnValue.Value);
+            }
 
             await response.CompleteAsync();
         }
 
-        protected virtual Task WriteExceptionAsync(WebServiceContext context) {
+        protected virtual Task WriteExceptionAsync(WebRequestContext context, Exception exception) {
             var httpResponse = context.HttpResponse;
-            var webRequestResult = context.RequestResult;
+            if(exception == null)
+                throw new ArgumentNullException(nameof(exception));
 
-            var restException = GetRestExceptionRecursive(webRequestResult.Exception);
+            var restException = GetRestExceptionRecursive(exception);
             if(httpResponse.StatusCode == HttpStatusCodes.Success.Ok) {
                 httpResponse.StatusCode = restException != null
                                                    ? restException.ErrorCode
@@ -55,24 +61,23 @@ namespace DotLogix.Core.Rest.Services.Writer {
                 var sb = new StringBuilder();
                 sb.AppendLine(restException.ToString());
                 sb.AppendLine();
-                sb.AppendLine(webRequestResult.Exception.ToString());
+                sb.AppendLine(exception.ToString());
                 message = sb.ToString();
             } else
-                message = webRequestResult.Exception.ToString();
+                message = exception.ToString();
             return httpResponse.WriteToResponseStreamAsync(message);
         }
 
-        protected virtual Task WriteResultAsync(WebServiceContext context) {
+        protected virtual Task WriteResultAsync(WebRequestContext context, object value) {
             var httpResponse = context.HttpResponse;
-            var webRequestResult = context.RequestResult;
-
-            if (webRequestResult.ReturnValue == null) {
+            
+            if (value == null) {
                 httpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
                 return Task.CompletedTask;
             }
 
             httpResponse.ContentType = MimeTypes.Text.Plain;
-            return httpResponse.WriteToResponseStreamAsync(webRequestResult.ReturnValue.ToString());
+            return httpResponse.WriteToResponseStreamAsync(value.ToString());
         }
 
 

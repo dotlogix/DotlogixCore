@@ -11,7 +11,6 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Attributes;
@@ -20,37 +19,27 @@ using DotLogix.Core.Rest.Services.Attributes.Events;
 using DotLogix.Core.Rest.Services.Attributes.ResultWriter;
 using DotLogix.Core.Rest.Services.Attributes.Routes;
 using DotLogix.Core.Rest.Services.Context;
-using DotLogix.Core.Rest.Services.Descriptors;
-using DotLogix.Core.Rest.Services.Processors.Json;
-using DotLogix.Core.Rest.Services.Writer;
 using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
-    public static class WebServiceHostExtensions {
-        public static WebServiceHost UseJson(this WebServiceHost host, JsonFormatterSettings settings) {
-            host.Settings.Set(WebServiceSettings.JsonFormatterSettings, settings);
-            host.Router.DefaultResultWriter = WebRequestResultJsonWriter.Instance;
-            host.GlobalPreProcessors.Add(ParseJsonBodyPreProcessor.Instance);
-            return host;
-        }
-    }
-
     public class WebServiceHost {
         public ISettings Settings { get; } = new Settings();
         public AsyncWebRequestRouter Router { get; }
         private int _currentRouteIndex;
         public IAsyncHttpServer Server { get; }
-        public WebRequestProcessorCollection GlobalPreProcessors => Router.GlobalPreProcessors;
-        public WebRequestProcessorCollection GlobalPostProcessors => Router.GlobalPostProcessors;
-        public WebServiceEventCollection ServerEvents => Router.ServerEvents;
+        public WebRequestProcessorCollection GlobalPreProcessors => Router.PreProcessors;
+        public WebRequestProcessorCollection GlobalPostProcessors => Router.PostProcessors;
+        public WebServiceEventCollection ServerEvents => Router.Events;
+        public WebServiceCollection Services { get; }
 
-        public WebServiceHost(Configuration configuration = null) {
+        public WebServiceHost(HttpServerConfiguration configuration = null) {
             Router = new AsyncWebRequestRouter();
             Server = new AsyncHttpServer(Router, configuration);
+            Services = new WebServiceCollection();
         }
 
-        public WebServiceHost(string urlPrefix, Configuration configuration = null) : this(configuration) {
+        public WebServiceHost(string urlPrefix, HttpServerConfiguration configuration = null) : this(configuration) {
             Server.AddServerPrefix(urlPrefix);
         }
 
@@ -59,7 +48,7 @@ namespace DotLogix.Core.Rest.Services {
         }
 
         public void Start() {
-            Log.Info($"HttpServer started with {Router.RegisteredRoutesCount} routes");
+            Log.Info($"HttpServer started with {Router.Routes.Count} routes");
             Server.Start();
         }
 
@@ -71,15 +60,18 @@ namespace DotLogix.Core.Rest.Services {
 
         #region Events
         public Task TriggerEventAsync(string name, WebServiceEventArgs eventArgs) {
-            if(Router.ServerEvents.TryGet(name, out var webServiceEvent) == false)
+            if(Router.Events.TryGet(name, out var webServiceEvent) == false)
                 throw new ArgumentException($"Event {name} is not defined", nameof(name));
 
-            return webServiceEvent.TriggerAsync(this, eventArgs);
+            return webServiceEvent.DispatchAsync(this, eventArgs);
         }
         #endregion
 
         #region Services
         public void RegisterService(IWebService serviceInstance) {
+            if(Services.TryAdd(serviceInstance) == false)
+                throw new ArgumentException($"A service with name {serviceInstance.Name} is already registered. Choose another name");
+
             var serviceType = serviceInstance.GetType();
             var methods = serviceType.GetMethods();
             var count = 0;
@@ -101,16 +93,16 @@ namespace DotLogix.Core.Rest.Services {
                     serviceRoute.PostProcessors.Add(postProcessorAttribute.CreateProcessor());
 
                 foreach(var descriptorAttribute in methodInfo.GetCustomAttributes<DescriptorAttribute>())
-                    serviceRoute.RequestProcessor.Descriptors.Add(descriptorAttribute.CreateDescriptor());
+                    serviceRoute.Descriptors.Add(descriptorAttribute.CreateDescriptor());
                 
-                serviceRoute.RequestProcessor.Descriptors.Add(new SettingsDescriptor(Settings));
+                serviceRoute.Descriptors.Add(new SettingsDescriptor(Settings));
 
                 var resultWriterAttribute = methodInfo.GetCustomAttribute<RouteResultWriterAttribute>();
                 if(resultWriterAttribute != null)
                     serviceRoute.WebRequestResultWriter = resultWriterAttribute.CreateResultWriter();
 
 
-                Router.ServerRoutes.Add(serviceRoute, serviceInstance.RoutePrefix ?? "");
+                Router.Routes.Add(serviceRoute, serviceInstance.RoutePrefix ?? "");
                 count++;
             }
             if(count > 0)
@@ -126,10 +118,10 @@ namespace DotLogix.Core.Rest.Services {
 
                 var serviceEvent = eventAttribute.CreateEvent();
 
-                if(Router.ServerEvents.TryAdd(serviceEvent) == false)
+                if(Router.Events.TryAdd(serviceEvent) == false)
                     throw new InvalidOperationException($"An event with name {serviceEvent.Name} is already defined");
 
-                async void TriggerEvent(object sender, WebServiceEventArgs args) => await serviceEvent.TriggerAsync(sender, args);
+                async void TriggerEvent(object sender, WebServiceEventArgs args) => await serviceEvent.DispatchAsync(sender, args);
 
                 eventInfo.GetAddMethod().CreateDynamicInvoke().Invoke(serviceInstance, (EventHandler<WebServiceEventArgs>)TriggerEvent);
                 count++;
@@ -143,12 +135,5 @@ namespace DotLogix.Core.Rest.Services {
             RegisterService(new TService());
         }
         #endregion
-    }
-
-    public class SettingsDescriptor : WebRequestProcessorDescriptorBase {
-        public IReadOnlySettings Settings { get; }
-        public SettingsDescriptor(IReadOnlySettings settings) {
-            Settings = settings;
-        }
     }
 }

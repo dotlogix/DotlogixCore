@@ -57,7 +57,7 @@ namespace DotLogix.Core.Rest.Services.Sessions {
         public event EventHandler<SessionDiscardedEventArgs<TSession>> SessionsDiscarded;
 
         private void _activeSessions_ItemsDiscarded(object sender, CacheItemsDiscardedEventArgs<Guid, TSession> e) {
-            SessionsDiscarded?.Invoke(this, new SessionDiscardedEventArgs<TSession>(e.DiscardedItems.Select(i => i.Value).ToList()));
+            SessionsDiscarded?.Invoke(this, new SessionDiscardedEventArgs<TSession>(e.DiscardedItems.Select(i => i.Item.Value).ToList()));
         }
     }
 }

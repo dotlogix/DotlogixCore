@@ -17,6 +17,6 @@ namespace DotLogix.Core.Rest.Server.Http {
         string Name { get; }
 
         void Subscribe(IAsyncHttpContext context, IWebServiceRoute route, AsyncWebRequestRouter router);
-        Task TriggerAsync(object sender, WebServiceEventArgs eventArgs);
+        Task DispatchAsync(object sender, WebServiceEventArgs eventArgs);
     }
 }

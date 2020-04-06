@@ -14,6 +14,7 @@ using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Routes;
 using DotLogix.Core.Rest.Services.Attributes.Http;
+using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Processors;
 using DotLogix.Core.Rest.Services.Processors.Base;
 #endregion
@@ -37,6 +38,7 @@ namespace DotLogix.Core.Rest.Services.Attributes.Routes {
             var acceptedMethods = GetAcceptedHttpMethods(dynamicInvoke);
 
             var route = CreateRoute(routeIndex, pattern, acceptedMethods, requestProcessor);
+            route.Descriptors.Add(new MethodDescriptor(dynamicInvoke));
             route.IsRooted |= IsRooted;
             RegisterInitialProcessors(route);
             return route;

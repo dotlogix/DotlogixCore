@@ -23,12 +23,12 @@ namespace DotLogix.Core.Rest.Services.Attributes.Descriptors {
             if(_property == null)
                 throw new InvalidOperationException($"Type {singletonHolderType.GetFriendlyName()} does not have a static property with the name {propertyName}");
 
-            if(_property.ValueType.IsAssignableTo(typeof(IWebRequestProcessorDescriptor)))
-                throw new InvalidOperationException($"The type of the property {singletonHolderType.GetFriendlyName()}.{propertyName} is not assignable to {nameof(IWebRequestProcessorDescriptor)}");
+            if(_property.ValueType.IsAssignableTo(typeof(IRouteDescriptor)))
+                throw new InvalidOperationException($"The type of the property {singletonHolderType.GetFriendlyName()}.{propertyName} is not assignable to {nameof(IRouteDescriptor)}");
         }
 
-        public override IWebRequestProcessorDescriptor CreateDescriptor() {
-            return _property.GetValue() as IWebRequestProcessorDescriptor;
+        public override IRouteDescriptor CreateDescriptor() {
+            return _property.GetValue() as IRouteDescriptor;
         }
     }
 }

@@ -7,6 +7,8 @@
 // ==================================================
 
 #region
+using System;
+using System.IO;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http;
@@ -18,27 +20,21 @@ using DotLogix.Core.Rest.Services.Processors.Json;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {
-    public class WebRequestResultJsonWriter : WebRequestResultWriterBase {
-        public static IAsyncWebRequestResultWriter Instance { get; } = new WebRequestResultJsonWriter();
-        protected WebRequestResultJsonWriter() { }
-
-        protected override Task WriteResultAsync(WebServiceContext context) {
-            var formatterSettings = context.Settings.Get(WebServiceSettings.JsonFormatterSettings, JsonFormatterSettings.Idented);
-
-            var webRequestResult = context.RequestResult;
+    public class JsonNodesWebRequestResultWriter : WebRequestResultWriter {
+        public static IAsyncWebRequestResultWriter Instance { get; } = new JsonNodesWebRequestResultWriter();
+        protected JsonNodesWebRequestResultWriter() { }
+        
+        protected override async Task WriteResultAsync(WebRequestContext context, object value) {
+            var formatterSettings = context.Settings.Get(WebServiceSettings.JsonNodesFormatterSettings, JsonFormatterSettings.Idented);
             var httpResponse = context.HttpResponse;
-
-            if(webRequestResult.ReturnValue == null) {
+            if(value == null) {
                 httpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
-                return Task.CompletedTask;
+                return;
             }
 
             httpResponse.ContentType = MimeTypes.Application.Json;
-            return httpResponse.WriteToResponseStreamAsync(JsonNodes.ToJson(webRequestResult.ReturnValue, webRequestResult.ReturnType, formatterSettings));
+            var json = JsonNodes.ToJson(value, formatterSettings);
+            await httpResponse.WriteToResponseStreamAsync(json);
         }
-    }
-
-    public static class WebServiceSettings {
-        public const string JsonFormatterSettings = "jsonFormatterSettings";
     }
 }

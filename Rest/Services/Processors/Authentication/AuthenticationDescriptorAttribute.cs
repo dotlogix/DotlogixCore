@@ -19,7 +19,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
             RequiresAuthentication = requiresAuthentication;
         }
 
-        public override IWebRequestProcessorDescriptor CreateDescriptor() {
+        public override IRouteDescriptor CreateDescriptor() {
             return new AuthenticationDescriptor(RequiresAuthentication);
         }
     }

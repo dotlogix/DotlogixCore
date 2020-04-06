@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
@@ -24,6 +25,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
     public class AsyncHttpResponse : IAsyncHttpResponse {
         public const int DefaultChunkSize = 2_097_152; // 2MiB;
         private readonly IParameterParser _parameterParser;
+        object IAsyncHttpResponse.OriginalResponse => OriginalResponse;
         public HttpListenerResponse OriginalResponse { get; }
 
         private AsyncHttpResponse(HttpListenerResponse originalResponse, IParameterParser parameterParser) {

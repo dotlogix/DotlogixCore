@@ -14,20 +14,20 @@ using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Descriptors {
-    public class WebRequestProcessorDescriptorCollection : Collection<IWebRequestProcessorDescriptor> {
-        public IEnumerable<TDescriptor> GetCustomDescriptors<TDescriptor>() where TDescriptor : IWebRequestProcessorDescriptor {
+    public class RouteDescriptorCollection : Collection<IRouteDescriptor> {
+        public IEnumerable<TDescriptor> GetCustomDescriptors<TDescriptor>() where TDescriptor : IRouteDescriptor {
             return Items.OfType<TDescriptor>();
         }
 
-        public TDescriptor GetCustomDescriptor<TDescriptor>() where TDescriptor : IWebRequestProcessorDescriptor {
+        public TDescriptor GetCustomDescriptor<TDescriptor>() where TDescriptor : IRouteDescriptor {
             return Items.OfType<TDescriptor>().FirstOrDefault();
         }
 
-        public TDescriptor GetCustomDescriptor<TDescriptor>(string name, StringComparison comparison = StringComparison.Ordinal) where TDescriptor : IWebRequestProcessorDescriptor {
+        public TDescriptor GetCustomDescriptor<TDescriptor>(string name, StringComparison comparison = StringComparison.Ordinal) where TDescriptor : IRouteDescriptor {
             return Items.OfType<TDescriptor>().FirstOrDefault(d => string.Equals(d.Name, name, comparison));
         }
 
-        public IWebRequestProcessorDescriptor GetCustomDescriptor(string name, StringComparison comparison = StringComparison.Ordinal) {
+        public IRouteDescriptor GetCustomDescriptor(string name, StringComparison comparison = StringComparison.Ordinal) {
             return Items.FirstOrDefault(d => string.Equals(d.Name, name, comparison));
         }
     }

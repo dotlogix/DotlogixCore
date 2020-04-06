@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,19 +28,29 @@ using HttpStatusCode = DotLogix.Core.Rest.Server.Http.State.HttpStatusCode;
 namespace DotLogix.Core.Rest.Server.Http {
     public class AsyncHttpServer : IAsyncHttpServer {
         private const string ServerDisposedMessage = "Server has been disposed already";
-        private static readonly Dictionary<string, HttpMethods> ChachedMethods = Enum.GetValues(typeof(HttpMethods)).Cast<HttpMethods>().ToDictionary(m => m.ToString(), StringComparer.OrdinalIgnoreCase);
+
+        private static readonly Dictionary<string, HttpMethods> CachedMethods = Enum.GetValues(typeof(HttpMethods))
+                                                                                     .Cast<HttpMethods>()
+                                                                                     .ToDictionary(m => m.ToString(), StringComparer.OrdinalIgnoreCase);
+
         private readonly HttpListener _httpListener = new HttpListener();
         private readonly IAsyncHttpRequestHandler _requestHandler;
+        private readonly IAsyncHttpWebSocketRequestHandler _webSocketRequestHandler;
         private SemaphoreSlim _requestSemaphore;
         private CancellationTokenSource _serverShutdownSource;
         public bool IsDisposed { get; private set; }
 
-        public AsyncHttpServer(IAsyncHttpRequestHandler requestHandler, Configuration configuration = null) {
-            Configuration = configuration ?? Configuration.Default;
-            _requestHandler = requestHandler ?? throw new ArgumentNullException(nameof(requestHandler));
+        public AsyncHttpServer(IAsyncHttpRequestHandler requestHandler, IAsyncHttpWebSocketRequestHandler webSocketRequestHandler, HttpServerConfiguration configuration = null) {
+            Configuration = configuration ?? HttpServerConfiguration.Default;
+            _requestHandler = requestHandler;
+            _webSocketRequestHandler = webSocketRequestHandler;
+        }
+        public AsyncHttpServer(IAsyncHttpRequestHandler requestHandler, HttpServerConfiguration configuration = null) : this(requestHandler, null, configuration) {
+        }
+        public AsyncHttpServer(IAsyncHttpWebSocketRequestHandler webSocketRequestHandler, HttpServerConfiguration configuration = null) : this(null, webSocketRequestHandler, configuration) {
         }
 
-        public Configuration Configuration { get; }
+        public HttpServerConfiguration Configuration { get; }
         public bool IsRunning { get; private set; }
 
         public void Start() {
@@ -89,7 +100,16 @@ namespace DotLogix.Core.Rest.Server.Http {
         }
 
         private async void HandleRequestsAsync() {
-            while(IsRunning) {
+            void ReleaseSemaphore(Task task) {
+                try {
+                    _requestSemaphore.Release();
+                } catch (Exception e) {
+                    if (IsRunning)
+                        Log.Error(e);
+                }
+            }
+
+            while (IsRunning) {
                 try {
                     await _requestSemaphore.WaitAsync(_serverShutdownSource.Token);
                 } catch(OperationCanceledException e) {
@@ -100,7 +120,22 @@ namespace DotLogix.Core.Rest.Server.Http {
 
                 try {
                     var context = await _httpListener.GetContextAsync().ConfigureAwait(false);
-                    HandleRequestAsync(context).ConfigureAwait(false);
+                    if(IsSupported(context) == false) {
+                        SendRequestTypeNotSupported(context);
+                        return;
+                    }
+
+
+
+                    var task = context.Request.IsWebSocketRequest
+                               ? HandleWebSocketRequestAsync(context)
+                               : HandleRequestAsync(context);
+
+#pragma warning disable 4014
+                    task.ContinueWith(ReleaseSemaphore)
+                        .ConfigureAwait(false);
+#pragma warning restore 4014
+
                 } catch(HttpListenerException e) {
                     if(IsRunning == false)
                         continue;
@@ -109,26 +144,56 @@ namespace DotLogix.Core.Rest.Server.Http {
             }
         }
 
+        private async Task HandleWebSocketRequestAsync(HttpListenerContext originalContext) {
+            IAsyncHttpWebSocketRequest webSocketRequest = null;
+
+            try {
+                string selectedProtocol = null;
+
+                var requestedProtocols = originalContext.Request.Headers.GetValues("Sec-WebSocket-Protocol");
+                var supportedSubProtocols = _webSocketRequestHandler.SupportedSubProtocols;
+                if(requestedProtocols == null || requestedProtocols.Length == 0) {
+                    selectedProtocol = supportedSubProtocols.FirstOrDefault();
+                } else {
+                    selectedProtocol = supportedSubProtocols.FirstOrDefault(supportedSubProtocols.Contains);
+                    if(selectedProtocol == null) {
+                        SendProtocolNotSupported(originalContext);
+                        return;
+                    }
+                }
+
+                var originalWebSocketContext = await originalContext.AcceptWebSocketAsync(selectedProtocol);
+                webSocketRequest = CreateContext(originalWebSocketContext);
+
+                await _webSocketRequestHandler.HandleRequestAsync(webSocketRequest);
+            } catch(Exception e) {
+                if (IsRunning)
+                    Log.Error(e);
+                try {
+                    webSocketRequest?.Dispose();
+                } catch(Exception ex) {
+                    if(IsRunning)
+                        Log.Error(ex);
+                }
+            }
+        }
+
         private async Task HandleRequestAsync(HttpListenerContext originalContext) {
-            IAsyncHttpContext httpContext;
+            IAsyncHttpContext httpContext = null;
+
             try {
                 httpContext = CreateContext(originalContext);
-            } catch(Exception e) {
-                if(IsRunning)
-                    Log.Error(e);
-                return;
-            }
+                var response = httpContext.Response;
 
-            var response = httpContext.Response;
-            try {
                 await _requestHandler.HandleRequestAsync(httpContext);
                 if((response.IsCompleted == false) && (httpContext.PreventAutoSend == false))
                     await response.CompleteAsync();
             } catch(Exception e) {
                 Log.Error(e);
-                await SendErrorMessageAsync(response, e);
+                if(httpContext != null)
+                    await SendErrorMessageAsync(httpContext.Response, e);
             } finally {
-                httpContext.Dispose();
+                httpContext?.Dispose();
                 try {
                     _requestSemaphore.Release();
                 } catch(Exception e) {
@@ -138,18 +203,40 @@ namespace DotLogix.Core.Rest.Server.Http {
             }
         }
 
-        private IAsyncHttpContext CreateContext(HttpListenerContext originalContext) {
+        #region Create
+
+        private AsyncHttpContext CreateContext(HttpListenerContext originalContext) {
             var request = CreateRequest(originalContext);
             var response = CreateResponse(originalContext);
             return new AsyncHttpContext(this, request, response);
         }
-
+        private AsyncHttpWebSocketRequest CreateContext(HttpListenerWebSocketContext originalContext) {
+            return AsyncHttpWebSocketRequest.Create(originalContext, Configuration.ParameterParser ?? PrimitiveParameterParser.Default);
+        }
         private AsyncHttpResponse CreateResponse(HttpListenerContext originalContext) {
-            return AsyncHttpResponse.Create(originalContext.Response, Configuration.ParameterParser ?? PrimitiveParameterParser.Instance);
+            return AsyncHttpResponse.Create(originalContext.Response, Configuration.ParameterParser ?? PrimitiveParameterParser.Default);
+        }
+        private AsyncHttpRequest CreateRequest(HttpListenerContext originalContext) {
+            return AsyncHttpRequest.Create(originalContext.Request, Configuration.ParameterParser ?? PrimitiveParameterParser.Default);
         }
 
-        private AsyncHttpRequest CreateRequest(HttpListenerContext originalContext) {
-            return AsyncHttpRequest.Create(originalContext.Request, Configuration.ParameterParser ?? PrimitiveParameterParser.Instance);
+        #endregion
+
+        #region Send
+
+        private static void SendBadRequest(HttpListenerContext context, string message = null) {
+            var badRequest = HttpStatusCodes.ClientError.BadRequest;
+            context.Response.StatusCode = badRequest.Code;
+            context.Response.StatusDescription = message == null
+                                                 ? badRequest.Description
+                                                 : $"{badRequest.Description} ({message})";
+            context.Response.Close();
+        }
+        private static void SendRequestTypeNotSupported(HttpListenerContext context) {
+            SendBadRequest(context, "Request mode not supported");
+        }
+        private static void SendProtocolNotSupported(HttpListenerContext context) {
+            SendBadRequest(context, "Protocol not supported");
         }
 
         public static async Task SendErrorMessageAsync(IAsyncHttpResponse response, Exception exception) {
@@ -167,13 +254,23 @@ namespace DotLogix.Core.Rest.Server.Http {
                 Log.Error(e);
             }
         }
+        #endregion
+
+        #region Helper
+
+        private bool IsSupported(HttpListenerContext context) {
+            if(context.Request.IsWebSocketRequest)
+                return _webSocketRequestHandler != null;
+            return _requestHandler != null;
+        }
 
         private static void CreateExceptionMessage(StringBuilder builder, Exception exception, ref HttpStatusCode statusCode) {
             if(exception is RestException re)
                 statusCode = re.ErrorCode;
 
             builder.Append("ExceptionType: ");
-            builder.Append(exception.GetType().GetFriendlyName());
+            builder.Append(exception.GetType()
+                                    .GetFriendlyName());
             builder.Append("Message: ");
             builder.AppendLine(exception.Message);
             builder.AppendLine("Stacktrace:");
@@ -193,7 +290,11 @@ namespace DotLogix.Core.Rest.Server.Http {
         }
 
         public static HttpMethods HttpMethodFromString(string originalRequestHttpMethod) {
-            return ChachedMethods.TryGetValue(originalRequestHttpMethod, out var httpMethod) ? httpMethod : HttpMethods.None;
+            return CachedMethods.TryGetValue(originalRequestHttpMethod, out var httpMethod)
+                   ? httpMethod
+                   : HttpMethods.None;
         }
+
+        #endregion
     }
 }

@@ -9,6 +9,7 @@
 #region
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http.Headers;
@@ -26,6 +27,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         Encoding ContentEncoding { get; set; }
         HttpStatusCode StatusCode { get; set; }
         Stream OutputStream { get; }
+        object OriginalResponse { get; }
         Task WriteToResponseStreamAsync(byte[] data, int offset, int count);
         Task WriteToResponseStreamAsync(string message);
         Task CompleteChunksAsync();

@@ -9,6 +9,7 @@
 #region
 using System.Collections.Generic;
 using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Processors;
 using DotLogix.Core.Rest.Services.Processors.Json;
 using DotLogix.Core.Rest.Services.Writer;
@@ -16,6 +17,8 @@ using DotLogix.Core.Rest.Services.Writer;
 
 namespace DotLogix.Core.Rest.Server.Routes {
     public interface IWebServiceRoute {
+        ParameterProviderCollection ParameterProviders { get; }
+        RouteDescriptorCollection Descriptors { get; }
         WebRequestProcessorCollection PreProcessors { get; }
         WebRequestProcessorCollection PostProcessors { get; }
         IWebRequestProcessor RequestProcessor { get; }

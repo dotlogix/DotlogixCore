@@ -11,33 +11,36 @@ using System;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
+using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Json {
-    public class ParseJsonBodyPreProcessor : WebRequestProcessorBase {
-        public const string JsonDataParamName = "$jsonData";
-        public static IWebRequestProcessor Instance { get; } = new ParseJsonBodyPreProcessor();
+    public class JsonNodesParseBodyPreProcessor : WebRequestProcessorBase {
+        public static IWebRequestProcessor Instance { get; } = new JsonNodesParseBodyPreProcessor();
         
-        private ParseJsonBodyPreProcessor() : base(int.MaxValue) { }
+        private JsonNodesParseBodyPreProcessor() : base(int.MaxValue) { }
 
-        public override async Task ProcessAsync(WebServiceContext context) {
+        public override async Task ProcessAsync(WebRequestContext context) {
             var request = context.HttpRequest;
-            if(request.ContentType != MimeTypes.Application.Json)
+            if(request.HasBody == false || request.ContentType != MimeTypes.Application.Json)
                 return;
 
             var json = await request.ReadStringFromRequestStreamAsync();
             if(json.Length > 1) {
                 try {
                     var jsonData = JsonNodes.ToNode(json);
-                    context.Variables.Add(JsonDataParamName, jsonData);
-                    context.ParameterProviders.Add(new JsonParameterProvider());
+                    context.Variables.Add(JsonNodesParameterProvider.JsonRawParamName, json);
+                    context.Variables.Add(JsonNodesParameterProvider.JsonDataParamName, jsonData);
+                    var formatterSettings = context.Settings.Get(WebServiceSettings.JsonNodesFormatterSettings, JsonFormatterSettings.Idented);
+                    context.ParameterProviders.Add(new JsonNodesParameterProvider(jsonData, formatterSettings));
                 } catch(Exception e) {
                     Log.Warn(e);
-                    context.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.BadRequest, "The body of the request is not in a valid json format", e));
+                    context.SetException(e, HttpStatusCodes.ClientError.BadRequest);
                 }
             }
         }

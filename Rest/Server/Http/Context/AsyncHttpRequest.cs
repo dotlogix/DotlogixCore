@@ -13,6 +13,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.Parameters;
 #endregion
@@ -29,6 +30,7 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
             HttpMethod = AsyncHttpServer.HttpMethodFromString(originalRequest.HttpMethod);
             ContentLength64 = originalRequest.ContentLength64;
             ContentEncoding = originalRequest.ContentEncoding;
+            HasBody = originalRequest.HasEntityBody;
             InputStream = originalRequest.InputStream;
         }
 
@@ -42,24 +44,29 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         public MimeType ContentType { get; }
         public long ContentLength64 { get; }
         public Encoding ContentEncoding { get; }
+
+        /// <inheritdoc />
+        public bool HasBody { get; }
         public Stream InputStream { get; }
 
+        object IAsyncHttpRequest.OriginalRequest => OriginalRequest;
         public HttpListenerRequest OriginalRequest { get; }
 
-        public virtual async Task<int> ReadDataFromRequestStreamAsync(byte[] data, int offset, int count) {
-            return await InputStream.ReadAsync(data, offset, count);
+        public virtual Task<int> ReadDataFromRequestStreamAsync(byte[] data, int offset, int count) {
+            return HasBody ? InputStream.ReadAsync(data, offset, count) : Task.FromResult(0);
         }
 
-        public virtual async Task<byte[]> ReadDataFromRequestStreamAsync() {
-            using(var memoryStream = new MemoryStream()) {
-                await InputStream.CopyToAsync(memoryStream);
-                return memoryStream.ToArray();
-            }
+        public virtual Task<byte[]> ReadDataFromRequestStreamAsync() {
+            return HasBody ? InputStream.ToByteArrayAsync() : Task.FromResult<byte[]>(default);
         }
 
         public virtual async Task<string> ReadStringFromRequestStreamAsync() {
-            var data = await ReadDataFromRequestStreamAsync();
-            return ContentEncoding.GetString(data);
+            if(HasBody == false)
+                return null;
+
+            using(var reader = new StreamReader(InputStream, ContentEncoding)) {
+                return await reader.ReadToEndAsync();
+            }
         }
 
         public static AsyncHttpRequest Create(HttpListenerRequest originalRequest, IParameterParser parameterParser) {

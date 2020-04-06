@@ -31,7 +31,7 @@ namespace DotLogix.Core.Rest.Server.Http.Headers {
             foreach(var attribute in Attributes) {
                 sb.Append(';');
                 sb.Append(attribute.Key);
-                if(attribute.Value.IsDefined)
+                if(attribute.Value.IsUndefinedOrDefault)
                     continue;
 
                 sb.Append('=');
@@ -94,6 +94,9 @@ namespace DotLogix.Core.Rest.Server.Http.Headers {
                     var keyValue = parts[i].Split(new[] {'='}, 2);
                     var attrName = keyValue[0].Trim(' ', '"');
                     var attrValue = keyValue.Length > 1 ? keyValue[1].Trim(' ', '"') : Optional<string>.Undefined;
+
+                    if(string.IsNullOrEmpty(attrName) && attrValue.IsUndefined)
+                        continue;
                     attributes[attrName] = attrValue;
                 }
             }

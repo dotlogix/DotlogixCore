@@ -8,7 +8,7 @@ namespace DotLogix.Core.Rest.Server.Http.Parameters {
         public static ExtendedParameterParser Default => CreateDefaultParser();
 
         public ExtendedParameterParser(IParameterParser fallBackParser = null) {
-            FallBackParser = fallBackParser ?? PrimitiveParameterParser.Instance;
+            FallBackParser = fallBackParser ?? PrimitiveParameterParser.Default;
         }
 
         private static ExtendedParameterParser CreateDefaultParser() {

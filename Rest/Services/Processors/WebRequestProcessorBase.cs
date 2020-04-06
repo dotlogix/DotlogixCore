@@ -8,6 +8,7 @@
 
 #region
 using System.Threading.Tasks;
+using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
@@ -20,16 +21,14 @@ namespace DotLogix.Core.Rest.Services.Processors {
         protected WebRequestProcessorBase(int priority, bool ignoreHandled = true) {
             Priority = priority;
             IgnoreHandled = ignoreHandled;
-            Descriptors = new WebRequestProcessorDescriptorCollection();
         }
 
-        public WebRequestProcessorDescriptorCollection Descriptors { get; }
         public int Priority { get; }
 
-        public abstract Task ProcessAsync(WebServiceContext context);
+        public abstract Task ProcessAsync(WebRequestContext context);
 
-        public virtual bool ShouldExecute(WebServiceContext webServiceContext) {
-            return (webServiceContext.RequestResult.Handled == false) || (IgnoreHandled == false);
+        public virtual bool ShouldExecute(WebRequestContext webRequestContext) {
+            return webRequestContext.RequestResult == null || (IgnoreHandled == false);
         }
     }
 }

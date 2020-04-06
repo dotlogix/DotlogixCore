@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Collections {
@@ -152,12 +153,36 @@ namespace DotLogix.Core.Collections {
         ///     read-only.
         /// </exception>
         public void Add(TKey key, TValue value) {
-            if(_innerDictionary.TryGetValue(key, out var collection) == false) {
+            if (_innerDictionary.TryGetValue(key, out var collection) == false) {
                 collection = _instantiateFunc.Invoke();
                 _innerDictionary.Add(key, collection);
             }
 
             collection.Add(value);
+        }
+
+        /// <summary>
+        ///     Adds multiple elements with the provided key and value to the
+        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
+        /// </summary>
+        /// <param name="key">The object to use as the key of the element to add.</param>
+        /// <param name="values">The object to use as the values of the element to add.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///     An element with the same key already exists in the
+        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
+        /// </exception>
+        /// <exception cref="T:System.NotSupportedException">
+        ///     The <see cref="T:System.Collections.Generic.IDictionary`2"></see> is
+        ///     read-only.
+        /// </exception>
+        public void Add(TKey key, IEnumerable<TValue> values) {
+            if (_innerDictionary.TryGetValue(key, out var collection) == false) {
+                collection = _instantiateFunc.Invoke();
+                _innerDictionary.Add(key, collection);
+            }
+
+            collection.AddRange(values);
         }
 
         /// <summary>
@@ -197,6 +222,30 @@ namespace DotLogix.Core.Collections {
         /// </exception>
         public bool Remove(TKey key, TValue value) {
             return _innerDictionary.TryGetValue(key, out var collection) && collection.Remove(value);
+        }
+
+
+
+        /// <summary>
+        ///     Removes the element with the specified key from the
+        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
+        /// </summary>
+        /// <param name="key">The key of the element to remove.</param>
+        /// <param name="values">The values of the element to remove.</param>
+        /// <returns>
+        ///     true if the element is successfully removed; otherwise, false.  This method also returns false if
+        ///     <paramref name="key">key</paramref> was not found in the original
+        ///     <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
+        /// </returns>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="key">key</paramref> is null.</exception>
+        /// <exception cref="T:System.NotSupportedException">
+        ///     The <see cref="T:System.Collections.Generic.IDictionary`2"></see> is
+        ///     read-only.
+        /// </exception>
+        public void Remove(TKey key, IEnumerable<TValue> values) {
+            if(_innerDictionary.TryGetValue(key, out var collection)) {
+                collection.RemoveRange(values.AsCollection());
+            }
         }
 
         /// <summary>Gets the value associated with the specified key.</summary>

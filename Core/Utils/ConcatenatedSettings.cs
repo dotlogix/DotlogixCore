@@ -42,23 +42,13 @@ namespace DotLogix.Core.Utils {
         }
 
         /// <inheritdoc />
-        public IReadOnlySettings Inherits => null;
-
-        /// <inheritdoc />
-        public IReadOnlySettings OwnSettings => new Settings();
-
-        /// <inheritdoc />
-        public IEnumerable<string> OwnKeys => Enumerable.Empty<string>();
-
-        /// <inheritdoc />
-        public int OwnCount => 0;
-
-        /// <inheritdoc />
         public IEnumerable<string> Keys {
             get {
-                return Settings.SkipNull()
-                               .SelectMany(s => s.Keys)
-                               .Distinct();
+                var keys = new HashSet<string>(EqualityComparer);
+                foreach(var setting in Settings) {
+                    keys.UnionWith(setting.Keys);
+                }
+                return keys;
             }
         }
 
@@ -118,23 +108,6 @@ namespace DotLogix.Core.Utils {
             value = default;
             return false;
         }
-        
-        /// <inheritdoc />
-        public virtual ISettings Reduce() {
-            var values = new Dictionary<string, object>(EqualityComparer);
-
-            foreach(var settings in Settings.Reverse()) {
-                if(settings != null)
-                    values.Union(settings);
-            }
-
-            return new Settings(values, EqualityComparer);
-        }
-
-        /// <inheritdoc />
-        public virtual ISettings Inherit() {
-            return new Settings { Inherits = this };
-        }
 
         /// <inheritdoc />
         public IReadOnlySettings Clone() {
@@ -152,17 +125,12 @@ namespace DotLogix.Core.Utils {
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator() {
             var settingKeys = new HashSet<string>(EqualityComparer);
 
-            IReadOnlySettings current = this;
-            do {
-                if (current.OwnCount > 0) {
-                    foreach (var kv in current) {
-                        if (settingKeys.Add(kv.Key))
-                            yield return kv;
-                    }
+            foreach(var settings in Settings) {
+                foreach(var kv in settings) {
+                    if(settingKeys.Add(kv.Key))
+                        yield return kv;
                 }
-
-                current = current.Inherits;
-            } while (current != null);
+            }
         }
 
         /// <summary>Returns an enumerator that iterates through a collection.</summary>

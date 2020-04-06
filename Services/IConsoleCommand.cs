@@ -19,10 +19,5 @@
         /// A callback to execute an action
         /// </summary>
         ConsoleCommandResult OnExecute(CommandArgs args);
-
-        /// <summary>
-        /// A callback to validate arguments
-        /// </summary>
-        bool OnValidate(CommandArgs args);
     }
 }

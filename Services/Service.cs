@@ -55,11 +55,9 @@ namespace DotLogix.Core.Services {
             LogDirectory = logDirectory;
             ServiceName = serviceName;
 
-            bool NoArgs(ConsoleCommand cmd, CommandArgs args) => args.IsEmpty;
-
-            Commands.AddOrUpdate(new LambdaConsoleCommand("exit", "exit", (c, a) => OnCommand_Exit(), NoArgs));
-            Commands.AddOrUpdate(new LambdaConsoleCommand("help", "help", (c, a) => OnCommand_Help(), NoArgs));
-            Commands.AddOrUpdate(new LambdaConsoleCommand("clear", "clear", (c, a) => OnCommand_Clear(), NoArgs));
+            Commands.AddOrUpdate(new LambdaConsoleCommand("exit", "exit", OnCommand_Exit));
+            Commands.AddOrUpdate(new LambdaConsoleCommand("help", "help", OnCommand_Help));
+            Commands.AddOrUpdate(new LambdaConsoleCommand("clear", "clear", OnCommand_Clear));
         }
 
         /// <summary>
@@ -176,7 +174,7 @@ namespace DotLogix.Core.Services {
         }
 
         protected virtual int ProcessUserInput() {
-            var commandResult = ConsoleCommandResult.Continue;
+            var commandResult = ConsoleCommandResult.CommandCompleted;
             var commandParserRegex = new Regex("\\s(?:(?<name>\\w+)\\s*[=:])?\\s*(?:(?:\\\"(?<value>[^\\\"]+)\\\")|(?<value>[^\\\"\\s]+))");
             do {
                 var line = Console.ReadLine();
@@ -218,23 +216,28 @@ namespace DotLogix.Core.Services {
         /// </summary>
         protected virtual ConsoleCommandResult OnCommand(string command, CommandArgs args) {
             if(Commands.TryGet(command, out var cmd)) {
-                if(cmd.OnValidate(args) == false) {
-                    Console.WriteLine("Invalid usage of command " + cmd.Name);
-                    Console.WriteLine(cmd.HelpText ?? cmd.Description);
-                    return ConsoleCommandResult.Continue;
-                }
-
                 if((args.Unnamed.Count == 1) && (args.Unnamed[0] == "help")) {
                     Console.WriteLine(cmd.HelpText ?? cmd.Description);
-                    return ConsoleCommandResult.Continue;
+                    return ConsoleCommandResult.CommandCompleted;
                 }
+                try {
+                    var commandResult = cmd.OnExecute(args);
+                    if(commandResult.Success)
+                        return commandResult;
 
-                return cmd.OnExecute(args);
+                    Console.WriteLine("Invalid usage of command " + cmd.Name);
+                    Console.WriteLine(cmd.HelpText ?? cmd.Description);
+                    return ConsoleCommandResult.CommandFailed;
+
+                } catch (Exception e) {
+                    Log.Error(e);
+                    return ConsoleCommandResult.CommandFailed;
+                }
             }
 
             Console.WriteLine("Command could not be found possible commands are");
             OnCommand_Help();
-            return ConsoleCommandResult.Continue;
+            return ConsoleCommandResult.CommandCompleted;
         }
 
         protected virtual ConsoleCommandResult OnCommand_Exit() {

@@ -21,7 +21,5 @@
 
         /// <inheritdoc />
         public abstract ConsoleCommandResult OnExecute(CommandArgs args);
-        /// <inheritdoc />
-        public abstract bool OnValidate(CommandArgs args);
     }
 }

@@ -6,33 +6,33 @@
         /// <summary>
         /// Exit application without error
         /// </summary>
-        public static ConsoleCommandResult ExitNoError { get; } = new ConsoleCommandResult(true);
-        /// <summary>
-        /// Continue application loop
-        /// </summary>
-        public static ConsoleCommandResult Continue { get; } = new ConsoleCommandResult(false);
+        public static ConsoleCommandResult ExitNoError { get; } = new ConsoleCommandResult { Exit = true, Success = true};
 
+        /// <summary>
+        /// Continue execution completed
+        /// </summary>
+        public static ConsoleCommandResult CommandCompleted { get; } = new ConsoleCommandResult { Success = true };
+
+        /// <summary>
+        /// Command execution failed
+        /// </summary>
+        public static ConsoleCommandResult CommandFailed { get; } = new ConsoleCommandResult { Success = false };
+
+        /// <summary>
+        /// Determines if the command executed successfully
+        /// </summary>
+        public bool Success;
         /// <summary>
         /// Determines if the application should exit
         /// </summary>
-        public bool Exit { get; }
+        public bool Exit;
         /// <summary>
         /// The exit code
         /// </summary>
-        public int ExitCode { get; }
+        public int ExitCode;
 
-        /// <summary>
-        ///   Creates a new instance of <see cref="ConsoleCommandResult"/>
-        /// </summary>
-        public ConsoleCommandResult(bool exit, int exitCode = 0) {
-            Exit = exit;
-            ExitCode = exitCode;
-        }
-
-        /// <summary>
-        /// Destruct this command result
-        /// </summary>
-        public void Deconstruct(out bool exit, out int exitCode) {
+        public void Deconstruct(out bool success, out bool exit, out int exitCode) {
+            success = Success;
             exit = Exit;
             exitCode = ExitCode;
         }

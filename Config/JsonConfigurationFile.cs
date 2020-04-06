@@ -8,7 +8,10 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
@@ -20,6 +23,9 @@ namespace DotLogix.Core.Config {
     /// </summary>
     /// <typeparam name="TConfig"></typeparam>
     public class JsonConfigurationFile<TConfig> : ConfigurationFileBase<TConfig> where TConfig : class, new() {
+        private const int MaxRetries = 5;
+        private const int ReloadDelay = 1000;
+
         /// <summary>
         ///     Creates a new instance of <see cref="JsonConfigurationFile{TConfig}" />
         /// </summary>
@@ -32,14 +38,26 @@ namespace DotLogix.Core.Config {
                 return false;
             }
 
-            try {
-                var json = File.ReadAllText(AbsolutePath);
-                CurrentConfig = JsonNodes.FromJson<TConfig>(json);
-                return true;
-            } catch(Exception e) {
-                Log.Error(e);
-                return false;
+            var exceptions = new List<Exception>();
+            for (var retry = 1; retry <= MaxRetries; retry++) {
+                try {
+                    var json = File.ReadAllText(AbsolutePath);
+                    CurrentConfig = JsonNodes.FromJson<TConfig>(json);
+                    Log.Debug($"Loading attempt {retry} config file \"{AbsolutePath}\" succeeded");
+                    return true;
+                } catch(IOException io) {
+                    Log.Warn($"Loading attempt {retry} config file \"{AbsolutePath}\" failed ... retry in 1s");
+                    Task.Delay(ReloadDelay).Wait();
+                    exceptions.Add(io);
+                } catch(Exception e) {
+                    exceptions.Add(e);
+                    break;
+                }
             }
+
+            CurrentConfig = null;
+            Log.Error(new AggregateException(exceptions));
+            return false;
         }
 
         /// <inheritdoc />

@@ -52,26 +52,7 @@ namespace DotLogix.Core.Utils {
         }
 
         /// <inheritdoc />
-        public IReadOnlySettings Inherits { get; set; }
-
-        /// <inheritdoc />
-        public IReadOnlySettings OwnSettings => new Settings(Values, EqualityComparer);
-
-        /// <inheritdoc />
-        public IEnumerable<string> OwnKeys => Values.Keys;
-
-        /// <inheritdoc />
-        public int OwnCount => Values.Count;
-
-        /// <inheritdoc />
-        public IEnumerable<string> Keys {
-            get {
-                IEnumerable<string> keys = Values.Keys;
-                if(Inherits != null)
-                    keys = keys.Concat(Inherits.Keys);
-                return keys;
-            }
-        }
+        public IEnumerable<string> Keys => Values.Keys;
 
         /// <inheritdoc />
         public int Count => Keys.Count();
@@ -128,11 +109,6 @@ namespace DotLogix.Core.Utils {
                     return true;
             }
 
-            if((Inherits != null) && (Inherits.Count > 0)) {
-                if(Inherits.TryGet(key, out value))
-                    return true;
-            }
-
             value = default;
             return false;
         }
@@ -142,12 +118,7 @@ namespace DotLogix.Core.Utils {
         public virtual bool TryGet<T>(string key, out T value) {
             if((Values.Count > 0) && Values.TryGetValue(key, out var objValue) && objValue.TryConvertTo(out value))
                 return true;
-
-            if((Inherits != null) && (Inherits.Count > 0)) {
-                if(Inherits.TryGet(key, out value))
-                    return true;
-            }
-
+            
             value = default;
             return false;
         }
@@ -156,27 +127,11 @@ namespace DotLogix.Core.Utils {
         public virtual void Apply(IEnumerable<KeyValuePair<string, object>> values, bool replaceExisting = true) {
             Values.Union(values, replaceExisting);
         }
-
-        /// <inheritdoc />
-        public virtual ISettings Reduce() {
-            var values = new Dictionary<string, object>(Values, EqualityComparer);
-            if(Inherits != null)
-                values.Union(Inherits, false);
-            return new Settings(values, EqualityComparer);
-        }
-
-        /// <inheritdoc />
-        public virtual ISettings Inherit() {
-            return new Settings {Inherits = this};
-        }
-
+        
         /// <inheritdoc />
         public virtual IReadOnlySettings Clone() {
             var values = new Dictionary<string, object>(Values, EqualityComparer);
-
-            return new Settings(values, EqualityComparer) {
-                                                          Inherits = Inherits
-                                                          };
+            return new Settings(values, EqualityComparer);
         }
 
         /// <summary>Creates a new object that is a copy of the current instance.</summary>
@@ -188,16 +143,7 @@ namespace DotLogix.Core.Utils {
         /// <summary>Returns an enumerator that iterates through the collection.</summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator() {
-            var settingKeys = new HashSet<string>(Values.Keys, EqualityComparer);
-
-            IEnumerable<KeyValuePair<string, object>> values = Values;
-            if(Inherits == null)
-                return values.GetEnumerator();
-            
-            var distinctInherited = Inherits.Where(kv => settingKeys.Add(kv.Key));
-            values = Values.Concat(distinctInherited);
-
-            return values.GetEnumerator();
+            return Values.GetEnumerator();
         }
 
         /// <summary>Returns an enumerator that iterates through a collection.</summary>
@@ -216,7 +162,7 @@ namespace DotLogix.Core.Utils {
         /// <summary>
         ///     If called by a class member the member name can be omitted
         /// </summary>
-        protected virtual T GetWithMemberName<T>([CallerMemberName] string memberName = null, T defaultValue = default) {
+        protected virtual T GetWithMemberName<T>(T defaultValue = default, [CallerMemberName] string memberName = null) {
             return Get(memberName, defaultValue);
         }
     }

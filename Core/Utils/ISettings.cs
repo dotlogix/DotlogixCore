@@ -4,25 +4,6 @@ using DotLogix.Core.Interfaces;
 namespace DotLogix.Core.Utils {
     public interface IReadOnlySettings : ICloneable<IReadOnlySettings>, IEnumerable<KeyValuePair<string, object>> {
         /// <summary>
-        /// Gets ot sets a parent settings object.
-        /// If a setting is not defined the setting will be inherited in the same order as in the collection
-        /// </summary>
-        IReadOnlySettings Inherits { get; }
-
-        /// <summary>
-        /// Gets the self defined settings
-        /// </summary>
-        IReadOnlySettings OwnSettings { get; }
-        /// <summary>
-        /// Gets the keys of self defined settings
-        /// </summary>
-        IEnumerable<string> OwnKeys { get; }
-        /// <summary>
-        /// Gets the amount of self defined settings
-        /// </summary>
-        int OwnCount { get; }
-
-        /// <summary>
         /// Gets the distinct keys of self defined and inherited settings
         /// </summary>
         IEnumerable<string> Keys { get; }
@@ -68,16 +49,6 @@ namespace DotLogix.Core.Utils {
         /// </summary>
         /// <returns>true if the setting is defined and the value is convertible to the target type, otherwise false</returns>
         bool TryGet<T>(string key, out T value);
-
-        /// <summary>
-        /// Cascades all own settings and inherited settings to a new settings instance (order: own, inherited[0]...inherited[n])
-        /// </summary>
-        ISettings Reduce();
-
-        /// <summary>
-        /// Creates a new settings object which inherits the current one
-        /// </summary>
-        ISettings Inherit();
     }
 
     /// <summary>

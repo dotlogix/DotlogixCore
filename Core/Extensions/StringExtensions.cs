@@ -435,7 +435,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Trys to convert a string to another type. Only works for the conversion of a string to primitives
+        ///     Tries to convert a string to another type. Only works for the conversion of a string to primitives
         /// </summary>
         /// <param name="targetType">The target type</param>
         /// <param name="value">The string representation of the type</param>
@@ -553,7 +553,7 @@ namespace DotLogix.Core.Extensions {
         }
 
         /// <summary>
-        ///     Trys to convert a string to another type. Only works for the conversion of a string to primitives
+        ///     Tries to convert a string to another type. Only works for the conversion of a string to primitives
         /// </summary>
         /// <typeparam name="TTarget">The target type</typeparam>
         /// <param name="value">The string representation of the type</param>

@@ -11,7 +11,7 @@ using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Authentication {
-    public class AuthenticationDescriptor : WebRequestProcessorDescriptorBase {
+    public class AuthenticationDescriptor : RouteDescriptorBase {
         public bool RequiresAuthentication { get; }
 
         public AuthenticationDescriptor(bool requiresAuthentication) {

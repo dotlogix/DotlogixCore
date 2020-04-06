@@ -7,15 +7,25 @@
 // ==================================================
 
 #region
+using System;
+using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Descriptors {
-    public class MethodDescriptor : WebRequestProcessorDescriptorBase {
+    public class MethodDescriptor : RouteDescriptorBase {
         public DynamicInvoke DynamicInvoke { get; }
+        public bool IsAsyncMethod { get; }
+        public Type ReturnType { get; }
 
         public MethodDescriptor(DynamicInvoke dynamicInvoke) {
             DynamicInvoke = dynamicInvoke;
+            ReturnType = dynamicInvoke.ReturnType;
+            if(ReturnType.IsAssignableToOpenGeneric(typeof(Task<>), out var arguments)) {
+                IsAsyncMethod = true;
+                ReturnType = arguments[0];
+            }
         }
     }
 }

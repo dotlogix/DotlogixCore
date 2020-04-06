@@ -30,8 +30,8 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
 
         public AuthenticationPreProcessor(int priority, params IAuthenticationMethod[] authMethods) : this(priority, authMethods.AsEnumerable()) { }
 
-        public override Task ProcessAsync(WebServiceContext context) {
-            var authenticationDescriptor = context.Route.RequestProcessor.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
+        public override Task ProcessAsync(WebRequestContext context) {
+            var authenticationDescriptor = context.Route.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
             if((authenticationDescriptor != null) && (authenticationDescriptor.RequiresAuthentication == false))
                 return Task.CompletedTask;
 
@@ -52,11 +52,12 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
             return authMethod.AuthenticateAsync(context, authValue[1]);
         }
 
-        protected void SetUnauthorizedException(WebServiceContext context, string message) {
-            context.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));
+        protected void SetUnauthorizedException(WebRequestContext context, string message) {
+            var exception = new RestException(HttpStatusCodes.ClientError.Unauthorized, message);
+            context.SetException(exception, HttpStatusCodes.ClientError.Unauthorized);
         }
 
-        protected void SetInvalidFormatException(WebServiceContext context) {
+        protected void SetInvalidFormatException(WebRequestContext context) {
             var messageBuilder = new StringBuilder();
             messageBuilder.AppendLine("The data you provided for authorization is in an invalid format.");
             messageBuilder.Append("Supported formats are:");

@@ -9,11 +9,12 @@
 #region
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Services.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {
     public interface IAsyncWebRequestResultWriter {
-        Task WriteAsync(WebServiceContext context);
+        Task WriteAsync(WebRequestContext context);
     }
 }

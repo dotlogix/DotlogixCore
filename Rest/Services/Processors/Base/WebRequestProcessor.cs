@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
+using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Descriptors;
@@ -32,35 +33,30 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
             Target = target;
             DynamicInvoke = dynamicInvoke;
             IsAsyncMethod = dynamicInvoke.ReturnType.IsAssignableTo(typeof(Task));
-
-            Descriptors.Add(new MethodDescriptor(dynamicInvoke));
         }
 
-        public override async Task ProcessAsync(WebServiceContext context) {
-            var webRequestResult = context.RequestResult;
+        public override async Task ProcessAsync(WebRequestContext context) {
             var parameters = CreateParameters(context);
-            if(webRequestResult.Handled)
-                return;
 
             try {
                 var result = await InvokeAsync(context, parameters);
-                webRequestResult.TrySetResult(result);
+                context.SetResult(result);
             } catch(Exception e) {
                 Log.Error(e);
-                webRequestResult.TrySetException(e);
+                context.SetException(e, HttpStatusCodes.ServerError.InternalServerError);
             }
         }
 
-        protected virtual object[] CreateParameters(WebServiceContext context) {
+        protected virtual object[] CreateParameters(WebRequestContext context) {
 
             if (TryGetParameterValues(context, out var parameters))
                 return parameters;
 
-            context.RequestResult.TrySetException(CreateBadRequestException(context));
+            context.SetException(CreateBadRequestException(context), HttpStatusCodes.ClientError.BadRequest);
             return null;
         }
 
-        protected virtual bool TryGetParameterValues(WebServiceContext context, out object[] paramValues) {
+        protected virtual bool TryGetParameterValues(WebRequestContext context, out object[] paramValues) {
             var methodParams = DynamicInvoke.Parameters;
             paramValues = new object[methodParams.Length];
             for (var i = 0; i < paramValues.Length; i++) {
@@ -71,7 +67,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
             return true;
         }
 
-        protected virtual bool TryGetParameterValue(WebServiceContext context, ParameterInfo methodParam, out object paramValue) {
+        protected virtual bool TryGetParameterValue(WebRequestContext context, ParameterInfo methodParam, out object paramValue) {
             var name = methodParam.Name;
             var type = methodParam.ParameterType;
             var request = context.HttpRequest;
@@ -95,7 +91,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
             return false;
         }
 
-        protected virtual RestException CreateBadRequestException(WebServiceContext context) {
+        protected virtual RestException CreateBadRequestException(WebRequestContext context) {
             var builder = new StringBuilder();
             builder.AppendLine($"One or more arguments are not defined for method {DynamicInvoke.Name}");
             builder.AppendLine();
@@ -124,14 +120,14 @@ namespace DotLogix.Core.Rest.Services.Processors.Base {
             return new RestException(HttpStatusCodes.ClientError.BadRequest, builder.ToString());
         }
 
-        protected virtual async Task<object> InvokeAsync(WebServiceContext context, object[] parameters) {
+        protected virtual async Task<object> InvokeAsync(WebRequestContext context, object[] parameters) {
             var returnValue = DynamicInvoke.Invoke(Target, parameters);
             if(IsAsyncMethod)
                 returnValue = await ((Task)returnValue).UnpackResultAsync();
             return returnValue;
         }
 
-        protected virtual void AppendParameterValues(StringBuilder builder, WebServiceContext context) {
+        protected virtual void AppendParameterValues(StringBuilder builder, WebRequestContext context) {
             for(var i = context.ParameterProviders.Count - 1; i >= 0; i--) {
                 var parameterProvider = context.ParameterProviders[i];
                 var values = parameterProvider.EnumerateValues(context)

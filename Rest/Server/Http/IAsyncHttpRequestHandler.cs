@@ -8,11 +8,12 @@
 
 #region
 using System.Threading.Tasks;
+using DotLogix.Core.Collections;
 using DotLogix.Core.Rest.Server.Http.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http {
     public interface IAsyncHttpRequestHandler {
-        Task HandleRequestAsync(IAsyncHttpContext asyncHttpContext);
+        Task HandleRequestAsync(IAsyncHttpContext httpContext);
     }
 }

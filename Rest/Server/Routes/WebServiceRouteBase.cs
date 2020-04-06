@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Processors;
 using DotLogix.Core.Rest.Services.Processors.Json;
 using DotLogix.Core.Rest.Services.Writer;
@@ -27,9 +28,18 @@ namespace DotLogix.Core.Rest.Server.Routes {
             RouteIndex = routeIndex;
             PreProcessors = new WebRequestProcessorCollection();
             PostProcessors = new WebRequestProcessorCollection();
+            Descriptors = new RouteDescriptorCollection();
+            ParameterProviders = new ParameterProviderCollection();
         }
 
+        /// <inheritdoc />
+        public ParameterProviderCollection ParameterProviders { get; }
+
+        /// <inheritdoc />
+        public RouteDescriptorCollection Descriptors { get; }
+
         public WebRequestProcessorCollection PostProcessors { get; }
+
         public WebRequestProcessorCollection PreProcessors { get; }
 
         public IWebRequestProcessor RequestProcessor { get; }

@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
+using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
@@ -21,16 +22,14 @@ namespace DotLogix.Core.Rest.Services.Processors.Dynamic {
     public class DynamicWebRequestProcessor : WebRequestProcessor {
         public DynamicWebRequestProcessor(object target, DynamicInvoke dynamicInvoke) : base(target, dynamicInvoke) { }
 
-        protected override object[] CreateParameters(WebServiceContext context) {
+        protected override object[] CreateParameters(WebRequestContext context) {
             
             if(TryGetParameterValues(context, out var parameters))
                 return parameters;
-
-            context.RequestResult.TrySetException(CreateBadRequestException(context));
             return null;
         }
 
-        protected virtual bool TryGetParameterValues(WebServiceContext context, out object[] paramValues) {
+        protected virtual bool TryGetParameterValues(WebRequestContext context, out object[] paramValues) {
             var methodParams = DynamicInvoke.Parameters;
             paramValues = new object[methodParams.Length];
             for(var i = 0; i < paramValues.Length; i++) {
@@ -41,7 +40,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Dynamic {
             return true;
         }
 
-        protected virtual bool TryGetParameterValue(WebServiceContext context, ParameterInfo methodParam, out object paramValue) {
+        protected virtual bool TryGetParameterValue(WebRequestContext context, ParameterInfo methodParam, out object paramValue) {
             var name = methodParam.Name;
             var type = methodParam.ParameterType;
             var request = context.HttpRequest;
@@ -59,7 +58,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Dynamic {
             return false;
         }
 
-        protected virtual RestException CreateBadRequestException(WebServiceContext context) {
+        protected virtual RestException CreateBadRequestException(WebRequestContext context) {
             var builder = new StringBuilder();
             builder.AppendLine($"One or more arguments are not defined for method {DynamicInvoke.Name}");
             builder.AppendLine();

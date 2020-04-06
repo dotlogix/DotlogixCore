@@ -12,7 +12,7 @@ using System.Collections.Specialized;
 
 namespace DotLogix.Core.Rest.Server.Http.Parameters {
     public class PrimitiveParameterParser : ParameterParserBase {
-        public static IParameterParser Instance { get; } = new PrimitiveParameterParser();
+        public static IParameterParser Default { get; } = new PrimitiveParameterParser();
         private PrimitiveParameterParser() { }
 
         public override void DeserializeValue(string name, string[] values, IDictionary<string, object> parameters) {

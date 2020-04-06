@@ -8,25 +8,22 @@
 
 #region
 using System.IO;
+using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.Headers;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {
-    public class WebRequestStreamResult {
-        public Stream OutputStream { get; }
-        public MimeType ContentType { get; }
-        public int ChunkSize { get; }
-        public bool SendInChunks { get; }
-        public TransportModes TransportMode { get; }
+    public class WebRequestStreamResult : WebRequestObjectResult<WebRequestStreamResult> {
+        public Stream OutputStream { get; set; }
+        public int ChunkSize { get; set; } = AsyncHttpResponse.DefaultChunkSize;
+        public bool SendInChunks { get; set; }
+        public TransportModes TransportMode { get; set; } = TransportModes.Raw;
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
-        public WebRequestStreamResult(Stream outputStream, MimeType contentType, bool sendInChunks = false, int chunkSize = AsyncHttpResponse.DefaultChunkSize, TransportModes transportMode = TransportModes.Raw) {
-            OutputStream = outputStream;
-            ContentType = contentType;
-            ChunkSize = chunkSize;
-            TransportMode = transportMode;
-            SendInChunks = sendInChunks;
+        public WebRequestStreamResult() {
+            ResultWriter = WebRequestResultStreamWriter.Instance;
+            ReturnValue = this;
         }
     }
 }

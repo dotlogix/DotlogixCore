@@ -7,7 +7,7 @@
 // ==================================================
 
 namespace DotLogix.Core.Rest.Services.Descriptors {
-    public interface IWebRequestProcessorDescriptor {
+    public interface IRouteDescriptor {
         string Name { get; }
     }
 }

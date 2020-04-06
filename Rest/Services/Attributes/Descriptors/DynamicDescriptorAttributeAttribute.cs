@@ -17,14 +17,14 @@ namespace DotLogix.Core.Rest.Services.Attributes.Descriptors {
         public Type RequestResultWriterType { get; }
 
         public DynamicDescriptorAttributeAttribute(Type requestResultWriterType) {
-            if(requestResultWriterType.IsAssignableTo(typeof(IWebRequestProcessorDescriptor)) == false)
-                throw new ArgumentException($"Type {requestResultWriterType.GetFriendlyName()} is not assignable to {nameof(IWebRequestProcessorDescriptor)}", nameof(requestResultWriterType));
+            if(requestResultWriterType.IsAssignableTo(typeof(IRouteDescriptor)) == false)
+                throw new ArgumentException($"Type {requestResultWriterType.GetFriendlyName()} is not assignable to {nameof(IRouteDescriptor)}", nameof(requestResultWriterType));
 
             RequestResultWriterType = requestResultWriterType;
         }
 
-        public override IWebRequestProcessorDescriptor CreateDescriptor() {
-            return RequestResultWriterType?.Instantiate<IWebRequestProcessorDescriptor>();
+        public override IRouteDescriptor CreateDescriptor() {
+            return RequestResultWriterType?.Instantiate<IRouteDescriptor>();
         }
     }
 }

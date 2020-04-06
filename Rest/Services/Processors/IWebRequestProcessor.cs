@@ -8,15 +8,15 @@
 
 #region
 using System.Threading.Tasks;
+using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors {
     public interface IWebRequestProcessor {
-        WebRequestProcessorDescriptorCollection Descriptors { get; }
         int Priority { get; }
-        Task ProcessAsync(WebServiceContext context);
-        bool ShouldExecute(WebServiceContext webServiceContext);
+        Task ProcessAsync(WebRequestContext context);
+        bool ShouldExecute(WebRequestContext webRequestContext);
     }
 }

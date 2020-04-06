@@ -31,7 +31,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             Subscribe(CreateSubscription(context, route, router));
         }
 
-        public async Task TriggerAsync(object sender, WebServiceEventArgs eventArgs) {
+        public async Task DispatchAsync(object sender, WebServiceEventArgs eventArgs) {
             List<IWebServiceEventSubscription> subscriptions;
             lock(_subscriptionLock) {
                 subscriptions = _subscriptions.Where(s => s.CheckPreCondition(sender, eventArgs)).ToList();

@@ -21,12 +21,12 @@ namespace DotLogix.Core.Rest.Server.Http {
             var parts = stream.SplitByArray(boundaryBytes, boundaryBytes.Length+2, stream.Length-2-boundaryBytes.Length).ToArray();
 
             var partData = new MultiPartData(boundary, stream);
-            var headerSeperators = new[]{"\r\n", ": "};
+            var headerSeparators = new[]{"\r\n", ": "};
             for(var index = 0; index < parts.Length-1; index++) {
                 var part = parts[index];
                 var headerEnd = part.IndexOfArray(headerSplitBytes, 0, part.Length);
                 var headerData = (new StreamSegment(stream, part.Offset, headerEnd)).ToByteArray();
-                var headerStr = encoding.GetString(headerData).Split(headerSeperators, StringSplitOptions.RemoveEmptyEntries);
+                var headerStr = encoding.GetString(headerData).Split(headerSeparators, StringSplitOptions.RemoveEmptyEntries);
 
                 ContentDisposition disposition = null;
                 MimeType contentType = null;

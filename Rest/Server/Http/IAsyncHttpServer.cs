@@ -12,7 +12,7 @@ using System;
 
 namespace DotLogix.Core.Rest.Server.Http {
     public interface IAsyncHttpServer : IDisposable {
-        Configuration Configuration { get; }
+        HttpServerConfiguration Configuration { get; }
         bool IsRunning { get; }
         void Start();
         void Stop();

@@ -12,34 +12,33 @@ using System.Reflection;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Reflection.Dynamics;
-using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Events;
+using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services.Attributes;
-using DotLogix.Core.Rest.Services.Attributes.Descriptors;
-using DotLogix.Core.Rest.Services.Attributes.Events;
-using DotLogix.Core.Rest.Services.Attributes.ResultWriter;
-using DotLogix.Core.Rest.Services.Attributes.Routes;
-using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services.Descriptors;
+using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.Routing;
 using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
     public class WebServiceHost {
         public ISettings Settings { get; } = new Settings();
-        public AsyncWebRequestRouter Router { get; }
+        public WebServiceRouter Router { get; }
         private int _currentRouteIndex;
-        public IAsyncHttpServer Server { get; }
+        public IAsyncWebServer Server { get; }
         public WebRequestProcessorCollection GlobalPreProcessors => Router.PreProcessors;
         public WebRequestProcessorCollection GlobalPostProcessors => Router.PostProcessors;
         public WebServiceEventCollection ServerEvents => Router.Events;
         public WebServiceCollection Services { get; }
 
-        public WebServiceHost(HttpServerConfiguration configuration = null) {
-            Router = new AsyncWebRequestRouter();
-            Server = new AsyncHttpServer(Router, configuration);
+        public WebServiceHost(WebServerConfiguration configuration = null) {
+            Router = new WebServiceRouter();
+            Server = new AsyncWebServer(Router, configuration);
             Services = new WebServiceCollection();
         }
 
-        public WebServiceHost(string urlPrefix, HttpServerConfiguration configuration = null) : this(configuration) {
+        public WebServiceHost(string urlPrefix, WebServerConfiguration configuration = null) : this(configuration) {
             Server.AddServerPrefix(urlPrefix);
         }
 
@@ -99,7 +98,7 @@ namespace DotLogix.Core.Rest.Services {
 
                 var resultWriterAttribute = methodInfo.GetCustomAttribute<RouteResultWriterAttribute>();
                 if(resultWriterAttribute != null)
-                    serviceRoute.WebRequestResultWriter = resultWriterAttribute.CreateResultWriter();
+                    serviceRoute.WebServiceResultWriter = resultWriterAttribute.CreateResultWriter();
 
 
                 Router.Routes.Add(serviceRoute, serviceInstance.RoutePrefix ?? "");

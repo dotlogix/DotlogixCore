@@ -13,7 +13,7 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryType>git</RepositoryType>
 		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<Version>2.1.19</Version>
+		<Version>2.2.0</Version>
 		<Configurations>Debug;Release;</Configurations>
 	</PropertyGroup>
 
@@ -22,9 +22,11 @@
     <WarningsAsErrors>NU1605;</WarningsAsErrors>
   </PropertyGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.0" />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Hub\**" />
+    <EmbeddedResource Remove="Hub\**" />
+    <None Remove="Hub\**" />
+  </ItemGroup>
 	
 	<ItemGroup>
 		<ProjectReference Include="..\Core\Core.csproj" />

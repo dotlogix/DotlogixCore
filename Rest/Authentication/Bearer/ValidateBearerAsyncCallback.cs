@@ -8,10 +8,9 @@
 
 #region
 using System.Threading.Tasks;
-using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Bearer {
-    public delegate Task ValidateBearerAsyncCallback(BearerAuthenticationMethod authenticationMethod, WebRequestContext context, string token);
+    public delegate Task ValidateBearerAsyncCallback(BearerAuthenticationMethod authenticationMethod, WebServiceContext context, string token);
 }

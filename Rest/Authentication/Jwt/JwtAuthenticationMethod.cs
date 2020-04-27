@@ -13,12 +13,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
-using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Authentication.Jwt.Algorithms;
-using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Json;
 using DotLogix.Core.Rest.Services;
-using DotLogix.Core.Rest.Services.Context;
-using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Jwt {
@@ -33,8 +30,8 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
             _signingAlgorithms = algorithms.ToDictionary(a => a.Name, StringComparer.OrdinalIgnoreCase);
         }
 
-        public override Task AuthenticateAsync(WebRequestContext context, string data) {
-            var formatterSettings = context.Settings.Get(WebServiceSettings.JsonNodesFormatterSettings, JsonFormatterSettings.Idented);
+        public override Task AuthenticateAsync(WebServiceContext context, string data) {
+            var formatterSettings = context.Settings.Get(WebServiceJsonSettings.JsonNodesFormatterSettings, JsonFormatterSettings.Idented);
 
             var result = JsonWebTokens.TryDeserialize<TPayload>(data, out var token, name => _signingAlgorithms.GetValue(name), formatterSettings);
             if(result == JsonWebTokenResult.Success)

@@ -11,10 +11,8 @@ namespace DotLogix.Core.Rest.Authentication.Jwt.Algorithms {
         public RsaAlgorithm Algorithm { get; }
 
         public RsaSigningAlgorithm(X509Certificate2 certificate, RsaAlgorithm algorithm) {
-            Certificate = certificate;
             Algorithm = algorithm;
             Name = algorithm.ToString().ToUpper();
-
             _algorithmName = GetAlgorithmName(algorithm);
             _padding = GetAlgorithmPadding(algorithm);
         }
@@ -23,12 +21,12 @@ namespace DotLogix.Core.Rest.Authentication.Jwt.Algorithms {
 
 
         public byte[] CalculateSignature(byte[] data) {
-            var privateKey = (RSA)Certificate.PrivateKey;
+            var privateKey = Certificate.GetRSAPrivateKey();
             return privateKey.SignData(data, _algorithmName, _padding);
         }
 
         public bool ValidateSignature(byte[] data, byte[] signature) {
-            var publicKey = (RSACryptoServiceProvider)Certificate.PublicKey.Key;
+            var publicKey = Certificate.GetRSAPublicKey();
             return publicKey.VerifyData(data, signature, _algorithmName, _padding);
         }
 
@@ -57,7 +55,7 @@ namespace DotLogix.Core.Rest.Authentication.Jwt.Algorithms {
                 case RsaAlgorithm.Ps256:
                 case RsaAlgorithm.Ps384:
                 case RsaAlgorithm.Ps512:
-                    return RSASignaturePadding.Pkcs1;
+                    return RSASignaturePadding.Pss;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

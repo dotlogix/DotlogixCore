@@ -33,11 +33,11 @@ namespace DotLogix.Core.Caching {
         /// <summary>
         ///     Check if there are dependent cache keys
         /// </summary>
-        public bool HasChildren => _children != null && _children.Count == 0;
+        public bool HasChildren => _children != null && _children.Count > 0;
         /// <summary>
         ///     Check if there are dependent cache keys
         /// </summary>
-        public bool HasAssociatedValues => _associatedValues != null && _associatedValues.Count == 0;
+        public bool HasAssociatedValues => _associatedValues != null && _associatedValues.Count > 0;
         /// <summary>
         ///     The dependent keys
         /// </summary>

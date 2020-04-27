@@ -216,7 +216,7 @@ namespace DotLogix.Core.Collections {
             if(child == null)
                 throw new ArgumentNullException(nameof(child));
 
-            if(child.Ancestor != null)
+            if(child.Ancestor != null && child.Ancestor != this)
                 throw new ArgumentException(nameof(Hierarchy<TKey, TValue>) + " already has an ancestor", nameof(child));
 
             child.Ancestor = this;
@@ -247,5 +247,10 @@ namespace DotLogix.Core.Collections {
                 AddChild(child);
         }
         #endregion
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return $"{(Key == null ? "root" : Key.ToString())} {{ {(Value == null ? "null" : Value.ToString())} , isRoot: {IsRoot}}}";
+        }
     }
 }

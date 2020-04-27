@@ -112,7 +112,11 @@ namespace DotLogix.Core.Extensions {
         /// <typeparam name="TTarget">The target type</typeparam>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
-        public static TTarget ConvertTo<TTarget>(this object value) {
+        public static TTarget ConvertTo<TTarget>(this object value)
+        {
+            if (value is TTarget t)
+                return t;
+
             var targetType = typeof(TTarget);
             return (TTarget)ConvertTo(value, targetType);
         }
@@ -125,7 +129,14 @@ namespace DotLogix.Core.Extensions {
         /// <param name="target">The target value</param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
-        public static bool TryConvertTo<TTarget>(this object value, out TTarget target) {
+        public static bool TryConvertTo<TTarget>(this object value, out TTarget target)
+        {
+            if (value is TTarget t)
+            {
+                target = t;
+                return true;
+            }
+
             var targetType = typeof(TTarget);
             if(TryConvertTo(value, targetType, out var convertedValue)) {
                 target = (TTarget)convertedValue;

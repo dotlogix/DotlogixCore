@@ -130,7 +130,7 @@ namespace DotLogix.Core.Types {
         /// <summary>
         /// NumericMask
         /// </summary>
-        NumericMask = ULong | Long | UInt | Int | UShort | Short | Byte | Float | Double | Decimal,
+        NumericMask = ULong | Long | UInt | Int | UShort | Short | Byte | SByte | Float | Double | Decimal,
         /// <summary>
         /// PrimitiveMask
         /// </summary>

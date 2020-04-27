@@ -30,18 +30,21 @@ namespace DotLogix.Core.Extensions {
             var buffer = new char[bufferSize];
             var count = 0;
 
-            do {
+            do
+            {
                 var firstCharAsync = reader.ReadAsync(buffer, 0, buffer.Length)
-                                           .ContinueWith(task => {
-                                                             count = task.Result;
+                    .ContinueWith(task =>
+                    {
+                        count = task.Result;
 
-                                                             if (count == 0)
-                                                                 return '\0';
+                        if (count == 0)
+                            return '\0';
 
-                                                             var chr = buffer[0];
-                                                             action?.Invoke(chr);
-                                                             return chr;
-                                                         }, TaskContinuationOptions.ExecuteSynchronously);
+                        var chr = buffer[0];
+                        action?.Invoke(chr);
+                        return chr;
+                    }, TaskContinuationOptions.ExecuteSynchronously);
+
                 if(firstCharAsync.IsCompleted) {
                     if(count == 0)
                         yield break;

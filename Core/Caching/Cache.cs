@@ -161,7 +161,7 @@ namespace DotLogix.Core.Caching {
             if (discardedItems.Count <= 0)
                 return false;
 
-            ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems.Values.ToList()));
+            ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems.Values.ToList(), CacheItemDiscardReason.Discarded));
             return true;
         }
 
@@ -182,7 +182,7 @@ namespace DotLogix.Core.Caching {
             if (discardedItems.Count <= 0)
                 return false;
 
-            ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems.Values.ToList()));
+            ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems.Values.ToList(), CacheItemDiscardReason.Discarded));
             return true;
         }
 
@@ -312,7 +312,7 @@ namespace DotLogix.Core.Caching {
             discardedItems.Add(key, currentArgs);
 
 
-            if(item.HasChildren)
+            if(item.HasChildren == false)
                 return currentArgs;
 
             foreach(var dependentKey in item.Children) {

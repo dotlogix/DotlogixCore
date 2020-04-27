@@ -11,6 +11,16 @@ namespace DotLogix.Core.Extensions
     /// </summary>
     public static class StreamExtensions
     {
+
+        /// <summary>
+        /// Returns the array data segment of unsigned bytes from which this stream was created.
+        /// </summary>
+        /// <returns></returns>
+        public static ArraySegment<byte> GetBufferSegment(this MemoryStream memoryStream) {
+            var buffer = memoryStream.GetBuffer();
+            return new ArraySegment<byte>(buffer, 0, (int)memoryStream.Length);
+        }
+
         /// <summary>
         /// Search the first occurence of a byte in a stream
         /// </summary>

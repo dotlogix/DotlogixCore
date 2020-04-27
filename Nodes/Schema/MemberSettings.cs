@@ -1,4 +1,5 @@
 using DotLogix.Core.Reflection.Dynamics;
+using DotLogix.Core.Utils;
 
 namespace DotLogix.Core.Nodes {
     public class MemberSettings : TypeSettings {

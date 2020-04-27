@@ -21,21 +21,19 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes {
     public static class Nodes {
-        public static INodeConverterResolver DefaultResolver { get; } = new NodeConverterResolver();
-        public static INodeConverterResolver DefaultJsonResolver { get; } = new NodeConverterResolver();
+        public static INodeConverterResolver DefaultResolver => CreateDefaultResolver();
+
+        private static INodeConverterResolver CreateDefaultResolver() {
+            var resolver = new NodeConverterResolver();
+            resolver.Register(new ObjectNodeConverterFactory());
+            resolver.Register(new OptionalNodeConverterFactory());
+            resolver.Register(new ListNodeConverterFactory());
+            resolver.Register(new KeyValuePairNodeConverterFactory());
+            resolver.Register(new ValueNodeConverterFactory());
+            return resolver;
+        }
 
         static Nodes() {
-            DefaultResolver.Register(new ObjectNodeConverterFactory());
-            DefaultResolver.Register(new OptionalNodeConverterFactory());
-            DefaultResolver.Register(new ListNodeConverterFactory());
-            DefaultResolver.Register(new KeyValuePairNodeConverterFactory());
-            DefaultResolver.Register(new ValueNodeConverterFactory(false));
-
-            DefaultJsonResolver.Register(new ObjectNodeConverterFactory());
-            DefaultJsonResolver.Register(new OptionalNodeConverterFactory());
-            DefaultJsonResolver.Register(new ListNodeConverterFactory());
-            DefaultJsonResolver.Register(new KeyValuePairNodeConverterFactory());
-            DefaultJsonResolver.Register(new ValueNodeConverterFactory(true));
         }
 
         #region NodeTypes
@@ -76,24 +74,27 @@ namespace DotLogix.Core.Nodes {
             return WriteToAsync(name, instance, instance?.GetType(), writer, settings);
         }
 
-        public static ValueTask WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static async ValueTask WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
             if(instance == null) {
-                return writer.WriteValueAsync(name, null);
+                await writer.WriteValueAsync(name, null).ConfigureAwait(false);
+                return;
             }
 
             if(instance is Node node) {
                 var reader = new NodeReader(node);
-                return reader.CopyToAsync(writer);
+                await reader.CopyToAsync(writer).ConfigureAwait(false);
+                return;
             }
 
             if(instanceType == null)
                 throw new ArgumentNullException(nameof(instanceType));
 
             if(settings.Resolver.TryResolve(instanceType, out var typeSettings)) {
-                return typeSettings.Converter.WriteAsync(instance, name, writer, settings);
+                await typeSettings.Converter.WriteAsync(instance, name, writer, settings).ConfigureAwait(false);
+                return;
             }
 
-            return writer.WriteValueAsync(name, null);
+            await writer.WriteValueAsync(name, null).ConfigureAwait(false);
         }
         #endregion
 

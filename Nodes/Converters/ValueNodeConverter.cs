@@ -25,7 +25,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public ValueNodeConverter2(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
             var scopedSettings = settings.GetScoped(TypeSettings);
             if (scopedSettings.ShouldEmitValue(instance) == false)
                 return default;
@@ -34,7 +34,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override object ConvertToObject(Node node, IConverterSettings settings) {
+        public override object ConvertToObject(Node node, IReadOnlyConverterSettings settings) {
             if (node.Type == NodeTypes.Empty)
                 return Type.GetDefaultValue();
 
@@ -55,7 +55,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public ValueNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
             var scopedSettings = settings.GetScoped(TypeSettings);
             if (scopedSettings.ShouldEmitValue(instance) == false)
                 return default;
@@ -64,7 +64,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override object ConvertToObject(Node node, IConverterSettings settings) {
+        public override object ConvertToObject(Node node, IReadOnlyConverterSettings settings) {
             if (node.Type == NodeTypes.Empty)
                 return Type.GetDefaultValue();
 

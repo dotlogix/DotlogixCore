@@ -1,74 +1,63 @@
 using System;
 using System.Runtime.CompilerServices;
+using DotLogix.Core.Nodes.Factories;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Utils;
 
 namespace DotLogix.Core.Nodes {
+
     [AttributeUsage(AttributeTargets.Class)]
-    public class NodeTypeAttribute : Attribute {
+    public class NodeTypeAttribute : Attribute{
         public Type ConverterFactory { get; set; }
         public Type NamingStrategy { get; set; }
-        /// <summary>
-        ///     The inner settings
-        /// </summary>
-        public ISettings Settings { get; set; } = new Settings(StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>
-        ///     The default settings
-        /// </summary>
-        public static ConverterSettings Default => new ConverterSettings();
 
         /// <summary>
         ///     The time format (u by default)
         /// </summary>
-        public string TimeFormat {
-            get => GetWithMemberName("u");
-            set => SetWithMemberName(value);
-        }
+        public string TimeFormat { get; set; }
 
         /// <summary>
         ///     The number format (G by default)
         /// </summary>
-        public string NumberFormat {
-            get => GetWithMemberName("G");
-            set => SetWithMemberName(value);
-        }
+        public string NumberFormat { get; set; }
 
         /// <summary>
         ///     The guid format (D by default)
         /// </summary>
-        public string GuidFormat {
-            get => GetWithMemberName("D");
-            set => SetWithMemberName(value);
-        }
+        public string GuidFormat { get; set; }
 
         /// <summary>
         ///     The enum format (D by default)
         /// </summary>
-        public string EnumFormat {
-            get => GetWithMemberName("D");
-            set => SetWithMemberName(value);
-        }
+        public string EnumFormat { get; set; }
 
         /// <summary>
         ///     Determines if default or null values should be ignored
         /// </summary>
-        public EmitMode EmitMode {
-            get => GetWithMemberName(EmitMode.Emit);
-            set => SetWithMemberName(value);
-        }
+        public EmitMode EmitMode { get; set; }
 
-        /// <summary>
-        ///     If called by a class member the member name can be omitted
-        /// </summary>
-        protected void SetWithMemberName(object value, [CallerMemberName] string memberName = null) {
-            Settings.Set(memberName, value);
-        }
+        /// <inheritdoc />
+        public virtual void ApplyTo(INodeConverterResolver resolver, TypeSettings settings) {
+            if(TimeFormat != null)
+                settings.TimeFormat = TimeFormat;
 
-        /// <summary>
-        ///     If called by a class member the member name can be omitted
-        /// </summary>
-        protected T GetWithMemberName<T>(T defaultValue = default, [CallerMemberName] string memberName = null) {
-            return Settings.Get(memberName, defaultValue);
+            if(NumberFormat != null)
+                settings.NumberFormat = NumberFormat;
+
+            if(GuidFormat != null)
+                settings.GuidFormat = GuidFormat;
+
+            if(EnumFormat != null)
+                settings.EnumFormat = EnumFormat;
+
+            if(EmitMode != EmitMode.Inherit)
+                settings.EmitMode = EmitMode;
+
+            if(NamingStrategy != null && resolver.TryGet(NamingStrategy, out INamingStrategy strategy))
+                settings.NamingStrategy = strategy;
+
+            if(ConverterFactory != null && resolver.TryGet(ConverterFactory, out INodeConverterFactory factory))
+                settings.Converter = factory.CreateConverter(resolver, settings);
         }
     }
 }

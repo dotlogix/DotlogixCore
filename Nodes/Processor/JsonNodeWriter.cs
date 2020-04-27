@@ -50,30 +50,26 @@ namespace DotLogix.Core.Nodes.Processor {
 
             _builder.Append('{');
 
-            PushContainer(NodeContainerType.Map);
+            ContainerStack.Push(NodeContainerType.Map);
             _isFirstChild = true;
 
             if(_builder.Length >= _bufferSize) {
-                var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false || task.IsFaulted)
-                    await task;
+                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
                 _builder.Clear();
             }
         }
 
         /// <inheritdoc />
         public override async ValueTask EndMapAsync() {
-            PopExpectedContainer(NodeContainerType.Map);
+            ContainerStack.PopExpected(NodeContainerType.Map);
             _isFirstChild = false;
 
             if(_formatterSettings.Ident)
                 WriteIdentAsync();
             _builder.Append('}');
             
-            if(_builder.Length >= _bufferSize || ContainerCount == 0) {
-                var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false || task.IsFaulted)
-                    await task;
+            if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
+                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
                 _builder.Clear();
             }
         }
@@ -93,30 +89,26 @@ namespace DotLogix.Core.Nodes.Processor {
 
             _builder.Append('[');
 
-            PushContainer(NodeContainerType.List);
+            ContainerStack.Push(NodeContainerType.List);
             _isFirstChild = true;
 
             if(_builder.Length >= _bufferSize) {
-                var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false || task.IsFaulted)
-                    await task;
+                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
                 _builder.Clear();
             }
         }
 
         /// <inheritdoc />
         public override async ValueTask EndListAsync() {
-            PopExpectedContainer(NodeContainerType.List);
+            ContainerStack.PopExpected(NodeContainerType.List);
             _isFirstChild = false;
 
             if(_formatterSettings.Ident)
                 WriteIdentAsync();
             _builder.Append(']');
             
-            if(_builder.Length >= _bufferSize || ContainerCount == 0) {
-                var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false || task.IsFaulted)
-                    await task;
+            if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
+                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
                 _builder.Clear();
             }
         }
@@ -137,20 +129,18 @@ namespace DotLogix.Core.Nodes.Processor {
             AppendValueString(value);
             _isFirstChild = false;
 
-            if(_builder.Length >= _bufferSize || ContainerCount == 0) {
-                var task = _writer.WriteAsync(_builder.ToString());
-                if(task.IsCompleted == false || task.IsFaulted)
-                    await task;
+            if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
+                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
                 _builder.Clear();
             }
         }
 
         private void WriteIdentAsync() {
             _builder.AppendLine();
-            if (ContainerCount == 0)
+            if (ContainerStack.Count == 0)
                 return;
 
-            var identCount = ContainerCount * _formatterSettings.IdentSize;
+            var identCount = ContainerStack.Count * _formatterSettings.IdentSize;
             if(identCount > 0)
                 _builder.Append(' ', identCount);
         }
@@ -188,15 +178,15 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         private void CheckName(string name, out bool appendName) {
-            switch(CurrentContainer) {
+            switch(ContainerStack.Current) {
                 case NodeContainerType.Map:
                     if(name == null)
-                        throw new ArgumentNullException(nameof(name), $"Name can not be null in the current container {CurrentContainer}");
+                        throw new ArgumentNullException(nameof(name), $"Name can not be null in the current container {ContainerStack.Current}");
                     appendName = true;
                     break;
                 case NodeContainerType.List:
                     if(name != null)
-                        throw new ArgumentException(nameof(name), $"Name can not have a value in the current container {CurrentContainer}");
+                        throw new ArgumentException(nameof(name), $"Name can not have a value in the current container {ContainerStack.Current}");
                     appendName = false;
                     break;
                 case NodeContainerType.None:

@@ -27,7 +27,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public ArrayNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
             var scopedSettings = settings.GetScoped(TypeSettings);
             var childConverter = TypeSettings.ChildSettings.Converter;
             
@@ -35,35 +35,27 @@ namespace DotLogix.Core.Nodes.Converters {
             if (scopedSettings.ShouldEmitValue(instance) == false)
                 return;
 
-            ValueTask task;
+            scopedSettings = settings.GetScoped(TypeSettings.ChildSettings);
+
             if (instance == null) {
-                task = writer.WriteValueAsync(name, null);
-                if (task.IsCompletedSuccessfully == false)
-                    await task;
+                await writer.WriteValueAsync(name, null).ConfigureAwait(false);
                 return;
             }
 
             if (!(instance is IEnumerable<T> values))
                 throw new ArgumentException($"Expected instance of type \"IEnumerable<T>\" got \"{instance.GetType()}\"");
 
-            task = writer.BeginListAsync(name);
-            if(task.IsCompletedSuccessfully == false)
-                await task;
+            await writer.BeginListAsync(name).ConfigureAwait(false);
 
             foreach (var value in values) {
-                task = childConverter.WriteAsync(value, null, writer, scopedSettings.ChildSettings);
-
-                if (task.IsCompletedSuccessfully == false)
-                    await task;
+                await childConverter.WriteAsync(value, null, writer, scopedSettings).ConfigureAwait(false);
             }
 
-            task = writer.EndListAsync();
-            if(task.IsCompletedSuccessfully == false)
-                await task;
+            await writer.EndListAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public override object ConvertToObject(Node node, IConverterSettings settings) {
+        public override object ConvertToObject(Node node, IReadOnlyConverterSettings settings) {
             if (node.Type == NodeTypes.Empty)
                 return default;
 
@@ -71,14 +63,14 @@ namespace DotLogix.Core.Nodes.Converters {
                 throw new ArgumentException($"Expected node of type \"NodeList\" got \"{node.Type}\"");
 
 
-            var scopedSettings = settings.GetScoped(TypeSettings);
+            var scopedSettings = settings.GetScoped(TypeSettings.ChildSettings);
             var childConverter = TypeSettings.ChildSettings.Converter;
 
             var children = nodeList.Children().ToArray();
             var childCount = children.Length;
             var array = new T[childCount];
             for (var i = 0; i < childCount; i++)
-                array[i] = (T)childConverter.ConvertToObject(children[i], scopedSettings.ChildSettings);
+                array[i] = (T)childConverter.ConvertToObject(children[i], scopedSettings);
 
             return array;
         }

@@ -1,79 +1,97 @@
+#region using
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
-using DotLogix.Core.Utils;
+#endregion
 
 namespace DotLogix.Core.Nodes {
-    public class ScopedConverterSettings : ConverterSettings {
+    public class ScopedConverterSettings : IReadOnlyConverterSettings {
         /// <summary>
         ///     The scope type settings
         /// </summary>
-        public IConverterSettings TypeSettings { get; protected set; }
+        public TypeSettings TypeSettings { get; }
 
         /// <summary>
         ///     The scope type settings
         /// </summary>
-        public IConverterSettings MemberSettings { get; protected set; }
+        public TypeSettings MemberSettings { get; }
 
         /// <summary>
         ///     The scope type settings
         /// </summary>
-        public IConverterSettings UserSettings { get; protected set; }
+        public IConverterSettings UserSettings { get; }
 
         /// <inheritdoc />
-        public override IConverterSettings ChildSettings {
-            get {
-                var childTypeSettings = TypeSettings?.ChildSettings;
-                var childMemberSettings = MemberSettings?.ChildSettings;
-                return new ScopedConverterSettings(UserSettings, childTypeSettings, childMemberSettings);
-            }
-            set => throw new NotSupportedException();
-        }
-
-
-        /// <inheritdoc />
-        public ScopedConverterSettings(IConverterSettings userSettings, IConverterSettings typeSettings = null, IConverterSettings memberSettings = null) : base(userSettings?.Settings) {
+        public ScopedConverterSettings(IConverterSettings userSettings, TypeSettings typeSettings, TypeSettings memberSettings) {
             TypeSettings = typeSettings;
             MemberSettings = memberSettings;
             UserSettings = userSettings;
-            Settings = null;
         }
 
         /// <inheritdoc />
-        protected override T GetWithMemberName<T>(T defaultValue = default, string memberName = null) {
-            if((MemberSettings != null) && MemberSettings.Settings.TryGet(memberName, out T value))
-                return value;
+        public INamingStrategy NamingStrategy => MemberSettings?.NamingStrategy ?? TypeSettings?.NamingStrategy ?? UserSettings.NamingStrategy;
 
-            if((TypeSettings != null) && TypeSettings.Settings.TryGet(memberName, out value))
-                return value;
+        /// <inheritdoc />
+        public string TimeFormat => MemberSettings?.TimeFormat ?? TypeSettings?.TimeFormat ?? UserSettings.TimeFormat;
 
-            if((UserSettings != null) && UserSettings.Settings.TryGet(memberName, out value))
-                return value;
-            return defaultValue;
+        /// <inheritdoc />
+        public string NumberFormat => MemberSettings?.NumberFormat ?? TypeSettings?.NumberFormat ?? UserSettings.NumberFormat;
+
+        /// <inheritdoc />
+        public string GuidFormat => MemberSettings?.GuidFormat ?? TypeSettings?.GuidFormat ?? UserSettings.GuidFormat;
+
+        /// <inheritdoc />
+        public string EnumFormat => MemberSettings?.EnumFormat ?? TypeSettings?.EnumFormat ?? UserSettings.EnumFormat;
+
+        /// <inheritdoc />
+        public EmitMode EmitMode {
+            get {
+                if(MemberSettings != null && MemberSettings.EmitMode != EmitMode.Inherit)
+                    return MemberSettings.EmitMode;
+
+                if(TypeSettings != null && TypeSettings.EmitMode != EmitMode.Inherit)
+                    return TypeSettings.EmitMode;
+
+                if(UserSettings != null && UserSettings.EmitMode != EmitMode.Inherit)
+                    return UserSettings.EmitMode;
+
+                return EmitMode.Emit;
+            }
         }
 
         /// <inheritdoc />
-        protected override void SetWithMemberName(object value, string memberName = null) {
-            throw new NotSupportedException("You can not override a setting on scoped settings");
+        public ScopedConverterSettings ChildSettings
+        {
+            get
+            {
+                if (TypeSettings == null && MemberSettings == null)
+                    return this;
+                return new ScopedConverterSettings(UserSettings, TypeSettings?.ChildSettings, MemberSettings?.ChildSettings);
+            }
         }
 
         /// <inheritdoc />
-        public override IConverterSettings GetScoped(TypeSettings typeSettings = null, MemberSettings memberSettings = null) {
-            return new ScopedConverterSettings(UserSettings, typeSettings ?? TypeSettings, memberSettings ?? MemberSettings);
+        public IFormatProvider FormatProvider {
+            get => UserSettings.FormatProvider;
+            set => UserSettings.FormatProvider = value;
+        }
+
+        /// <inheritdoc />
+        public IReadOnlyConverterSettings GetScoped(TypeSettings typeSettings = null, TypeSettings memberSettings = null)
+        {
+            if ((typeSettings != null && typeSettings.HasOverrides) || (memberSettings != null && memberSettings.HasOverrides))
+                return new ScopedConverterSettings(UserSettings, memberSettings, typeSettings);
+            return UserSettings;
+        }
+
+
+        public virtual bool ShouldEmitValue(object value) {
+            return ConverterSettings.ShouldEmitValue(value, EmitMode);
         }
     }
 
     public class ConverterSettings : IConverterSettings {
-        /// <summary>
-        ///     The inner settings
-        /// </summary>
-        public ISettings Settings { get; protected set; }
-        IReadOnlySettings IReadOnlyConverterSettings.Settings => Settings;
-
         /// <summary>
         ///     The default settings
         /// </summary>
@@ -82,115 +100,60 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         ///     The default settings
         /// </summary>
-        public static ConverterSettings JsonDefault => new ConverterSettings {Resolver = Nodes.DefaultJsonResolver};
+        public static ConverterSettings JsonDefault => JsonFormatterSettings.Default;
 
         /// <summary>
         ///     The format provider (invariant by default)
         /// </summary>
-        public IFormatProvider FormatProvider {
-            get => GetWithMemberName((IFormatProvider)CultureInfo.InvariantCulture);
-            set => SetWithMemberName(value);
-        }
-
-        /// <summary>
-        ///     The format provider (invariant by default)
-        /// </summary>
-        public INodeConverterResolver Resolver {
-            get => GetWithMemberName(Nodes.DefaultResolver);
-            set => SetWithMemberName(value);
-        }
-
-        /// <summary>
-        ///     Creates a new instance of <see cref="Settings" />
-        /// </summary>
-        public ConverterSettings() : this(null) { }
-
-        /// <summary>
-        ///     Creates a new instance of <see cref="Settings" />
-        /// </summary>
-        public ConverterSettings(ISettings settings) {
-            Settings = settings ?? new Settings(StringComparer.Ordinal);
-        }
+        public IFormatProvider FormatProvider { get; set; } = CultureInfo.InvariantCulture;
 
         /// <summary>
         ///     The naming strategy (camelCase by default)
         /// </summary>
-        public INamingStrategy NamingStrategy {
-            get => GetWithMemberName(NamingStrategies.CamelCase);
-            set => SetWithMemberName(value);
-        }
+        public INamingStrategy NamingStrategy { get; set; } = NamingStrategies.CamelCase;
 
         /// <summary>
-        ///     The time format (u by default)
+        ///     The time format (o by default)
         /// </summary>
-        public string TimeFormat {
-            get => GetWithMemberName("u");
-            set => SetWithMemberName(value);
-        }
+        public string TimeFormat { get; set; } = "o";
 
         /// <summary>
         ///     The number format (G by default)
         /// </summary>
-        public string NumberFormat {
-            get => GetWithMemberName("G");
-            set => SetWithMemberName(value);
-        }
+        public string NumberFormat { get; set; } = "G";
 
         /// <summary>
         ///     The guid format (D by default)
         /// </summary>
-        public string GuidFormat {
-            get => GetWithMemberName("D");
-            set => SetWithMemberName(value);
-        }
+        public string GuidFormat { get; set; } = "D";
 
         /// <summary>
         ///     The enum format (D by default)
         /// </summary>
-        public string EnumFormat {
-            get => GetWithMemberName("D");
-            set => SetWithMemberName(value);
-        }
+        public string EnumFormat { get; set; } = "D";
 
         /// <summary>
         ///     Determines if default or null values should be ignored
         /// </summary>
-        public EmitMode EmitMode {
-            get => GetWithMemberName(EmitMode.Emit);
-            set => SetWithMemberName(value);
-        }
-
-        /// <inheritdoc />
-        public virtual IConverterSettings ChildSettings {
-            get => GetWithMemberName<IConverterSettings>();
-            set => SetWithMemberName(value);
-        }
-
-
-        /// <inheritdoc />
-        IReadOnlyConverterSettings IReadOnlyConverterSettings.ChildSettings => ChildSettings;
+        public EmitMode EmitMode { get; set; } = EmitMode.Emit;
 
         /// <summary>
-        ///     If called by a class member the member name can be omitted
+        ///     The format provider (invariant by default)
         /// </summary>
-        protected virtual void SetWithMemberName(object value, [CallerMemberName] string memberName = null) {
-            Settings.Set(memberName, value);
-        }
+        public INodeConverterResolver Resolver { get; set; } = Nodes.DefaultResolver;
 
-        /// <summary>
-        ///     If called by a class member the member name can be omitted
-        /// </summary>
-        protected virtual T GetWithMemberName<T>(T defaultValue = default, [CallerMemberName] string memberName = null) {
-            return Settings.Get(memberName, defaultValue);
-        }
-        
-        public virtual IConverterSettings GetScoped(TypeSettings typeSettings = null, MemberSettings memberSettings = null) {
-            return new ScopedConverterSettings(this, typeSettings, memberSettings);
+        public virtual IReadOnlyConverterSettings GetScoped(TypeSettings typeSettings = null, TypeSettings memberSettings = null) {
+            if ((typeSettings != null && typeSettings.HasOverrides) || (memberSettings != null && memberSettings.HasOverrides))
+                return new ScopedConverterSettings(this, memberSettings, typeSettings);
+            return this;
         }
 
         public virtual bool ShouldEmitValue(object value) {
-            var emitMode = EmitMode;
-            if (value == null)
+            return ShouldEmitValue(value, EmitMode);
+        }
+
+        public static bool ShouldEmitValue(object value, EmitMode emitMode) {
+            if(value == null)
                 return emitMode == EmitMode.Emit;
 
             var type = value.GetType();

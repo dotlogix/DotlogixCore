@@ -12,13 +12,13 @@ namespace DotLogix.Core.Nodes.Converters {
         public NodeToNodeConverter(TypeSettings typeSettings, bool dynamic = false) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
             var reader = new NodeReader((Node)instance);
-            return reader.CopyToAsync(writer);
+            await reader.CopyToAsync(writer).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public override object ConvertToObject(Node node, IConverterSettings settings) {
+        public override object ConvertToObject(Node node, IReadOnlyConverterSettings settings) {
             return node;
 
         }

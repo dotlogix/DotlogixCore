@@ -27,12 +27,12 @@ namespace DotLogix.Core.Nodes.Processor {
                 AddChild(name, map);
 
             CurrentNodeCollection = map;
-            PushContainer(NodeContainerType.Map);
+            ContainerStack.Push(NodeContainerType.Map);
             return default;
         }
 
         public override ValueTask EndMapAsync() {
-            PopExpectedContainer(NodeContainerType.Map);
+            ContainerStack.PopExpected(NodeContainerType.Map);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
             return default;
         }
@@ -47,12 +47,12 @@ namespace DotLogix.Core.Nodes.Processor {
                 AddChild(name, list);
 
             CurrentNodeCollection = list;
-            PushContainer(NodeContainerType.List);
+            ContainerStack.Push(NodeContainerType.List);
             return default;
         }
 
         public override ValueTask EndListAsync() {
-            PopExpectedContainer(NodeContainerType.List);
+            ContainerStack.PopExpected(NodeContainerType.List);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
             return default;
         }
@@ -69,14 +69,14 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         private void CheckName(string name) {
-            switch(CurrentContainer) {
+            switch(ContainerStack.Current) {
                 case NodeContainerType.Map:
                     if(name == null)
-                        throw new ArgumentNullException(nameof(name), $"Name can not be null in the current container {CurrentContainer}");
+                        throw new ArgumentNullException(nameof(name), $"Name can not be null in the current container {ContainerStack.Current}");
                     break;
                 case NodeContainerType.List:
                     if(name != null)
-                        throw new ArgumentException(nameof(name), $"Name can not have a value in the current container {CurrentContainer}");
+                        throw new ArgumentException(nameof(name), $"Name can not have a value in the current container {ContainerStack.Current}");
                     break;
                 case NodeContainerType.None:
                     if(Root != null)
@@ -88,7 +88,7 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         private void AddChild(string name, Node node) {
-            switch(CurrentContainer) {
+            switch(ContainerStack.Current) {
                 case NodeContainerType.List:
                     ((NodeList)CurrentNodeCollection).AddChild(node);
                     break;

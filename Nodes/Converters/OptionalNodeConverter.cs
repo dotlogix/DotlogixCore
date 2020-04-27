@@ -25,32 +25,32 @@ namespace DotLogix.Core.Nodes.Converters {
         public OptionalNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
             if(!(instance is Optional<TValue> opt))
                 return default;
 
             if (opt.IsDefined == false)
                 return default;
 
-            var scopedSettings = settings.GetScoped(TypeSettings);
+            var scopedSettings = settings.GetScoped(TypeSettings.ChildSettings);
             var childConverter = TypeSettings.ChildSettings.Converter;
 
             if (scopedSettings.ShouldEmitValue(opt.Value) == false)
                 return default;
 
-            return childConverter.WriteAsync(opt.Value, name, writer, scopedSettings.ChildSettings);
+            return childConverter.WriteAsync(opt.Value, name, writer, scopedSettings);
         }
 
         /// <inheritdoc />
-        public override object ConvertToObject(Node node, IConverterSettings settings) {
+        public override object ConvertToObject(Node node, IReadOnlyConverterSettings settings) {
             if(node.Type == NodeTypes.Empty)
                 return new Optional<TValue>(default);
 
 
-            var scopedSettings = settings.GetScoped(TypeSettings);
+            var scopedSettings = settings.GetScoped(TypeSettings.ChildSettings);
             var childConverter = TypeSettings.ChildSettings.Converter;
 
-            var optionalValue = childConverter.ConvertToObject(node, scopedSettings.ChildSettings);
+            var optionalValue = childConverter.ConvertToObject(node, scopedSettings);
             return new Optional<TValue>((TValue)optionalValue);
 
         }

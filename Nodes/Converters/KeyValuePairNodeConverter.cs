@@ -36,29 +36,18 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
             var keyFieldValue = _keySettings.Accessor.GetValue(instance);
             var valueFieldValue = _valueSettings.Accessor.GetValue(instance);
 
-            var task = writer.BeginMapAsync(name);
-            if(task.IsCompletedSuccessfully == false)
-                await task;
-
-            task = _keySettings.Converter.WriteAsync(keyFieldValue, GetMemberName(_keySettings, settings), writer, settings);
-            if(task.IsCompletedSuccessfully == false)
-                await task;
-
-            task = _valueSettings.Converter.WriteAsync(valueFieldValue, GetMemberName(_valueSettings, settings), writer, settings);
-            if (task.IsCompletedSuccessfully == false)
-                await task;
-
-            task = writer.EndMapAsync();
-            if(task.IsCompletedSuccessfully == false)
-                await task;
+            await writer.BeginMapAsync(name).ConfigureAwait(false);
+            await _keySettings.Converter.WriteAsync(keyFieldValue, GetMemberName(_keySettings, settings), writer, settings).ConfigureAwait(false);
+            await _valueSettings.Converter.WriteAsync(valueFieldValue, GetMemberName(_valueSettings, settings), writer, settings).ConfigureAwait(false);
+            await writer.EndMapAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public override object ConvertToObject(Node node, IConverterSettings settings) {
+        public override object ConvertToObject(Node node, IReadOnlyConverterSettings settings) {
             if(!(node is NodeMap nodeMap))
                 throw new ArgumentException($"Expected node of type \"NodeMap\" got \"{node.Type}\"");
 

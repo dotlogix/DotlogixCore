@@ -5,10 +5,6 @@ using DotLogix.Core.Utils;
 namespace DotLogix.Core.Nodes {
     public interface IReadOnlyConverterSettings {
         /// <summary>
-        ///     The inner settings
-        /// </summary>
-        IReadOnlySettings Settings { get; }
-        /// <summary>
         ///     The naming strategy (camelCase by default)
         /// </summary>
         INamingStrategy NamingStrategy { get; }
@@ -37,25 +33,18 @@ namespace DotLogix.Core.Nodes {
         ///     Determines if default or null values should be ignored
         /// </summary>
         EmitMode EmitMode { get; }
-        /// <summary>
-        ///     The child settings for collection types
-        /// </summary>
-        IReadOnlyConverterSettings ChildSettings { get;}
 
         /// <summary>
         ///     The format provider (invariant by default)
         /// </summary>
         IFormatProvider FormatProvider { get; set; }
-        IConverterSettings GetScoped(TypeSettings typeSettings = null, MemberSettings memberSettings = null);
         bool ShouldEmitValue(object value);
+
+        /// <inheritdoc />
+        IReadOnlyConverterSettings GetScoped(TypeSettings typeSettings = null, TypeSettings memberSettings = null);
     }
 
     public interface IConverterSettings : IReadOnlyConverterSettings {
-        /// <summary>
-        ///     The inner settings
-        /// </summary>
-        new ISettings Settings { get; }
-
         /// <summary>
         ///     The naming strategy (camelCase by default)
         /// </summary>
@@ -85,9 +74,5 @@ namespace DotLogix.Core.Nodes {
         ///     Determines if default or null values should be ignored
         /// </summary>
         new EmitMode EmitMode { get; set; }
-        /// <summary>
-        ///     The child settings for collection types
-        /// </summary>
-        new IConverterSettings ChildSettings { get; set; }
     }
 }

@@ -14,12 +14,10 @@ using System.Threading.Tasks;
 
 namespace DotLogix.Core.Nodes.Processor {
     public abstract class NodeWriterBase : IAsyncNodeWriter {
-        protected readonly Stack<NodeContainerType> ContainerStack = new Stack<NodeContainerType>();
+        protected readonly NodeContainerStack ContainerStack = new NodeContainerStack();
         protected NodeWriterBase(ConverterSettings converterSettings = null) {  
             ConverterSettings = converterSettings ?? ConverterSettings.Default;
         }
-        protected NodeContainerType CurrentContainer => ContainerStack.Count > 0 ? ContainerStack.Peek() : NodeContainerType.None;
-        protected int ContainerCount => ContainerStack.Count;
         protected ConverterSettings ConverterSettings { get; }
 
         public virtual ValueTask BeginMapAsync() => BeginMapAsync(null);
@@ -35,20 +33,16 @@ namespace DotLogix.Core.Nodes.Processor {
 
         public virtual async ValueTask AutoCompleteAsync() {
             while(ContainerStack.Count > 0) {
-                ValueTask task;
                 switch(ContainerStack.Pop()) {
                     case NodeContainerType.Map:
-                        task = EndMapAsync();
+                        await EndMapAsync().ConfigureAwait(false);
                         break;
                     case NodeContainerType.List:
-                        task = EndListAsync();
+                        await EndListAsync().ConfigureAwait(false);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-
-                if(task.IsCompletedSuccessfully == false)
-                    await task;
             }
         }
 
@@ -69,26 +63,6 @@ namespace DotLogix.Core.Nodes.Processor {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        protected void PushContainer(NodeContainerType containerType) {
-            ContainerStack.Push(containerType);
-        }
-
-        protected void PopExpectedContainer(NodeContainerType expectedType) {
-            if(ContainerStack.Count == 0)
-                throw new InvalidOperationException("There is nothing on the container stack");
-
-            var currentContainer = ContainerStack.Pop();
-            if(currentContainer == expectedType)
-                return;
-
-            ContainerStack.Push(currentContainer);
-            throw new InvalidOperationException($"The current container doesn't match the expected type {expectedType} (current: {currentContainer})");
-        }
-
-        protected NodeContainerType PopContainer() {
-            return ContainerStack.Pop();
         }
     }
 }

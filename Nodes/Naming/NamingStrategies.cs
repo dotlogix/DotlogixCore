@@ -16,26 +16,26 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         /// A camelCase naming strategy
         /// </summary>
-        public static INamingStrategy CamelCase => new CamelCaseNamingStrategy();
+        public static INamingStrategy CamelCase { get; } = new CamelCaseNamingStrategy();
         /// <summary>
         /// A kebap-case naming strategy
         /// </summary>
-        public static INamingStrategy KebapCase => new KebapCaseNamingStrategy();
+        public static INamingStrategy KebapCase { get; } = new KebapCaseNamingStrategy();
         /// <summary>
         /// A lowercase naming strategy
         /// </summary>
-        public static INamingStrategy LowerCase => new LowerCaseNamingStrategy();
+        public static INamingStrategy LowerCase { get; } = new LowerCaseNamingStrategy();
         /// <summary>
         /// A PascalCase naming strategy
         /// </summary>
-        public static INamingStrategy PascalCase => new PascalCaseNamingStrategy();
+        public static INamingStrategy PascalCase { get; } = new PascalCaseNamingStrategy();
         /// <summary>
         /// A snake_case naming strategy
         /// </summary>
-        public static INamingStrategy SnakeCase => new SnakeCaseNamingStrategy();
+        public static INamingStrategy SnakeCase { get; } = new SnakeCaseNamingStrategy();
         /// <summary>
         /// A UPPERCASE naming strategy
         /// </summary>
-        public static INamingStrategy UpperCase => new UpperCaseNamingStrategy();
+        public static INamingStrategy UpperCase { get; } = new UpperCaseNamingStrategy();
     }
 }

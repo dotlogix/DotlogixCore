@@ -24,45 +24,29 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         protected async ValueTask CopyToRecursiveAsync(Node node, IAsyncNodeWriter writer) {
-            ValueTask task;
             switch(node.Type) {
                 case NodeTypes.Empty:
-                    task = writer.WriteValueAsync(node.Name, null);
-                    if(task.IsCompletedSuccessfully == false)
-                        await task;
+                    await writer.WriteValueAsync(node.Name, null).ConfigureAwait(false);
                     break;
                 case NodeTypes.Value:
-                    task = writer.WriteValueAsync(node.Name, ((NodeValue)node).Value);
-                    if(task.IsCompletedSuccessfully == false)
-                        await task;
+                    await writer.WriteValueAsync(node.Name, ((NodeValue)node).Value).ConfigureAwait(false);
                     break;
                 case NodeTypes.List:
-                    task = writer.BeginListAsync(node.Name);
-                    if(task.IsCompletedSuccessfully == false)
-                        await task;
+                    await writer.BeginListAsync(node.Name).ConfigureAwait(false);
 
                     foreach(var child in ((NodeList)node).Children()) {
-                        task = CopyToRecursiveAsync(child, writer);
-                        if(task.IsCompletedSuccessfully == false)
-                            await task;
+                        await CopyToRecursiveAsync(child, writer).ConfigureAwait(false);
                     }
-                    task = writer.EndListAsync();
-                    if(task.IsCompletedSuccessfully == false)
-                        await task;
+                    await writer.EndListAsync().ConfigureAwait(false);
                     break;
                 case NodeTypes.Map:
-                    task = writer.BeginMapAsync(node.Name);
-                    if(task.IsCompletedSuccessfully == false)
-                        await task;
+                    await writer.BeginMapAsync(node.Name).ConfigureAwait(false);
 
                     foreach(var child in ((NodeMap)node).Children()) {
-                        task = CopyToRecursiveAsync(child, writer);
-                        if(task.IsCompletedSuccessfully == false)
-                            await task;
+                        await CopyToRecursiveAsync(child, writer).ConfigureAwait(false);
                     }
-                    task = writer.EndMapAsync();
-                    if(task.IsCompletedSuccessfully == false)
-                        await task;
+
+                    await writer.EndMapAsync().ConfigureAwait(false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

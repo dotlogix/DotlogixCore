@@ -8,10 +8,10 @@
 
 #region
 using System;
-using DotLogix.Core.Rest.Server.Http;
+using DotLogix.Core.Rest.Http;
 #endregion
 
-namespace DotLogix.Core.Rest.Services.Attributes.Http {
+namespace DotLogix.Core.Rest.Services.Attributes {
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpGetAttribute : HttpMethodAttribute {
         public HttpGetAttribute() : base(HttpMethods.Get) { }

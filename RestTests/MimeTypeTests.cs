@@ -1,7 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
+using System.Text.RegularExpressions;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Rest.Http;
+using DotLogix.Core.Rest.Http.Headers;
 using NUnit.Framework;
-using DotLogix.Core.Rest.Server.Http.Headers;
 
 namespace CoreTests {
     [TestFixture]
@@ -9,13 +12,36 @@ namespace CoreTests {
         
         [SetUp]
         public void Setup() {
-            
+
+        }
+
+        [Test]
+        public void MimeType_Invalid() {
+            var mimeTypeStr = "This is not a valid mime type; test;=1";
+            Assert.That(() => MimeType.Parse(mimeTypeStr), Throws.TypeOf<FormatException>());
+        }
+
+        [Test]
+        public void MimeType_Regex() {
+            var jsonValue = MimeTypes.Application.Json.Value;
+            var value = jsonValue + ";q=0.3;v;v=test;a    ;b;    c     =    abcde;";
+
+            var tokenRegex = "(?:[!#$%&'*+-.^_`|~'\\d\\w]+)";
+            var attributeRegex = "(<attrName>"+tokenRegex+ ")(<attrValue>" + tokenRegex+"\\s*=\\s*"+ tokenRegex + "|(?:\"[^\"]+\"))";
+            var headerRegex = "^(?<code>"+tokenRegex+")(?:\\s*;\\s*"+ attributeRegex + ")+;";
+            var partMatch = Regex.Match(value, headerRegex);
+
+
         }
 
         [Test]
         public void MimeType_SimpleParse() {
             var mimeTypeStr = MimeTypes.Application.Json.Value;
             var mimeType = MimeType.Parse(mimeTypeStr);
+            Assert.That(mimeType.HasAttributes, Is.False);
+            Assert.That(mimeType.Group, Is.EqualTo("application"));
+            Assert.That(mimeType.SubType, Is.EqualTo("json"));
+            Assert.That(mimeType.Quality, Is.EqualTo(1));
 
             Assert.That(mimeType, Is.EqualTo(MimeTypes.Application.Json));
         }
@@ -31,6 +57,7 @@ namespace CoreTests {
             Assert.That(mimeType.HasAttributes, Is.True);
             Assert.That(mimeType.Group, Is.EqualTo("application"));
             Assert.That(mimeType.SubType, Is.EqualTo("json"));
+            Assert.That(mimeType.Quality, Is.EqualTo(0.3d));
 
             Assert.That(mimeType.Attributes, Is.Not.Empty);
 

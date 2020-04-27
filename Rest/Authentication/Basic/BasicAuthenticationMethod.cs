@@ -9,9 +9,7 @@
 #region
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Rest.Authentication.Base;
-using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Basic {
@@ -23,7 +21,7 @@ namespace DotLogix.Core.Rest.Authentication.Basic {
             _callbackAsync = callbackAsync;
         }
 
-        public override Task AuthenticateAsync(WebRequestContext context, string data) {
+        public override Task AuthenticateAsync(WebServiceContext context, string data) {
             var dataSplit = StringExtensions.DecodeBase64(data).Split(':');
             if(dataSplit.Length == 2)
                 return _callbackAsync.Invoke(this, context, dataSplit[0], dataSplit[1]);

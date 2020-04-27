@@ -9,9 +9,7 @@
 #region
 using System;
 using System.Threading.Tasks;
-using DotLogix.Core.Rest.Authentication.Base;
-using DotLogix.Core.Rest.Server.Http;
-using DotLogix.Core.Rest.Services.Context;
+using DotLogix.Core.Rest.Services;
 #endregion
 
 namespace DotLogix.Core.Rest.Authentication.Token {
@@ -22,7 +20,7 @@ namespace DotLogix.Core.Rest.Authentication.Token {
             _callbackAsync = callbackAsync;
         }
 
-        public override Task AuthenticateAsync(WebRequestContext context, string data) {
+        public override Task AuthenticateAsync(WebServiceContext context, string data) {
             if(Guid.TryParseExact(data, "D", out var token))
                 return _callbackAsync.Invoke(this, context, token);
 

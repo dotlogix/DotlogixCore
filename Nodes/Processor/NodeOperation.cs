@@ -7,7 +7,7 @@
 // ==================================================
 
 namespace DotLogix.Core.Nodes.Processor {
-    public struct NodeOperation {
+    public readonly struct NodeOperation {
         public readonly NodeOperationTypes Type;
         public readonly string Name;
         public readonly object Value;

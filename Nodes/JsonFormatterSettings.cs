@@ -9,6 +9,7 @@
 #region
 #endregion
 
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Utils;
 
 namespace DotLogix.Core.Nodes {
@@ -20,7 +21,7 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         ///     Creates new json settings with ident
         /// </summary>
-        public static JsonFormatterSettings Idented => new JsonFormatterSettings {Ident = true};
+        public static JsonFormatterSettings Idented => new JsonFormatterSettings { Ident = true };
 
         /// <summary>
         ///     Creates new json settings
@@ -30,31 +31,16 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         ///     Determines if the json text should be idented
         /// </summary>
-        public bool Ident {
-            get => GetWithMemberName(false);
-            set => SetWithMemberName(value);
-        }
+        public bool Ident { get; set; }
 
         /// <summary>
         ///     The amount of spaces to insert for ident (4 by default)
         /// </summary>
-        public int IdentSize {
-            get => GetWithMemberName(4);
-            set => SetWithMemberName(value);
-        }
+        public int IdentSize { get; set; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="ConverterSettings.Settings"/>
+        ///     The options for json parsing
         /// </summary>
-        public JsonFormatterSettings() {
-            Resolver = Nodes.DefaultJsonResolver;
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="ConverterSettings.Settings"/>
-        /// </summary>
-        protected JsonFormatterSettings(ISettings settings) : base(settings) {
-            Resolver = Nodes.DefaultJsonResolver;
-        }
+        public JsonReaderOptions ReadOptions { get; set; }
     }
 }

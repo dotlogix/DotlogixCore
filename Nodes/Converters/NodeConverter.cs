@@ -35,12 +35,12 @@ namespace DotLogix.Core.Nodes.Converters {
         public TypeSettings TypeSettings { get; }
 
         /// <inheritdoc />
-        public abstract ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings);
+        public abstract ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
 
         /// <inheritdoc />
-        public abstract object ConvertToObject(Node node, IConverterSettings settings);
+        public abstract object ConvertToObject(Node node, IReadOnlyConverterSettings settings);
 
-        protected static string GetMemberName(MemberSettings member, IConverterSettings settings) {
+        protected static string GetMemberName(MemberSettings member, IReadOnlyConverterSettings settings) {
             return member.Name ?? settings.NamingStrategy?.TransformName(member.Accessor.Name) ?? member.Accessor.Name;
         }
     }

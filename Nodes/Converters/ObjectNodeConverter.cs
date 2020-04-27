@@ -64,39 +64,29 @@ namespace DotLogix.Core.Nodes.Converters
         }
 
         /// <inheritdoc/>
-        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings)
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings)
         {
             var scopedSettings = settings.GetScoped(TypeSettings);
             if (scopedSettings.ShouldEmitValue(instance) == false)
                 return;
 
-            ValueTask task;
             if(instance == null) {
-                task = writer.WriteValueAsync(name, null);
-                if (task.IsCompletedSuccessfully == false)
-                    await task;
+                await writer.WriteValueAsync(name, null).ConfigureAwait(false);
                 return;
             }
 
-            task = writer.BeginMapAsync(name);
-            if (task.IsCompletedSuccessfully == false)
-                await task;
+            await writer.BeginMapAsync(name).ConfigureAwait(false);
             foreach (var member in MembersToSerialize) {
                 var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: member);
 
                 var memberValue = member.Accessor.GetValue(instance);
-                task = member.Converter.WriteAsync(memberValue, GetMemberName(member, scopedMemberSettings), writer, scopedMemberSettings);
-
-                if (task.IsCompletedSuccessfully == false)
-                    await task;
+                await member.Converter.WriteAsync(memberValue, GetMemberName(member, scopedMemberSettings), writer, scopedMemberSettings).ConfigureAwait(false);
             }
-            task = writer.EndMapAsync();
-            if (task.IsCompletedSuccessfully == false)
-                await task;
+            await writer.EndMapAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public override object ConvertToObject(Node node, IConverterSettings settings)
+        public override object ConvertToObject(Node node, IReadOnlyConverterSettings settings)
         {
             if (node.Type == NodeTypes.Empty)
                 return default;

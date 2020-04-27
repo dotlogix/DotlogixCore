@@ -16,7 +16,6 @@ namespace DotLogix.Core.Nodes {
 
 
         protected ConcurrentDictionary<Type, INamingStrategy> NamingStrategiesMap { get; } = new ConcurrentDictionary<Type, INamingStrategy>();
-        protected ConcurrentDictionary<Type, IAsyncNodeConverter> ConvertersMap { get; } = new ConcurrentDictionary<Type, IAsyncNodeConverter>();
         protected ConcurrentDictionary<Type, INodeConverterFactory> ConverterFactoriesMap { get; } = new ConcurrentDictionary<Type, INodeConverterFactory>();
         protected IList<INodeConverterFactory> ConverterFactories { get; } = new List<INodeConverterFactory>();
 
@@ -26,10 +25,6 @@ namespace DotLogix.Core.Nodes {
 
         public virtual bool TryGet(Type type, out INamingStrategy value) {
             return NamingStrategiesMap.TryGetValue(type, out value);
-        }
-
-        public virtual bool TryGet(Type type, out IAsyncNodeConverter value) {
-            return ConvertersMap.TryGetValue(type, out value);
         }
 
         public virtual bool TryGet(Type type, out INodeConverterFactory value) {
@@ -49,10 +44,6 @@ namespace DotLogix.Core.Nodes {
             return false;
         }
 
-        public virtual bool Register(IAsyncNodeConverter converter) {
-            return ConvertersMap.TryAdd(converter.GetType(), converter);
-        }
-
         public virtual void Replace(INamingStrategy namingStrategy) {
             NamingStrategiesMap[namingStrategy.GetType()] = namingStrategy;
         }
@@ -67,18 +58,10 @@ namespace DotLogix.Core.Nodes {
                                               });
         }
 
-        public virtual void Replace(IAsyncNodeConverter converter) {
-            ConvertersMap[converter.GetType()] = converter;
-        }
-
         public bool Unregister(INodeConverterFactory factory) {
             return ConverterFactoriesMap.TryRemove(factory.GetType(), out _) && ConverterFactories.Remove(factory);
         }
-
-        public bool Unregister(IAsyncNodeConverter converter) {
-            return ConvertersMap.TryRemove(converter.GetType(), out _);
-        }
-
+        
         public bool Unregister(INamingStrategy namingStrategy) {
             return NamingStrategiesMap.TryRemove(namingStrategy.GetType(), out _);
         }
@@ -124,17 +107,15 @@ namespace DotLogix.Core.Nodes {
                 return false;
             }
 
-            settings = new MemberSettings {
-                                          Accessor = accessor
-                                          };
-            settings.Apply(memberTypeSettings);
+            settings = new MemberSettings
+            {
+                Accessor = accessor
+            };
+            memberTypeSettings.ApplyTo(settings);
 
             var propertyAttribute = accessor.MemberInfo.GetCustomAttribute<NodePropertyAttribute>();
-            if((propertyAttribute != null) && (ApplyPropertyOverrides(settings, propertyAttribute) == false)) {
-                settings = null;
-                return false;
-            }
-
+            propertyAttribute?.ApplyTo(this, settings);
+            
             return ApplyChildSettings(accessor.MemberInfo, settings);
         }
 
@@ -148,57 +129,20 @@ namespace DotLogix.Core.Nodes {
                     return true;
             }
 
-            var childAttribute = memberInfo.GetCustomAttribute<NodeChildAttribute>();
-
-            if(TryResolve(childType, out var elementTypeSettings) == false) {
+            if (TryResolve(childType, out var elementTypeSettings) == false) {
                 return false;
             }
 
             var elementSettings = new TypeSettings();
-            elementSettings.Apply(elementTypeSettings);
+            elementTypeSettings.ApplyTo(elementSettings);
             settings.ChildSettings = elementSettings;
 
-            if((childAttribute != null) && (ApplyElementOverrides(elementSettings, childAttribute) == false)) {
-                return false;
-            }
-
+            var childAttribute = memberInfo.GetCustomAttribute<NodeChildAttribute>();
+            childAttribute?.ApplyTo(this, settings);
+            
             return true;
         }
-
-        private bool ApplyElementOverrides(TypeSettings elementSettings, NodeChildAttribute childAttribute) {
-            elementSettings.Settings.Apply(childAttribute.Settings);
-
-            if(childAttribute.ConverterFactory != null) {
-                var nodeConverterFactory = ConverterFactoriesMap.GetOrAdd(childAttribute.ConverterFactory, TypeExtension.Instantiate<INodeConverterFactory>);
-                if(nodeConverterFactory.TryCreateConverter(this, elementSettings, out var converter))
-                    elementSettings.Converter = converter;
-                else
-                    return false;
-            }
-
-            return true;
-        }
-
-        private bool ApplyPropertyOverrides(MemberSettings settings, NodePropertyAttribute propertyAttribute) {
-            settings.Name = propertyAttribute.Name;
-            settings.Order = propertyAttribute.Order;
-
-            settings.Settings.Apply(propertyAttribute.Settings);
-
-            if(propertyAttribute.NamingStrategy != null)
-                settings.NamingStrategy = NamingStrategiesMap.GetOrAdd(propertyAttribute.NamingStrategy, TypeExtension.Instantiate<INamingStrategy>);
-
-            if(propertyAttribute.ConverterFactory == null)
-                return true;
-
-            var nodeConverterFactory = ConverterFactoriesMap.GetOrAdd(propertyAttribute.ConverterFactory, TypeExtension.Instantiate<INodeConverterFactory>);
-            if(nodeConverterFactory.TryCreateConverter(this, settings, out var converter) == false)
-                return false;
-
-            settings.Converter = converter;
-            return true;
-        }
-
+        
         protected virtual bool TryCreateSettings(Type type, out TypeSettings settings) {
             var dataType = type.ToDataType();
             var nodeType = Nodes.GetNodeType(dataType);
@@ -210,22 +154,7 @@ namespace DotLogix.Core.Nodes {
                                         };
 
             var typeAttribute = type.GetCustomAttribute<NodeTypeAttribute>();
-            if(typeAttribute != null) {
-                settings.Settings.Apply(typeAttribute.Settings);
-
-                if(typeAttribute.NamingStrategy != null)
-                    settings.NamingStrategy = NamingStrategiesMap.GetOrAdd(typeAttribute.NamingStrategy, TypeExtension.Instantiate<INamingStrategy>);
-
-                if(typeAttribute.ConverterFactory != null) {
-                    var nodeConverterFactory = ConverterFactoriesMap.GetOrAdd(typeAttribute.ConverterFactory, TypeExtension.Instantiate<INodeConverterFactory>);
-                    if(nodeConverterFactory.TryCreateConverter(this, settings, out var converter))
-                        settings.Converter = converter;
-                    else {
-                        settings = null;
-                        return false;
-                    }
-                }
-            }
+            typeAttribute?.ApplyTo(this, settings);
 
             if(ApplyChildSettings(type, settings) == false) {
                 settings = null;
@@ -238,7 +167,7 @@ namespace DotLogix.Core.Nodes {
                     var converterFactory = ConverterFactories[i];
                     if(converterFactory.TryCreateConverter(this, settings, out var converter) == false)
                         continue;
-
+                    
                     settings.Converter = converter;
                     return true;
                 }

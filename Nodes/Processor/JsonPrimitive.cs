@@ -23,7 +23,7 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
 
-        public object ToObject(Type targetType, IConverterSettings settings) {
+        public object ToObject(Type targetType, IReadOnlyConverterSettings settings) {
             var currentValue = Json;
             if(currentValue == null || currentValue == "null")
                 return targetType.GetDefaultValue();
@@ -80,7 +80,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 }
                 case DataTypeFlags.UShort: {
                     var numberStyles = ToNumberStyles(settings.NumberFormat, ref currentValue);
-                    if(byte.TryParse(currentValue, numberStyles, settings.FormatProvider, out var value))
+                    if(ushort.TryParse(currentValue, numberStyles, settings.FormatProvider, out var value))
                         return value;
                     throw new FormatException($"Invalid format while parsing ushort \"{currentValue}\" with format \"{settings.NumberFormat}\"");
                 }
@@ -178,7 +178,7 @@ namespace DotLogix.Core.Nodes.Processor {
             return numberStyles;
         }
 
-        public static JsonPrimitive FromObject(object value, IConverterSettings settings) {
+        public static JsonPrimitive FromObject(object value, IReadOnlyConverterSettings settings) {
             if(value == null)
                 return Null;
 

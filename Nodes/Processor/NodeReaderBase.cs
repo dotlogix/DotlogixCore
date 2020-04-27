@@ -18,9 +18,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
         public async ValueTask<IEnumerable<NodeOperation>> ReadAsync() {
             var writer = new NodeOperationWriter();
-            var task = CopyToAsync(writer);
-            if(task.IsCompletedSuccessfully == false)
-                await task;
+            await CopyToAsync(writer).ConfigureAwait(false);
             return writer.Operations;
         }
 

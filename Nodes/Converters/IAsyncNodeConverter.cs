@@ -34,11 +34,11 @@ namespace DotLogix.Core.Nodes.Converters {
         /// <summary>
         /// Write the value to the node writer
         /// </summary>
-        ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings);
+        ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
 
         /// <summary>
         /// Convert the node to an object of the target type
         /// </summary>
-        object ConvertToObject(Node node, IConverterSettings settings);
+        object ConvertToObject(Node node, IReadOnlyConverterSettings settings);
     }
 }

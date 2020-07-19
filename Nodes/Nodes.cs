@@ -25,11 +25,11 @@ namespace DotLogix.Core.Nodes {
 
         private static INodeConverterResolver CreateDefaultResolver() {
             var resolver = new NodeConverterResolver();
-            resolver.Register(new ObjectNodeConverterFactory());
-            resolver.Register(new OptionalNodeConverterFactory());
-            resolver.Register(new ListNodeConverterFactory());
-            resolver.Register(new KeyValuePairNodeConverterFactory());
-            resolver.Register(new ValueNodeConverterFactory());
+            resolver.Add(new ObjectNodeConverterFactory());
+            resolver.Add(new OptionalNodeConverterFactory());
+            resolver.Add(new ListNodeConverterFactory());
+            resolver.Add(new KeyValuePairNodeConverterFactory());
+            resolver.Add(new ValueNodeConverterFactory());
             return resolver;
         }
 
@@ -115,8 +115,7 @@ namespace DotLogix.Core.Nodes {
             if(instance is Node node)
                 return node;
 
-            if(settings == null)
-                settings = ConverterSettings.Default;
+            settings ??= ConverterSettings.Default;
             var nodeWriter = new NodeWriter(settings);
             WriteToAsync(name, instance, instanceType, nodeWriter, settings);
             return nodeWriter.Root;
@@ -141,8 +140,7 @@ namespace DotLogix.Core.Nodes {
             if(type == typeof(object))
                 return DynamicNode.From(node);
 
-            if(settings == null)
-                settings = JsonFormatterSettings.Idented;
+            settings ??= JsonFormatterSettings.Idented;
 
             return settings.Resolver.TryResolve(type, out var typeSettings)
                        ? typeSettings.Converter.ConvertToObject(node, settings)

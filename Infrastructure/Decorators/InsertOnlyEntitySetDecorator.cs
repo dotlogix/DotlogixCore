@@ -10,6 +10,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DotLogix.Architecture.Common.Options;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
@@ -22,7 +23,7 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
     ///     A entity set decorator to disable deletion of entities instead manage existence with the is active flag
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class InsertOnlyEntitySetDecorator<TEntity> : EntitySetDecoratorBase<TEntity> where TEntity : class, IInsertOnlyEntity, new() {
+    public class InsertOnlyEntitySetDecorator<TEntity> : EntitySetDecoratorBase<TEntity> where TEntity : class, IInsertOnly, new() {
         /// <summary>
         ///     Creates a new instance of <see cref="InsertOnlyEntitySetDecorator{TEntity}" />
         /// </summary>

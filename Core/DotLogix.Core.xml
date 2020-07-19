@@ -2023,7 +2023,7 @@
                 Searches for differences of two enumerables using an equality comparer
             </summary>
             <param name="left">The first enumerable</param>
-            <param name="right">The second enumerable</param>
+            <param name="keys">The second enumerable</param>
             <param name="comparer">The comparer used to check equality</param>
             <returns></returns>
         </member>
@@ -2032,7 +2032,7 @@
                 Searches for differences of two enumerables using a common key and a comparer
             </summary>
             <param name="left">The first enumerable</param>
-            <param name="right">The second enumerable</param>
+            <param name="keys">The second enumerable</param>
             <param name="keySelector">The method to select the key to check equality</param>
             <param name="comparer">The comparer used to check equality</param>
             <returns></returns>
@@ -2042,9 +2042,9 @@
                 Searches for differences of two enumerables using a common key and a comparer
             </summary>
             <param name="left">The first enumerable</param>
-            <param name="leftKeySelector">The method to select the key to check equality</param>
-            <param name="right">The second enumerable</param>
-            <param name="rightKeySelector">The method to select the key to check equality</param>
+            <param name="keySelector">The method to select the key to check equality</param>
+            <param name="keys">The second enumerable</param>
+            <param name="keysKeySelector">The method to select the key to check equality</param>
             <param name="comparer">The comparer used to check equality</param>
             <returns></returns>
         </member>
@@ -2638,7 +2638,7 @@
             <param name="value">The string value</param>
             <param name="padding">The padding character</param>
             <param name="length">The target length of the string</param>
-            <param name="padLeft">Determines if padding should be applied left or right</param>
+            <param name="padLeft">Determines if padding should be applied left or keys</param>
             <returns></returns>
         </member>
         <member name="M:DotLogix.Core.Extensions.StringExtensions.WordWrap(System.String,System.Int32)">
@@ -3333,9 +3333,9 @@
                 equal.
             </summary>
             <param name="left">The first value to compare.</param>
-            <param name="right">The second value to compare.</param>
+            <param name="keys">The second value to compare.</param>
             <returns>
-                true if the <paramref name="left" /> and <paramref name="right" /> parameters have the same value; otherwise,
+                true if the <paramref name="left" /> and <paramref name="keys" /> parameters have the same value; otherwise,
                 false.
             </returns>
         </member>
@@ -3345,8 +3345,8 @@
                 values.
             </summary>
             <param name="left">The first value to compare.</param>
-            <param name="right">The second value to compare.</param>
-            <returns>true if <paramref name="left" /> and <paramref name="right" /> are not equal; otherwise, false.</returns>
+            <param name="keys">The second value to compare.</param>
+            <returns>true if <paramref name="left" /> and <paramref name="keys" /> are not equal; otherwise, false.</returns>
         </member>
         <member name="M:DotLogix.Core.Optional`1.op_Equality(DotLogix.Core.Optional{`0},`0)">
             <summary>
@@ -3354,9 +3354,9 @@
                 equal.
             </summary>
             <param name="left">The first value to compare.</param>
-            <param name="right">The second value to compare.</param>
+            <param name="keys">The second value to compare.</param>
             <returns>
-                true if the <paramref name="left" /> and <paramref name="right" /> parameters have the same value; otherwise,
+                true if the <paramref name="left" /> and <paramref name="keys" /> parameters have the same value; otherwise,
                 false.
             </returns>
         </member>
@@ -3366,8 +3366,8 @@
                 values.
             </summary>
             <param name="left">The first value to compare.</param>
-            <param name="right">The second value to compare.</param>
-            <returns>true if <paramref name="left" /> and <paramref name="right" /> are not equal; otherwise, false.</returns>
+            <param name="keys">The second value to compare.</param>
+            <returns>true if <paramref name="left" /> and <paramref name="keys" /> are not equal; otherwise, false.</returns>
         </member>
         <member name="M:DotLogix.Core.Optional`1.ToString">
             <summary>Returns the fully qualified type name of this instance.</summary>
@@ -4421,7 +4421,7 @@
         </member>
         <member name="T:DotLogix.Core.Reflection.Dynamics.ValueAccessModes">
             <summary>
-            Value accessing rights
+            Value accessing keyss
             </summary>
         </member>
         <member name="F:DotLogix.Core.Reflection.Dynamics.ValueAccessModes.None">
@@ -5565,13 +5565,13 @@
         </member>
         <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Shr">
             <summary>
-                Shifts an integer value (in sign) to the right by a specified number of bits, pushing the result onto the
+                Shifts an integer value (in sign) to the keys by a specified number of bits, pushing the result onto the
                 evaluation stack.
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Fluent.Generator.FluentIlGenerator.Shr_Un">
             <summary>
-                Shifts an unsigned integer value (in zeroes) to the right by a specified number of bits, pushing the result
+                Shifts an unsigned integer value (in zeroes) to the keys by a specified number of bits, pushing the result
                 onto the evaluation stack.
             </summary>
         </member>
@@ -5858,7 +5858,7 @@
             A delegate to create projections from two types
             </summary>
             <param name="left"></param>
-            <param name="right"></param>
+            <param name="keys"></param>
             <returns></returns>
         </member>
         <member name="T:DotLogix.Core.Reflection.Projections.EqualityCheckProjection">
@@ -5890,12 +5890,12 @@
         </member>
         <member name="M:DotLogix.Core.Reflection.Projections.IProjection.ProjectLeftToRight(System.Object,System.Object)">
             <summary>
-            Project the left object to the right
+            Project the left object to the keys
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Projections.IProjection.ProjectRightToLeft(System.Object,System.Object)">
             <summary>
-            Project the right object to the left
+            Project the keys object to the left
             </summary>
         </member>
         <member name="T:DotLogix.Core.Reflection.Projections.IProjectionFactory">
@@ -5942,7 +5942,7 @@
         </member>
         <member name="P:DotLogix.Core.Reflection.Projections.Projection.RightGetter">
             <summary>
-            The getter from the right side
+            The getter from the keys side
             </summary>
         </member>
         <member name="P:DotLogix.Core.Reflection.Projections.Projection.LeftSetter">
@@ -5952,7 +5952,7 @@
         </member>
         <member name="P:DotLogix.Core.Reflection.Projections.Projection.RightSetter">
             <summary>
-            The setter from the right side
+            The setter from the keys side
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Projections.Projection.#ctor(DotLogix.Core.Reflection.Delegates.GetterDelegate,DotLogix.Core.Reflection.Delegates.GetterDelegate,DotLogix.Core.Reflection.Delegates.SetterDelegate,DotLogix.Core.Reflection.Delegates.SetterDelegate)">
@@ -5962,12 +5962,12 @@
         </member>
         <member name="M:DotLogix.Core.Reflection.Projections.Projection.ProjectLeftToRight(System.Object,System.Object)">
             <summary>
-            Project the left object to the right
+            Project the left object to the keys
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Projections.Projection.ProjectRightToLeft(System.Object,System.Object)">
             <summary>
-            Project the right object to the left
+            Project the keys object to the left
             </summary>
         </member>
         <member name="T:DotLogix.Core.Reflection.Projections.ProjectionFactory">
@@ -6025,12 +6025,12 @@
         </member>
         <member name="M:DotLogix.Core.Reflection.Projections.TypeProjector.ProjectLeftToRight(System.Object,System.Object)">
             <summary>
-            Project the left object to the right
+            Project the left object to the keys
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Projections.TypeProjector.ProjectRightToLeft(System.Object,System.Object)">
             <summary>
-            Project the right object to the left
+            Project the keys object to the left
             </summary>
         </member>
         <member name="M:DotLogix.Core.Reflection.Projections.TypeProjector.Create(System.Type,System.Type,DotLogix.Core.Reflection.Projections.IProjectionFactory)">
@@ -6814,7 +6814,7 @@
             The type
             </summary>
         </member>
-        <member name="P:DotLogix.Core.Types.DataType.UnderlayingType">
+        <member name="P:DotLogix.Core.Types.DataType.UnderlyingType">
             <summary>
             The underlying type (enums)
             </summary>
@@ -6824,7 +6824,7 @@
             The element type (collections)
             </summary>
         </member>
-        <member name="P:DotLogix.Core.Types.DataType.UnderlayingDataType">
+        <member name="P:DotLogix.Core.Types.DataType.UnderlyingDataType">
             <summary>
             The underlying data type (enums)
             </summary>
@@ -7043,7 +7043,7 @@
         </member>
         <member name="P:DotLogix.Core.Utils.DiffEnumerable`1.RightOnly">
             <summary>
-            Values only occuring right
+            Values only occuring keys
             </summary>
         </member>
         <member name="M:DotLogix.Core.Utils.DiffEnumerable`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.IEnumerable{`0})">
@@ -7068,7 +7068,7 @@
         </member>
         <member name="P:DotLogix.Core.Utils.DiffEnumerable`2.RightOnly">
             <summary>
-            Values only occuring right
+            Values only occuring keys
             </summary>
         </member>
         <member name="M:DotLogix.Core.Utils.DiffEnumerable`2.#ctor(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.IEnumerable{DotLogix.Core.Utils.DiffEnumerable{`0,`1}.DiffValue},System.Collections.Generic.IEnumerable{`1})">
@@ -7078,7 +7078,7 @@
         </member>
         <member name="T:DotLogix.Core.Utils.DiffEnumerable`2.DiffValue">
             <summary>
-            A tuple containing the left and right values of a diff
+            A tuple containing the left and keys values of a diff
             </summary>
         </member>
         <member name="P:DotLogix.Core.Utils.DiffEnumerable`2.DiffValue.Left">

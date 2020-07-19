@@ -19,7 +19,7 @@ using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Services {
     /// <summary>
-    ///     A base for windows services
+    ///     A base class for service like applications
     /// </summary>
     public class Service {
         /// <summary>
@@ -52,8 +52,8 @@ namespace DotLogix.Core.Services {
         /// </summary>
         public Service(string serviceName, string logDirectory) {
             ProgramExecutable = Assembly.GetEntryAssembly()?.Location;
-            LogDirectory = logDirectory;
             ServiceName = serviceName;
+            LogDirectory = logDirectory;
 
             Commands.AddOrUpdate(new LambdaConsoleCommand("exit", "exit", OnCommand_Exit));
             Commands.AddOrUpdate(new LambdaConsoleCommand("help", "help", OnCommand_Help));

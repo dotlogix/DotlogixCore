@@ -23,6 +23,11 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
         /// </summary>
         public LogLevel MinLogLevel { get; }
 
+        /// <summary>
+        /// The minimum entity framework log level
+        /// </summary>
+        public ILogSource LogSource { get; } = Core.Diagnostics.Log.CreateSource("EntityFramework Internal");
+
 
         /// <summary>
         /// Create a new instance of <see cref="LoggingAdapter"/>
@@ -35,7 +40,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
         /// <inheritdoc />
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
             var logLevels = ConvertLogLevel(logLevel);
-            if((eventId.Id == 10403) || (Core.Diagnostics.Log.LogLevel > logLevels))
+            if((eventId.Id == 10403) || (LogSource.LogLevel > logLevels))
                 return;
 
             if(formatter == null)
@@ -48,7 +53,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Diagnostics {
             if(exception != null)
                 message += "\n" + exception.StackTrace;
 
-            Core.Diagnostics.Log.Custom(logLevels, "EntityFramework Internal", nameof(LoggingAdapter), "EntityFramework", message);
+            LogSource.Custom(logLevels, "EntityFramework Internal", nameof(LoggingAdapter), "EntityFramework", message);
         }
 
         bool ILogger.IsEnabled(LogLevel logLevel) {

@@ -49,7 +49,7 @@ namespace DotLogix.Core.Extensions {
         /// <param name="value">The value to check</param>
         /// <param name="range">The range</param>
         /// <returns></returns>
-        public static bool LaysBetween(this int value, Range range) {
+        public static bool LaysBetween(this int value, Utils.Patterns.Range range) {
             if(range.Min.HasValue && value < range.Min.Value)
                 return false;
             if (range.Max.HasValue && value > range.Max.Value)

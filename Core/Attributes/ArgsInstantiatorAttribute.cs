@@ -1,0 +1,56 @@
+﻿using System;
+using DotLogix.Core.Utils;
+
+namespace DotLogix.Core.Attributes {
+    /// <summary>
+    /// An attribute to create a new instance of <see cref="IArgsInstantiator"/>
+    /// </summary>
+    public class ArgsInstantiatorAttribute : Attribute
+    {
+        private readonly IArgsInstantiator _instantiator;
+
+        /// <summary>
+        /// Creates a new instance of <see cref="ArgsInstantiatorAttribute"/> using an existing <see cref="IInstantiator"/>
+        /// </summary>
+        /// <param name="instantiator">The instance</param>
+        public ArgsInstantiatorAttribute(IArgsInstantiator instantiator)
+        {
+            _instantiator = instantiator ?? throw new ArgumentNullException(nameof(instantiator));
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="InstantiatorAttribute"/> using a constructor with the specified type arguments
+        /// </summary>
+        /// <param name="type">The type</param>
+        /// <param name="parameterTypes">The parameter types used by the constructor</param>
+        /// <param name="constraintType">An optional constraint type to ensure type compatibility</param>
+        protected ArgsInstantiatorAttribute(Type type, Type[] parameterTypes, Type constraintType = null) : this(Instantiator.UseCtor(type, parameterTypes, constraintType)) { }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="InstantiatorAttribute"/> using a delegate method
+        /// </summary>
+        /// <param name="instantiateFunc">The factory method</param>
+        protected ArgsInstantiatorAttribute(Func<object[], object> instantiateFunc) : this(Instantiator.UseDelegate(instantiateFunc)) { }
+
+        /// <summary>
+        /// Get or create a new instance using the configured method
+        /// </summary>
+        /// <param name="args">The arguments to create a new instance</param>
+        /// <returns></returns>
+        protected object GetInstance(params object[] args)
+        {
+            return _instantiator.GetInstance(args);
+        }
+
+        /// <summary>
+        /// Get or create a new instance as a specific type using the configured method
+        /// </summary>
+        /// <param name="args">The arguments to create a new instance</param>
+        /// <typeparam name="TInstance">The target type</typeparam>
+        /// <returns>The instance if the provided type is compatible, otherwise <value>default</value></returns>
+        protected TInstance GetInstance<TInstance>(params object[] args)
+        {
+            return _instantiator.GetInstance(args) is TInstance instance ? instance : default;
+        }
+    }
+}

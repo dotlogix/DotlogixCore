@@ -7,6 +7,7 @@
 // ==================================================
 
 #region
+using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Http;
@@ -32,8 +33,7 @@ namespace DotLogix.Core.Rest.Json {
                 return;
             }
 
-            var json = JsonNodes.ToJson(value, formatterSettings);
-            await httpResponse.WriteToResponseStreamAsync(json);
+            await JsonNodes.ToJsonAsync(value, httpResponse.OutputStream, Encoding.UTF8, formatterSettings);
         }
     }
 }

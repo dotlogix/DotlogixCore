@@ -9,7 +9,6 @@
 #region
 using System;
 using System.Threading.Tasks;
-using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services;
@@ -30,13 +29,13 @@ namespace DotLogix.Core.Rest.Json {
             var json = await request.ReadStringFromRequestStreamAsync();
             if(json.Length > 1) {
                 try {
-                    var jsonData = JsonNodes.ToNode(json);
+                    var jsonData = await JsonNodes.ToNodeAsync(request.InputStream, request.ContentEncoding);
                     context.Variables.Add(WebServiceJsonSettings.JsonRawParamName, json);
                     context.Variables.Add(WebServiceJsonSettings.JsonDataParamName, jsonData);
                     var formatterSettings = context.Settings.Get(WebServiceJsonSettings.JsonNodesFormatterSettings, JsonFormatterSettings.Idented);
                     context.ParameterProviders.Add(new JsonNodesParameterProvider(jsonData, formatterSettings));
                 } catch(Exception e) {
-                    Log.Warn(e);
+                    context.LogSource.Warn(e);
                     context.SetException(e, HttpStatusCodes.ClientError.BadRequest);
                 }
             }

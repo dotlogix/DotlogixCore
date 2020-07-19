@@ -6,13 +6,6 @@ using DotLogix.Core.Extensions;
 using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes.Processor {
-    public enum JsonPrimitiveType {
-        Null,
-        Boolean,
-        String,
-        Number
-    }
-
     public struct JsonPrimitive {
         public readonly JsonPrimitiveType Type;
         public readonly string Json;

@@ -8,7 +8,6 @@
 
 #region
 using DotLogix.Architecture.Infrastructure.Queries;
-using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {

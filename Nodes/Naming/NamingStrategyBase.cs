@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Concurrent;
 using System.Text;
 using DotLogix.Core.Nodes.Processor;
 
@@ -6,18 +8,20 @@ namespace DotLogix.Core.Nodes {
     /// A base class for naming strategies
     /// </summary>
     public abstract class NamingStrategyBase : INamingStrategy {
-        private readonly object _lock = new object();
-        private readonly StringBuilder _builder = new StringBuilder(50);
+        private const int MaxBuilderPoolSize = 20;
+        private static readonly ConcurrentQueue<StringBuilder> StringBuilderPool = new ConcurrentQueue<StringBuilder>();
 
         /// <inheritdoc />
         public string TransformName(string name) {
-            lock (_lock)
-            {
-                if(TransformIfRequired(name, _builder) == false)
-                    return name;
-                name = _builder.ToString();
-                _builder.Clear();
-            }
+            if (StringBuilderPool.TryDequeue(out var builder) == false)
+                builder = new StringBuilder(Math.Max(name.Length, 50));
+            
+            if (TransformIfRequired(name, builder) == false)
+                return name;
+            name = StringBuilderPool.ToString();
+            builder.Clear();
+            if(StringBuilderPool.Count < MaxBuilderPoolSize)
+                StringBuilderPool.Enqueue(builder);
             return name;
         }
 

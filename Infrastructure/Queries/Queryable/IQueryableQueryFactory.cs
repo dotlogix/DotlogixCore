@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+namespace DotLogix.Architecture.Infrastructure.Queries {
     /// <summary>
     /// An interface to represent a factory creating objects used for <see cref="IQuery{T}"/>
     /// </summary>
@@ -19,7 +19,7 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
         /// <summary>
         /// Create a new query based on an <see cref="IQueryable{T}"/>
         /// </summary>
-        IQuery<T> CreateQuery<T>(IQueryable<T> queryable, IEnumerable<IQueryInterceptor> interceptors = null);
+        IQuery<T>  CreateQuery<T>(IQueryable<T> queryable, IEnumerable<IQueryInterceptor> interceptors = null);
         /// <summary>
         /// Create a new query based on an <see cref="IOrderedQuery{T}"/>
         /// </summary>

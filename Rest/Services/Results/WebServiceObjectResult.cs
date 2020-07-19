@@ -3,9 +3,7 @@ using System;
 namespace DotLogix.Core.Rest.Services {
     public class WebServiceObjectResult : WebServiceResult, IWebServiceObjectResult {
         /// <inheritdoc />
-        public Type ReturnType => ReturnValue.IsDefined
-                                  ? ReturnValue.Value.GetType()
-                                  : null;
+        public Type ReturnType => ReturnValue.IsDefined ? ReturnValue.Value.GetType() : typeof(object);
 
         /// <inheritdoc />
         public Optional<object> ReturnValue { get; set; }
@@ -13,7 +11,7 @@ namespace DotLogix.Core.Rest.Services {
 
     public class WebServiceObjectResult<T> : WebServiceResult, IWebServiceObjectResult<T> {
         /// <inheritdoc />
-        public Type ReturnType => typeof(T);
+        public Type ReturnType => ReturnValue.IsDefined ? ReturnValue.Value.GetType() : typeof(T);
 
         /// <inheritdoc />
         public Optional<T> ReturnValue { get; set; }
@@ -23,6 +21,9 @@ namespace DotLogix.Core.Rest.Services {
                                                                 ? new Optional<object>(ReturnValue.Value)
                                                                 : Optional<object>.Undefined;
 
+        /// <summary>
+        /// Converts a value to a corresponding object result
+        /// </summary>
         public static implicit operator WebServiceObjectResult<T>(T value) {
             return new WebServiceObjectResult<T>{ReturnValue = value};
         }

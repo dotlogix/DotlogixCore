@@ -23,6 +23,11 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public interface IEntitySet<TEntity> where TEntity : class, new() {
+        /// <summary>
+        /// The current entity context
+        /// </summary>
+        IEntityContext EntityContext { get; }
+        
         #region Add
 
         /// <summary>

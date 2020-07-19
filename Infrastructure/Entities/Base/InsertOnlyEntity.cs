@@ -10,9 +10,9 @@ using DotLogix.Architecture.Common.Options;
 
 namespace DotLogix.Architecture.Infrastructure.Entities.Base {
     /// <summary>
-    /// A simple entity implementing the <see cref="ISimpleEntity"/> and the <see cref="IInsertOnlyEntity"/> interface
+    /// A simple entity implementing the <see cref="ISimpleEntity"/> and the <see cref="IInsertOnly"/> interface
     /// </summary>
-    public abstract class InsertOnlyEntity : SimpleEntity, IInsertOnlyEntity {
+    public abstract class InsertOnlyEntity : SimpleEntity, IInsertOnly {
         /// <inheritdoc />
         public bool IsActive { get; set; }
     }

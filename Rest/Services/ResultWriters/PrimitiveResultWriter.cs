@@ -24,17 +24,21 @@ namespace DotLogix.Core.Rest.Services {
             var response = context.HttpResponse;
             if (response.IsCompleted)
                 return;
-
-            var requestResult = context.Result as IWebServiceObjectResult;
-            if(requestResult == null)
-                throw new ArgumentException($"This result writer accepts only values of type \"{nameof(IWebServiceObjectResult)}\"");
-
-            if (requestResult.Exception.IsDefined) {
-                await WriteExceptionAsync(context, requestResult.Exception.Value);
-            } else if(requestResult.ReturnValue.IsDefined) {
-                await WriteResultAsync(context, requestResult.ReturnValue.Value);
+            
+            if(context.Result.Exception.IsDefined) {
+                await WriteExceptionAsync(context, context.Result.Exception.Value);
+            } else {
+                switch (context.Result) {
+                    case IWebServiceObjectResult requestResult:
+                        await WriteResultAsync(context, requestResult.ReturnValue.GetValueOrDefault());
+                        break;
+                    default:
+                        var httpResponse = context.HttpResponse;
+                        httpResponse.StatusCode = context.Result.StatusCode ?? HttpStatusCodes.Success.Ok;
+                        httpResponse.ContentType = context.Result.ContentType ?? MimeTypes.Text.Plain;
+                        break;
+                }
             }
-
             await response.CompleteAsync();
         }
 
@@ -66,14 +70,14 @@ namespace DotLogix.Core.Rest.Services {
             httpResponse.StatusCode = context.Result.StatusCode ?? HttpStatusCodes.Success.Ok;
             httpResponse.ContentType = context.Result.ContentType ?? MimeTypes.Text.Plain;
 
-            if(value == null) {
-                if(context.Result.StatusCode == null) {
-                    httpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
-                }
-                return Task.CompletedTask;
+            if(value != null)
+                return httpResponse.WriteToResponseStreamAsync(value.ToString());
+            
+            if(context.Result.StatusCode == null) {
+                httpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
             }
+            return Task.CompletedTask;
 
-            return httpResponse.WriteToResponseStreamAsync(value.ToString());
         }
 
 

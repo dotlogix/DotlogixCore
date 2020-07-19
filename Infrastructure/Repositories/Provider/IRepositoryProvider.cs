@@ -18,6 +18,6 @@ namespace DotLogix.Architecture.Infrastructure.Repositories.Provider {
         /// <summary>
         /// Get or create an instance of <see cref="IRepository"/>
         /// </summary>
-        TRepoInterface Create<TRepoInterface>(IEntitySetProvider entitySetProvider) where TRepoInterface : IRepository;
+        TRepoInterface Create<TRepoInterface>(IEntityContext entityContext) where TRepoInterface : IRepository;
     }
 }

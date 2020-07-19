@@ -19,7 +19,6 @@ using DotLogix.Architecture.Infrastructure.Decorators;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
-using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 #endregion
 
@@ -33,18 +32,18 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         /// <summary>
         ///     The undecorated and unmodified entity set
         /// </summary>
-        public IEntitySet<TEntity> EntitySet => _entitySet ?? (_entitySet = EntitySetProvider.UseSet<TEntity>());
+        public IEntitySet<TEntity> EntitySet => _entitySet ?? (_entitySet = EntityContext.UseSet<TEntity>());
 
         /// <summary>
-        ///     The internal entity set provider
+        ///     The current entity context
         /// </summary>
-        protected IEntitySetProvider EntitySetProvider { get; }
+        protected IEntityContext EntityContext { get; }
 
         /// <summary>
         ///     Creates a new instance of <see cref="RepositoryBase{TEntity}" />
         /// </summary>
-        protected RepositoryBase(IEntitySetProvider entitySetProvider) {
-            EntitySetProvider = entitySetProvider;
+        protected RepositoryBase(IEntityContext entityContext) {
+            EntityContext = entityContext;
         }
 
         /// <inheritdoc />

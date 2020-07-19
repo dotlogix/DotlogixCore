@@ -4,7 +4,21 @@ using System.Linq;
 
 namespace DotLogix.Core.Utils.Mappers {
     public abstract class ValueSetterBase<TTarget, TValue> : IValueSetter<TTarget, TValue> {
+        private readonly Type _targetType;
+        private readonly Type _valueType;
         protected List<Func<TTarget, TValue, bool>> PreConditionFuncs { get; } = new List<Func<TTarget, TValue, bool>>();
+
+        /// <inheritdoc />
+        public Type TargetType => _targetType ?? typeof(TTarget);
+
+        /// <inheritdoc />
+        public Type ValueType => _valueType ?? typeof(TValue);
+
+        protected ValueSetterBase() { }
+        protected ValueSetterBase(Type targetType, Type valueType) {
+            _targetType = targetType;
+            _valueType = valueType;
+        }
 
         public void AddPreCondition(Func<TTarget, bool> conditionFunc) {
             PreConditionFuncs.Add((t, v) => conditionFunc.Invoke(t));

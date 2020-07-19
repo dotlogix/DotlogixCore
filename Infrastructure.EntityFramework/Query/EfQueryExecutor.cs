@@ -14,7 +14,6 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Queries;
-using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 #pragma warning disable 1591
@@ -40,7 +39,7 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
 
         /// <inheritdoc />
         public Task<IEnumerable<T>> ToEnumerableAsync(CancellationToken cancellationToken = default) {
-            return _innerQueryable.ToListAsync(cancellationToken).ConvertResult(list => list.AsEnumerable());
+            return _innerQueryable.ToListAsync(cancellationToken).ConvertResult(list => list.Result.AsEnumerable());
         }
 
         /// <inheritdoc />

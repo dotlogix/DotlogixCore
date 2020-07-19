@@ -10,14 +10,14 @@ namespace DotLogix.Core.Nodes {
         bool TryGet(Type type, out INamingStrategy value);
         bool TryGet(Type type, out INodeConverterFactory value);
 
-        bool Register(INamingStrategy namingStrategy);
-        bool Register(INodeConverterFactory factory);
+        bool Add(INamingStrategy namingStrategy);
+        bool Add(INodeConverterFactory factory);
 
         void Replace(INamingStrategy namingStrategy);
         void Replace(INodeConverterFactory factory);
 
-        bool Unregister(INamingStrategy namingStrategy);
-        bool Unregister(INodeConverterFactory factory);
+        bool Remove(INamingStrategy namingStrategy);
+        bool Remove(INodeConverterFactory factory);
 
         bool TryResolve(Type type, out TypeSettings settings);
         bool TryResolve(TypeSettings typeSettings, MemberInfo memberInfo, out MemberSettings settings);

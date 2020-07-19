@@ -6,6 +6,8 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
+using System.Collections.Generic;
+
 namespace DotLogix.Architecture.Domain.UoW {
     /// <summary>
     /// An interface to represent a factory to create a <see cref="IUnitOfWork"/>

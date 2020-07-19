@@ -13,7 +13,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Http;
@@ -38,7 +37,7 @@ namespace DotLogix.Core.Rest.Services.Processors {
                 var result = await InvokeAsync(context, parameters);
                 context.SetResult(result);
             } catch(Exception e) {
-                Log.Error(e);
+                context.LogSource.Error(e);
                 context.SetException(e, HttpStatusCodes.ServerError.InternalServerError);
             }
         }
@@ -66,7 +65,7 @@ namespace DotLogix.Core.Rest.Services.Processors {
         protected virtual bool TryGetParameterValue(WebServiceContext context, ParameterInfo methodParam, out object paramValue) {
             for(var i = context.ParameterProviders.Count - 1; i >= 0; i--) {
                 var parameterProvider = context.ParameterProviders[i];
-                if(parameterProvider.TryResolve(context, methodParam, out paramValue)) {
+                if (parameterProvider.TryResolve(context, methodParam, out paramValue)) {
                     return true;
                 }
             }

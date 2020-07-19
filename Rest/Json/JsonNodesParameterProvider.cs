@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Nodes;
-using DotLogix.Core.Rest.Http.Context;
 using DotLogix.Core.Rest.Services;
 using DotLogix.Core.Rest.Services.Parameters;
-using DotLogix.Core.Rest.Services.Processors;
 
 namespace DotLogix.Core.Rest.Json {
     public class JsonNodesParameterProvider : IParameterProvider {
@@ -42,8 +39,9 @@ namespace DotLogix.Core.Rest.Json {
 
             if(parameter.IsDefined(typeof(JsonBodyAttribute)))
                 child = JsonRoot;
-            else if(JsonRoot is NodeMap nodeMap)
-                child = nodeMap.GetChild(parameter.Name);
+            else if(JsonRoot is NodeMap nodeMap) {
+                child = nodeMap.GetChild(FormatterSettings.NamingStrategy.TransformName(parameter.Name));
+            }
 
             if (child == null) {
                 paramValue = null;
@@ -54,7 +52,7 @@ namespace DotLogix.Core.Rest.Json {
                 paramValue = child.ToObject(parameter.ParameterType, FormatterSettings);
                 return true;
             } catch (Exception e) {
-                Log.Warn(e);
+                context.LogSource.Warn(e);
                 // Not convertible exception ignored in a try method
                 paramValue = null;
                 return false;

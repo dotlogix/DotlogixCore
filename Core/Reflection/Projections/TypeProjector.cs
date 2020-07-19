@@ -31,8 +31,7 @@ namespace DotLogix.Core.Reflection.Projections {
             if(right == null)
                 throw new ArgumentNullException(nameof(right));
 
-            if(factory == null)
-                factory = ProjectionFactory.Auto;
+            factory ??= ProjectionFactory.Auto;
 
             Projections = factory.CreateProjections(left, right).ToList();
         }

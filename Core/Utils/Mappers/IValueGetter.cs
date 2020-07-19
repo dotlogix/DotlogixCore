@@ -6,6 +6,16 @@ namespace DotLogix.Core.Utils.Mappers {
     /// </summary>
     public interface IValueGetter<TSource, TValue> {
         /// <summary>
+        /// The source type
+        /// </summary>
+        Type SourceType { get; }
+        
+        /// <summary>
+        /// The value type
+        /// </summary>
+        Type ValueType { get; }
+        
+        /// <summary>
         /// Add a pre-conditions executed before a value will be resolved
         /// </summary>
         void AddPreCondition(Func<TSource, bool> conditionFunc);

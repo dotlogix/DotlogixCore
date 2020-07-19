@@ -7,13 +7,14 @@
 // ==================================================
 
 #region
+using System;
 using System.IO;
 using DotLogix.Core.Rest.Http.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
-    public class WebServiceStreamResult : WebServiceObjectResult<WebServiceStreamResult> {
-        public Stream OutputStream { get; set; }
+    public class WebServiceStreamResult : WebServiceResult, IWebServiceObjectResult<WebServiceStreamResult> {
+        public Stream Stream { get; set; }
         public int ChunkSize { get; set; } = AsyncHttpResponse.DefaultChunkSize;
         public bool SendInChunks { get; set; }
         public TransportModes TransportMode { get; set; } = TransportModes.Raw;
@@ -21,7 +22,10 @@ namespace DotLogix.Core.Rest.Services {
         /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
         public WebServiceStreamResult() {
             ResultWriter = StreamResultWriter.Instance;
-            ReturnValue = this;
         }
+
+        Optional<WebServiceStreamResult> IWebServiceObjectResult<WebServiceStreamResult>.ReturnValue => this;
+        Optional<object> IWebServiceObjectResult.ReturnValue => this;
+        Type IWebServiceObjectResult.ReturnType => GetType();
     }
 }

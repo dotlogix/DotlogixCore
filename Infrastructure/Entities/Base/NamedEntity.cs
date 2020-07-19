@@ -12,9 +12,9 @@ using DotLogix.Architecture.Common.Options;
 
 namespace DotLogix.Architecture.Infrastructure.Entities.Base {
     /// <summary>
-    /// A simple entity implementing the <see cref="IEntity"/> and the <see cref="INamed"/> interface
+    /// A simple entity implementing the <see cref="ISimpleEntity"/> and the <see cref="INamed"/> interface
     /// </summary>
-    public abstract class NamedEntity : Entity, INamed {
+    public abstract class NamedEntity : SimpleEntity, INamed {
         /// <inheritdoc />
         public string Name { get; set; }
     }

@@ -18,7 +18,7 @@ using DotLogix.Core.Extensions;
 #pragma warning disable 1591
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+namespace DotLogix.Architecture.Infrastructure.Queries {
     /// <summary>
     /// A static class providing extension methods for <see cref="IQuery{T}"/>
     /// </summary>

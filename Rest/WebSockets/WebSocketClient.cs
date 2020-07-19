@@ -137,9 +137,8 @@ namespace DotLogix.Core.Rest.Server.Http.WebSockets {
                 if(segment.Array == null || segment.Count == 0)
                     continue;
 
-                if(memoryStream == null)
-                    memoryStream = new MemoryStream(ReceiverBufferSize);
-                memoryStream.Write(segment.Array, segment.Offset, segment.Count);
+                memoryStream ??= new MemoryStream(ReceiverBufferSize);
+                await memoryStream.WriteAsync(segment.Array, segment.Offset, segment.Count, token);
             } while(continueRead);
 
             return (result, memoryStream);

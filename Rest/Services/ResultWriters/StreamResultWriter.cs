@@ -25,35 +25,38 @@ namespace DotLogix.Core.Rest.Services {
             if(response.IsCompleted)
                 return;
 
-            var requestResult = context.Result as IWebServiceObjectResult;
-            if(requestResult == null)
-                throw new ArgumentException($"This result writer accepts only values of type \"{nameof(IWebServiceObjectResult)}\"");
-
-
-            if(requestResult.Exception.IsDefined)
-                await WriteExceptionAsync(context, requestResult.Exception.Value);
-            else if(requestResult.ReturnValue.IsDefined) {
-                var returnValue = requestResult.ReturnValue.Value;
-                WebServiceStreamResult contentResult;
-                switch (returnValue) {
-                    case WebServiceStreamResult streamResult:
-                        contentResult = await GetStreamResult(streamResult);
-                        break;
-                    case Stream stream:
-                        contentResult = await GetStreamResult(stream);
-                        break;
-                    default:
-                        await base.WriteResultAsync(context, returnValue);
-                        await response.CompleteAsync();
-                        return;
-                }
-                await WriteResultAsync(context, contentResult);
-                await response.CompleteAsync();
+            if(context.Result.Exception.IsDefined) {
+                await WriteExceptionAsync(context, context.Result.Exception.Value);
+                return;
             }
 
+            var requestResult = context.Result as IWebServiceObjectResult;
+            if(requestResult == null)
+                throw new ArgumentException($"The provided value type {(context.Result != null ? context.Result.GetType().Name : "null")} is not supported. This result writer accepts only values of type \"{nameof(IWebServiceObjectResult)}\"");
 
+            if(requestResult.ReturnValue.IsUndefined) {
+                await response.CompleteAsync();
+                return;
+            }
 
+            var returnValue = requestResult.ReturnValue.Value;
+            WebServiceStreamResult contentResult;
+            switch(returnValue) {
+                case WebServiceStreamResult streamResult:
+                    contentResult = await GetStreamResult(streamResult);
+                    break;
+                case Stream stream:
+                    contentResult = await GetStreamResult(stream);
+                    break;
+                default:
+                    await base.WriteResultAsync(context, returnValue);
+                    await response.CompleteAsync();
+                    return;
+            }
+
+            await WriteResultAsync(context, contentResult);
             await response.CompleteAsync();
+            return;
         }
 
         protected virtual async Task WriteResultAsync(WebServiceContext context, WebServiceStreamResult streamResult) {
@@ -61,7 +64,7 @@ namespace DotLogix.Core.Rest.Services {
             httpResponse.StatusCode = streamResult.StatusCode ?? HttpStatusCodes.Success.Ok;
             httpResponse.ContentType = streamResult.ContentType ?? MimeTypes.Application.OctetStream;
             
-            if(streamResult.OutputStream == null) {
+            if(streamResult.Stream == null) {
                 if(streamResult.StatusCode == null) {
                     httpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
                 }
@@ -75,14 +78,14 @@ namespace DotLogix.Core.Rest.Services {
                     httpResponse.ChunkSize = chunkSize;
                     var buffer = new byte[chunkSize];
                     int read;
-                    while((read = await streamResult.OutputStream.ReadAsync(buffer, 0, chunkSize)) > 0) {
+                    while((read = await streamResult.Stream.ReadAsync(buffer, 0, chunkSize)) > 0) {
                         await httpResponse.WriteToResponseStreamAsync(buffer, 0, read);
                         await httpResponse.CompleteChunksAsync();
                     }
                 } else
-                    await streamResult.OutputStream.CopyToAsync(httpResponse.OutputStream);
+                    await streamResult.Stream.CopyToAsync(httpResponse.OutputStream);
             } finally {
-                streamResult.OutputStream?.Dispose();
+                streamResult.Stream?.Dispose();
             }
         }
 
@@ -94,17 +97,17 @@ namespace DotLogix.Core.Rest.Services {
 
                     string base64String;
                     using(var stream = new MemoryStream()) {
-                        await streamResult.OutputStream.CopyToAsync(stream);
-                        streamResult.OutputStream.Dispose();
+                        await streamResult.Stream.CopyToAsync(stream);
+                        streamResult.Stream.Dispose();
                         base64String = Convert.ToBase64String(stream.GetBuffer(), 0, (int)stream.Length);
                     }
 
                     var memStream = new MemoryStream(Encoding.UTF8.GetBytes(base64String));
                     memStream.Seek(0, SeekOrigin.Begin);
 
-                    streamResult.ReturnValue.Value.OutputStream = memStream;
-                    streamResult.ContentType = streamResult.ContentType ?? MimeTypes.Application.OctetStream;
-                    streamResult.OutputStream = memStream;
+                    streamResult.Stream = memStream;
+                    streamResult.ContentType ??= MimeTypes.Application.OctetStream;
+                    streamResult.Stream = memStream;
                     return streamResult;
                 case TransportModes.Raw:
                     return streamResult;
@@ -115,7 +118,7 @@ namespace DotLogix.Core.Rest.Services {
 
         protected virtual Task<WebServiceStreamResult> GetStreamResult(Stream stream) {
             return Task.FromResult(new WebServiceStreamResult {
-                                                              OutputStream = stream,
+                                                              Stream = stream,
                                                               ContentType = MimeTypes.Application.OctetStream
                                                               });
         }

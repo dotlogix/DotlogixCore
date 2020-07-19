@@ -13,7 +13,7 @@
 using Microsoft.EntityFrameworkCore;
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Factories {
+namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
     /// <summary>
     ///     An interface to represent a factory to create a <see cref="DbContext" />
     /// </summary>

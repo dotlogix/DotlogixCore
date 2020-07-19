@@ -13,21 +13,29 @@ using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Events;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Http.Context;
-using DotLogix.Core.Rest.Json;
 using DotLogix.Core.Rest.Services.Processors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Routing {
     public class WebServiceRouter : IAsyncHttpRequestHandler {
+        public WebServiceRouterSettings Settings { get; }
+
+        public WebServiceRouter(WebServiceRouterSettings settings = null) {
+            Settings = settings ?? new WebServiceRouterSettings();
+        }
+
         public const string EventSubscriptionParameterName = "$event";
         public const string EventSubscriptionChannelParameterName = "$eventChannel";
 
-        public WebRequestProcessorCollection PreProcessors { get; } = new WebRequestProcessorCollection();
-        public WebRequestProcessorCollection PostProcessors { get; } = new WebRequestProcessorCollection();
-        public ParameterProviderCollection ParameterProviders { get; } = new ParameterProviderCollection(Parameters.ParameterProviders.Context);
-        public WebServiceRouteCollection Routes { get; } = new WebServiceRouteCollection();
-        public WebServiceEventCollection Events { get; } = new WebServiceEventCollection();
-        public IWebServiceResultWriter DefaultResultWriter { get; set; } = JsonNodesResultWriter.Instance;
+        public WebRequestProcessorCollection PreProcessors => Settings.PreProcessors;
+        public WebRequestProcessorCollection PostProcessors => Settings.PostProcessors;
+        public ParameterProviderCollection ParameterProviders => Settings.ParameterProviders;
+        public WebServiceRouteCollection Routes => Settings.Routes;
+        public WebServiceEventCollection Events => Settings.Events;
+        public IWebServiceResultWriter DefaultResultWriter {
+            get => Settings.DefaultResultWriter;
+            set => Settings.DefaultResultWriter = value;
+        }
 
 
         #region Processing
@@ -59,20 +67,20 @@ namespace DotLogix.Core.Rest.Services.Routing {
             parameterProviders.AddRange(globalParameterProviders);
             parameterProviders.AddRange(routeParameterProviders);
 
+            using var webServiceContext = new WebServiceContext(asyncHttpContext, route, parameterProviders);
+            
+            // start of processing
+            await ProcessRequest(webServiceContext);
+            // end of processing
+            if(asyncHttpContext.Response.IsCompleted)
+                return;
 
-            using (var webServiceContext = new WebServiceContext(asyncHttpContext, route, parameterProviders)) {
-                // start of processing
-                await ProcessRequest(webServiceContext);
-                // end of processing
+            var result = webServiceContext.Result;
+            var resultWriter = result.ResultWriter
+                            ?? route.WebServiceResultWriter
+                            ?? DefaultResultWriter;
 
-                var result = webServiceContext.Result;
-                var resultWriter = result.ResultWriter
-                                   ?? route.WebServiceResultWriter
-                                   ?? DefaultResultWriter;
-
-                if(asyncHttpContext.Response.IsCompleted == false)
-                    await resultWriter.WriteAsync(webServiceContext);
-            }
+            await resultWriter.WriteAsync(webServiceContext);
         }
 
         private bool TryGetRoute(IAsyncHttpContext asyncHttpContext, out IWebServiceRoute route) {

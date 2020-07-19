@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+namespace DotLogix.Architecture.Infrastructure.Queries {
     /// <summary>
     /// An implementation of the <see cref="IQueryableQueryFactory"/>
     /// </summary>

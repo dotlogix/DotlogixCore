@@ -8,7 +8,6 @@
 
 #region
 using System.Threading.Tasks;
-using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors {
@@ -26,7 +25,7 @@ namespace DotLogix.Core.Rest.Services.Processors {
         public abstract Task ProcessAsync(WebServiceContext context);
 
         public virtual bool ShouldExecute(WebServiceContext webServiceContext) {
-            return webServiceContext.Result == null || (IgnoreHandled == false);
+            return webServiceContext.Result == null || IgnoreHandled == false;
         }
     }
 }

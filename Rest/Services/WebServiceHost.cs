@@ -13,46 +13,37 @@ using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Events;
-using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services.Attributes;
-using DotLogix.Core.Rest.Services.Descriptors;
-using DotLogix.Core.Rest.Services.Processors;
 using DotLogix.Core.Rest.Services.Routing;
-using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
     public class WebServiceHost {
-        public ISettings Settings { get; } = new Settings();
-        public WebServiceRouter Router { get; }
         private int _currentRouteIndex;
+        public WebServiceSettings Settings { get; }
+        public ILogSource LogSource => Settings.LogSource;
         public IAsyncWebServer Server { get; }
-        public WebRequestProcessorCollection GlobalPreProcessors => Router.PreProcessors;
-        public WebRequestProcessorCollection GlobalPostProcessors => Router.PostProcessors;
-        public WebServiceEventCollection ServerEvents => Router.Events;
+        public WebServiceRouter Router { get; }
         public WebServiceCollection Services { get; }
 
-        public WebServiceHost(WebServerConfiguration configuration = null) {
-            Router = new WebServiceRouter();
-            Server = new AsyncWebServer(Router, configuration);
+        public WebServiceHost(WebServiceSettings settings = null) {
+            Settings = settings ?? new WebServiceSettings();
+            Router = new WebServiceRouter(Settings.RouterSettings);
+            Server = new AsyncWebServer(Router, Settings.ServerSettings);
             Services = new WebServiceCollection();
         }
 
-        public WebServiceHost(string urlPrefix, WebServerConfiguration configuration = null) : this(configuration) {
-            Server.AddServerPrefix(urlPrefix);
-        }
-
-        public void AddPrefix(string urlPrefix) {
-            Server.AddServerPrefix(urlPrefix);
+        public WebServiceHost(string urlPrefix, WebServiceSettings settings = null) : this(settings) {
+            Settings.ServerSettings.UrlPrefixes.Add(urlPrefix);
         }
 
         public void Start() {
-            Log.Info($"HttpServer started with {Router.Routes.Count} routes");
+            LogSource.Info($"HttpServer started with {Router.Routes.Count} routes listening on {string.Join(", ", Server.Settings.UrlPrefixes)}");
             Server.Start();
         }
 
         public void Stop() {
-            Log.Info("HttpServer stopped");
+            LogSource.Info("HttpServer stopped");
             Server.Stop();
         }
 
@@ -74,7 +65,9 @@ namespace DotLogix.Core.Rest.Services {
             var serviceType = serviceInstance.GetType();
             var methods = serviceType.GetMethods();
             var count = 0;
-            foreach(var methodInfo in methods) {
+
+            LogSource.Trace($"Register webservice {serviceInstance.Name}");
+            foreach (var methodInfo in methods) {
                 var routeAttribute = methodInfo.GetCustomAttribute<RouteAttribute>();
                 if(routeAttribute == null)
                     continue;
@@ -93,19 +86,18 @@ namespace DotLogix.Core.Rest.Services {
 
                 foreach(var descriptorAttribute in methodInfo.GetCustomAttributes<DescriptorAttribute>())
                     serviceRoute.Descriptors.Add(descriptorAttribute.CreateDescriptor());
-                
-                serviceRoute.Descriptors.Add(new SettingsDescriptor(Settings));
 
                 var resultWriterAttribute = methodInfo.GetCustomAttribute<RouteResultWriterAttribute>();
                 if(resultWriterAttribute != null)
                     serviceRoute.WebServiceResultWriter = resultWriterAttribute.CreateResultWriter();
 
 
+                LogSource.Trace($"Registered webservice route {serviceInstance.Name}.{methodInfo.Name} as {serviceInstance.RoutePrefix ?? ""}{routeAttribute.Pattern}");
                 Router.Routes.Add(serviceRoute, serviceInstance.RoutePrefix ?? "");
                 count++;
             }
             if(count > 0)
-                Log.Debug($"Registered webservice {serviceInstance.Name} with {count} methods");
+                LogSource.Debug($"Registered webservice {serviceInstance.Name} with {count} routes");
 
 
             count = 0;
@@ -127,7 +119,7 @@ namespace DotLogix.Core.Rest.Services {
             }
 
             if(count > 0)
-                Log.Debug($"Bound {count} events to webservice {serviceInstance.Name}");
+                LogSource.Debug($"Bound {count} events to webservice {serviceInstance.Name}");
         }
 
         public void RegisterService<TService>() where TService : class, IWebService, new() {

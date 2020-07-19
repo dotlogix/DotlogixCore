@@ -25,6 +25,9 @@ namespace DotLogix.Core.Types {
         /// </summary>
         public static DataTypeConverter Instance { get; } = new DataTypeConverter();
 
+        /// <summary>
+        /// Get a dictionary of primitive data types
+        /// </summary>
         public IReadOnlyDictionary<Type, DataType> Primitives { get; }
 
         private DataTypeConverter() {

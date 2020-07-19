@@ -7,6 +7,7 @@
 // ==================================================
 
 #region
+using System;
 using System.Collections.Generic;
 using DotLogix.Architecture.Domain.Context;
 using DotLogix.Architecture.Domain.Services;
@@ -26,9 +27,6 @@ namespace DotLogix.Architecture.Application.Context {
         /// The internal unit of work
         /// </summary>
         protected IUnitOfWork UnitOfWork { get; }
-
-        /// <inheritdoc />
-        public IDictionary<string, object> Variables { get; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Creates a new instance of <see cref="ApplicationContext"/>

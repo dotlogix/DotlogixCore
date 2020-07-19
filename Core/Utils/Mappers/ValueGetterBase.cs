@@ -1,39 +1,57 @@
-﻿using System;
+﻿#region using
+using System;
 using System.Collections.Generic;
 using System.Linq;
+#endregion
 
 namespace DotLogix.Core.Utils.Mappers {
     /// <summary>
-    /// An implementation of the <see cref="IValueGetter{TSource,TValue}" interface/>
+    ///     An implementation of the <see cref="IValueGetter{TSource,TValue}" interface />
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     public abstract class ValueGetterBase<TSource, TValue> : IValueGetter<TSource, TValue> {
+        private readonly Type _sourceType;
+
+        private readonly Type _valueType;
+        protected ValueGetterBase() { }
+        protected ValueGetterBase(Type sourceType, Type valueType) {
+            _sourceType = sourceType;
+            _valueType = valueType;
+        }
+
         /// <summary>
-        /// A list of pre-conditions executed before a value will be resolved
+        ///     A list of pre-conditions executed before a value will be resolved
         /// </summary>
         protected List<Func<TSource, bool>> PreConditionFuncs { get; } = new List<Func<TSource, bool>>();
 
         /// <summary>
-        /// A list of post-conditions executed after a value has been resolved
+        ///     A list of post-conditions executed after a value has been resolved
         /// </summary>
         protected List<Func<TSource, TValue, bool>> PostConditionFuncs { get; } = new List<Func<TSource, TValue, bool>>();
 
+        /// <inheritdoc />
+        public Type SourceType => _sourceType ?? typeof(TSource);
+
+        /// <inheritdoc />
+        public Type ValueType => _valueType ?? typeof(TValue);
+
         /// <summary>
-        /// Add a pre-conditions executed before a value will be resolved
+        ///     Add a pre-conditions executed before a value will be resolved
         /// </summary>
         public void AddPreCondition(Func<TSource, bool> conditionFunc) {
             PreConditionFuncs.Add(conditionFunc);
         }
+
         /// <summary>
-        /// Add a post-conditions executed after a value has been resolved
+        ///     Add a post-conditions executed after a value has been resolved
         /// </summary>
         public void AddPostCondition(Func<TSource, TValue, bool> conditionFunc) {
             PostConditionFuncs.Add(conditionFunc);
         }
 
         /// <summary>
-        /// Tries to resolve a value
+        ///     Tries to resolve a value
         /// </summary>
         public bool TryGet(TSource source, out TValue value) {
             if(CheckPreConditions(source) && TryGetValue(source, out value) && CheckPostConditions(source, value))
@@ -43,19 +61,19 @@ namespace DotLogix.Core.Utils.Mappers {
         }
 
         /// <summary>
-        /// Tries to resolve a value
+        ///     Tries to resolve a value
         /// </summary>
         protected abstract bool TryGetValue(TSource source, out TValue value);
 
         /// <summary>
-        /// Check if all pre-conditions are fulfilled
+        ///     Check if all pre-conditions are fulfilled
         /// </summary>
         protected bool CheckPreConditions(TSource source) {
             return (PreConditionFuncs.Count == 0) || PreConditionFuncs.All(c => c.Invoke(source));
         }
 
         /// <summary>
-        /// Check if all post-conditions are fulfilled
+        ///     Check if all post-conditions are fulfilled
         /// </summary>
         protected bool CheckPostConditions(TSource source, TValue value) {
             return (PostConditionFuncs.Count == 0) || PostConditionFuncs.All(c => c.Invoke(source, value));

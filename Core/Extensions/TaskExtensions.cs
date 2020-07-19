@@ -40,10 +40,23 @@ namespace DotLogix.Core.Extensions {
 
             var tcs = new TaskCompletionSource<object>();
 
-            task.ContinueWith(t => tcs.SetResult(UnpackResult(t)), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously);
-            // ReSharper disable once PossibleNullReferenceException
-            task.ContinueWith(t => tcs.SetException(t.Exception.InnerExceptions), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
-            task.ContinueWith(t => tcs.SetCanceled(), TaskContinuationOptions.OnlyOnCanceled | TaskContinuationOptions.ExecuteSynchronously);
+            task.ContinueWith(t => {
+                                  if (t.IsCanceled) { 
+                                      tcs.SetCanceled();
+                                      return;
+                                  }
+
+                                  if (t.IsFaulted) {
+                                      if (t.Exception != null)
+                                          tcs.SetException(t.Exception.InnerExceptions);
+                                      else
+                                        tcs.SetException(new ArgumentException("Exception must be present for a faulted task"));
+                                      return;
+                                  }
+
+                                  tcs.SetResult(UnpackResult(task));
+                              },
+                              TaskContinuationOptions.ExecuteSynchronously);
             return tcs.Task;
         }
 
@@ -69,25 +82,7 @@ namespace DotLogix.Core.Extensions {
         /// <param name="task">The task</param>
         /// <returns></returns>
         public static Task<TBase> ConvertResult<TBase, TDerived>(this Task<TDerived> task) where TDerived : TBase {
-            return task.ContinueWith(
-                                     t => (TBase)t.Result,
-                                     TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnRanToCompletion
-                                    );
-        }
-
-        /// <summary>
-        ///     Converts the result of a task using a selector method
-        /// </summary>
-        /// <typeparam name="TResult">The target type</typeparam>
-        /// <typeparam name="TSource">The current type</typeparam>
-        /// <param name="selectorFunc">The function used to convert the result</param>
-        /// <param name="task">The task</param>
-        /// <returns></returns>
-        public static Task<TResult> ConvertResult<TSource, TResult>(this Task<TSource> task, Func<TSource, TResult> selectorFunc) {
-            return task.ContinueWith(
-                                     t => selectorFunc.Invoke(t.Result),
-                                     TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnRanToCompletion
-                                    );
+            return task.ConvertResult<TDerived, TBase>(r => r.Result);
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace DotLogix.Architecture.Domain.UoW {
         /// <summary>
         /// The internal <see cref="IEntityContext"/>
         /// </summary>
-        protected IEntityContext EntityContext { get; }
+        public IEntityContext EntityContext { get; }
         /// <summary>
         /// The internal <see cref="IRepositoryProvider"/>
         /// </summary>

@@ -33,7 +33,7 @@ namespace DotLogix.Core.Rest.Http.Parameters {
         }
 
         public override void SerializeValue(string name, object value, NameValueCollection collection) {
-            if(!(value is IEnumerable enumerable))
+            if(value is string || !(value is IEnumerable enumerable))
             {
                 collection.Add(name, value.ToString());
                 return;

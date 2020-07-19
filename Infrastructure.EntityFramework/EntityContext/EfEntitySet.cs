@@ -12,24 +12,38 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
     /// An implementation of the <see cref="IEntitySet{TEntity}"/> interface for entity framework
     /// </summary>
     public class EfEntitySet<TEntity> : IEntitySet<TEntity> where TEntity : class, new() {
+        private DbSet<TEntity> _dbSet;
+        private EfEntityHooks _hooks;
+
         /// <summary>
-        /// The inner DbSet
+        /// The entity context
         /// </summary>
-        protected DbSet<TEntity> DbSet { get; }
+        public IEfEntityContext EntityContext { get; }
+
+        IEntityContext IEntitySet<TEntity>.EntityContext => EntityContext;
+
+        /// <summary>
+        /// The entity db set
+        /// </summary>
+        protected DbSet<TEntity> DbSet => _dbSet ?? (_dbSet = EntityContext.DbContext.Set<TEntity>());
+
+        /// <summary>
+        /// The entity hooks
+        /// </summary>
+        protected EfEntityHooks Hooks => _hooks ?? (_hooks = EntityContext.GetEntityHooks<TEntity>());
+
 
         /// <summary>
         /// Create a new instance of <see cref="EfEntitySet{TEntity}"/>
         /// </summary>
-        public EfEntitySet(DbSet<TEntity> dbSet) {
-            DbSet = dbSet;
+        public EfEntitySet(IEfEntityContext entityContext) {
+            EntityContext = entityContext;
         }
         
         /// <inheritdoc />
         public virtual async ValueTask<TEntity> AddAsync(TEntity entity) {
-            var asyncResult = DbSet.AddAsync(entity);
-            if(asyncResult.IsCompletedSuccessfully == false)
-                await asyncResult;
-            return asyncResult.Result.Entity;
+            var asyncResult = await DbSet.AddAsync(entity);
+            return asyncResult.Entity;
         }
 
         /// <inheritdoc />

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+namespace DotLogix.Architecture.Infrastructure.Queries {
     /// <summary>
     /// An implementation of the <see cref="IQueryExecutor{T}"/> interface using an <see cref="IQueryable{T}"/>
     /// </summary>

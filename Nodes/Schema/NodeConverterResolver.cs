@@ -31,11 +31,11 @@ namespace DotLogix.Core.Nodes {
             return ConverterFactoriesMap.TryGetValue(type, out value);
         }
 
-        public virtual bool Register(INamingStrategy namingStrategy) {
+        public virtual bool Add(INamingStrategy namingStrategy) {
             return NamingStrategiesMap.TryAdd(namingStrategy.GetType(), namingStrategy);
         }
 
-        public virtual bool Register(INodeConverterFactory factory) {
+        public virtual bool Add(INodeConverterFactory factory) {
             if(ConverterFactoriesMap.TryAdd(factory.GetType(), factory)) {
                 ConverterFactories.Add(factory);
                 return true;
@@ -58,11 +58,11 @@ namespace DotLogix.Core.Nodes {
                                               });
         }
 
-        public bool Unregister(INodeConverterFactory factory) {
+        public virtual bool Remove(INodeConverterFactory factory) {
             return ConverterFactoriesMap.TryRemove(factory.GetType(), out _) && ConverterFactories.Remove(factory);
         }
         
-        public bool Unregister(INamingStrategy namingStrategy) {
+        public virtual bool Remove(INamingStrategy namingStrategy) {
             return NamingStrategiesMap.TryRemove(namingStrategy.GetType(), out _);
         }
 
@@ -119,8 +119,8 @@ namespace DotLogix.Core.Nodes {
             return ApplyChildSettings(accessor.MemberInfo, settings);
         }
 
-        private bool ApplyChildSettings(MemberInfo memberInfo, TypeSettings settings) {
-            var childType = settings.DataType.ElementType ?? settings.DataType.UnderlayingType;
+        protected bool ApplyChildSettings(MemberInfo memberInfo, TypeSettings settings) {
+            var childType = settings.DataType.ElementType ?? settings.DataType.UnderlyingType;
             if(childType == null) {
                 if(settings.DataType.Type.IsAssignableTo(typeof(IOptional)))
                     childType = settings.DataType.Type.GenericTypeArguments[0];
@@ -179,7 +179,7 @@ namespace DotLogix.Core.Nodes {
 
         private static IDictionary<Type, TypeSettings> CreatePrimitiveTypeSettings() {
             TypeSettings CreatePrimitiveTypeSettings(DataType dataType) {
-                var typeSettings = new TypeSettings { DataType= dataType, NodeType = NodeTypes.Value };
+                var typeSettings = new TypeSettings { DataType = dataType, NodeType = NodeTypes.Value };
                 typeSettings.Converter = new ValueNodeConverter(typeSettings);
                 return typeSettings;
             }

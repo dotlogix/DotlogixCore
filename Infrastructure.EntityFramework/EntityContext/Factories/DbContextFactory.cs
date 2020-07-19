@@ -11,7 +11,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Factories {
+namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
     /// <summary>
     ///     An implementation of the <see cref="IDbContextFactory" /> interface for entity framework
     /// </summary>

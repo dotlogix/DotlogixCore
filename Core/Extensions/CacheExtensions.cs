@@ -17,6 +17,28 @@ namespace DotLogix.Core.Extensions {
     /// </summary>
     public static class CacheExtensions {
         /// <summary>
+        ///     Stores a value in a cache using a <see cref="DynamicCachePolicy" /> with the given timestamp
+        /// </summary>
+        /// <param name="cache">The cache</param>
+        /// <param name="key">The key of the value</param>
+        /// <param name="value">The value</param>
+        /// <param name="hasExpiredFunc">The callback to get the expiration status</param>
+        public static void Store<TKey, TValue>(this ICache<TKey, TValue> cache, TKey key, TValue value, Func<bool> hasExpiredFunc) {
+            cache.Store(key, value, new DynamicCachePolicy(hasExpiredFunc));
+        }
+
+        /// <summary>
+        ///     Stores a value in a cache using a <see cref="DynamicCachePolicy" /> with the given timestamp
+        /// </summary>
+        /// <param name="cache">The cache</param>
+        /// <param name="key">The key of the value</param>
+        /// <param name="value">The value</param>
+        /// <param name="hasExpiredFunc">The callback to get the expiration status</param>
+        public static void Store<TKey, TValue>(this ICache<TKey, TValue> cache, TKey key, TValue value, Func<DateTime, bool> hasExpiredFunc) {
+            cache.Store(key, value, new DynamicCachePolicy(hasExpiredFunc));
+        }
+        
+        /// <summary>
         ///     Stores a value in a cache using a <see cref="ValidUntilCachePolicy" /> with the given timestamp
         /// </summary>
         /// <param name="cache">The cache</param>

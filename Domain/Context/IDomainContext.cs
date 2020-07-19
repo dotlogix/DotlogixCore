@@ -18,10 +18,6 @@ namespace DotLogix.Architecture.Domain.Context {
     /// </summary>
     public interface IDomainContext {
         /// <summary>
-        /// The context variables
-        /// </summary>
-        IDictionary<string, object> Variables { get; }
-        /// <summary>
         /// Get or create a service
         /// </summary>
         TService UseService<TService>(IUnitOfWorkContextFactory contextFactory) where TService : class, IDomainService;

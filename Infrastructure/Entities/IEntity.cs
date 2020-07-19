@@ -12,7 +12,7 @@ using DotLogix.Architecture.Common.Options;
 
 namespace DotLogix.Architecture.Infrastructure.Entities {
     /// <summary>
-    /// An interface combining <see cref="IInsertOnlyEntity"/> and <see cref="IOrdered"/> interface
+    /// An interface combining <see cref="ISimpleEntity"/>, <see cref="IInsertOnly"/> and <see cref="IOrdered"/> interface
     /// </summary>
-    public interface IEntity : IInsertOnlyEntity, IOrdered { }
+    public interface IEntity : ISimpleEntity, IInsertOnly, IOrdered { }
 }

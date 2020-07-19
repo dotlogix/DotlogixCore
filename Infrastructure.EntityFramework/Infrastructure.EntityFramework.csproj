@@ -13,10 +13,7 @@
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<RepositoryType>git</RepositoryType>
 	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-	<AssemblyVersion>1.1</AssemblyVersion>
-    <FileVersion>1.1</FileVersion>
-    <Version>2.2.0</Version>
-		<Configurations>Debug;Release;</Configurations>
+    <Version>2.2.19</Version>
 	</PropertyGroup>
 
 
@@ -27,6 +24,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
+    <PackageReference Include="Remotion.Linq" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

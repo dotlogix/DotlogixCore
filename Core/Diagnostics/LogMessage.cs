@@ -31,6 +31,11 @@ namespace DotLogix.Core.Diagnostics {
         }
 
         /// <summary>
+        /// The logger source timestamp
+        /// </summary>
+        public ILogSource Source { get; set; }
+
+        /// <summary>
         /// The local timestamp
         /// </summary>
         public DateTime TimeStamp => UtcTimeStamp.ToLocalTime();
@@ -56,8 +61,13 @@ namespace DotLogix.Core.Diagnostics {
         public string Message { get; set; }
 
         /// <summary>
-        /// The Context
+        /// The context
         /// </summary>
         public List<KeyValuePair<string, string>> Context { get; set; }
+        
+        /// <summary>
+        /// The optional exception
+        /// </summary>
+        public Exception Exception { get; set; }
     }
 }

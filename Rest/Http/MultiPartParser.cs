@@ -13,8 +13,7 @@ namespace DotLogix.Core.Rest.Http {
         private MultiPartParser(){}
 
         public MultiPartData Parse(Stream stream, string boundary, Encoding encoding = null) {
-            if(encoding == null)
-                encoding = Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
 
             var boundaryBytes = encoding.GetBytes("--"+boundary);
             var headerSplitBytes = encoding.GetBytes("\r\n\r\n");
@@ -31,7 +30,7 @@ namespace DotLogix.Core.Rest.Http {
                 ContentDisposition disposition = null;
                 MimeType contentType = null;
 
-                for(int i = 0; i < headerStr.Length; i += 2) {
+                for(var i = 0; i < headerStr.Length; i += 2) {
                     switch(headerStr[i].ToLower()) {
                         case "content-disposition":
                             disposition = ContentDisposition.Parse(headerStr[1]);
@@ -70,9 +69,8 @@ namespace DotLogix.Core.Rest.Http {
             }else if(disposition.HasAttribute("boundary", true)) {
                 dataValue = Parse(data, disposition.GetAttribute("boundary").Value);
             } else {
-                using(var reader = new StreamReader(data, Encoding.UTF8, false, 1024, false)) {
-                    dataValue = reader.ReadToEnd();
-                }
+                using var reader = new StreamReader(data, Encoding.UTF8, false, 1024, true);
+                dataValue = reader.ReadToEnd();
             }
 
             return new MultiPartDataValue(disposition, contentType, dataValue);

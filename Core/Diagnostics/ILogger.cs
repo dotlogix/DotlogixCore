@@ -18,6 +18,7 @@ namespace DotLogix.Core.Diagnostics {
         /// The name of the logger
         /// </summary>
         string Name { get; }
+        
         /// <summary>
         /// Initialize the logger instance
         /// </summary>

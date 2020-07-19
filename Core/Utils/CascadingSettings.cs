@@ -6,14 +6,6 @@
 // LastEdited:  12.12.2019
 // ==================================================
 
-// ==================================================
-// Copyright 2019(C) , DotLogix
-// File:  ConcatenatedSettings.cs
-// Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  ..
-// LastEdited:  12.12.2019
-// ==================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,29 +14,32 @@ using System.Runtime.CompilerServices;
 using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Utils {
-    public class ConcatenatedSettings : IReadOnlySettings {
-        public IEqualityComparer<string> EqualityComparer { get; protected set; }
+    public class CascadingSettings : IReadOnlySettings {
+        /// <summary>
+        /// The settings key equality comparer used to cascade
+        /// </summary>
+        protected IEqualityComparer<string> SettingsKeyComparer { get; set; }
 
         /// <summary>
         /// The source settings collection
         /// </summary>
-        public ICollection<IReadOnlySettings> Settings { get; }
+        protected IReadOnlyCollection<IReadOnlySettings> Settings { get; }
 
         /// <inheritdoc />
-        public ConcatenatedSettings(ICollection<IReadOnlySettings> settings, IEqualityComparer<string> comparer = null) {
+        public CascadingSettings(IReadOnlyCollection<IReadOnlySettings> settings, IEqualityComparer<string> settingsKeyComparer = null) {
             Settings = settings;
-            EqualityComparer = comparer ?? StringComparer.Ordinal;
+            SettingsKeyComparer = settingsKeyComparer ?? StringComparer.Ordinal;
         }
 
         /// <inheritdoc />
-        public ConcatenatedSettings(IEqualityComparer<string> comparer = null) : this(new List<IReadOnlySettings>(), comparer) {
+        public CascadingSettings(IEqualityComparer<string> comparer = null) : this(new List<IReadOnlySettings>(), comparer) {
 
         }
 
         /// <inheritdoc />
         public IEnumerable<string> Keys {
             get {
-                var keys = new HashSet<string>(EqualityComparer);
+                var keys = new HashSet<string>(SettingsKeyComparer);
                 foreach(var setting in Settings) {
                     keys.UnionWith(setting.Keys);
                 }
@@ -110,8 +105,8 @@ namespace DotLogix.Core.Utils {
         }
 
         /// <inheritdoc />
-        public IReadOnlySettings Clone() {
-            return new ConcatenatedSettings(new List<IReadOnlySettings>(Settings), EqualityComparer);
+        public virtual IReadOnlySettings Clone() {
+            return new CascadingSettings(new List<IReadOnlySettings>(Settings), SettingsKeyComparer);
         }
 
         /// <inheritdoc />
@@ -123,7 +118,7 @@ namespace DotLogix.Core.Utils {
         /// <summary>Returns an enumerator that iterates through the collection.</summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator() {
-            var settingKeys = new HashSet<string>(EqualityComparer);
+            var settingKeys = new HashSet<string>(SettingsKeyComparer);
 
             foreach(var settings in Settings) {
                 foreach(var kv in settings) {

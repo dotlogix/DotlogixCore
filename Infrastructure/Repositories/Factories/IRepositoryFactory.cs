@@ -18,6 +18,6 @@ namespace DotLogix.Architecture.Infrastructure.Repositories.Factories {
         /// <summary>
         /// Get or create an instance of <see cref="IRepository"/>
         /// </summary>
-        IRepository Create(IEntitySetProvider entitySetProvider);
+        IRepository Create(IEntityContext entityContext);
     }
 }

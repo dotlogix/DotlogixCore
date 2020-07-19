@@ -10,12 +10,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Http.Headers;
 using DotLogix.Core.Rest.Http.Parameters;
-using HttpStatusCode = DotLogix.Core.Rest.Http.HttpStatusCode;
 #endregion
 
 namespace DotLogix.Core.Rest.Http.Context {
@@ -29,16 +30,17 @@ namespace DotLogix.Core.Rest.Http.Context {
             _parameterParser = parameterParser;
             OriginalResponse = originalResponse ?? throw new ArgumentNullException(nameof(originalResponse));
             ContentType = MimeTypes.Text.Plain;
-            ContentLength64 = 0;
+            ContentLength = 0;
             ContentEncoding = Encoding.UTF8;
             StatusCode = HttpStatusCodes.Success.Ok;
             OutputStream = new MemoryStream();
             HeaderParameters = parameterParser.Deserialize(originalResponse.Headers);
-            Cookies = originalResponse.Cookies;
+            Cookies = new List<Cookie>(originalResponse.Cookies.Count);
+            Cookies.AddRange(originalResponse.Cookies.Cast<Cookie>());
             ChunkSize = DefaultChunkSize;
         }
 
-        public CookieCollection Cookies { get; set; }
+        public ICollection<Cookie> Cookies { get; set; }
 
         public TransferState TransferState { get; private set; }
         public bool IsCompleted => TransferState == TransferState.Completed;
@@ -46,7 +48,7 @@ namespace DotLogix.Core.Rest.Http.Context {
         public IDictionary<string, object> HeaderParameters { get; }
 
         public MimeType ContentType { get; set; }
-        public long ContentLength64 { get; set; }
+        public long ContentLength { get; set; }
         public int ChunkSize { get; set; }
         public Encoding ContentEncoding { get; set; }
         public HttpStatusCode StatusCode { get; set; }
@@ -126,6 +128,11 @@ namespace DotLogix.Core.Rest.Http.Context {
             OriginalResponse.StatusDescription = StatusCode.Description;
             OriginalResponse.ContentType = ContentType.Value;
             OriginalResponse.ContentEncoding = ContentEncoding;
+            OriginalResponse.Cookies = new CookieCollection();
+            foreach(var cookie in Cookies) {
+                OriginalResponse.Cookies.Add(cookie);
+            }
+
             if(OriginalResponse.SendChunked == false)
                 OriginalResponse.ContentLength64 = OutputStream.Length;
         }

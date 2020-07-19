@@ -37,20 +37,27 @@ namespace DotLogix.Core.Rest {
         private readonly IAsyncWebSocketRequestHandler _webSocketRequestHandler;
         private SemaphoreSlim _requestSemaphore;
         private CancellationTokenSource _serverShutdownSource;
-        public bool IsDisposed { get; private set; }
-
-        public AsyncWebServer(IAsyncHttpRequestHandler requestHandler, IAsyncWebSocketRequestHandler webSocketRequestHandler, WebServerConfiguration configuration = null) {
-            Configuration = configuration ?? WebServerConfiguration.Default;
+        
+        public AsyncWebServer(IAsyncHttpRequestHandler requestHandler, IAsyncWebSocketRequestHandler webSocketRequestHandler, WebServerSettings settings = null) {
+            Settings = settings ?? new WebServerSettings();
             _requestHandler = requestHandler;
             _webSocketRequestHandler = webSocketRequestHandler;
-        }
-        public AsyncWebServer(IAsyncHttpRequestHandler requestHandler, WebServerConfiguration configuration = null) : this(requestHandler, null, configuration) {
-        }
-        public AsyncWebServer(IAsyncWebSocketRequestHandler webSocketRequestHandler, WebServerConfiguration configuration = null) : this(null, webSocketRequestHandler, configuration) {
+
+            if(Settings.UrlPrefixes != null) {
+                _httpListener.Prefixes.AddRange(Settings.UrlPrefixes);
+            }
         }
 
-        public WebServerConfiguration Configuration { get; }
+        public AsyncWebServer(IAsyncHttpRequestHandler requestHandler, WebServerSettings settings = null) : this(requestHandler, null, settings) {
+        }
+        public AsyncWebServer(IAsyncWebSocketRequestHandler webSocketRequestHandler, WebServerSettings settings = null) : this(null, webSocketRequestHandler, settings) {
+        }
+
+        public WebServerSettings Settings { get; }
+
+
         public bool IsRunning { get; private set; }
+        public bool IsDisposed { get; private set; }
 
         public void Start() {
             if(IsDisposed)
@@ -59,10 +66,14 @@ namespace DotLogix.Core.Rest {
                 return;
             IsRunning = true;
             _serverShutdownSource = new CancellationTokenSource();
-            _requestSemaphore = new SemaphoreSlim(0, Configuration.MaxConcurrentRequests);
+            var requestLimit = Settings.EnableConcurrentRequests? Settings.RequestLimit : 1;
+            _requestSemaphore = new SemaphoreSlim(0, requestLimit);
+
+            _httpListener.Prefixes.Clear();
+            _httpListener.Prefixes.AddRange(Settings.UrlPrefixes);
             _httpListener.Start();
 
-            _requestSemaphore.Release(Configuration.MaxConcurrentRequests);
+            _requestSemaphore.Release(requestLimit);
             HandleRequestsAsync();
         }
 
@@ -87,6 +98,8 @@ namespace DotLogix.Core.Rest {
                 throw new InvalidOperationException("Can not add prefix while the server is running");
             if(IsDisposed)
                 throw new ObjectDisposedException(nameof(AsyncWebServer), ServerDisposedMessage);
+
+            Settings.UrlPrefixes.Add(uriPrefix);
             _httpListener.Prefixes.Add(uriPrefix);
         }
 
@@ -104,7 +117,7 @@ namespace DotLogix.Core.Rest {
                     _requestSemaphore.Release();
                 } catch (Exception e) {
                     if (IsRunning)
-                        Log.Error(e);
+                        Settings.LogSource.Error(e);
                 }
             }
 
@@ -113,7 +126,7 @@ namespace DotLogix.Core.Rest {
                     await _requestSemaphore.WaitAsync(_serverShutdownSource.Token);
                 } catch(OperationCanceledException e) {
                     if(IsRunning == false)
-                        continue; // Supress cancellation because of server shutdown
+                        continue; // Suppress cancellation because of server shutdown
                     Log.Error(e);
                 }
 
@@ -193,12 +206,6 @@ namespace DotLogix.Core.Rest {
                     await SendErrorMessageAsync(httpContext.Response, e);
             } finally {
                 httpContext?.Dispose();
-                try {
-                    _requestSemaphore.Release();
-                } catch(Exception e) {
-                    if(IsRunning)
-                        Log.Error(e);
-                }
             }
         }
 
@@ -210,13 +217,13 @@ namespace DotLogix.Core.Rest {
             return new AsyncHttpContext(this, request, response);
         }
         private AsyncWebSocketContext CreateContext(HttpListenerWebSocketContext originalContext) {
-            return AsyncWebSocketContext.Create(originalContext, Configuration.ParameterParser ?? PrimitiveParameterParser.Default);
+            return AsyncWebSocketContext.Create(originalContext, Settings.ParameterParser ?? PrimitiveParameterParser.Default);
         }
         private AsyncHttpResponse CreateResponse(HttpListenerContext originalContext) {
-            return AsyncHttpResponse.Create(originalContext.Response, Configuration.ParameterParser ?? PrimitiveParameterParser.Default);
+            return AsyncHttpResponse.Create(originalContext.Response, Settings.ParameterParser ?? PrimitiveParameterParser.Default);
         }
         private AsyncHttpRequest CreateRequest(HttpListenerContext originalContext) {
-            return AsyncHttpRequest.Create(originalContext.Request, Configuration.ParameterParser ?? PrimitiveParameterParser.Default);
+            return AsyncHttpRequest.Create(originalContext.Request, Settings.ParameterParser ?? PrimitiveParameterParser.Default);
         }
 
         #endregion
@@ -238,7 +245,7 @@ namespace DotLogix.Core.Rest {
             SendBadRequest(context, "Protocol not supported");
         }
 
-        public static async Task SendErrorMessageAsync(IAsyncHttpResponse response, Exception exception) {
+        public async Task SendErrorMessageAsync(IAsyncHttpResponse response, Exception exception) {
             var stringBuilder = new StringBuilder();
             var httpStatusCode = HttpStatusCodes.ServerError.InternalServerError;
             CreateExceptionMessage(stringBuilder, exception, ref httpStatusCode);
@@ -250,7 +257,7 @@ namespace DotLogix.Core.Rest {
                 await response.WriteToResponseStreamAsync(stringBuilder.ToString());
                 await response.CompleteAsync();
             } catch(Exception e) {
-                Log.Error(e);
+                Settings.LogSource.Error(e);
             }
         }
         #endregion

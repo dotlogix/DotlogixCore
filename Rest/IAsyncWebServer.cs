@@ -8,15 +8,15 @@
 
 #region
 using System;
-using DotLogix.Core.Rest.Http;
 #endregion
 
 namespace DotLogix.Core.Rest {
     public interface IAsyncWebServer : IDisposable {
-        WebServerConfiguration Configuration { get; }
+        WebServerSettings Settings { get; }
         bool IsRunning { get; }
+        bool IsDisposed { get; }
         void Start();
         void Stop();
-        void AddServerPrefix(string uriPrefix);
+        void Dispose();
     }
 }

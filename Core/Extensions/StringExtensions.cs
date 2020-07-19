@@ -181,21 +181,21 @@ namespace DotLogix.Core.Extensions {
         public static StringBuilder AppendJoin<T>(this StringBuilder sb, string separator, IEnumerable<T> values) {
             if(values == null)
                 throw new ArgumentNullException(nameof(values));
-            if(separator == null)
-                separator = string.Empty;
-            using(var enumerator = values.GetEnumerator()) {
-                if(!enumerator.MoveNext())
-                    return sb;
 
+            separator ??= string.Empty;
+            using var enumerator = values.GetEnumerator();
+
+            if(!enumerator.MoveNext())
+                return sb;
+
+            if(enumerator.Current != null)
+                sb.Append(enumerator.Current);
+            while(enumerator.MoveNext()) {
+                sb.Append(separator);
                 if(enumerator.Current != null)
                     sb.Append(enumerator.Current);
-                while(enumerator.MoveNext()) {
-                    sb.Append(separator);
-                    if(enumerator.Current != null)
-                        sb.Append(enumerator.Current);
-                }
-                return sb;
             }
+            return sb;
         }
         #endregion
 

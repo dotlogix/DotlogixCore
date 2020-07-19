@@ -91,9 +91,7 @@ namespace DotLogix.Core.Collections {
                 }
             }
         }
-
-		/// <inheritdoc />
-
+        
 		/// <summary>
 		/// The keys of the collection
 		/// </summary>

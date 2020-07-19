@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Threading.Tasks;
+using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Repositories;
 #endregion
 
@@ -18,7 +19,12 @@ namespace DotLogix.Architecture.Domain.UoW {
     /// </summary>
     public interface IUnitOfWorkContext : IUnitOfWorkContextFactory, IDisposable {
         /// <summary>
-        /// Get or create an instance of <see cref="IRepository{TEntity, TKey}"/>
+        /// The entity context
+        /// </summary>
+        IEntityContext EntityContext { get; }
+        
+        /// <summary>
+        /// Get or create an instance of <see cref="IRepository"/>
         /// </summary>
         TRepo UseRepository<TRepo>() where TRepo : IRepository;
 

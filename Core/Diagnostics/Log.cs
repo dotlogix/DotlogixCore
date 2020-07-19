@@ -20,13 +20,23 @@ namespace DotLogix.Core.Diagnostics {
     /// A static logging interface
     /// </summary>
     public static class Log {
-        private static readonly ParrallelLogger Logger = ParrallelLogger.Instance;
+        private static readonly ParallelLogger ParallelLogger = ParallelLogger.Instance;
+        /// <summary>
+        /// The global logger instance
+        /// </summary>
+        public static ILogger Logger => ParallelLogger;
+
+        /// <summary>
+        /// Gets or sets the default logger source (name = "Default")
+        /// </summary>
+        public static ILogSource Default { get; set; } = new LogSource("Default", ParallelLogger, () => LogLevel) { StackFramesToSkip = 3 };
+
         /// <summary>
         /// The level to log messages
         /// </summary>
         public static LogLevels LogLevel {
-            get => Logger.CurrentLogLevel;
-            set => Logger.CurrentLogLevel = value;
+            get => ParallelLogger.CurrentLogLevel;
+            set => ParallelLogger.CurrentLogLevel = value;
         }
 
         /// <summary>
@@ -34,7 +44,7 @@ namespace DotLogix.Core.Diagnostics {
         /// </summary>
         /// <returns></returns>
         public static bool Initialize() {
-            return Logger.Initialize();
+            return ParallelLogger.Initialize();
         }
 
         /// <summary>
@@ -43,7 +53,7 @@ namespace DotLogix.Core.Diagnostics {
         /// <param name="loggers"></param>
         /// <returns></returns>
         public static bool AttachLoggers(params ILogger[] loggers) {
-            return Logger.AttachLogger(loggers);
+            return ParallelLogger.AttachLogger(loggers);
         }
 
         /// <summary>
@@ -52,7 +62,7 @@ namespace DotLogix.Core.Diagnostics {
         /// <param name="loggers"></param>
         /// <returns></returns>
         public static bool AttachLoggers(IEnumerable<ILogger> loggers) {
-            return Logger.AttachLogger(loggers);
+            return ParallelLogger.AttachLogger(loggers);
         }
 
         /// <summary>
@@ -61,7 +71,7 @@ namespace DotLogix.Core.Diagnostics {
         /// <param name="loggers"></param>
         /// <returns></returns>
         public static bool DetachLoggers(params ILogger[] loggers) {
-            return Logger.DetachLogger(loggers);
+            return ParallelLogger.DetachLogger(loggers);
         }
         /// <summary>
         /// Detach some loggers from the log instance
@@ -69,281 +79,161 @@ namespace DotLogix.Core.Diagnostics {
         /// <param name="loggers"></param>
         /// <returns></returns>
         public static bool DetachLoggers(IEnumerable<ILogger> loggers) {
-            return Logger.DetachLogger(loggers);
+            return ParallelLogger.DetachLogger(loggers);
         }
         /// <summary>
         /// Shutdown the log instance
         /// </summary>
         /// <returns></returns>
         public static bool Shutdown() {
-            return Logger.Shutdown();
+            return ParallelLogger.Shutdown();
         }
 
         /// <summary>
         /// Write a trace message to the loggers
         /// </summary>
         /// <param name="message"></param>
-        public static void Trace(string message) {
-            if(Logger.IsLoggingDisabled(LogLevels.Trace))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Trace, message, 2);
-            Logger.Log(logMessage);
-        }
+        public static void Trace(string message) => Default.Trace(message);
 
         /// <summary>
         /// Write a trace message to the loggers
         /// </summary>
         /// <param name="messageFunc"></param>
-        public static void Trace(Func<string> messageFunc) {
-            if(Logger.IsLoggingDisabled(LogLevels.Trace))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Trace, messageFunc.Invoke(), 2);
-            Logger.Log(logMessage);
-        }
+        public static void Trace(Func<string> messageFunc) => Default.Trace(messageFunc);
 
         /// <summary>
         /// Write a debug message to the loggers
         /// </summary>
         /// <param name="message"></param>
-        public static void Debug(string message) {
-            if(Logger.IsLoggingDisabled(LogLevels.Debug))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Debug, message, 2);
-            Logger.Log(logMessage);
-        }
+        public static void Debug(string message) => Default.Debug(message);
 
         /// <summary>
         /// Write a debug message to the loggers
         /// </summary>
         /// <param name="messageFunc"></param>
-        public static void Debug(Func<string> messageFunc) {
-            if(Logger.IsLoggingDisabled(LogLevels.Debug))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Debug, messageFunc.Invoke(), 2);
-            Logger.Log(logMessage);
-        }
+        public static void Debug(Func<string> messageFunc) => Default.Debug(messageFunc);
 
         /// <summary>
         /// Writes a method enter message to the loggers
         /// </summary>
-        public static void MethodEnter() {
-            if(Logger.IsLoggingDisabled(LogLevels.Trace))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Trace, null, 2);
-            logMessage.Message = $"Enter Method \"{logMessage.MethodName}\"";
-            Logger.Log(logMessage);
-        }
+        public static void MethodEnter() => Default.MethodEnter();
 
         /// <summary>
         /// Writes a method exit message to the loggers
         /// </summary>
-        public static void MethodExit() {
-            if(Logger.IsLoggingDisabled(LogLevels.Trace))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Trace, null, 2);
-            logMessage.Message = $"Exit Method \"{logMessage.MethodName}\"";
-            Logger.Log(logMessage);
-        }
+        public static void MethodExit() => Default.MethodExit();
 
         /// <summary>
         /// Writes an info message to the loggers
         /// </summary>
-        public static void Info(string message) {
-            if(Logger.IsLoggingDisabled(LogLevels.Info))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Info, message, 2);
-            Logger.Log(logMessage);
-        }
+        public static void Info(string message) => Default.Info(message);
 
         /// <summary>
         /// Writes an info message to the loggers
         /// </summary>
-        public static void Info(Func<string> messageFunc) {
-            if(Logger.IsLoggingDisabled(LogLevels.Info))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Info, messageFunc.Invoke(), 2);
-            Logger.Log(logMessage);
-        }
+        public static void Info(Func<string> messageFunc) => Default.Info(messageFunc);
 
         /// <summary>
         /// Writes a warning message to the loggers
         /// </summary>
-        public static void Warn(string message) {
-            if (Logger.IsLoggingDisabled(LogLevels.Warning))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Warning, message, 2);
-            Logger.Log(logMessage);
-        }
+        public static void Warn(string message) => Default.Warn(message);
 
         /// <summary>
         /// Writes a warning message to the loggers
         /// </summary>
-        public static void Warn(Exception exception) {
-            if (Logger.IsLoggingDisabled(LogLevels.Warning))
-                return;
-
-            if (exception is AggregateException ae) {
-                foreach (var inner in ae.InnerExceptions)
-                    Warn(inner);
-            } else if (exception.InnerException != null)
-                Warn(exception.InnerException);
-
-
-            var message = exception.Message + "\n" + exception.StackTrace;
-
-            var logMessage = CreateLogMessage(LogLevels.Warning, message, exception.TargetSite);
-            Logger.Log(logMessage);
-        }
+        public static void Warn(Exception exception) => Default.Warn(exception);
 
         /// <summary>
         /// Writes a warning message to the loggers
         /// </summary>
-        public static void Warn(Func<string> messageFunc) {
-            if(Logger.IsLoggingDisabled(LogLevels.Warning))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Warning, messageFunc.Invoke(), 2);
-            Logger.Log(logMessage);
-        }
+        public static void Warn(Func<string> messageFunc) => Default.Warn(messageFunc);
 
         /// <summary>
         /// Writes a error message to the loggers
         /// </summary>
-        public static void Error(string message) {
-            if(Logger.IsLoggingDisabled(LogLevels.Error))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Error, message, 2);
-            Logger.Log(logMessage);
-        }
+        public static void Error(string message) => Default.Error(message);
 
         /// <summary>
         /// Writes a error message to the loggers
         /// </summary>
-        public static void Error(Func<string> messageFunc) {
-            if(Logger.IsLoggingDisabled(LogLevels.Error))
-                return;
-            var logMessage = CreateLogMessage(LogLevels.Error, messageFunc.Invoke(), 2);
-            Logger.Log(logMessage);
-        }
+        public static void Error(Func<string> messageFunc) => Default.Error(messageFunc);
 
         /// <summary>
         /// Writes a error message to the loggers
         /// </summary>
-        public static void Error(Exception exception) {
-            if(Logger.IsLoggingDisabled(LogLevels.Error))
-                return;
-
-            if(exception is AggregateException ae) {
-                foreach(var inner in ae.InnerExceptions)
-                    Error(inner);
-            } else if(exception.InnerException != null)
-                Error(exception.InnerException);
-
-
-            var message = exception.Message + "\n" + exception.StackTrace;
-
-            var logMessage = CreateLogMessage(LogLevels.Error, message, exception.TargetSite);
-            Logger.Log(logMessage);
-        }
+        public static void Error(Exception exception) => Default.Error(exception);
 
         /// <summary>
         /// Writes a critical message to the loggers
         /// </summary>
-        public static void Critical(Exception exception) {
-            if(Logger.IsLoggingDisabled(LogLevels.Critical))
-                return;
-
-            if(exception is AggregateException ae) {
-                foreach(var inner in ae.InnerExceptions)
-                    Critical(inner);
-            } else if(exception.InnerException != null)
-                Critical(exception.InnerException);
-
-            var message = exception.Message + "\n" + exception.StackTrace;
-
-            var logMessage = CreateLogMessage(LogLevels.Critical, message,
-                                              exception.TargetSite);
-            Logger.Log(logMessage);
-        }
+        public static void Critical(Exception exception) => Default.Critical(exception);
 
         /// <summary>
         /// Writes a critical message to the loggers
         /// </summary>
-        public static void Critical(string message) {
-            if(Logger.IsLoggingDisabled(LogLevels.Critical))
-                return;
-
-            var logMessage = CreateLogMessage(LogLevels.Critical, message, 2);
-            Logger.Log(logMessage);
-        }
+        public static void Critical(string message) => Default.Critical(message);
 
         /// <summary>
         /// Writes a critical message to the loggers
         /// </summary>
-        public static void Critical(Func<string> messageFunc) {
-            if(Logger.IsLoggingDisabled(LogLevels.Critical))
-                return;
+        public static void Critical(Func<string> messageFunc) => Default.Critical(messageFunc);
 
-            var logMessage = CreateLogMessage(LogLevels.Critical, messageFunc.Invoke(), 2);
-            Logger.Log(logMessage);
+        /// <summary>
+        /// Writes a custom message to the loggers
+        /// </summary>
+        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, string message, Exception exception = null) {
+            Default.Custom(logLevel, methodName, className, threadName, message, exception);
         }
 
         /// <summary>
         /// Writes a custom message to the loggers
         /// </summary>
-        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, string message) {
-            if(Logger.IsLoggingDisabled(logLevel))
-                return;
-
-            var logMessage = new LogMessage {
-                                                LogLevel = logLevel,
-                                                UtcTimeStamp = DateTime.UtcNow,
-                                                MethodName = methodName,
-                                                ClassName = className,
-                                                ThreadName = threadName ?? "Undefined",
-                                                Message = message
-                                            };
-
-            Logger.Log(logMessage);
+        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, Func<string> messageFunc, Exception exception = null) {
+            Default.Custom(logLevel, methodName, className, threadName, messageFunc, exception);
         }
 
         /// <summary>
-        /// Writes a custom message to the loggers
+        /// Creates a custom logger source with an optional log level override
         /// </summary>
-        public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, Func<string> messageFunc) {
-            if(Logger.IsLoggingDisabled(logLevel))
-                return;
-
-            var logMessage = new LogMessage {
-                                                LogLevel = logLevel,
-                                                UtcTimeStamp = DateTime.UtcNow,
-                                                MethodName = methodName,
-                                                ClassName = className,
-                                                ThreadName = threadName ?? "Undefined",
-                                                Message = messageFunc.Invoke()
-                                            };
-
-            Logger.Log(logMessage);
+        public static ILogSource CreateSource(string name, LogLevels? customLogLevel = null) {
+            if(customLogLevel.HasValue)
+                return new LogSource(name, ParallelLogger, customLogLevel.Value);
+            return new LogSource(name, ParallelLogger, () => LogLevel);
+        }
+        
+        /// <summary>
+        /// Creates a custom logger source with an optional log level override
+        /// </summary>
+        public static ILogSource CreateSource(string name, Func<LogLevels?> getCustomLogLevelFunc) {
+            return new LogSource(name, ParallelLogger, () => getCustomLogLevelFunc.Invoke() ?? ParallelLogger.CurrentLogLevel);
+        }
+        
+        /// <summary>
+        /// Creates a custom logger source with an optional log level override
+        /// </summary>
+        public static ILogSource CreateSource(string name, Func<LogLevels> getCustomLogLevelFunc) {
+            return new LogSource(name, ParallelLogger, getCustomLogLevelFunc);
         }
 
-        private static LogMessage CreateLogMessage(LogLevels logLevel, string message, int framesToSkip) {
-            var frame = new StackFrame(framesToSkip);
-            var methodBase = frame.GetMethod();
-            return CreateLogMessage(logLevel, message, methodBase);
+        /// <summary>
+        /// Creates a custom logger source with an optional log level override
+        /// </summary>
+        public static ILogSource CreateSource<T>(LogLevels? customLogLevel) {
+            return CreateSource(typeof(T).Name, customLogLevel);
         }
 
-        private static LogMessage CreateLogMessage(LogLevels logLevel, string message, MethodBase methodBase) {
-            var type = methodBase.DeclaringType;
-            var typename = type == null ? "Undefined" : type.GetFriendlyName();
-            var logMessage = new LogMessage {
-                                                LogLevel = logLevel,
-                                                UtcTimeStamp = DateTime.UtcNow,
-                                                MethodName = methodBase.Name,
-                                                ClassName = typename,
-                                                ThreadName = Thread.CurrentThread.Name ?? "Undefined",
-                                                Message = message
-                                            };
+        /// <summary>
+        /// Creates a custom logger source with an optional log level override
+        /// </summary>
+        public static ILogSource CreateSource<T>(Func<LogLevels> getCustomLogLevelFunc = null) {
+            return CreateSource(typeof(T).Name, getCustomLogLevelFunc);
+        }
 
-            return logMessage;
+        /// <summary>
+        /// Creates a custom logger source with a log level override
+        /// </summary>
+        public static ILogSource CreateSource<T>(Func<LogLevels?> getCustomLogLevelFunc) {
+            return CreateSource(typeof(T).Name, getCustomLogLevelFunc);
         }
     }
 }

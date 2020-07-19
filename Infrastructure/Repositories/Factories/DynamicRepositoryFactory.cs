@@ -8,6 +8,9 @@
 
 #region
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
@@ -30,27 +33,45 @@ namespace DotLogix.Architecture.Infrastructure.Repositories.Factories {
         /// <summary>
         /// Creates a new repository
         /// </summary>
-        public IRepository Create(IEntitySetProvider entitySetProvider) {
-            return (IRepository)_repoCtor.Invoke(entitySetProvider);
+        public IRepository Create(IEntityContext entityContext) {
+            return (IRepository)_repoCtor.Invoke(entityContext);
         }
 
         /// <summary>
-        /// Creates a repository factory using a constructor of the shape .ctor(<see cref="IEntitySetProvider"/>)
+        /// Creates a repository factory using a constructor of the shape .ctor(<see cref="IEntityContext"/>)
         /// </summary>
         public static IRepositoryFactory CreateFor<TRepo>() where TRepo : IRepository {
             return CreateFor(typeof(TRepo));
         }
 
         /// <summary>
-        /// Creates a repository factory using a constructor of the shape .ctor(<see cref="IEntitySetProvider"/>)
+        /// Creates a repository factory using a constructor of the shape .ctor(<see cref="IEntityContext"/>)
         /// </summary>
         public static IRepositoryFactory CreateFor(Type repoType) {
             if(repoType.IsAssignableTo(typeof(IRepository)) == false)
                 throw new ArgumentException($"Type {repoType} is not assignable to type {nameof(IRepository)}", nameof(repoType));
 
-            var repoCtor = repoType.GetConstructor(new[] {typeof(IEntitySetProvider)});
-            if(repoCtor == null)
-                throw new ArgumentException($"Type {repoType} doesnt have a valid constructor [.ctor({typeof(IEntitySetProvider).Name})]", nameof(repoType));
+            var ctors = repoType.GetConstructors();
+            ConstructorInfo repoCtor = null;
+            ConstructorInfo defaultCtor = null;
+            foreach (var ctor in ctors) {
+                var parameters = ctor.GetParameters();
+                if(parameters.Length == 1 && parameters[0].ParameterType.IsAssignableTo<IEntityContext>()) {
+                    repoCtor = ctor;
+                    break;
+                }
+
+                if(parameters.Length == 0) {
+                    defaultCtor = ctor;
+                }
+            }
+
+            if(repoCtor == null) {
+                if(defaultCtor == null)
+                    throw new ArgumentException($"Type {repoType} doesn't have a valid constructor [ {repoType.Name}() | {repoType.Name}(T implements {nameof(IEntityContext)}) ]", nameof(repoType));
+                
+                repoCtor = defaultCtor;
+            }
             var dynamicCtor = repoCtor.CreateDynamicCtor();
             if(dynamicCtor == null)
                 throw new ArgumentException($"Can not create dynamic constructor for type {repoType}");

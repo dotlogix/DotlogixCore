@@ -9,10 +9,5 @@ namespace CoreTests.Collections {
         [SetUp]
         public void Setup() {
         }
-
-        [Test]
-        public void TestMethod() {
-            
-        }
     }
 }

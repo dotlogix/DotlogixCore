@@ -8,6 +8,11 @@ namespace DotLogix.Core.Utils.Mappers {
             _setterFunc = setterFunc;
         }
 
+        /// <inheritdoc />
+        public ValueSetter(Type targetType, Type valueType, Action<TTarget, TValue> setterFunc) : base(targetType, valueType) {
+            _setterFunc = setterFunc;
+        }
+
 
         protected override bool TrySetValue(TTarget source, TValue value) {
             _setterFunc.Invoke(source, value);

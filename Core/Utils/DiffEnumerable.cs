@@ -85,6 +85,14 @@ namespace DotLogix.Core.Utils {
                 Left = left;
                 Right = right;
             }
+
+            /// <summary>
+            /// Deconstructs the value in their parts
+            /// </summary>
+            public void Deconstruct(out TLeft left, out TRight right) {
+                left = Left;
+                right = Right;
+            }
         }
     }
 }

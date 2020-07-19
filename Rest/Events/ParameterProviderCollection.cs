@@ -1,8 +1,5 @@
 using System.Collections.Generic;
-using DotLogix.Core.Rest.Http.Context;
-using DotLogix.Core.Rest.Services;
 using DotLogix.Core.Rest.Services.Parameters;
-using DotLogix.Core.Rest.Services.Processors;
 
 namespace DotLogix.Core.Rest.Events {
     public class ParameterProviderCollection : List<IParameterProvider> {

@@ -33,28 +33,4 @@ namespace DotLogix.Core.Lucene {
             return FSDirectory.Open(IndexPath);
         }
     }
-    
-    /// <summary>
-    ///     An file based implementation of the <see cref="ILuceneIndex" /> interface
-    /// </summary>
-    public class RamLuceneIndex : LuceneIndex {
-
-        /// <summary>
-        /// The index path
-        /// </summary>
-        public string IndexPath { get; }
-
-        /// <summary>
-        ///     Creates a new instance of <see cref="FileLuceneIndex" />
-        /// </summary>
-        public RamLuceneIndex(LuceneVersion version, string indexPath) : base(version) {
-            IndexPath = indexPath;
-        }
-
-        /// <inheritdoc />
-        protected override Directory CreateDirectory()
-        {
-            return new RAMDirectory();
-        }
-    }
 }

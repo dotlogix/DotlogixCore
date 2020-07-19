@@ -13,7 +13,7 @@ using System.Linq;
 using System.Linq.Expressions;
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+namespace DotLogix.Architecture.Infrastructure.Queries {
     /// <summary>
     /// An extension of the <see cref="QueryableQuery{TValue}"/> to allow multi level ordering
     /// </summary>

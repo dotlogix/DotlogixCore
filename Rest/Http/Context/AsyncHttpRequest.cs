@@ -28,13 +28,14 @@ namespace DotLogix.Core.Rest.Http.Context {
             UrlParameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             ContentType = MimeType.Parse(originalRequest.ContentType);
             HttpMethod = AsyncWebServer.HttpMethodFromString(originalRequest.HttpMethod);
-            ContentLength64 = originalRequest.ContentLength64;
+            ContentLength = originalRequest.ContentLength64;
             ContentEncoding = originalRequest.ContentEncoding;
             HasBody = originalRequest.HasEntityBody;
             InputStream = originalRequest.InputStream;
             AcceptedContentTypes = originalRequest.AcceptTypes?.Select(MimeType.Parse).OrderBy(h => h.Quality).ToList();
             AcceptedLanguages = originalRequest.UserLanguages?.Select(UserLanguage.Parse).OrderBy(h => h.Quality).ToList();
-            Cookies = originalRequest.Cookies;
+            Cookies = new List<Cookie>(originalRequest.Cookies.Count);
+            Cookies.AddRange(originalRequest.Cookies.Cast<Cookie>());
         }
 
         public IDictionary<string, object> HeaderParameters { get; }
@@ -42,12 +43,12 @@ namespace DotLogix.Core.Rest.Http.Context {
         public IDictionary<string, object> UrlParameters { get; }
         public Uri Url => OriginalRequest.Url;
         public HttpMethods HttpMethod { get; }
-        public CookieCollection Cookies { get; }
         public MimeType ContentType { get; }
         public Encoding ContentEncoding { get; }
-        public long ContentLength64 { get; }
+        public long ContentLength { get; }
         public ICollection<MimeType> AcceptedContentTypes { get; }
         public ICollection<UserLanguage> AcceptedLanguages { get; }
+        public ICollection<Cookie> Cookies { get; set; }
 
         /// <inheritdoc />
         public bool HasBody { get; }
@@ -68,9 +69,8 @@ namespace DotLogix.Core.Rest.Http.Context {
             if(HasBody == false)
                 return null;
 
-            using(var reader = new StreamReader(InputStream, ContentEncoding)) {
-                return await reader.ReadToEndAsync();
-            }
+            using var reader = new StreamReader(InputStream, ContentEncoding);
+            return await reader.ReadToEndAsync();
         }
 
         public static AsyncHttpRequest Create(HttpListenerRequest originalRequest, IParameterParser parameterParser) {

@@ -13,10 +13,10 @@ using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Attributes {
-    public class DynamicDescriptorAttributeAttribute : DescriptorAttribute {
+    public class DynamicDescriptorAttribute : DescriptorAttribute {
         public Type RequestResultWriterType { get; }
 
-        public DynamicDescriptorAttributeAttribute(Type requestResultWriterType) {
+        public DynamicDescriptorAttribute(Type requestResultWriterType) {
             if(requestResultWriterType.IsAssignableTo(typeof(IRouteDescriptor)) == false)
                 throw new ArgumentException($"Type {requestResultWriterType.GetFriendlyName()} is not assignable to {nameof(IRouteDescriptor)}", nameof(requestResultWriterType));
 

@@ -8,8 +8,8 @@
 
 #region
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
@@ -17,11 +17,6 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
     /// An interface to represent an entity context
     /// </summary>
     public interface IEntityContext : IEntitySetProvider, IDisposable {
-        /// <summary>
-        /// The context variables
-        /// </summary>
-        IDictionary<string, object> Variables { get; }
-
         /// <summary>
         /// Complete the underlying unit of work and commit all changes to entities
         /// </summary>

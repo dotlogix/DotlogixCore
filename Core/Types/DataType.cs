@@ -32,7 +32,7 @@ namespace DotLogix.Core.Types {
         /// <summary>
         /// The underlying type (enums)
         /// </summary>
-        public Type UnderlayingType { get; }
+        public Type UnderlyingType { get; }
         /// <summary>
         /// The element type (collections)
         /// </summary>
@@ -40,7 +40,7 @@ namespace DotLogix.Core.Types {
         /// <summary>
         /// The underlying data type (enums)
         /// </summary>
-        public DataType UnderlayingDataType => UnderlayingType?.ToDataType();
+        public DataType UnderlyingDataType => UnderlyingType?.ToDataType();
         /// <summary>
         /// The element data type (collections)
         /// </summary>
@@ -49,10 +49,10 @@ namespace DotLogix.Core.Types {
         /// <summary>
         /// Create a new instance of <see cref="DataType"/>
         /// </summary>
-        public DataType(DataTypeFlags flags, Type type, Type underlayingType = null, Type elementType = null) {
+        public DataType(DataTypeFlags flags, Type type, Type underlyingType = null, Type elementType = null) {
             Flags = flags;
             Type = type;
-            UnderlayingType = underlayingType;
+            UnderlyingType = underlyingType;
             ElementType = elementType;
         }
 

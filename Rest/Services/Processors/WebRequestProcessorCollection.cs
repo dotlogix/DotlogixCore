@@ -7,11 +7,13 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using DotLogix.Core.Collections;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors {
     public class WebRequestProcessorCollection : SortedCollection<IWebRequestProcessor> {
         public WebRequestProcessorCollection() : base(WebRequestProcessorComparer.Instance) { }
+        public WebRequestProcessorCollection(IEnumerable<IWebRequestProcessor> items) : base(items, WebRequestProcessorComparer.Instance) { }
     }
 }

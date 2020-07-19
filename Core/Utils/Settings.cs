@@ -6,14 +6,6 @@
 // LastEdited:  29.11.2019
 // ==================================================
 
-// ==================================================
-// Copyright 2019(C) , DotLogix
-// File:  cs
-// Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  ..
-// LastEdited:  29.11.2019
-// ==================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,6 +18,9 @@ namespace DotLogix.Core.Utils {
     ///     A class implementing the <see cref="ISettings" /> interface
     /// </summary>
     public class Settings : ISettings {
+        /// <summary>
+        /// The equality comparer used when cloning the dictionary
+        /// </summary>
         public IEqualityComparer<string> EqualityComparer { get; protected set; }
 
         /// <summary>

@@ -29,7 +29,7 @@ namespace DotLogix.Architecture.Infrastructure.Repositories.Provider {
         protected Dictionary<Type, Type> RepositoryRemapping { get; } = new Dictionary<Type, Type>();
 
         /// <inheritdoc />
-        public virtual TRepoInterface Create<TRepoInterface>(IEntitySetProvider entitySetProvider) where TRepoInterface : IRepository {
+        public virtual TRepoInterface Create<TRepoInterface>(IEntityContext entityContext) where TRepoInterface : IRepository {
             var repoType = typeof(TRepoInterface);
             if (RepositoryRemapping.TryGetValue(repoType, out var remappedType))
                 repoType = remappedType;
@@ -46,7 +46,7 @@ namespace DotLogix.Architecture.Infrastructure.Repositories.Provider {
             }
             if (repositoryFactory == null)
                 throw new ArgumentException($"Type {repoType} is not registered for this provider", nameof(TRepoInterface));
-            return (TRepoInterface)repositoryFactory.Create(entitySetProvider);
+            return (TRepoInterface)repositoryFactory.Create(entityContext);
         }
 
         /// <summary>

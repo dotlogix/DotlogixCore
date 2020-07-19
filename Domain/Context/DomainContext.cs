@@ -7,6 +7,7 @@
 // ==================================================
 
 #region
+using System;
 using System.Collections.Generic;
 using DotLogix.Architecture.Domain.Services;
 using DotLogix.Architecture.Domain.Services.Providers;
@@ -22,10 +23,7 @@ namespace DotLogix.Architecture.Domain.Context {
         /// The internal domains service provider
         /// </summary>
         protected IDomainServiceProvider DomainServiceProvider { get; }
-
-        /// <inheritdoc />
-        public IDictionary<string, object> Variables { get; } = new Dictionary<string, object>();
-
+        
         /// <summary>
         /// Creates a new instance of <see cref="DomainContext"/>
         /// </summary>

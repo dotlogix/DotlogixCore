@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <Company>DotLogix</Company>
     <Product>DotLogix Core</Product>
     <PackageId>DotLogix.Core</PackageId>
@@ -13,7 +13,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright (c) 2018 DotLogix</Copyright>
-    <Version>2.2.0</Version>
+    <Version>2.2.17</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Configurations>Debug;Release;</Configurations>
   </PropertyGroup>
@@ -21,6 +21,7 @@
   <PropertyGroup>
     <DocumentationFile>..\assemblies\docs\$(AssemblyName).xml</DocumentationFile>
     <WarningsAsErrors>NU1605;</WarningsAsErrors>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

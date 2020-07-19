@@ -119,7 +119,7 @@ namespace DotLogix.Core.Extensions {
         /// <param name="count">The amount of elements in the list</param>
         /// <returns></returns>
         public static Task<T[]> CreateArray<T>(this Task<T> value, int count = 1) {
-            return value.ConvertResult(v => v.CreateArray(count));
+            return value.ConvertResult(v => v.Result.CreateArray(count));
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace DotLogix.Core.Extensions {
         /// <param name="count">The amount of elements in the list</param>
         /// <returns></returns>
         public static Task<List<T>> CreateList<T>(this Task<T> value, int count = 1) {
-            return value.ConvertResult(v => v.CreateList(count));
+            return value.ConvertResult(v => v.Result.CreateList(count));
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace DotLogix.Core.Extensions {
         /// <param name="count">The amount of elements in the list</param>
         /// <returns></returns>
         public static Task<IEnumerable<T>> CreateEnumerable<T>(this Task<T> value, int count = 1) {
-            return value.ConvertResult(v => v.CreateEnumerable(count));
+            return value.ConvertResult(v => v.Result.CreateEnumerable(count));
         }
 
         /// <summary>
@@ -207,11 +207,8 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="right">The second enumerable</param>
 		/// <param name="comparer">The comparer used to check equality</param>
 		/// <returns></returns>
-        public static DiffEnumerable<T> Diff<T>(this IEnumerable<T> left,
-                                                IEnumerable<T> right,
-			IEqualityComparer<T> comparer = null) {
-			if (comparer == null)
-				comparer = EqualityComparer<T>.Default;
+        public static DiffEnumerable<T> Diff<T>(this IEnumerable<T> left, IEnumerable<T> right, IEqualityComparer<T> comparer = null) {
+			comparer ??= EqualityComparer<T>.Default;
 
 			var leftOnly = new HashSet<T>(left, comparer);
 			var rightOnly = new HashSet<T>(right, comparer);
@@ -227,7 +224,26 @@ namespace DotLogix.Core.Extensions {
 			return new DiffEnumerable<T>(leftOnly, intersect, rightOnly);
 		}
 
-		/// <summary>
+        /// <summary>
+        ///     Searches for differences of an enumerable and a range of keys using a comparer
+        /// </summary>
+        /// <param name="enumerable">The first enumerable</param>
+        /// <param name="keySelector">The method to select the key to check equality</param>
+        /// <param name="keys">The second enumerable</param>
+        /// <param name="comparer">The comparer used to check equality</param>
+        /// <returns></returns>
+        public static DiffEnumerable<T, TKey> Diff<T, TKey>(this IEnumerable<T> enumerable, Func<T, TKey> keySelector, IEnumerable<TKey> keys, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
+            var dict = enumerable.ToDictionary(keySelector, comparer);
+
+            var keyDiff = dict.Keys.Diff(keys, comparer);
+            var leftOnly = keyDiff.LeftOnly.Select(k => dict[k]).ToList();
+            var rightOnly = keyDiff.RightOnly.ToList();
+            var intersection = keyDiff.Intersect.Select(k => new DiffEnumerable<T, TKey>.DiffValue(dict[k], k)).ToList();
+
+            return new DiffEnumerable<T, TKey>(leftOnly, intersection, rightOnly);
+        }
+
+        /// <summary>
 		///     Searches for differences of two enumerables using a common key and a comparer
 		/// </summary>
 		/// <param name="left">The first enumerable</param>
@@ -235,52 +251,42 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="keySelector">The method to select the key to check equality</param>
 		/// <param name="comparer">The comparer used to check equality</param>
 		/// <returns></returns>
-        public static DiffEnumerable<T, T> Diff<T, TKey>(this IEnumerable<T> left,
-                                                         IEnumerable<T> right,
-                                                         Func<T, TKey> keySelector,
-                                                         IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
+        public static DiffEnumerable<T, T> Diff<T, TKey>(this IEnumerable<T> left, IEnumerable<T> right, Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
 			return left.Diff(keySelector, right, keySelector, comparer);
 		}
 
-		/// <summary>
-		///     Searches for differences of two enumerables using a common key and a comparer
-		/// </summary>
-		/// <param name="left">The first enumerable</param>
-		/// <param name="leftKeySelector">The method to select the key to check equality</param>
-		/// <param name="right">The second enumerable</param>
-		/// <param name="rightKeySelector">The method to select the key to check equality</param>
-		/// <param name="comparer">The comparer used to check equality</param>
-		/// <returns></returns>
-		public static DiffEnumerable<TLeft, TRight> Diff<TLeft, TRight, TKey>(this IEnumerable<TLeft> left,
-                                                                              Func<TLeft, TKey> leftKeySelector,
-                                                                              IEnumerable<TRight> right,
-                                                                              Func<TRight, TKey> rightKeySelector,
-			IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
-			var leftDictionary = left.ToDictionary(leftKeySelector);
-			var rightDictionary = right.ToDictionary(rightKeySelector);
+        /// <summary>
+        ///     Searches for differences of two enumerables using a common key and a comparer
+        /// </summary>
+        /// <param name="left">The first enumerable</param>
+        /// <param name="leftKeySelector">The method to select the key to check equality</param>
+        /// <param name="right">The second enumerable</param>
+        /// <param name="rightKeySelector">The method to select the key to check equality</param>
+        /// <param name="comparer">The comparer used to check equality</param>
+        /// <returns></returns>
+        public static DiffEnumerable<TLeft, TRight> Diff<TLeft, TRight, TKey>(this IEnumerable<TLeft> left, Func<TLeft, TKey> leftKeySelector, IEnumerable<TRight> right, Func<TRight, TKey> rightKeySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
+            var leftDictionary = left.ToDictionary(leftKeySelector, comparer);
+            var rightDictionary = right.ToDictionary(rightKeySelector, comparer);
 
-			var keyDiff = leftDictionary.Keys.Diff(rightDictionary.Keys, comparer);
+            var keyDiff = leftDictionary.Keys.Diff(rightDictionary.Keys, comparer);
 
-            var leftOnly = keyDiff.LeftOnly.Select(k => leftDictionary[k])
-                                  .ToList();
-            var rightOnly = keyDiff.RightOnly.Select(k => rightDictionary[k])
-                                   .ToList();
-			var intersection = keyDiff
-			                   .Intersect.Select(k =>
-				                   new DiffEnumerable<TLeft, TRight>.DiffValue(leftDictionary[k], rightDictionary[k]))
-			                   .ToList();
+            var leftOnly = keyDiff.LeftOnly.Select(k => leftDictionary[k]).ToList();
+            var rightOnly = keyDiff.RightOnly.Select(k => rightDictionary[k]).ToList();
+            var intersection = keyDiff.Intersect.Select(k => new DiffEnumerable<TLeft, TRight>.DiffValue(leftDictionary[k], rightDictionary[k])).ToList();
 
-			return new DiffEnumerable<TLeft, TRight>(leftOnly, intersection, rightOnly);
-		}
+            return new DiffEnumerable<TLeft, TRight>(leftOnly, intersection, rightOnly);
+        }
+
+#if !NETSTANDARD2_1
 
 		/// <summary>
 		///     Converts a enumerable to a hashset
 		/// </summary>
 		/// <param name="enumerable">The enumerable</param>
 		/// <returns></returns>
-        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable) {
-            return new HashSet<T>(enumerable);
-        }
+		public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable) {
+			return new HashSet<T>(enumerable);
+		}
 
 		/// <summary>
 		///     Converts a enumerable to a hashset
@@ -290,7 +296,8 @@ namespace DotLogix.Core.Extensions {
 		/// <returns></returns>
 		public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, IEqualityComparer<T> comparer) {
 			return new HashSet<T>(enumerable, comparer);
-		}
+		} 
+#endif
 
 		/// <summary>
 		///     Converts a enumerable to a list, but checks if it is already a list
@@ -567,9 +574,8 @@ namespace DotLogix.Core.Extensions {
 				}
 
                 if(grouped.Count == prevCount) {
-					throw new InvalidOperationException(
-						"Can not resolve the whole hierarchy, maybe there are some cross dependencies");
-			}
+                    throw new InvalidOperationException("Can not resolve the whole hierarchy, maybe there are some cross dependencies");
+                }
             }
 
 			return root;

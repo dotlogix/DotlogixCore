@@ -20,6 +20,7 @@
   <PropertyGroup>
     <DocumentationFile>..\assemblies\docs\$(AssemblyName).xml</DocumentationFile>
     <WarningsAsErrors>NU1605;</WarningsAsErrors>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
 	<ItemGroup>

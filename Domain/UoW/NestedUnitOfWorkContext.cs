@@ -8,6 +8,7 @@
 
 #region
 using System.Threading.Tasks;
+using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Repositories;
 #endregion
 
@@ -16,10 +17,14 @@ namespace DotLogix.Architecture.Domain.UoW {
     /// A wrapper class for a nested <see cref="IUnitOfWorkContext"/>
     /// </summary>
     public class NestedUnitOfWorkContext : IUnitOfWorkContext {
+        /// <inheritdoc />
+        public IEntityContext EntityContext => ParentContext.EntityContext;
+
         /// <summary>
         /// The parent context
         /// </summary>
         protected IUnitOfWorkContext ParentContext { get; }
+        
         /// <summary>
         /// Create a new instance of <see cref="NestedUnitOfWorkContext"/>
         /// </summary>

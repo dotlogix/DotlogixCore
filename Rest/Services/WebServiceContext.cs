@@ -10,14 +10,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Http.Context;
 using DotLogix.Core.Rest.Http.Headers;
-using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Parameters;
-using DotLogix.Core.Rest.Services.Processors;
 using DotLogix.Core.Rest.Services.Routing;
-using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
@@ -33,31 +31,27 @@ namespace DotLogix.Core.Rest.Services {
         public IWebServiceResult Result { get; private set; }
         public IWebServiceRoute Route { get; }
         public List<IParameterProvider> ParameterProviders { get; }
+        public ILogSource LogSource => Settings.LogSource;
+        public WebServiceSettings Settings { get; }
+
 
         public WebServiceContext(IAsyncHttpContext httpContext, IWebServiceRoute route, List<IParameterProvider> parameterProviders) {
             HttpContext = httpContext;
             Route = route;
             ParameterProviders = parameterProviders;
             Result = null;
-            var settingsDescriptor = route.Descriptors.GetCustomDescriptor<SettingsDescriptor>();
-            if (settingsDescriptor != null) {
-                Settings = settingsDescriptor.Settings;
-            }
 
             AsyncCurrent.Value = this;
 
             Variables["webServiceContext"] = this;
             Variables["webServiceRoute"] = route;
             Variables["webServiceResult"] = Result;
-            Variables["webServiceSettings"] = Settings;
+            Variables["webServiceSettings"] = httpContext.Server.Settings;
 
             Variables["httpContext"] = httpContext;
             Variables["httpResponse"] = httpContext.Response;
             Variables["httpRequest"] = httpContext.Request;
         }
-
-        public IReadOnlySettings Settings { get; }
-
 
         public void SetResult(object result, HttpStatusCode statusCode = null, MimeType contentType = null) {
             switch(result) {

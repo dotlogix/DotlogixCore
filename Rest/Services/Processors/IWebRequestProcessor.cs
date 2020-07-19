@@ -8,7 +8,6 @@
 
 #region
 using System.Threading.Tasks;
-using DotLogix.Core.Rest.Services.Descriptors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors {

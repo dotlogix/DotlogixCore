@@ -13,7 +13,7 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryType>git</RepositoryType>
 		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<Version>2.2.0</Version>
+		<Version>2.2.17</Version>
 		<Configurations>Debug;Release;</Configurations>
 	</PropertyGroup>
 

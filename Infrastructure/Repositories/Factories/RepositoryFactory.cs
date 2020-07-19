@@ -16,18 +16,18 @@ namespace DotLogix.Architecture.Infrastructure.Repositories.Factories {
     /// A <see cref="IRepositoryFactory"/> using a callback method to create instances
     /// </summary>
     public class RepositoryFactory : IRepositoryFactory {
-        private readonly Func<IEntitySetProvider, IRepository> _createRepositoryFunc;
+        private readonly Func<IEntityContext, IRepository> _createRepositoryFunc;
 
         /// <summary>
         /// Creates a new instance of <see cref="RepositoryFactory"/>
         /// </summary>
-        public RepositoryFactory(Func<IEntitySetProvider, IRepository> createRepositoryFunc) {
+        public RepositoryFactory(Func<IEntityContext, IRepository> createRepositoryFunc) {
             _createRepositoryFunc = createRepositoryFunc;
         }
 
         /// <inheritdoc />
-        public IRepository Create(IEntitySetProvider entitySetProvider) {
-            return _createRepositoryFunc.Invoke(entitySetProvider);
+        public IRepository Create(IEntityContext entityContext) {
+            return _createRepositoryFunc.Invoke(entityContext);
         }
     }
 }

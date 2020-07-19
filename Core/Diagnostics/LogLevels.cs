@@ -14,8 +14,11 @@ namespace DotLogix.Core.Diagnostics {
     /// <summary>
     /// Log levels
     /// </summary>
-    [Flags]
     public enum LogLevels {
+        /// <summary>
+        /// Unknown / internal messages
+        /// </summary>
+        Unknown = 0,
         /// <summary>
         /// Trace messages
         /// </summary>

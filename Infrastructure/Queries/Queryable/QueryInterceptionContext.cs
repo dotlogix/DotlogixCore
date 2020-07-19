@@ -1,7 +1,7 @@
 ﻿using System;
 using DotLogix.Core;
 
-namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+namespace DotLogix.Architecture.Infrastructure.Queries {
     /// <summary>
     /// An implementation of the <see cref="IQueryInterceptionContext"/>
     /// </summary>

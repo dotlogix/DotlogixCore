@@ -13,6 +13,8 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.Repositories;
+using DotLogix.Core;
+using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Architecture.Domain.UoW {
@@ -72,7 +74,6 @@ namespace DotLogix.Architecture.Domain.UoW {
         }
 
         #endregion
-
 
         #region Remove
 

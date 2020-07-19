@@ -13,7 +13,7 @@ using System.Linq;
 using System.Linq.Expressions;
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+namespace DotLogix.Architecture.Infrastructure.Queries {
     /// <summary>
     /// An implementation of the <see cref="IQuery{T}"/> interface using <see cref="IQueryable{T}"/>
     /// </summary>
@@ -25,21 +25,30 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
         /// <summary>
         /// Creates a new instance of <see cref="QueryableQuery{TValue}"/>
         /// </summary>
-        public QueryableQuery(IQueryable<TValue> innerQueryable, IQueryableQueryFactory factory, IEnumerable<IQueryInterceptor> interceptors=null) {
+        public QueryableQuery(IQueryable<TValue> innerQueryable, IQueryableQueryFactory factory, IEnumerable<IQueryInterceptor> interceptors) {
             InnerQueryable = innerQueryable;
             _factory = factory;
-            InterceptorList = interceptors == null ? new List<IQueryInterceptor>() : new List<IQueryInterceptor>(interceptors);
+            Interceptors = interceptors?.ToList() ?? new List<IQueryInterceptor>();
         }
 
         /// <inheritdoc />
         public IQueryExecutor<TValue> QueryExecutor => _queryExecutor ?? (_queryExecutor = CreateExecutor());
+
         /// <summary>
         /// The internal interceptor list
         /// </summary>
-        protected readonly List<IQueryInterceptor> InterceptorList;
+        protected List<IQueryInterceptor> Interceptors { get; set; }
+
+        /// <summary>
+        /// The internal interceptor list
+        /// </summary>
+        protected Dictionary<string, object> Variables { get; set; }
 
         /// <inheritdoc />
-        public IEnumerable<IQueryInterceptor> Interceptors => InterceptorList;
+        IEnumerable<IQueryInterceptor> IQuery<TValue>.Interceptors => Interceptors;
+
+        /// <inheritdoc />
+        IDictionary<string, object> IQuery<TValue>.Variables => Variables;
 
         /// <summary>
         /// The internal <see cref="IQueryable{T}"/>
@@ -217,7 +226,7 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
 
         /// <inheritdoc />
         public IQuery<TValue> InterceptQuery(IQueryInterceptor interceptor) {
-            InterceptorList.Add(interceptor);
+            Interceptors.Add(interceptor);
             return this;
         }
         #endregion
@@ -227,14 +236,14 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
         /// Create a new <see cref="IQuery{T}"/> using the internal <see cref="IQueryableQueryFactory"/>
         /// </summary>
         public IQuery<T> CreateQuery<T>(IQueryable<T> queryable) {
-            return _factory.CreateQuery(queryable, InterceptorList);
+            return _factory.CreateQuery(queryable, Interceptors);
         }
 
         /// <summary>
         /// Create a new <see cref="IOrderedQuery{T}"/> using the internal <see cref="IQueryableQueryFactory"/>
         /// </summary>
         public IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable) {
-            return _factory.CreateQuery(queryable, InterceptorList);
+            return _factory.CreateQuery(queryable, Interceptors);
         }
 
         /// <summary>

@@ -26,7 +26,7 @@ namespace DotLogix.Core.Rest.Server.Http.WebSockets {
 
         /// <inheritdoc />
         public Task<TMessage> ReceiveMessageAsync(WebSocketClient client, CancellationToken token = default) {
-            return client.ReceiveMessageAsync(token).ConvertResult(_deserializeFunc);
+            return client.ReceiveMessageAsync(token).ConvertResult(m=> _deserializeFunc.Invoke(m.Result));
         }
     }
 }

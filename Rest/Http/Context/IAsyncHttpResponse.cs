@@ -13,7 +13,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Http.Headers;
-using HttpStatusCode = DotLogix.Core.Rest.Http.HttpStatusCode;
 #endregion
 
 namespace DotLogix.Core.Rest.Http.Context {
@@ -21,14 +20,14 @@ namespace DotLogix.Core.Rest.Http.Context {
         TransferState TransferState { get; }
         bool IsCompleted { get; }
         IDictionary<string, object> HeaderParameters { get; }
+        ICollection<Cookie> Cookies { get; set; }
         MimeType ContentType { get; set; }
-        long ContentLength64 { get; set; }
+        long ContentLength { get; set; }
         int ChunkSize { get; set; }
         Encoding ContentEncoding { get; set; }
         HttpStatusCode StatusCode { get; set; }
         Stream OutputStream { get; }
         object OriginalResponse { get; }
-        CookieCollection Cookies { get; set; }
         Task WriteToResponseStreamAsync(byte[] data, int offset, int count);
         Task WriteToResponseStreamAsync(string message);
         Task CompleteChunksAsync();

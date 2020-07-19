@@ -49,7 +49,7 @@ namespace DotLogix.Core.Rest.Http.Headers {
                     continue;
 
                 sb.Append('=');
-                sb.Append(attribute.Value);
+                sb.Append(attribute.Value.Value);
             }
             return sb.ToString();
         }

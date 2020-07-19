@@ -698,7 +698,7 @@
         <member name="P:DotLogix.Architecture.Infrastructure.Queries.Queryable.QueryableQuery`1.QueryExecutor">
             <inheritdoc />
         </member>
-        <member name="F:DotLogix.Architecture.Infrastructure.Queries.Queryable.QueryableQuery`1.InterceptorList">
+        <member name="F:DotLogix.Architecture.Infrastructure.Queries.Queryable.QueryableQuery`1.Interceptors">
             <summary>
             The internal interceptor list
             </summary>

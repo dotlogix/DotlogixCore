@@ -16,5 +16,12 @@ namespace DotLogix.Core.Rest.Services {
             StatusCode = statusCode;
             ContentType = contentType;
         }
+
+        /// <summary>
+        /// Converts a value to a corresponding object result
+        /// </summary>
+        public static implicit operator WebServiceResult(HttpStatusCode statusCode) {
+            return new WebServiceResult(statusCode);
+        }
     }
 }

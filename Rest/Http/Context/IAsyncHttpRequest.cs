@@ -24,10 +24,10 @@ namespace DotLogix.Core.Rest.Http.Context {
         IDictionary<string, object> UrlParameters { get; }
         Uri Url { get; }
         HttpMethods HttpMethod { get; }
-        CookieCollection Cookies { get; }
+        ICollection<Cookie> Cookies { get; }
         MimeType ContentType { get; }
         Encoding ContentEncoding { get; }
-        long ContentLength64 { get; }
+        long ContentLength { get; }
         ICollection<MimeType> AcceptedContentTypes { get; }
         ICollection<UserLanguage> AcceptedLanguages { get; }
         bool HasBody { get; }

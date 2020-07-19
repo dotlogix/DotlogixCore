@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using DotLogix.Architecture.Infrastructure.Queries.Queryable;
+
 #pragma warning disable 1591
 #endregion
 
@@ -19,6 +19,7 @@ namespace DotLogix.Architecture.Infrastructure.Queries {
     public interface IQuery<T> {
         IQueryExecutor<T> QueryExecutor { get; }
         IEnumerable<IQueryInterceptor> Interceptors { get; }
+        IDictionary<string, object> Variables { get; }
 
         #region Where
 

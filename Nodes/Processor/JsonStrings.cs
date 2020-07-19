@@ -193,8 +193,7 @@ namespace DotLogix.Core.Nodes.Processor {
         /// Creates a hex encoded version for a unicode character
         /// </summary>
         public static void ToCharAsUnicode(int chr, ref char[] buffer) {
-            if(buffer == null)
-                buffer = new char[6];
+            buffer ??= new char[6];
             buffer[0] = '\\';
             buffer[1] = 'u';
 

@@ -4,7 +4,17 @@ namespace DotLogix.Core.Utils.Mappers {
     /// <summary>
     /// An interface representation value setters
     /// </summary>
-    public interface IValueSetter<TTarget, TValue> {
+    public interface IValueSetter<TTarget, TValue> { 
+        /// <summary>
+        /// The source type
+        /// </summary>
+        Type TargetType { get; }
+
+        /// <summary>
+        /// The value type
+        /// </summary>
+        Type ValueType { get; }
+        
         /// <summary>
         /// Add a pre-conditions executed before a value will be set
         /// </summary>

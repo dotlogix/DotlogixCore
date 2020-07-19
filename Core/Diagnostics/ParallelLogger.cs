@@ -16,7 +16,7 @@ namespace DotLogix.Core.Diagnostics {
     /// <summary>
     /// A background-threaded hub for log messages
     /// </summary>
-    public class ParrallelLogger : ILogger {
+    public class ParallelLogger : ILogger {
         private readonly Thread _loggingThread;
         private readonly ManualResetEvent _logWait;
         private readonly Queue<LogMessage> _queuedMessages = new Queue<LogMessage>();
@@ -28,8 +28,8 @@ namespace DotLogix.Core.Diagnostics {
         /// <summary>
         /// The singleton instance
         /// </summary>
-        public static ParrallelLogger Instance { get; } = new ParrallelLogger();
-
+        public static ParallelLogger Instance { get; } = new ParallelLogger();
+        
         /// <summary>
         /// The sync root
         /// </summary>
@@ -44,7 +44,7 @@ namespace DotLogix.Core.Diagnostics {
         /// </summary>
         public LogLevels CurrentLogLevel { get; set; } = LogLevels.Off;
 
-        private ParrallelLogger() {
+        private ParallelLogger() {
             SyncRoot = new object();
             _loggingThread = new Thread(LoggerMain) {
                                                         Name = "LoggerThread",
@@ -56,7 +56,7 @@ namespace DotLogix.Core.Diagnostics {
         }
 
         /// <inheritdoc />
-        public string Name => "ParrallelLogger";
+        public string Name => "ParallelLogger";
 
         /// <inheritdoc />
         public bool Log(LogMessage logMessage) {
@@ -95,8 +95,6 @@ namespace DotLogix.Core.Diagnostics {
                 if(Initialized == false)
                     return false;
                 Initialized = false;
-                if(_currentReceivers.All(l => l.Shutdown()) == false)
-                    return false;
             }
             _receiverWait.Set();
             _logWait.Set();
@@ -107,6 +105,9 @@ namespace DotLogix.Core.Diagnostics {
                 foreach(var currentReceiver in _receivers)
                     currentReceiver.Log(queuedMessage);
             }
+
+            if (_currentReceivers.All(l => l.Shutdown()) == false)
+                return false;
             return true;
         }
 

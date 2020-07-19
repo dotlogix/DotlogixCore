@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
-using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core;
 #endregion
 
@@ -36,7 +35,11 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
         /// </summary>
         protected EntitySetDecoratorBase(IEntitySet<TEntity> baseEntitySet) {
 	        BaseEntitySet = baseEntitySet;
+            EntityContext = baseEntitySet.EntityContext;
         }
+
+        /// <inheritdoc />
+        public IEntityContext EntityContext { get; }
 
         /// <inheritdoc />
 		public virtual ValueTask<TEntity> AddAsync(TEntity entity) {

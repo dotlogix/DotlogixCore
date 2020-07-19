@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 
 namespace DotLogix.Architecture.Infrastructure.Queries {
@@ -34,7 +33,7 @@ namespace DotLogix.Architecture.Infrastructure.Queries {
                 break;
             }
 
-            if (!cancelled) {
+            if (!cancelled && context.Result.IsUndefined) {
                 state = "Execute";
                 context.DisableQueryModification();
 
@@ -54,6 +53,8 @@ namespace DotLogix.Architecture.Infrastructure.Queries {
                         break;
                     }
                 }
+            } else {
+                context.DisableQueryModification();
             }
 
             if(!cancelled) {

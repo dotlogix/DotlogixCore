@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Rest.Http.Context;
 using DotLogix.Core.Rest.Services.Routing;
 #endregion
@@ -49,8 +48,8 @@ namespace DotLogix.Core.Rest.Events {
                     if(response.IsCompleted == false)
                         await response.CompleteAsync();
                 } catch(Exception e) {
-                    Log.Error(e);
-                    await AsyncWebServer.SendErrorMessageAsync(response, e);
+                    asyncHttpContext.Server.Settings.LogSource.Error(e);
+                    await ((AsyncWebServer)asyncHttpContext.Server).SendErrorMessageAsync(response, e);
                 }
             }
         }

@@ -41,7 +41,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public abstract object ConvertToObject(Node node, IReadOnlyConverterSettings settings);
 
         protected static string GetMemberName(MemberSettings member, IReadOnlyConverterSettings settings) {
-            return member.Name ?? settings.NamingStrategy?.TransformName(member.Accessor.Name) ?? member.Accessor.Name;
+            return member.Name ?? settings.NamingStrategy?.Rewrite(member.Accessor.Name) ?? member.Accessor.Name;
         }
     }
 }

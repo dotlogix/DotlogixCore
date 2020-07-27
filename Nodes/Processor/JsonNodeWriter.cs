@@ -43,7 +43,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 _builder.Append(',');
 
             if(_formatterSettings.Ident)
-                WriteIdentAsync();
+                WriteIdent();
 
             if(appendName)
                 AppendName(name);
@@ -65,7 +65,7 @@ namespace DotLogix.Core.Nodes.Processor {
             _isFirstChild = false;
 
             if(_formatterSettings.Ident)
-                WriteIdentAsync();
+                WriteIdent();
             _builder.Append('}');
             
             if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
@@ -82,7 +82,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 _builder.Append(',');
 
             if(_formatterSettings.Ident)
-                WriteIdentAsync();
+                WriteIdent();
 
             if(appendName)
                 AppendName(name);
@@ -104,7 +104,7 @@ namespace DotLogix.Core.Nodes.Processor {
             _isFirstChild = false;
 
             if(_formatterSettings.Ident)
-                WriteIdentAsync();
+                WriteIdent();
             _builder.Append(']');
             
             if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
@@ -121,7 +121,7 @@ namespace DotLogix.Core.Nodes.Processor {
                 _builder.Append(',');
 
             if(_formatterSettings.Ident)
-                WriteIdentAsync();
+                WriteIdent();
 
             if(appendName)
                 AppendName(name);
@@ -135,7 +135,7 @@ namespace DotLogix.Core.Nodes.Processor {
             }
         }
 
-        private void WriteIdentAsync() {
+        private void WriteIdent() {
             _builder.AppendLine();
             if (ContainerStack.Count == 0)
                 return;
@@ -150,30 +150,33 @@ namespace DotLogix.Core.Nodes.Processor {
 
             JsonStrings.AppendJsonString(_builder, name);
 
-            _builder.Append("\":");
+            _builder.Append('"').Append(':');
         }
 
-        private void AppendValueString(object value) {
-            if(value == null) {
-                _builder.Append("null");
-                return;
-            }
-
-            if(value is JsonPrimitive primitive) {
-                switch(primitive.Type) {
-                    case JsonPrimitiveType.Null:
-                    case JsonPrimitiveType.Number:
-                    case JsonPrimitiveType.Boolean:
-                        _builder.Append(primitive.Json);
-                        return;
-                    case JsonPrimitiveType.String:
-                        JsonStrings.AppendJsonString(_builder, primitive.Json, true);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            } else {
-                JsonStrings.AppendJsonString(_builder, value.ToString(), true);
+        private void AppendValueString(object value)
+        {
+            switch (value)
+            {
+                case null:
+                    _builder.Append("null");
+                    return;
+                case JsonPrimitive primitive:
+                    switch(primitive.Type) {
+                        case JsonPrimitiveType.Null:
+                        case JsonPrimitiveType.Number:
+                        case JsonPrimitiveType.Boolean:
+                            _builder.Append(primitive.Json);
+                            return;
+                        case JsonPrimitiveType.String:
+                            JsonStrings.AppendJsonString(_builder, primitive.Json, true);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    break;
+                default:
+                    JsonStrings.AppendJsonString(_builder, value.ToString(), true);
+                    break;
             }
         }
 

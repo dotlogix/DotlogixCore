@@ -48,12 +48,12 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         public ValueTask WriteValueAsync(string name, object value) {
-            _operations.Add(new NodeOperation(NodeOperationTypes.WriteValue, name, value));
+            _operations.Add(new NodeOperation(NodeOperationTypes.Value, name, value));
             return default;
         }
 
         public ValueTask WriteValueAsync(object value) {
-            _operations.Add(new NodeOperation(NodeOperationTypes.WriteValue, value: value));
+            _operations.Add(new NodeOperation(NodeOperationTypes.Value, value: value));
             return default;
         }
 

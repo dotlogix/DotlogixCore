@@ -8,17 +8,11 @@
 
 #region
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Extensions;
-using DotLogix.Core.Types;
-
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {

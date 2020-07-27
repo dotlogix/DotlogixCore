@@ -8,12 +8,8 @@
 
 #region
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes.Converters;
 using DotLogix.Core.Nodes.Factories;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
@@ -117,7 +113,10 @@ namespace DotLogix.Core.Nodes {
 
             settings ??= ConverterSettings.Default;
             var nodeWriter = new NodeWriter(settings);
-            WriteToAsync(name, instance, instanceType, nodeWriter, settings);
+            WriteToAsync(name, instance, instanceType, nodeWriter, settings)
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult();
             return nodeWriter.Root;
         }
         #endregion

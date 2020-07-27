@@ -8,7 +8,6 @@
 
 #region
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 #endregion
 
@@ -56,7 +55,7 @@ namespace DotLogix.Core.Nodes.Processor {
                     return BeginListAsync(operation.Name);
                 case NodeOperationTypes.EndList:
                     return EndListAsync();
-                case NodeOperationTypes.WriteValue:
+                case NodeOperationTypes.Value:
                     return WriteValueAsync(operation.Name, operation.Value);
                 case NodeOperationTypes.AutoComplete:
                     return AutoCompleteAsync();

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Types;
 
@@ -29,11 +27,13 @@ namespace DotLogix.Core.Nodes.Processor {
 
             switch (flags) {
                 case DataTypeFlags.Bool:
-                    if(string.Equals(currentValue, "true", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                    if(string.Equals(currentValue, "false", StringComparison.OrdinalIgnoreCase))
-                        return false;
-                    throw new FormatException($"Invalid format while parsing boolean \"{currentValue}\" with format \"{settings.GuidFormat}\"");
+                    return currentValue switch
+                    {
+                        "true" => true,
+                        "false" => false,
+                        _ => throw new FormatException($"Invalid format while parsing boolean \"{currentValue}\" with format \"{settings.GuidFormat}\"")
+                    };
+
                 case DataTypeFlags.Guid:
                     Guid guid;
                     if(settings.GuidFormat == null) {

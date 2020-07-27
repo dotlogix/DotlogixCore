@@ -38,7 +38,7 @@ namespace DotLogix.Core.Nodes
                     childNode = nodeList.GetChild(index);
                     break;
                 case NodeMap nodeMap when objIndex is string name:
-                    childNode = nodeMap.GetChild(_settings.NamingStrategy?.TransformName(name) ?? name);
+                    childNode = nodeMap.GetChild(_settings.NamingStrategy?.Rewrite(name) ?? name);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -55,7 +55,7 @@ namespace DotLogix.Core.Nodes
                 result = null;
                 return false;
             }
-            var childNode = nodeMap.GetChild(_settings.NamingStrategy?.TransformName(binder.Name) ?? binder.Name);
+            var childNode = nodeMap.GetChild(_settings.NamingStrategy?.Rewrite(binder.Name) ?? binder.Name);
             result = new DynamicNode(childNode, _settings);
             return true;
         }

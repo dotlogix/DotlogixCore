@@ -1,5 +1,5 @@
 using System;
-using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Utils.Naming;
 
 namespace DotLogix.Core.Nodes {
     public class ScopedConverterSettings : IReadOnlyConverterSettings {

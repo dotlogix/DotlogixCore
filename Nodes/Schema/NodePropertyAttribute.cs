@@ -1,6 +1,6 @@
 using System;
 using DotLogix.Core.Nodes.Factories;
-using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Utils.Naming;
 
 namespace DotLogix.Core.Nodes {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]

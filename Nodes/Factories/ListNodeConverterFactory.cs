@@ -19,27 +19,36 @@ using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes.Factories {
     /// <summary>
-    /// An implementation of the <see cref="INodeConverterFactory"/> for collection types
+    ///     An implementation of the <see cref="INodeConverterFactory" /> for collection types
     /// </summary>
     public class ListNodeConverterFactory : NodeConverterFactoryBase {
-        private static readonly Dictionary<Type, Type> _interfaceRemapping = new Dictionary<Type, Type> {
-                                                                                                  {typeof(IEnumerable), typeof(List<>) },
-                                                                                                  {typeof(IEnumerable<>), typeof(List<>) },
-                                                                                                  {typeof(ICollection), typeof(List<>) },
-                                                                                                  {typeof(ICollection<>), typeof(List<>) },
-                                                                                                  {typeof(IList), typeof(List<>) },
-                                                                                                  {typeof(IList<>), typeof(List<>) },
-                                                                                                  {typeof(IReadOnlyList<>), typeof(List<>) },
-                                                                                                  {typeof(IDictionary<,>), typeof(Dictionary<,>) },
-                                                                                                  {typeof(IReadOnlyDictionary<,>), typeof(Dictionary<,>) },
-                                                                                                  };
+        private static readonly Dictionary<Type, Type> _interfaceRemapping;
 
-        private static readonly HashSet<Type> StandardOpenGenerics = new HashSet<Type> {
-                                                                                           typeof(Collection<>),
-                                                                                           typeof(List<>),
-                                                                                           typeof(Dictionary<,>),
-                                                                                           typeof(ReadOnlyCollection<>)
-                                                                                       };
+        private static readonly HashSet<Type> StandardOpenGenerics;
+
+        static ListNodeConverterFactory() {
+            _interfaceRemapping = new Dictionary<Type, Type> {
+                {typeof(IEnumerable), typeof(List<>)},
+                {typeof(IEnumerable<>), typeof(List<>)},
+
+                {typeof(ICollection), typeof(List<>)},
+                {typeof(ICollection<>), typeof(List<>)},
+                {typeof(IReadOnlyCollection<>), typeof(List<>)},
+
+                {typeof(ISet<>), typeof(HashSet<>)},
+                {typeof(IList<>), typeof(List<>)},
+                {typeof(IReadOnlyList<>), typeof(List<>)},
+                {typeof(IDictionary<,>), typeof(Dictionary<,>)},
+                {typeof(IReadOnlyDictionary<,>), typeof(Dictionary<,>)}
+            };
+
+            StandardOpenGenerics = new HashSet<Type> {
+                typeof(Collection<>),
+                typeof(List<>),
+                typeof(Dictionary<,>),
+                typeof(ReadOnlyCollection<>)
+            };
+        }
 
         /// <inheritdoc />
         public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter) {
@@ -55,7 +64,7 @@ namespace DotLogix.Core.Nodes.Factories {
                 converter = CreateArrayConverter(typeSettings);
             else if(type.IsGenericType) {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
-                if (type.IsInterface) {
+                if(type.IsInterface) {
                     if(_interfaceRemapping.TryGetValue(genericTypeDefinition, out var mappedType) == false)
                         return false;
                     var genericArguments = type.GetGenericArguments();

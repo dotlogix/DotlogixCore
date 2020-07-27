@@ -1,8 +1,6 @@
-using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Converters;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
-using DotLogix.Core.Utils;
 
 namespace DotLogix.Core.Nodes {
     public class TypeSettings : ConverterSettings{

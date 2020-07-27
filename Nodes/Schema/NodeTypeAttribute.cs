@@ -1,8 +1,6 @@
 using System;
-using System.Runtime.CompilerServices;
 using DotLogix.Core.Nodes.Factories;
-using DotLogix.Core.Nodes.Processor;
-using DotLogix.Core.Utils;
+using DotLogix.Core.Utils.Naming;
 
 namespace DotLogix.Core.Nodes {
 

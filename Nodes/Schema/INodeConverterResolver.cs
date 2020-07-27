@@ -1,9 +1,8 @@
 using System;
 using System.Reflection;
-using DotLogix.Core.Nodes.Converters;
 using DotLogix.Core.Nodes.Factories;
-using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
+using DotLogix.Core.Utils.Naming;
 
 namespace DotLogix.Core.Nodes {
     public interface INodeConverterResolver {

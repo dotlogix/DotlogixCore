@@ -10,7 +10,6 @@
 #endregion
 
 using DotLogix.Core.Nodes.Processor;
-using DotLogix.Core.Utils;
 
 namespace DotLogix.Core.Nodes {
     /// <summary>

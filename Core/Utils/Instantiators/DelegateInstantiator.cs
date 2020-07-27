@@ -17,4 +17,26 @@ namespace DotLogix.Core.Utils.Instantiators {
             return _getInstanceFunc.Invoke();
         }
     }
+    
+    /// <inheritdoc />
+    public class DelegateInstantiator<T> : IInstantiator<T> {
+        private readonly Func<T> _getInstanceFunc;
+
+        /// <summary>
+        /// Create a new instance of <see cref="DelegateInstantiator"/>
+        /// </summary>
+        public DelegateInstantiator(Func<T> instantiateFunc) {
+            _getInstanceFunc = instantiateFunc ?? throw new ArgumentNullException(nameof(instantiateFunc));
+        }
+
+        /// <inheritdoc />
+        object IInstantiator.GetInstance() {
+            return GetInstance();
+        }
+
+        /// <inheritdoc />
+        public T GetInstance() {
+            return _getInstanceFunc.Invoke();
+        }
+    }
 }

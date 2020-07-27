@@ -8,6 +8,11 @@ namespace DotLogix.Core.Diagnostics {
         public ILogger Logger { get; }
 
         /// <summary>
+        /// Enables or disables this log source
+        /// </summary>
+        public bool Enabled { get; set; }
+
+        /// <summary>
         /// The parent logger source
         /// </summary>
         public ILogSource Parent { get; }

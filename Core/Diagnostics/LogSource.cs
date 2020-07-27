@@ -11,6 +11,10 @@ namespace DotLogix.Core.Diagnostics {
         public string Name { get; }
         /// <inheritdoc />
         public ILogger Logger { get; }
+
+        /// <inheritdoc />
+        public bool Enabled { get; set; } = true;
+
         /// <inheritdoc />
         public ILogSource Parent { get; }
 
@@ -317,7 +321,7 @@ namespace DotLogix.Core.Diagnostics {
         }
 
         private bool IsLoggingDisabled(LogLevels logLevel) {
-            return LogLevel > logLevel;
+            return LogLevel > logLevel && Enabled;
         }
     }
 }

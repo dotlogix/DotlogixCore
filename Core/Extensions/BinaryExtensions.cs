@@ -13,17 +13,17 @@ namespace DotLogix.Core.Extensions
         /// Find the index of an array of bytes in another array
         /// </summary>
         /// <param name="searchWithin">The byte array to search within</param>
-        /// <param name="serachFor">The byte array to search</param>
+        /// <param name="searchFor">The byte array to search</param>
         /// <param name="startIndex">The offset to start searching</param>
         /// <param name="count">The maximum amount bytes to search</param>
         /// <returns>The index or -1 if the sequence can not be found</returns>
-        public static int IndexOfArray(this byte[] searchWithin, byte[] serachFor, int startIndex = 0, int count=-1) {
+        public static int IndexOfArray(this byte[] searchWithin, byte[] searchFor, int startIndex = 0, int count=-1) {
             if(count == -1)
                 count = searchWithin.Length - startIndex;
 
             var endIndex = startIndex + count;
-            while((startIndex = Array.IndexOf(searchWithin, serachFor[0], startIndex, endIndex-startIndex-serachFor.Length)) != -1) {
-                if(EqualBytesLongUnrolled(searchWithin, serachFor, startIndex, 0, serachFor.Length))
+            while((startIndex = Array.IndexOf(searchWithin, searchFor[0], startIndex, endIndex-startIndex-searchFor.Length)) != -1) {
+                if(EqualBytesLongUnrolled(searchWithin, searchFor, startIndex, 0, searchFor.Length))
                     return startIndex;
                 startIndex++;
             }

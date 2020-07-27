@@ -23,7 +23,7 @@ namespace DotLogix.Core.Extensions {
     /// A static class providing extension methods for <see cref="Type"/>
     /// </summary>
     public static class TypeExtension {
-        private static readonly ConcurrentDictionary<Type, object> _defaultValues = new ConcurrentDictionary<Type, object>();
+        private static readonly ConcurrentDictionary<Type, object> DefaultValues = new ConcurrentDictionary<Type, object>();
 
         /// <summary>
         ///     Gets the properties of a type ordered by the inheritance level (deepest first)
@@ -31,24 +31,30 @@ namespace DotLogix.Core.Extensions {
         /// <param name="type"></param>
         /// <returns></returns>
         public static IEnumerable<PropertyInfo> GetPropertiesByInheritance(this Type type) {
-            var types = type.GetBaseTypes().ToList();
-            types.Reverse();
-            types.Add(type);
-            return types.SelectMany(t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)).ToArray();
+            var declaredOnly = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+            foreach(var property in type.GetProperties(declaredOnly)) {
+                yield return property;
+            }
+
+            foreach(var baseType in type.GetBaseTypes()) {
+                foreach (var property in baseType.GetProperties(declaredOnly)) {
+                    yield return property;
+                }
+            }
         }
 
         /// <summary>
         ///     Gets all base types of a specified type
         /// </summary>
         /// <param name="type">The type</param>
-        /// <param name="autoOpenGenericType">get the open generic type definition of the basetypes</param>
+        /// <param name="asTypeDefinition">get the open generic type definition of the basetypes</param>
         /// <param name="genericOnly">Only return generic types</param>
         /// <returns></returns>
-        public static IEnumerable<Type> GetBaseTypes(this Type type, bool autoOpenGenericType = false,
+        public static IEnumerable<Type> GetBaseTypes(this Type type, bool asTypeDefinition = false,
                                                      bool genericOnly = false) {
             type = type.BaseType;
             while(type != null) {
-                if(autoOpenGenericType && type.IsGenericType)
+                if(asTypeDefinition && type.IsGenericType)
                     yield return type.GetGenericTypeDefinition();
                 else if(genericOnly == false)
                     yield return type;
@@ -60,12 +66,12 @@ namespace DotLogix.Core.Extensions {
         ///     Gets all types a specified type is assignable to
         /// </summary>
         /// <param name="type">The type</param>
-        /// <param name="autoOpenGenericType">get the open generic type definition of the basetypes</param>
+        /// <param name="asTypeDefinition">get the open generic type definition of the basetypes</param>
         /// <param name="genericOnly">Only return generic types</param>
-        public static IEnumerable<Type> GetTypesAssignableTo(this Type type, bool autoOpenGenericType = false,
+        public static IEnumerable<Type> GetTypesAssignableTo(this Type type, bool asTypeDefinition = false,
                                                              bool genericOnly = false) {
-            var baseInterfaces = GetInterfacesAssignableTo(type, autoOpenGenericType, genericOnly);
-            var baseTypes = GetBaseTypes(type, autoOpenGenericType, genericOnly);
+            var baseInterfaces = GetInterfacesAssignableTo(type, asTypeDefinition, genericOnly);
+            var baseTypes = GetBaseTypes(type, asTypeDefinition, genericOnly);
             return baseTypes.Concat(baseInterfaces);
         }
 
@@ -73,16 +79,16 @@ namespace DotLogix.Core.Extensions {
         ///     Gets all interfaces a specified type is assignable to
         /// </summary>
         /// <param name="type">The type</param>
-        /// <param name="autoOpenGenericType">get the open generic type definition of the basetypes</param>
+        /// <param name="asTypeDefinition">get the open generic type definition of the basetypes</param>
         /// <param name="genericOnly">Only return generic types</param>
-        public static IEnumerable<Type> GetInterfacesAssignableTo(this Type type, bool autoOpenGenericType = false,
+        public static IEnumerable<Type> GetInterfacesAssignableTo(this Type type, bool asTypeDefinition = false,
                                                                   bool genericOnly = false) {
             IEnumerable<Type> interfaces = type.GetInterfaces();
             if(genericOnly) {
                 interfaces = interfaces.Where(i => i.IsGenericType);
-                if(autoOpenGenericType)
+                if(asTypeDefinition)
                     interfaces = interfaces.Select(i => i.GetGenericTypeDefinition());
-            } else if(autoOpenGenericType)
+            } else if(asTypeDefinition)
                 interfaces = interfaces.Select(OpenIfGenericType);
 
             return interfaces;
@@ -114,7 +120,7 @@ namespace DotLogix.Core.Extensions {
         public static object GetDefaultValue(this Type type) {
             object CreateDefaultValue(Type t) => t.IsValueType ? t.CreateDefaultCtor()?.Invoke() : null;
 
-            return _defaultValues.GetOrAdd(type, CreateDefaultValue);
+            return DefaultValues.GetOrAdd(type, CreateDefaultValue);
         }
 
         #region TypeCheck

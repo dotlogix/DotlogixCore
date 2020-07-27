@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace DotLogix.Core.Rest.Server.Http.WebSockets {
+namespace DotLogix.Core.Rest.WebSockets {
     public interface IWebSocketProtocol<TMessage> {
         string Name { get; }
 

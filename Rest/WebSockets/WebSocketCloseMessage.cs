@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.WebSockets;
 
-namespace DotLogix.Core.Rest.Server.Http.WebSockets {
+namespace DotLogix.Core.Rest.WebSockets {
     public class WebSocketCloseMessage : IWebSocketCloseMessage {
         public WebSocketCloseMessage(DateTime timeStamp, WebSocketCloseStatus? closeStatus = default, string closeStatusDescription = null, WebSocketMessageType originalMessageType = WebSocketMessageType.Close) {
             TimeStamp = timeStamp;

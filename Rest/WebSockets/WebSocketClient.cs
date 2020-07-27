@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DotLogix.Core.Rest.Server.Http.WebSockets {
+namespace DotLogix.Core.Rest.WebSockets {
     public class WebSocketClient : IDisposable{
         private readonly WebSocket _webSocket;
         public WebSocketClient(WebSocket webSocket) {

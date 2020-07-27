@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 
-namespace DotLogix.Core.Rest.Server.Http.WebSockets {
+namespace DotLogix.Core.Rest.WebSockets {
     public class WebSocketProtocol<TMessage> : IWebSocketProtocol<TMessage> {
         /// <inheritdoc />
         public string Name { get; }

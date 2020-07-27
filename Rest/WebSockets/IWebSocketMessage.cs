@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.WebSockets;
 
-namespace DotLogix.Core.Rest.Server.Http.WebSockets {
+namespace DotLogix.Core.Rest.WebSockets {
     public interface IWebSocketMessage {
         DateTime TimeStamp { get; }
         WebSocketMessageType MessageType { get; }

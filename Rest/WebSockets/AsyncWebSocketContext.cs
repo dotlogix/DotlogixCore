@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.WebSockets;
 using DotLogix.Core.Rest.Http.Parameters;
-using DotLogix.Core.Rest.Server.Http.WebSockets;
 
 namespace DotLogix.Core.Rest.WebSockets {
     public class AsyncWebSocketContext : IAsyncWebSocketRequest {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.WebSockets;
 
-namespace DotLogix.Core.Rest.Server.Http.WebSockets {
+namespace DotLogix.Core.Rest.WebSockets {
     public class WebSocketBinaryMessage : IWebSocketMessage<ArraySegment<byte>> {
         public WebSocketBinaryMessage(ArraySegment<byte> data) {
             TimeStamp = DateTime.UtcNow;

@@ -107,10 +107,9 @@ namespace DotLogix.Core.Extensions
         {
             if(stream is MemoryStream mem)
                 return mem.ToArray();
-            using(var ms = new MemoryStream()) {
-                stream.CopyTo(ms);
-                return ms.ToArray();
-            }
+            using var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            return ms.ToArray();
         }
 
         /// <summary>
@@ -121,10 +120,9 @@ namespace DotLogix.Core.Extensions
         public static async Task<byte[]> ToByteArrayAsync(this Stream stream) {
             if(stream is MemoryStream mem)
                 return mem.ToArray();
-            using(var ms = new MemoryStream()) {
-                await stream.CopyToAsync(ms);
-                return ms.ToArray();
-            }
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            return ms.ToArray();
         }
 
         /// <summary>

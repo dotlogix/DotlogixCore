@@ -48,6 +48,46 @@ namespace DotLogix.Core.Extensions {
             return source.Where(s => Equals(s,
                                             s?.GetType()
                                              .GetDefaultValue()));
+		}
+
+		/// <summary>
+		///     Creates an enumerable of items using a recursive selectorFunc
+		/// </summary>
+		/// <param name="source">The initial value</param>
+		/// <param name="selectChildrenFunc">A method to select the current children</param>
+		/// <returns></returns>
+		public static IEnumerable<TSource> EnumerateRecursive<TSource>(this IEnumerable<TSource> source, Func<TSource, IEnumerable<TSource>> selectChildrenFunc) {
+            var stack = new Stack<IEnumerator<TSource>>();
+            var enumerator = source.GetEnumerator();
+
+            try {
+                while (true) {
+                    if (enumerator.MoveNext()) {
+                        var element = enumerator.Current;
+                        yield return element;
+
+                        var childEnumerator = selectChildrenFunc(element);
+                        if (childEnumerator == null)
+                            continue;
+
+                        stack.Push(enumerator);
+                        enumerator = childEnumerator.GetEnumerator();
+                    } else if (stack.Count > 0) {
+                        enumerator.Dispose();
+                        enumerator = stack.Pop();
+                    } else {
+                        yield break;
+                    }
+                }
+            } finally {
+                enumerator.Dispose();
+
+                while (stack.Count > 0) // Clean up in case of an exception.
+                {
+                    enumerator = stack.Pop();
+                    enumerator.Dispose();
+                }
+            }
         }
 
 		/// <summary>
@@ -58,7 +98,7 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="hasNextFunc">A method to check if an additional value is available</param>
 		/// <param name="yieldInitial">A flag if the initial value should be yield or skipped</param>
 		/// <returns></returns>
-        public static IEnumerable<T> Enumerate<T>(this T initialValue,
+		public static IEnumerable<T> Enumerate<T>(this T initialValue,
                                                   Func<T, T> selectNextFunc,
                                                   Func<T, bool> hasNextFunc,
 			bool yieldInitial = false) {

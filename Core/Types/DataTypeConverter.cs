@@ -18,7 +18,8 @@ namespace DotLogix.Core.Types {
     /// A singleton DataTypeConverter
     /// </summary>
     public class DataTypeConverter {
-        private readonly ConcurrentDictionary<Type, DataType> _cachedDataTypes;
+        private readonly Dictionary<Type, DataType> _cachedDataTypes;
+        private readonly object _lock = new object();
 
         /// <summary>
         /// The static singleton instance
@@ -32,7 +33,7 @@ namespace DotLogix.Core.Types {
 
         private DataTypeConverter() {
             var primitives = CreatePrimitiveTypes();
-            _cachedDataTypes = new ConcurrentDictionary<Type, DataType>(primitives);
+            _cachedDataTypes = new Dictionary<Type, DataType>(primitives);
             Primitives = primitives;
         }
 
@@ -47,7 +48,17 @@ namespace DotLogix.Core.Types {
         /// Get a data type of a type
         /// </summary>
         public DataType GetDataType(Type type) {
-            return type == null ? DataType.EmptyType : _cachedDataTypes.GetOrAdd(type, CreateDataType);
+            if(type == null)
+                return DataType.EmptyType;
+
+            lock (_lock) {
+                if (_cachedDataTypes.TryGetValue(type, out var dataType))
+                    return dataType;
+
+                dataType = CreateDataType(type);
+                _cachedDataTypes[type] = dataType;
+                return dataType;
+            }
         }
 
         private DataType CreateDataType(Type type) {

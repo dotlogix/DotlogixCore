@@ -197,6 +197,29 @@ namespace DotLogix.Core.Extensions {
             }
             return sb;
         }
+        
+        /// <summary>
+        /// Appends some values to a <see cref="StringBuilder"/> and places a separator between each item
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static StringBuilder AppendJoin<T>(this StringBuilder sb, char separator, IEnumerable<T> values) {
+            if(values == null)
+                throw new ArgumentNullException(nameof(values));
+
+            using var enumerator = values.GetEnumerator();
+
+            if(!enumerator.MoveNext())
+                return sb;
+
+            if(enumerator.Current != null)
+                sb.Append(enumerator.Current);
+            while(enumerator.MoveNext()) {
+                sb.Append(separator);
+                if(enumerator.Current != null)
+                    sb.Append(enumerator.Current);
+            }
+            return sb;
+        }
         #endregion
 
         #region Base64

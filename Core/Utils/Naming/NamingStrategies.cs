@@ -8,35 +8,41 @@
 
 namespace DotLogix.Core.Utils.Naming {
     /// <summary>
-    /// Common naming strategies
+    ///     Common naming strategies
     /// </summary>
     public static class NamingStrategies {
         /// <summary>
-        /// A camelCase naming strategy
+        ///     A camelCase naming strategy
         /// </summary>
         public static INamingStrategy CamelCase { get; } = new CamelCaseNamingStrategy();
+
         /// <summary>
-        /// A kebap-case naming strategy
+        ///     A kebap-case naming strategy
         /// </summary>
         public static INamingStrategy KebapCase { get; } = new KebapCaseNamingStrategy();
+
         /// <summary>
-        /// A lowercase naming strategy
+        ///     A lowercase naming strategy
         /// </summary>
         public static INamingStrategy LowerCase { get; } = new LowerCaseNamingStrategy();
+
         /// <summary>
-        /// A PascalCase naming strategy
+        ///     A PascalCase naming strategy
         /// </summary>
         public static INamingStrategy PascalCase { get; } = new PascalCaseNamingStrategy();
+
         /// <summary>
-        /// A snake_case naming strategy
+        ///     A snake_case naming strategy
         /// </summary>
         public static INamingStrategy SnakeCase { get; } = new SnakeCaseNamingStrategy();
+
         /// <summary>
-        /// A snake_case naming strategy
+        ///     A snake_case naming strategy
         /// </summary>
         public static INamingStrategy UpperSnakeCase { get; } = new UpperSnakeCaseNamingStrategy();
+
         /// <summary>
-        /// A UPPERCASE naming strategy
+        ///     A UPPERCASE naming strategy
         /// </summary>
         public static INamingStrategy UpperCase { get; } = new UpperCaseNamingStrategy();
     }

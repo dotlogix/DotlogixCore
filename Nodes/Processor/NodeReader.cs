@@ -8,7 +8,10 @@
 
 #region
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
@@ -17,39 +20,100 @@ namespace DotLogix.Core.Nodes.Processor {
 
         public NodeReader(Node node) {
             Node = node;
+            Operations = EnumerateRecursive(node).GetEnumerator();
+        }
+        
+        protected override Task<NodeOperation?> ReadNextAsync() {
+            return Operations.MoveNext()
+                       ? Task.FromResult<NodeOperation?>(Operations.Current)
+                       : Task.FromResult<NodeOperation?>(null);
         }
 
-        public override ValueTask CopyToAsync(IAsyncNodeWriter writer) {
-            return CopyToRecursiveAsync(Node, writer);
+        public IEnumerator<NodeOperation> Operations { get; set; }
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing) {
+            Operations.Dispose();
+            base.Dispose(disposing);
         }
 
-        protected async ValueTask CopyToRecursiveAsync(Node node, IAsyncNodeWriter writer) {
-            switch(node.Type) {
+        protected IEnumerable<NodeOperation> EnumerateRecursive(Node initial) {
+            switch(initial.Type) {
                 case NodeTypes.Empty:
-                    await writer.WriteValueAsync(node.Name, null).ConfigureAwait(false);
-                    break;
+                    yield return new NodeOperation(NodeOperationTypes.Value, initial.Name);
+                    yield break;
                 case NodeTypes.Value:
-                    await writer.WriteValueAsync(node.Name, ((NodeValue)node).Value).ConfigureAwait(false);
-                    break;
-                case NodeTypes.List:
-                    await writer.BeginListAsync(node.Name).ConfigureAwait(false);
+                    yield return new NodeOperation(NodeOperationTypes.Value, initial.Name, ((NodeValue)initial).Value);
+                    yield break;
+            }
 
-                    foreach(var child in ((NodeList)node).Children()) {
-                        await CopyToRecursiveAsync(child, writer).ConfigureAwait(false);
+
+            var stack = new Stack<(NodeTypes, IEnumerator<Node>)>();
+            var enumerator = initial.CreateEnumerable().GetEnumerator();
+            var containerType = initial.Type;
+
+            try {
+                while (true) {
+                    if (enumerator.MoveNext()) {
+                        var currentNode = enumerator.Current;
+                        if (currentNode == null)
+                            continue;
+
+                        switch (currentNode.Type) {
+                            case NodeTypes.Empty:
+                                yield return new NodeOperation(NodeOperationTypes.Value, currentNode.Name);
+                                break;
+                            case NodeTypes.Value:
+                                yield return new NodeOperation(NodeOperationTypes.Value, currentNode.Name, ((NodeValue)currentNode).Value);
+                                break;
+                            case NodeTypes.List:
+                            case NodeTypes.Map:
+                                if (currentNode.Type == NodeTypes.List) {
+                                    yield return new NodeOperation(NodeOperationTypes.BeginList, currentNode.Name);
+                                } else {
+                                    yield return new NodeOperation(NodeOperationTypes.BeginMap, currentNode.Name);
+                                }
+
+                                var childEnumerator = ((NodeContainer)currentNode).Children().GetEnumerator();
+                                stack.Push((containerType, enumerator));
+                                enumerator = childEnumerator;
+                                containerType = currentNode.Type;
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    } else if (stack.Count > 0) {
+                        enumerator.Dispose();
+
+                        switch(containerType) {
+                            case NodeTypes.List:
+                                yield return new NodeOperation(NodeOperationTypes.EndList);
+                                break;
+                            case NodeTypes.Map:
+                                yield return new NodeOperation(NodeOperationTypes.EndMap);
+                                break;
+                        }
+                        (containerType, enumerator) = stack.Pop();
+                    } else {
+                        switch (containerType) {
+                            case NodeTypes.List:
+                                yield return new NodeOperation(NodeOperationTypes.EndList);
+                                break;
+                            case NodeTypes.Map:
+                                yield return new NodeOperation(NodeOperationTypes.EndMap);
+                                break;
+                        }
+                        yield break;
                     }
-                    await writer.EndListAsync().ConfigureAwait(false);
-                    break;
-                case NodeTypes.Map:
-                    await writer.BeginMapAsync(node.Name).ConfigureAwait(false);
+                }
+            } finally {
+                enumerator.Dispose();
 
-                    foreach(var child in ((NodeMap)node).Children()) {
-                        await CopyToRecursiveAsync(child, writer).ConfigureAwait(false);
-                    }
-
-                    await writer.EndMapAsync().ConfigureAwait(false);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                while (stack.Count > 0) // Clean up in case of an exception.
+                {
+                    (_, enumerator) = stack.Pop();
+                    enumerator.Dispose();
+                }
             }
         }
     }

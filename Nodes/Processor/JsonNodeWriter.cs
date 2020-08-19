@@ -35,18 +35,23 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
 
-        /// <inheritdoc />
-        public override async ValueTask BeginMapAsync(string name) {
-            CheckName(name, out var appendName);
+        #region Async
 
-            if(_isFirstChild == false)
+        /// <inheritdoc />
+        public override async Task WriteBeginMapAsync()
+        {
+            CheckName(CurrentName, out var appendName);
+
+            if (_isFirstChild == false)
                 _builder.Append(',');
 
-            if(_formatterSettings.Ident)
+            if (_formatterSettings.Ident)
                 WriteIdent();
 
-            if(appendName)
-                AppendName(name);
+            if (appendName) {
+                AppendName(CurrentName);
+                CurrentName = null;
+            }
 
             _builder.Append('{');
 
@@ -60,14 +65,15 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         /// <inheritdoc />
-        public override async ValueTask EndMapAsync() {
+        public override async Task WriteEndMapAsync()
+        {
             ContainerStack.PopExpected(NodeContainerType.Map);
             _isFirstChild = false;
 
-            if(_formatterSettings.Ident)
+            if (_formatterSettings.Ident)
                 WriteIdent();
             _builder.Append('}');
-            
+
             if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
                 await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
                 _builder.Clear();
@@ -75,17 +81,20 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         /// <inheritdoc />
-        public override async ValueTask BeginListAsync(string name) {
-            CheckName(name, out var appendName);
+        public override async Task WriteBeginListAsync()
+        {
+            CheckName(CurrentName, out var appendName);
 
-            if(_isFirstChild == false)
+            if (_isFirstChild == false)
                 _builder.Append(',');
 
-            if(_formatterSettings.Ident)
+            if (_formatterSettings.Ident)
                 WriteIdent();
 
-            if(appendName)
-                AppendName(name);
+            if (appendName) {
+                AppendName(CurrentName);
+                CurrentName = null;
+            }
 
             _builder.Append('[');
 
@@ -99,14 +108,15 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         /// <inheritdoc />
-        public override async ValueTask EndListAsync() {
+        public override async Task WriteEndListAsync()
+        {
             ContainerStack.PopExpected(NodeContainerType.List);
             _isFirstChild = false;
 
-            if(_formatterSettings.Ident)
+            if (_formatterSettings.Ident)
                 WriteIdent();
             _builder.Append(']');
-            
+
             if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
                 await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
                 _builder.Clear();
@@ -114,17 +124,20 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         /// <inheritdoc />
-        public override async ValueTask WriteValueAsync(string name, object value) {
-            CheckName(name, out var appendName);
+        public override async Task WriteValueAsync(object value)
+        {
+            CheckName(CurrentName, out var appendName);
 
-            if(_isFirstChild == false)
+            if (_isFirstChild == false)
                 _builder.Append(',');
 
-            if(_formatterSettings.Ident)
+            if (_formatterSettings.Ident)
                 WriteIdent();
 
-            if(appendName)
-                AppendName(name);
+            if (appendName) {
+                AppendName(CurrentName);
+                CurrentName = null;
+            }
 
             AppendValueString(value);
             _isFirstChild = false;
@@ -134,6 +147,8 @@ namespace DotLogix.Core.Nodes.Processor {
                 _builder.Clear();
             }
         }
+
+        #endregion
 
         private void WriteIdent() {
             _builder.AppendLine();
@@ -160,19 +175,8 @@ namespace DotLogix.Core.Nodes.Processor {
                 case null:
                     _builder.Append("null");
                     return;
-                case JsonPrimitive primitive:
-                    switch(primitive.Type) {
-                        case JsonPrimitiveType.Null:
-                        case JsonPrimitiveType.Number:
-                        case JsonPrimitiveType.Boolean:
-                            _builder.Append(primitive.Json);
-                            return;
-                        case JsonPrimitiveType.String:
-                            JsonStrings.AppendJsonString(_builder, primitive.Json, true);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                case IJsonPrimitive primitive:
+                    primitive.AppendJson(_builder);
                     break;
                 default:
                     JsonStrings.AppendJsonString(_builder, value.ToString(), true);

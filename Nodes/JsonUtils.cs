@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
 #endregion
 
@@ -18,7 +19,7 @@ namespace DotLogix.Core.Nodes {
     /// <summary>
     /// A static class providing extension methods for <see cref="Node"/>
     /// </summary>
-    public static class JsonNodes {
+    public static class JsonUtils {
         private const int StringBuilderCapacity = 256;
 
         #region ToNode
@@ -32,7 +33,7 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         /// Convert json text to node asynchronously
         /// </summary>
-        public static async ValueTask<TNode> ToNodeAsync<TNode>(TextReader reader, JsonReaderOptions options = default) where TNode : Node
+        public static async Task<TNode> ToNodeAsync<TNode>(TextReader reader, JsonReaderOptions options = default) where TNode : Node
         {
             return (TNode) await ToNodeAsync(reader, options).ConfigureAwait(false);
         }
@@ -40,7 +41,7 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         /// Convert json text to node asynchronously
         /// </summary>
-        public static async ValueTask<TNode> ToNodeAsync<TNode>(Stream stream, Encoding encoding, JsonReaderOptions options = default) where TNode : Node {
+        public static async Task<TNode> ToNodeAsync<TNode>(Stream stream, Encoding encoding, JsonReaderOptions options = default) where TNode : Node {
             return (TNode) await ToNodeAsync(stream, encoding, options).ConfigureAwait(false);
         }
 
@@ -50,7 +51,6 @@ namespace DotLogix.Core.Nodes {
         public static Node ToNode(string json, JsonReaderOptions options = default) {
             var reader = new JsonNodeReader(json, options);
             var writer = new NodeWriter();
-
             reader.CopyToAsync(writer)
                 .ConfigureAwait(false)
                 .GetAwaiter()
@@ -61,7 +61,7 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         /// Convert json text to node asynchronously
         /// </summary>
-        public static async ValueTask<Node> ToNodeAsync(TextReader reader, JsonReaderOptions options = default) {
+        public static async Task<Node> ToNodeAsync(TextReader reader, JsonReaderOptions options = default) {
             var jsonReader = new JsonNodeReader(reader, options);
             var writer = new NodeWriter();
 
@@ -72,10 +72,10 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         /// Convert json text to node asynchronously
         /// </summary>
-        public static async ValueTask<Node> ToNodeAsync(Stream stream, Encoding encoding, JsonReaderOptions options = default) {
-            using(var reader = new StreamReader(stream, encoding ?? Encoding.UTF8)) {
-                return await ToNodeAsync(reader, options).ConfigureAwait(false);
-            }
+        public static async Task<Node> ToNodeAsync(Stream stream, Encoding encoding, JsonReaderOptions options = default)
+        {
+            using var reader = new StreamReader(stream, encoding ?? Encoding.UTF8);
+            return await ToNodeAsync(reader, options).ConfigureAwait(false);
         }
         #endregion
 
@@ -90,21 +90,21 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         /// Convert a node to json text asynchronously
         /// </summary>
-        public static ValueTask<string> ToJsonAsync(this Node value, JsonFormatterSettings formatterSettings = null) {
+        public static Task<string> ToJsonAsync(this Node value, JsonFormatterSettings formatterSettings = null) {
             return ToJsonAsync(value, value?.GetType(), formatterSettings);
         }
 
         /// <summary>
         /// Convert a node to json text asynchronously
         /// </summary>
-        public static ValueTask ToJsonAsync(this Node value, Stream stream, Encoding encoding, JsonFormatterSettings formatterSettings = null) {
+        public static Task ToJsonAsync(this Node value, Stream stream, Encoding encoding, JsonFormatterSettings formatterSettings = null) {
             return ToJsonAsync(value, value?.GetType(), stream, encoding, formatterSettings);
         }
 
         /// <summary>
         /// Convert a node to json text asynchronously
         /// </summary>
-        public static ValueTask ToJsonAsync(this Node value, TextWriter writer, JsonFormatterSettings formatterSettings = null) {
+        public static Task ToJsonAsync(this Node value, TextWriter writer, JsonFormatterSettings formatterSettings = null) {
             return ToJsonAsync(value, value?.GetType(), writer, formatterSettings);
         }
 
@@ -128,54 +128,54 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         /// Convert an object to json text asynchronously
         /// </summary>
-        public static ValueTask<string> ToJsonAsync(object value, JsonFormatterSettings formatterSettings = null) {
+        public static Task<string> ToJsonAsync(object value, JsonFormatterSettings formatterSettings = null) {
             return ToJsonAsync(value, value?.GetType(), formatterSettings);
         }
 
         /// <summary>
         /// Convert an object to json text asynchronously
         /// </summary>
-        public static ValueTask ToJsonAsync(object value, Stream stream, Encoding encoding, JsonFormatterSettings formatterSettings = null) {
+        public static Task ToJsonAsync(object value, Stream stream, Encoding encoding, JsonFormatterSettings formatterSettings = null) {
             return ToJsonAsync(value, value?.GetType(), stream, encoding, formatterSettings);
         }
 
         /// <summary>
         /// Convert an object to json text asynchronously
         /// </summary>
-        public static ValueTask ToJsonAsync(object value, TextWriter writer, JsonFormatterSettings formatterSettings = null) {
+        public static Task ToJsonAsync(object value, TextWriter writer, JsonFormatterSettings formatterSettings = null) {
             return ToJsonAsync(value, value?.GetType(), writer, formatterSettings);
         }
 
         /// <summary>
         /// Convert an object to json text asynchronously
         /// </summary>
-        public static async ValueTask<string> ToJsonAsync(object value, Type instanceType, JsonFormatterSettings formatterSettings = null) {
-            using(var writer = new StringWriter(new StringBuilder(StringBuilderCapacity))) {
-                await ToJsonAsync(value, instanceType, writer, formatterSettings).ConfigureAwait(false);
-                return writer.ToString();
-            }
+        public static async Task<string> ToJsonAsync(object value, Type instanceType, JsonFormatterSettings formatterSettings = null)
+        {
+            using var writer = new StringWriter(new StringBuilder(StringBuilderCapacity));
+            await ToJsonAsync(value, instanceType, writer, formatterSettings).ConfigureAwait(false);
+            return writer.ToString();
         }
 
         /// <summary>
         /// Convert an object to json text asynchronously
         /// </summary>
-        public static async ValueTask ToJsonAsync(object value, Type instanceType, Stream stream, Encoding encoding, JsonFormatterSettings formatterSettings = null) {
-            using(var writer = new StreamWriter(stream, encoding)) {
-                await ToJsonAsync(value, instanceType, writer, formatterSettings).ConfigureAwait(false);
-            }
+        public static async Task ToJsonAsync(object value, Type instanceType, Stream stream, Encoding encoding, JsonFormatterSettings formatterSettings = null)
+        {
+            using var writer = new StreamWriter(stream, encoding);
+            await ToJsonAsync(value, instanceType, writer, formatterSettings).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Convert an object to json text asynchronously
         /// </summary>
-        public static async ValueTask ToJsonAsync(object value, Type instanceType, TextWriter writer, JsonFormatterSettings formatterSettings = null) {
+        public static async Task ToJsonAsync(object value, Type instanceType, TextWriter writer, JsonFormatterSettings formatterSettings = null) {
             var nodeWriter = new JsonNodeWriter(writer, formatterSettings, StringBuilderCapacity);
 
             if(value is Node node) {
                 var nodeReader = new NodeReader(node);
                 await nodeReader.CopyToAsync(nodeWriter).ConfigureAwait(false);
             } else {
-                await Nodes.WriteToAsync(null, value, instanceType, nodeWriter, formatterSettings ?? JsonFormatterSettings.Default).ConfigureAwait(false);
+                await NodeUtils.WriteToAsync(null, value, instanceType, nodeWriter, formatterSettings ?? JsonFormatterSettings.Default).ConfigureAwait(false);
             }
         }
         #endregion
@@ -191,14 +191,14 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         /// Convert json text to an instance of object asynchronously
         /// </summary>
-        public static async ValueTask<TInstance> FromJsonAsync<TInstance>(Stream stream, Encoding encoding, ConverterSettings settings = null) {
+        public static async Task<TInstance> FromJsonAsync<TInstance>(Stream stream, Encoding encoding, ConverterSettings settings = null) {
             return (TInstance) await FromJsonAsync(stream, encoding, typeof(TInstance), settings).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Convert json text to an instance of object asynchronously
         /// </summary>
-        public static async ValueTask<TInstance> FromJsonAsync<TInstance>(TextReader reader, ConverterSettings settings = null) {
+        public static async Task<TInstance> FromJsonAsync<TInstance>(TextReader reader, ConverterSettings settings = null) {
             return (TInstance) await FromJsonAsync(reader, typeof(TInstance), settings).ConfigureAwait(false);
         }
 
@@ -206,26 +206,45 @@ namespace DotLogix.Core.Nodes {
         /// Convert json text to an instance of object
         /// </summary>
         public static object FromJson(string json, Type instanceType, ConverterSettings settings = null) {
+            settings ??= ConverterSettings.JsonDefault;
+
             var options = GetJsonReaderOptions(settings);
-            return ToNode(json, options).ToObject(instanceType, settings);
+            var jsonReader = new JsonNodeReader(json, options);
+
+            if(settings.Resolver.TryResolve(instanceType, out var typeSettings))
+                return typeSettings.Converter
+                                   .ReadAsync(jsonReader, settings)
+                                   .ConfigureAwait(false)
+                                   .GetAwaiter()
+                                   .GetResult();
+
+            return instanceType.GetDefaultValue();
         }
 
         /// <summary>
         /// Convert json text to an instance of object asynchronously
         /// </summary>
-        public static async ValueTask<object> FromJsonAsync(TextReader reader, Type instanceType, ConverterSettings settings = null) {
+        public static async Task<object> FromJsonAsync(TextReader reader, Type instanceType, ConverterSettings settings = null) {
+            settings ??= ConverterSettings.JsonDefault;
+
             var options = GetJsonReaderOptions(settings);
-            var node = await ToNodeAsync(reader, options).ConfigureAwait(false);
-            return node.ToObject(instanceType, settings);
+            var jsonReader = new JsonNodeReader(reader, options);
+
+            if (settings.Resolver.TryResolve(instanceType, out var typeSettings))
+                return await typeSettings.Converter
+                                   .ReadAsync(jsonReader, settings)
+                                   .ConfigureAwait(false);
+
+            return instanceType.GetDefaultValue();
         }
 
         /// <summary>
         /// Convert json text to an instance of object asynchronously
         /// </summary>
-        public static async ValueTask<object> FromJsonAsync(Stream stream, Encoding encoding, Type instanceType, ConverterSettings settings = null) {
-            using (var reader = new StreamReader(stream, encoding ?? Encoding.UTF8)) {
-                return await FromJsonAsync(reader, instanceType, settings).ConfigureAwait(false);
-            }
+        public static async Task<object> FromJsonAsync(Stream stream, Encoding encoding, Type instanceType, ConverterSettings settings = null)
+        {
+            using var reader = new StreamReader(stream, encoding ?? Encoding.UTF8);
+            return await FromJsonAsync(reader, instanceType, settings).ConfigureAwait(false);
         }
 
         private static JsonReaderOptions GetJsonReaderOptions(ConverterSettings settings) {

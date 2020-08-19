@@ -266,7 +266,7 @@ namespace DotLogix.Core.Nodes {
             return SelectNodes(pathParts, start, count).OfType<TNode>();
         }
 
-        protected virtual void AddMatchingNodes(string pattern, List<Node> newResults) { }
+        protected virtual void AddMatchingNodes(string pattern, List<Node> newResults){}
         #endregion
 
         #region Helper

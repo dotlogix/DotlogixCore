@@ -4,11 +4,6 @@ using DotLogix.Core.Utils.Naming;
 namespace DotLogix.Core.Nodes {
     public interface IReadOnlyConverterSettings {
         /// <summary>
-        ///     The naming strategy (camelCase by default)
-        /// </summary>
-        INamingStrategy NamingStrategy { get; }
-
-        /// <summary>
         ///     The time format (u by default)
         /// </summary>
         string TimeFormat { get; }
@@ -34,9 +29,10 @@ namespace DotLogix.Core.Nodes {
         EmitMode EmitMode { get; }
 
         /// <summary>
-        ///     The format provider (invariant by default)
+        ///     The naming strategy (camelCase by default)
         /// </summary>
-        IFormatProvider FormatProvider { get; set; }
+        INamingStrategy NamingStrategy { get; }
+
         bool ShouldEmitValue(object value);
 
         /// <inheritdoc />

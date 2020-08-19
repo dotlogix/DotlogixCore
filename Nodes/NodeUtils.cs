@@ -16,20 +16,20 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes {
-    public static class Nodes {
+    public static class NodeUtils {
         public static INodeConverterResolver DefaultResolver => CreateDefaultResolver();
 
         private static INodeConverterResolver CreateDefaultResolver() {
             var resolver = new NodeConverterResolver();
             resolver.Add(new ObjectNodeConverterFactory());
             resolver.Add(new OptionalNodeConverterFactory());
-            resolver.Add(new ListNodeConverterFactory());
+            resolver.Add(new CollectionNodeConverterFactory());
             resolver.Add(new KeyValuePairNodeConverterFactory());
             resolver.Add(new ValueNodeConverterFactory());
             return resolver;
         }
 
-        static Nodes() {
+        static NodeUtils() {
         }
 
         #region NodeTypes
@@ -58,21 +58,24 @@ namespace DotLogix.Core.Nodes {
 
 
         #region WriteTo
-        public static ValueTask WriteToAsync(object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static Task WriteToAsync(object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
             return WriteToAsync(null, instance, instance?.GetType(), writer, settings);
         }
 
-        public static ValueTask WriteToAsync(object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static Task WriteToAsync(object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
             return WriteToAsync(null, instance, instanceType, writer, settings);
         }
 
-        public static ValueTask WriteToAsync(string name, object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static Task WriteToAsync(string name, object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
             return WriteToAsync(name, instance, instance?.GetType(), writer, settings);
         }
 
-        public static async ValueTask WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static async Task WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
+            if(string.IsNullOrEmpty(name) == false)
+                await writer.WriteNameAsync(name).ConfigureAwait(false);
+
             if(instance == null) {
-                await writer.WriteValueAsync(name, null).ConfigureAwait(false);
+                await writer.WriteValueAsync(null).ConfigureAwait(false);
                 return;
             }
 
@@ -86,11 +89,11 @@ namespace DotLogix.Core.Nodes {
                 throw new ArgumentNullException(nameof(instanceType));
 
             if(settings.Resolver.TryResolve(instanceType, out var typeSettings)) {
-                await typeSettings.Converter.WriteAsync(instance, name, writer, settings).ConfigureAwait(false);
+                await typeSettings.Converter.WriteAsync(instance, writer, settings).ConfigureAwait(false);
                 return;
             }
 
-            await writer.WriteValueAsync(name, null).ConfigureAwait(false);
+            await writer.WriteValueAsync(null).ConfigureAwait(false);
         }
         #endregion
 

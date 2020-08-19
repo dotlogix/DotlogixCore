@@ -32,9 +32,14 @@ namespace DotLogix.Core.Nodes.Converters {
         TypeSettings TypeSettings { get; }
 
         /// <summary>
-        /// Write the value to the node writer
+        /// Writes an object value to a node writer
         /// </summary>
-        ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
+        Task WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
+
+        /// <summary>
+        /// Reads an object value from a node reader
+        /// </summary>
+        Task<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings);
 
         /// <summary>
         /// Convert the node to an object of the target type

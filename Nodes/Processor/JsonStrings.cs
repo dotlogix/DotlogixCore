@@ -7,6 +7,8 @@
 // ==================================================
 
 #region
+using System;
+using System.Net.Security;
 using System.Text;
 using DotLogix.Core.Extensions;
 #endregion
@@ -16,6 +18,13 @@ namespace DotLogix.Core.Nodes.Processor {
     /// A static class providing extension methods for json strings
     /// </summary>
     public static class JsonStrings {
+        private const int Char0 = '0';
+        private const int Char9 = '9';
+        private const int CharA = 'A';
+        private const int CharAlower = 'a';
+        private const int CharF = 'F';
+        private const int CharFlower = 'f';
+
         /// <summary>
         /// Unescapes a json formatted string
         /// </summary>
@@ -66,7 +75,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             i += 4;
                             break;
                         default:
-                            throw new JsonParsingException("Character is not valid at this point, maybe your json string is not escaped correctly", i, 0, 0, null);
+                            throw new JsonParsingException("Character is not valid at this point, maybe your json string is not escaped correctly", i, 0, 0, new string(json));
                     }
                     i++;
                 } else {
@@ -218,26 +227,281 @@ namespace DotLogix.Core.Nodes.Processor {
         /// </summary>
         /// <param name="number"></param>
         /// <returns></returns>
-        private static char IntToHex(int number) {
+        public static char IntToHex(int number) {
+            if(number < 0 || number > 15)
+                throw new ArgumentOutOfRangeException(nameof(number), number, $"Number {number} is not in range of hex characters [0-15]");
             if(number <= 9)
-                return (char)(number + 48); // + '0'
-            return (char)(number + 87); // - 10 + 'a'
+                return (char)(number + Char0);
+            return (char)(number -10 + CharAlower);
         }
 
         /// <summary>
         /// Quick conversion of an hex character to an int
         /// </summary>
-        private static int HexToInt(int hex) {
-            if(hex <= 57) // <= '9'
-                return hex - 48; // - '0'
-            return hex - 87; // - 10 + 'a'
+        public static int HexToInt(int hex)
+        {
+            if(hex >= Char0 && hex <= Char9)
+                return hex - Char0;
+            
+            if(hex >= CharA && hex <= CharF)
+                return hex - CharA + 10;
+
+            if(hex >= CharAlower && hex <= CharFlower)
+                return hex - CharAlower + 10;
+
+            throw new ArgumentOutOfRangeException(nameof(hex), hex, $"Number {hex} is not in range of hex characters [0-9A-Fa-f]");
         }
 
         /// <summary>
         /// Check if an integer is a hex value (0-15)
         /// </summary>
         public static bool IsHex(int hex) {
-            return HexToInt(hex).LaysBetween(0, 15);
+            if (hex >= Char0 && hex <= Char9)
+                return true;
+
+            if (hex >= CharA && hex <= CharF)
+                return true;
+
+            if (hex >= CharAlower && hex <= CharFlower)
+                return true;
+
+            return false;
         }
+
+        public static string FormatLong(long value)
+        {
+           var neg = value < 0;
+           var offset = 0;
+            if (neg)
+            {
+                offset++;
+                value = -value;
+            }
+
+            var integerValue = ((ulong) value);
+            var digitCount = integerValue.DigitCount();
+            var chars = new char[digitCount + offset];
+
+            if (neg) {
+                chars[0] = '-';
+            }
+
+            FormatInteger(integerValue, offset, digitCount, chars);
+
+            return new string(chars);
+        }
+
+        private static void FormatInteger(ulong value, int startIndex, int count, char[] chars)
+        {
+            for (var i = startIndex + count - 1; i >= startIndex; i--)
+            {
+                chars[i] = (char) ((value % 10) + Char0);
+                value /= 10;
+            }
+        }
+
+        public static string FormatULong(ulong value)
+        {
+            var digitCount = value.DigitCount();
+            var chars = new char[digitCount];
+            FormatInteger(value, 0, digitCount, chars);
+            return new string(chars);
+        }
+
+        public static long ParseLong(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                throw new ArgumentException("Parameter can not be null or empty");
+
+            long value = 0;
+            var neg = false;
+            for (var i = 0; i < str.Length; i++)
+            {
+                var chr = str[i];
+                if (chr >= Char0 && chr <= Char9)
+                    value = value * 10 + (chr - Char0);
+                else if (chr == '-' && i == 0)
+                    neg = true;
+                else
+                    throw new FormatException($"Character {chr} is not valid at this point");
+            }
+
+            return neg ? -value : value;
+        }
+        public static ulong ParseULong(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                throw new ArgumentException("Parameter can not be null or empty");
+
+            ulong value = 0;
+            for (var i = 0; i < str.Length; i++)
+            {
+                var chr = str[i];
+                if (chr >= Char0 && chr <= Char9)
+                    value = value * 10 + (ulong)(chr - Char0);
+                else 
+                    throw new FormatException($"Character {chr} is not valid at this point");
+            }
+
+            return value;
+        }
+        public static double ParseDouble(string str)
+        {
+            if(string.IsNullOrEmpty(str))
+                throw new ArgumentException("Parameter can not be null or empty");
+
+            long part = 0;
+            var chr = '\0';
+            var neg = false;
+            var index = 0;
+
+            for (; index < str.Length; index++) {
+                chr = str[index];
+                if (chr >= Char0 && chr <= Char9)
+                    part = part * 10 + (chr - Char0);
+                else if (chr == '-' && index == 0)
+                    neg = true;
+                else
+                    break;
+            }
+
+            double value = part;
+
+            if (chr == '.')
+            {
+                index++;
+                part = 10;
+                for (; index < str.Length; index++)
+                {
+                    chr = str[index];
+                    if (chr >= Char0 && chr <= Char9)
+                    {
+                        value += ((double) (chr - Char0)) / part;
+                        part *= 10;
+                    }
+                    else
+                        break;
+                }
+            }
+            
+            if (neg)
+                value = -value;
+
+            if (chr == 'e' || chr == 'E')
+            {
+                neg = false;
+                part = 0;
+                index++;
+                var startIndex = index;
+
+                for (; index < str.Length; index++) {
+                    chr = str[index];
+                    if (chr >= Char0 && chr <= Char9)
+                        part = part * 10 + (chr - Char0);
+                    else if (chr == '-' && index == startIndex)
+                        neg = true;
+                    else if(chr != '+' || index > startIndex)
+                        throw new FormatException($"Character {chr} is not valid at this point");
+                }
+
+                if (startIndex < index) {
+                    if (neg)
+                        value /= Math.Pow(10d, part);
+                    else
+                        value *= Math.Pow(10d, part);
+                }
+            }
+
+            if(index != str.Length)
+                throw new FormatException($"Character {chr} is not valid at this point");
+
+            return value;
+        }
+        
+        //private static unsafe long ParseLong(char* input, int len) {
+        //    int pos = 0;           // read pointer position
+        //    long part = 0;          // the current part (int, float and sci parts of the number)
+        //    bool neg = false;      // true if part is a negative number
+
+        //    long* ret = stackalloc long[1];
+
+        //    while (pos < len && (*(input + pos) > Char9 || *(input + pos) < Char0) && *(input + pos) != '-')
+        //        pos++;
+
+        //    // sign
+        //    if (*(input + pos) == '-') {
+        //        neg = true;
+        //        pos++;
+        //    }
+
+        //    // integer part
+        //    while (pos < len && !(input[pos] > Char9 || input[pos] < Char0))
+        //        part = part * 10 + (input[pos++] - Char0);
+
+        //    *ret = neg ? (part * -1) : part;
+        //    return *ret;
+        //}
+
+        //private static unsafe double ParseDouble(char* input, int len) {
+        //    //float ret = 0f;      // return value
+        //    int pos = 0;           // read pointer position
+        //    int part = 0;          // the current part (int, float and sci parts of the number)
+        //    bool neg = false;      // true if part is a negative number
+
+        //    double* ret = stackalloc double[1];
+
+        //    // find start
+        //    while (pos < len && (input[pos] < Char0 || input[pos] > Char9) && input[pos] != '-' && input[pos] != '.')
+        //        pos++;
+
+        //    // sign
+        //    if (input[pos] == '-') {
+        //        neg = true;
+        //        pos++;
+        //    }
+
+        //    // integer part
+        //    while (pos < len && !(input[pos] > Char9 || input[pos] < Char0))
+        //        part = part * 10 + (input[pos++] - Char0);
+
+        //    *ret = neg ? part * -1 : part;
+
+        //    // float part
+        //    if (pos < len && input[pos] == '.') {
+        //        pos++;
+        //        double mul = 1;
+        //        part = 0;
+
+        //        while (pos < len && !(input[pos] > Char9 || input[pos] < Char0)) {
+        //            part = part * 10 + (input[pos] - Char0);
+        //            mul *= 10;
+        //            pos++;
+        //        }
+
+        //        if (neg)
+        //            *ret -= part / mul;
+        //        else
+        //            *ret += part / mul;
+
+        //    }
+
+        //    // scientific part
+        //    if (pos < len && (input[pos] == 'e' || input[pos] == 'E')) {
+        //        pos++;
+        //        neg = (input[pos] == '-');
+        //        pos++;
+        //        part = 0;
+        //        while (pos < len && !(input[pos] > Char9 || input[pos] < Char0)) {
+        //            part = part * 10 + (input[pos++] - Char0);
+        //        }
+
+        //        if (neg)
+        //            *ret /= Math.Pow(10d, part);
+        //        else
+        //            *ret *= Math.Pow(10d, part);
+        //    }
+
+        //    return *ret;
+        //}
     }
 }

@@ -12,25 +12,22 @@ using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
-    public class NodeOperationReader : IAsyncNodeReader {
-        public IEnumerable<NodeOperation> Operations { get; }
+    public class NodeOperationReader : NodeReaderBase {
+        public IEnumerator<NodeOperation> Operations { get; }
 
         public NodeOperationReader(IEnumerable<NodeOperation> operations) {
-            Operations = operations;
+            Operations = operations.GetEnumerator();
         }
 
-
-        public async ValueTask CopyToAsync(IAsyncNodeWriter writer) {
-            foreach(var nodeOperation in Operations) {
-                await writer.ExecuteAsync(nodeOperation).ConfigureAwait(false);
-            }
-                
+        protected override Task<NodeOperation?> ReadNextAsync() {
+            return Operations.MoveNext()
+                       ? Task.FromResult<NodeOperation?>(Operations.Current)
+                       : Task.FromResult<NodeOperation?>(null);
         }
 
-        public ValueTask<IEnumerable<NodeOperation>> ReadAsync() {
-            return new ValueTask<IEnumerable<NodeOperation>>(Operations);
+        protected override void Dispose(bool disposing)
+        {
+            Operations.Dispose();
         }
-
-        public void Dispose() { }
     }
 }

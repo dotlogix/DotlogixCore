@@ -20,20 +20,9 @@ namespace DotLogix.Core.Nodes {
 
         private object _value;
 
-        public override NodeTypes Type {
-            get {
-                if(Value is JsonPrimitive primitive) {
-                    return primitive.Type == JsonPrimitiveType.Null
-                           ? NodeTypes.Empty
-                           : NodeTypes.Value;
-                }
-                return Value == null
-                       ? NodeTypes.Empty
-                       : NodeTypes.Value;
-            }
-        }
+        public override NodeTypes Type => Value == null ? NodeTypes.Empty : NodeTypes.Value;
 
-        public DataType DataType => _dataType ?? (_dataType = Value.GetDataType());
+        public DataType DataType => _dataType ??= Value.GetDataType();
 
         public object Value {
             get => _value;
@@ -88,16 +77,6 @@ namespace DotLogix.Core.Nodes {
         }
 
         public bool TryGetValue(Type targetType, out object value) {
-            if(Value is JsonPrimitive primitive) {
-                try {
-                    value = primitive.ToObject(targetType, ConverterSettings.JsonDefault);
-                    return true;
-                } catch(Exception) {
-                    value = default;
-                    return false;
-                }
-            }
-
             return Value.TryConvertTo(targetType, out value);
         }
         #endregion

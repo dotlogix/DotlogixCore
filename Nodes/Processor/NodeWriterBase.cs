@@ -17,51 +17,54 @@ namespace DotLogix.Core.Nodes.Processor {
         protected NodeWriterBase(ConverterSettings converterSettings = null) {  
             ConverterSettings = converterSettings ?? ConverterSettings.Default;
         }
+
+        protected string CurrentName { get; set; }
         protected ConverterSettings ConverterSettings { get; }
 
-        public virtual ValueTask BeginMapAsync() => BeginMapAsync(null);
-        public abstract ValueTask BeginMapAsync(string name);
-        public abstract ValueTask EndMapAsync();
+        #region Async
 
-        public virtual ValueTask BeginListAsync() => BeginListAsync(null);
-        public abstract ValueTask BeginListAsync(string name);
-        public abstract ValueTask EndListAsync();
-
-        public virtual ValueTask WriteValueAsync(object value) => WriteValueAsync(null, value);
-        public abstract ValueTask WriteValueAsync(string name, object value);
-
-        public virtual async ValueTask AutoCompleteAsync() {
-            while(ContainerStack.Count > 0) {
-                switch(ContainerStack.Pop()) {
-                    case NodeContainerType.Map:
-                        await EndMapAsync().ConfigureAwait(false);
-                        break;
-                    case NodeContainerType.List:
-                        await EndListAsync().ConfigureAwait(false);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
+        public Task WriteNameAsync(string name)
+        {
+            CurrentName = name;
+            return Task.CompletedTask;
         }
 
-        public ValueTask ExecuteAsync(NodeOperation operation) {
+        public abstract Task WriteBeginMapAsync();
+        public abstract Task WriteEndMapAsync();
+
+        public abstract Task WriteBeginListAsync();
+        public abstract Task WriteEndListAsync();
+
+        public abstract Task WriteValueAsync(object value);
+
+        public async Task WriteOperationAsync(NodeOperation operation)
+        {
+            var name = operation.Name ?? CurrentName;
+            CurrentName = null;
+            if (string.IsNullOrEmpty(name) == false)
+                await WriteNameAsync(name).ConfigureAwait(false);
+
             switch(operation.Type) {
                 case NodeOperationTypes.BeginMap:
-                    return BeginMapAsync(operation.Name);
+                    await WriteBeginMapAsync().ConfigureAwait(false);
+                    break;
                 case NodeOperationTypes.EndMap:
-                    return EndMapAsync();
+                    await WriteEndMapAsync().ConfigureAwait(false);
+                    break;
                 case NodeOperationTypes.BeginList:
-                    return BeginListAsync(operation.Name);
+                    await WriteBeginListAsync().ConfigureAwait(false);
+                    break;
                 case NodeOperationTypes.EndList:
-                    return EndListAsync();
+                    await WriteEndListAsync().ConfigureAwait(false);
+                    break;
                 case NodeOperationTypes.Value:
-                    return WriteValueAsync(operation.Name, operation.Value);
-                case NodeOperationTypes.AutoComplete:
-                    return AutoCompleteAsync();
+                    await WriteValueAsync(operation.Value).ConfigureAwait(false);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        #endregion
     }
 }

@@ -16,57 +16,65 @@ namespace DotLogix.Core.Nodes.Processor {
         protected NodeContainer CurrentNodeCollection;
         public NodeWriter(ConverterSettings converterSettings = null) : base(converterSettings) { }
         public Node Root { get; private set; }
+        public bool IsComplete => Root != null && ContainerStack.Count == 0;
 
-        public override ValueTask BeginMapAsync(string name) {
-            CheckName(name);
+        #region Async
+
+        public override Task WriteBeginMapAsync() {
+            CheckName(CurrentName);
 
             var map = new NodeMap();
             if(Root == null)
                 Root = map;
             else
-                AddChild(name, map);
+                AddChild(CurrentName, map);
+            CurrentName = null;
 
             CurrentNodeCollection = map;
             ContainerStack.Push(NodeContainerType.Map);
             return default;
         }
 
-        public override ValueTask EndMapAsync() {
+        public override Task WriteEndMapAsync() {
             ContainerStack.PopExpected(NodeContainerType.Map);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
             return default;
         }
 
-        public override ValueTask BeginListAsync(string name) {
-            CheckName(name);
+        public override Task WriteBeginListAsync() {
+            CheckName(CurrentName);
 
             var list = new NodeList();
             if(Root == null)
                 Root = list;
             else
-                AddChild(name, list);
+                AddChild(CurrentName, list);
+            CurrentName = null;
 
             CurrentNodeCollection = list;
             ContainerStack.Push(NodeContainerType.List);
             return default;
         }
 
-        public override ValueTask EndListAsync() {
+        public override Task WriteEndListAsync() {
             ContainerStack.PopExpected(NodeContainerType.List);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
             return default;
         }
 
-        public override ValueTask WriteValueAsync(string name, object value) {
-            CheckName(name);
+        public override Task WriteValueAsync(object value) {
+            CheckName(CurrentName);
 
             var val = new NodeValue(value);
             if(Root == null)
                 Root = val;
             else
-                AddChild(name, val);
+                AddChild(CurrentName, val);
+            CurrentName = null;
             return default;
         }
+
+        #endregion
 
         private void CheckName(string name) {
             switch(ContainerStack.Current) {

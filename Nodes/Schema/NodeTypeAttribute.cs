@@ -5,8 +5,14 @@ using DotLogix.Core.Utils.Naming;
 namespace DotLogix.Core.Nodes {
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class NodeTypeAttribute : Attribute{
+    public class NodeTypeAttribute : Attribute {
+        /// <summary>
+        ///     The custom converter factory type
+        /// </summary>
         public Type ConverterFactory { get; set; }
+        /// <summary>
+        ///     The custom naming strategy type
+        /// </summary>
         public Type NamingStrategy { get; set; }
 
         /// <summary>
@@ -35,27 +41,45 @@ namespace DotLogix.Core.Nodes {
         public EmitMode EmitMode { get; set; }
 
         /// <inheritdoc />
-        public virtual void ApplyTo(INodeConverterResolver resolver, TypeSettings settings) {
-            if(TimeFormat != null)
+        public virtual void ApplyTo(INodeConverterResolver resolver, TypeSettings typeSettings) {
+            var hasOverrides = false;
+            var settings = new ConverterSettings();
+            if (TimeFormat != null) {
+                hasOverrides = true;
                 settings.TimeFormat = TimeFormat;
+            }
 
-            if(NumberFormat != null)
+            if (NumberFormat != null) {
+                hasOverrides = true;
                 settings.NumberFormat = NumberFormat;
+            }
 
-            if(GuidFormat != null)
+            if (GuidFormat != null) {
+                hasOverrides = true;
                 settings.GuidFormat = GuidFormat;
+            }
 
-            if(EnumFormat != null)
+            if (EnumFormat != null) {
+                hasOverrides = true;
                 settings.EnumFormat = EnumFormat;
+            }
 
-            if(EmitMode != EmitMode.Inherit)
+            if (EmitMode != EmitMode.Inherit) {
+                hasOverrides = true;
                 settings.EmitMode = EmitMode;
+            }
 
-            if(NamingStrategy != null && resolver.TryGet(NamingStrategy, out INamingStrategy strategy))
+            if (NamingStrategy != null && resolver.TryGet(NamingStrategy, out INamingStrategy strategy)) {
+                hasOverrides = true;
                 settings.NamingStrategy = strategy;
+            }
 
-            if(ConverterFactory != null && resolver.TryGet(ConverterFactory, out INodeConverterFactory factory))
-                settings.Converter = factory.CreateConverter(resolver, settings);
+            if (ConverterFactory != null && resolver.TryGet(ConverterFactory, out INodeConverterFactory factory)) {
+                typeSettings.Converter = factory.CreateConverter(resolver, typeSettings);
+            }
+
+            if (hasOverrides)
+                typeSettings.Overrides = settings;
         }
     }
 }

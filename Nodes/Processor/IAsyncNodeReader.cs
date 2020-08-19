@@ -16,14 +16,14 @@ namespace DotLogix.Core.Nodes.Processor {
     /// <summary>
     /// An interface to represent node readers
     /// </summary>
-    public interface IAsyncNodeReader : IDisposable {
+    public interface IAsyncNodeReader2 : IDisposable {
         /// <summary>
         /// Copies all nodes to a node writer
         /// </summary>
-        ValueTask CopyToAsync(IAsyncNodeWriter writer);
+        Task CopyToAsync(IAsyncNodeWriter writer);
         /// <summary>
         /// Read the nodes as node operations
         /// </summary>
-        ValueTask<IEnumerable<NodeOperation>> ReadAsync();
+        Task<IEnumerable<NodeOperation>> ReadAsync();
     }
 }

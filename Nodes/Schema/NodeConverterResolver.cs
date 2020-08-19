@@ -14,7 +14,6 @@ namespace DotLogix.Core.Nodes {
     public class NodeConverterResolver : INodeConverterResolver {
         protected static IDictionary<Type, TypeSettings> Primitives { get; } = CreatePrimitiveTypeSettings();
 
-
         protected ConcurrentDictionary<Type, INamingStrategy> NamingStrategiesMap { get; } = new ConcurrentDictionary<Type, INamingStrategy>();
         protected ConcurrentDictionary<Type, INodeConverterFactory> ConverterFactoriesMap { get; } = new ConcurrentDictionary<Type, INodeConverterFactory>();
         protected IList<INodeConverterFactory> ConverterFactories { get; } = new List<INodeConverterFactory>();
@@ -145,7 +144,7 @@ namespace DotLogix.Core.Nodes {
         
         protected virtual bool TryCreateSettings(Type type, out TypeSettings settings) {
             var dataType = type.ToDataType();
-            var nodeType = Nodes.GetNodeType(dataType);
+            var nodeType = NodeUtils.GetNodeType(dataType);
 
             settings = new TypeSettings {
                                         DataType = dataType,

@@ -3,6 +3,7 @@
         Null,
         Boolean,
         String,
-        Number
+        Number,
+        Raw
     }
 }

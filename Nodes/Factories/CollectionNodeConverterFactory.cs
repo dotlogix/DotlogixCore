@@ -1,6 +1,6 @@
 // ==================================================
 // Copyright 2018(C) , DotLogix
-// File:  ListNodeConverterFactory.cs
+// File:  CollectionNodeConverterFactory.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
 // LastEdited:  01.08.2018
@@ -21,13 +21,12 @@ namespace DotLogix.Core.Nodes.Factories {
     /// <summary>
     ///     An implementation of the <see cref="INodeConverterFactory" /> for collection types
     /// </summary>
-    public class ListNodeConverterFactory : NodeConverterFactoryBase {
-        private static readonly Dictionary<Type, Type> _interfaceRemapping;
-
+    public class CollectionNodeConverterFactory : NodeConverterFactoryBase {
+        private static readonly Dictionary<Type, Type> InterfaceRemapping;
         private static readonly HashSet<Type> StandardOpenGenerics;
 
-        static ListNodeConverterFactory() {
-            _interfaceRemapping = new Dictionary<Type, Type> {
+        static CollectionNodeConverterFactory() {
+            InterfaceRemapping = new Dictionary<Type, Type> {
                 {typeof(IEnumerable), typeof(List<>)},
                 {typeof(IEnumerable<>), typeof(List<>)},
 
@@ -46,7 +45,8 @@ namespace DotLogix.Core.Nodes.Factories {
                 typeof(Collection<>),
                 typeof(List<>),
                 typeof(Dictionary<,>),
-                typeof(ReadOnlyCollection<>)
+                typeof(ReadOnlyCollection<>),
+                typeof(HashSet<>)
             };
         }
 
@@ -65,7 +65,7 @@ namespace DotLogix.Core.Nodes.Factories {
             else if(type.IsGenericType) {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
                 if(type.IsInterface) {
-                    if(_interfaceRemapping.TryGetValue(genericTypeDefinition, out var mappedType) == false)
+                    if(InterfaceRemapping.TryGetValue(genericTypeDefinition, out var mappedType) == false)
                         return false;
                     var genericArguments = type.GetGenericArguments();
                     type = mappedType.MakeGenericType(genericArguments);

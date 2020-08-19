@@ -9,6 +9,8 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
 #endregion
 
@@ -231,6 +233,29 @@ namespace DotLogix.Core.Nodes {
 
         public static TNode Clone<TNode>(this TNode node) where TNode : Node {
             return (TNode)Clone((Node)node);
+        }
+
+        public static async Task<TNode> ReadNodeAsync<TNode>(this IAsyncNodeReader reader) where TNode : Node
+        {
+            return (TNode)(await ReadNodeAsync(reader).ConfigureAwait(false));
+        }
+        
+        public static async Task<Node> ReadNodeAsync(this IAsyncNodeReader reader)
+        {
+            var writer = new NodeWriter();
+            do
+            {
+                var operation = await reader.ReadOperationAsync().ConfigureAwait(true);
+                await writer.WriteOperationAsync(operation).ConfigureAwait(true);
+            } while (!writer.IsComplete);
+
+            return writer.Root;
+        }
+        
+        public static async Task WriteNodeAsync(this IAsyncNodeWriter writer, Node node)
+        {
+            var reader = new NodeReader(node);
+            await reader.CopyToAsync(writer).ConfigureAwait(true);
         }
     }
 }

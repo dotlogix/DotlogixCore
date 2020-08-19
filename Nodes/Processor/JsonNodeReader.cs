@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -71,12 +72,12 @@ namespace DotLogix.Core.Nodes.Processor {
             CloseAny = EndList | EndMap,
         }
 
-
         private readonly char[] _unicodeBuffer = new char[4];
-        private const int NearQueueSize = 50;
 
-        private readonly Queue<char> _nearQueue = new Queue<char>(NearQueueSize);
         private readonly JsonReaderOptions _options;
+        private readonly TextReader _reader;
+        private readonly bool _canReadFurther;
+        private readonly Func<char[], int, int, Task<int>> _readBlockFunc;
 
         private int _line;
         private int _lineStart;
@@ -87,13 +88,17 @@ namespace DotLogix.Core.Nodes.Processor {
         private int _remaining;
         private int _index;
 
-        private readonly Func<char[], int, int, Task<int>> _readBlockFunc;
-        private readonly TextReader _reader;
-        private readonly bool _canReadFurther;
+        private readonly StringBuilder _stringBuilder;
         private bool IsTolerantMode => (_options & JsonReaderOptions.Tolerant) != 0;
-        private string Near => new string(_nearQueue.ToArray());
+        public string Near => new string(_buffer);
 
-        private readonly List<char> _valueBuffer;
+
+        private Stack<NodeContainerType> _stateStack = new Stack<NodeContainerType>();
+        private string _name = null;
+        private JsonCharacter _allowedCharacters = JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other | JsonCharacter.End;
+        
+        private JsonCharacter _previousCharacter = JsonCharacter.None;
+        private JsonCharacter _currentCharacter = JsonCharacter.None;
 
         /// <summary>
         /// Creates a new instance of <see cref="JsonNodeReader"/>
@@ -102,7 +107,7 @@ namespace DotLogix.Core.Nodes.Processor {
         {
             _options = options;
             _buffer = json.ToCharArray();
-            _valueBuffer = new List<char>(Math.Min(50, json.Length));
+            _stringBuilder = new StringBuilder(Math.Min(50, json.Length));
             _remaining = _buffer.Length;
         }
         /// <summary>
@@ -115,7 +120,7 @@ namespace DotLogix.Core.Nodes.Processor {
             _reader = reader;
             _buffer = new char[bufferSize];
         }
-
+        
         protected override void Dispose(bool disposing)
         {
             if(disposing)
@@ -124,29 +129,35 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         /// <inheritdoc />
-        public override async ValueTask CopyToAsync(IAsyncNodeWriter nodeWriter)
-        {
-            var stateStack = new Stack<NodeContainerType>();
-            string name = null;
-            var allowedCharacters = JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other | JsonCharacter.End;
+        protected override async Task<NodeOperation?> ReadNextAsync() {
+            while(true) {
+                if (_remaining <= 0)
+                {
+                    if (_canReadFurther == false)
+                        break;
 
-            var previousCharacter = JsonCharacter.None;
-            var currentCharacter = JsonCharacter.None;
+                    var succeed = await EnsureNextCharsAsync().ConfigureAwait(false);
+                    if (succeed == false)
+                        break;
+                }
 
-            while (_remaining > 0 || (_canReadFurther && await EnsureNextCharsAsync().ConfigureAwait(false)))
-            {
-                previousCharacter = currentCharacter;
-                currentCharacter = await NextJsonCharacterAsync().ConfigureAwait(false);
 
-                if ((allowedCharacters & currentCharacter) == 0) {
-                    var errorBehaviour = HandleParsingError(currentCharacter, previousCharacter, allowedCharacters);
-                    switch (errorBehaviour) {
+                var currentCharacter = GetJsonCharacter();
+                if (currentCharacter == JsonCharacter.None)
+                    continue;
+                
+                _previousCharacter = _currentCharacter;
+                _currentCharacter = currentCharacter;
+                
+                if((_allowedCharacters & _currentCharacter) == 0) {
+                    var errorBehaviour = HandleParsingError();
+                    switch(errorBehaviour) {
                         case ErrorBehaviour.Unhandled:
-                            throw new JsonParsingException($"Character {currentCharacter} is not allowed in the current state {{ current: {previousCharacter} allowed: {allowedCharacters} }}", _position, _line, _position - _lineStart, Near);
+                            throw new JsonParsingException($"Character {_currentCharacter} is not allowed in the current state {{ current: {_previousCharacter} allowed: {_allowedCharacters} }}", _position, _line, _position - _lineStart, Near);
                         case ErrorBehaviour.SkipCharacter:
                             continue;
                         case ErrorBehaviour.SkipToEnd:
-                            return;
+                            return null;
                         case ErrorBehaviour.Accept:
                             break;
                         default:
@@ -154,153 +165,65 @@ namespace DotLogix.Core.Nodes.Processor {
                     }
                 }
 
-                switch (currentCharacter) {
+                switch(_currentCharacter) {
                     case JsonCharacter.End:
-                        allowedCharacters = JsonCharacter.None;
+                        _allowedCharacters = JsonCharacter.None;
                         break;
                     case JsonCharacter.BeginMap:
-                        await nodeWriter.BeginMapAsync(name).ConfigureAwait(false);
-                        name = null;
-                        allowedCharacters = JsonCharacter.String | JsonCharacter.EndMap;
-                        stateStack.Push(NodeContainerType.Map);
-
-                        break;
+                        return HandleBeginMap();
                     case JsonCharacter.EndMap:
+                        return HandleEndMap();
                     case JsonCharacter.EndList:
-                        if (stateStack.Pop() == NodeContainerType.Map)
-                            await nodeWriter.EndMapAsync().ConfigureAwait(false);
-                        else
-                            await nodeWriter.EndListAsync().ConfigureAwait(false);
-
-                        if (stateStack.Count == 0) {
-                            allowedCharacters = JsonCharacter.End;
-                            break;
-                        }
-
-                        allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.EndMap, JsonCharacter.ValueDelimiter | JsonCharacter.EndList);
-                        break;
+                        return HandleEndList();
                     case JsonCharacter.BeginList:
-                        await nodeWriter.BeginListAsync(name).ConfigureAwait(false);
-                        name = null;
-
-                        allowedCharacters = JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other | JsonCharacter.EndList;
-                        stateStack.Push(NodeContainerType.List);
-                        break;
+                        return HandleBeginList();
                     case JsonCharacter.String:
                         var str = await NextJsonStringAsync().ConfigureAwait(false);
-                        if (stateStack.Count > 0 && stateStack.Peek() == NodeContainerType.Map && name == null) {
-                            name = str;
-                            allowedCharacters = JsonCharacter.ValueAssignment;
-                            break;
-                        }
-
-                        await nodeWriter.WriteValueAsync(name, new JsonPrimitive(JsonPrimitiveType.String, str)).ConfigureAwait(false);
-                        name = null;
-                        allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.EndMap, JsonCharacter.ValueDelimiter | JsonCharacter.EndList);
-                        break;
+                        var op = HandleString(str);
+                        if (op.HasValue == false)
+                            continue;
+                        return op.Value;
                     case JsonCharacter.ValueAssignment:
-                        allowedCharacters = JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other;
+                        _allowedCharacters = JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other;
                         break;
                     case JsonCharacter.ValueDelimiter:
-                        allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.String, JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other);
+                        _allowedCharacters = GetAllowedCharacters(JsonCharacter.String, JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other);
                         break;
                     case JsonCharacter.Other:
                         var value = await NextJsonValueAsync().ConfigureAwait(false);
-                        await nodeWriter.WriteValueAsync(name, value).ConfigureAwait(false);
-                        
-                        name = null;
-                        allowedCharacters = GetAllowedCharacters(stateStack, JsonCharacter.ValueDelimiter | JsonCharacter.EndMap, JsonCharacter.ValueDelimiter | JsonCharacter.EndList);
-                        continue;
+                        return HandleValue(value);
                     default:
                         throw new JsonParsingException("The current state is invalid", _position, _line, _position - _lineStart, Near);
                 }
             }
 
-            if (stateStack.Count > 0)
+            if(_stateStack.Count > 0)
                 throw new JsonParsingException("Wrong end of json, make sure you are closing all opened arrays and objects", _position, _line, _position - _lineStart, Near);
 
+            return null;
         }
 
-        private ErrorBehaviour HandleParsingError(JsonCharacter current, JsonCharacter previous, JsonCharacter allowed) {
-            if(allowed == JsonCharacter.None || allowed == JsonCharacter.End)
-                return ErrorBehaviour.SkipToEnd;
+        private async Task<string> NextJsonStringAsync() {
+            while(true) {
+                if (_remaining <= 0) {
+                    if (_canReadFurther == false)
+                        break;
 
-            if(IsTolerantMode) {
-                if(current == JsonCharacter.ValueDelimiter)
-                    return ErrorBehaviour.SkipCharacter;
-                if(previous == JsonCharacter.ValueDelimiter && (JsonCharacter.CloseAny & current) != 0)
-                    return ErrorBehaviour.Accept;
-            }
+                    var succeed = await EnsureNextCharsAsync().ConfigureAwait(false);
+                    if (succeed == false)
+                        break;
+                }
 
-            return ErrorBehaviour.Unhandled;
-        }
-
-        private static bool TryGetValueFromString(List<char> valueStr, out JsonPrimitive value)
-        {
-            if (valueStr.Count < 1)
-            {
-                value = default;
-                return false;
-            }
-
-            if (EqualsString(valueStr, "null")) {
-                value = JsonPrimitive.Null;
-
-            } else if (EqualsString(valueStr, "true")) {
-                value = JsonPrimitive.True;
-
-            } else if (EqualsString(valueStr, "false")) {
-                value = JsonPrimitive.False;
-            }
-            else
-            {
-                value = new JsonPrimitive(JsonPrimitiveType.Number, new string(valueStr.ToArray()));
-            }
-            return true;
-        }
-
-        private static bool EqualsString(IReadOnlyList<char> valueStr, string other)
-        {
-            if (valueStr.Count != other.Length)
-                return false;
-
-            for (var i = 0; i < valueStr.Count; i++)
-            {
-                if (valueStr[i] != other[i])
-                    return false;
-            }
-            return true;
-        }
-
-        private async ValueTask<bool> EnsureNextCharsAsync(int minCharsRemaining = 1)
-        {
-            for (var i = 0; i < _remaining; i++)
-            {
-                _buffer[i] = _buffer[_index + i];
-            }
-
-            if (_canReadFurther)
-            {
-                _remaining += await _readBlockFunc.Invoke(_buffer, _remaining, _buffer.Length - _remaining).ConfigureAwait(false);
-            }
-
-            return _remaining >= minCharsRemaining;
-        }
-
-
-
-        private async ValueTask<string> NextJsonStringAsync() {
-            while(_remaining > 0 || (_canReadFurther && await EnsureNextCharsAsync().ConfigureAwait(false))) {
                 var current = NextChar();
                 switch(current) {
                     case '\"':
-                        var json = new string(_valueBuffer.ToArray());
-                        _valueBuffer.Clear();
+                        var json = _stringBuilder.ToString();
+                        _stringBuilder.Clear();
                         return json;
                     case '\\':
                         if(_remaining < 1 && (_canReadFurther && await EnsureNextCharsAsync().ConfigureAwait(false)) == false)
                         {
-                            _valueBuffer.Clear();
+                            _stringBuilder.Clear();
                             throw new JsonParsingException("The escape sequence '\\' requires at least one following character to be valid.", _position, _line, _position - _lineStart, Near);
                         }
                         current = NextChar();
@@ -329,7 +252,7 @@ namespace DotLogix.Core.Nodes.Processor {
                             case 'u':
                                 if (_remaining < 4 && (_canReadFurther && await EnsureNextCharsAsync(4).ConfigureAwait(false)) == false)
                                 {
-                                    _valueBuffer.Clear();
+                                    _stringBuilder.Clear();
                                     throw new JsonParsingException("The escape sequence '\\u' requires 4 following hex digits to be valid.", _position, _line, _position - _lineStart, Near);
                                 }
 
@@ -339,7 +262,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
                                     if(JsonStrings.IsHex(current) == false)
                                     {
-                                        _valueBuffer.Clear();
+                                        _stringBuilder.Clear();
                                         throw new JsonParsingException($"The character '{current}' is not a valid hex character.", _position, _line, _position - _lineStart, Near);
                                     }
 
@@ -349,7 +272,7 @@ namespace DotLogix.Core.Nodes.Processor {
                                 current = JsonStrings.FromCharAsUnicode(_unicodeBuffer, 0);
                                 break;
                             default:
-                                _valueBuffer.Clear();
+                                _stringBuilder.Clear();
                                 throw new JsonParsingException($"The character '{current}' can not be escaped.", _position, _line, _position - _lineStart, Near);
                         }
 
@@ -361,30 +284,39 @@ namespace DotLogix.Core.Nodes.Processor {
                                 continue;
                             }
 
-                            _valueBuffer.Clear(); 
+                            _stringBuilder.Clear(); 
                             throw new JsonParsingException($"The character '{JsonStrings.ToCharAsUnicode(current)}' is a control character and requires to be escaped to be valid.", _position, _line, _position - _lineStart, Near);
                         }
                         break;
                 }
 
-                _valueBuffer.Add(current);
+                _stringBuilder.Append(current);
             }
 
-            _valueBuffer.Clear();
+            _stringBuilder.Clear();
             throw new JsonParsingException("The string never ends", _position, _line, _position - _lineStart, Near);
         }
 
-        private async ValueTask<object> NextJsonValueAsync()
+        private async Task<object> NextJsonValueAsync()
         {
             object GetValueFromString() {
-                var result = TryGetValueFromString(_valueBuffer, out var obj);
-                _valueBuffer.Clear();
+                var result = TryGetValueFromString(_stringBuilder, out var obj);
+                _stringBuilder.Clear();
                 if (result == false)
-                    throw new JsonParsingException($"Value can not be parsed make sure \"{new string(_valueBuffer.ToArray())}\" is a valid json value", _position, _line, _position - _lineStart, Near);
+                    throw new JsonParsingException($"Value can not be parsed make sure \"{_stringBuilder}\" is a valid json value", _position, _line, _position - _lineStart, Near);
                 return obj;
             }
 
-            while(_remaining > 0 || (_canReadFurther && await EnsureNextCharsAsync().ConfigureAwait(false))) {
+            while(true) {
+                if (_remaining <= 0) {
+                    if (_canReadFurther == false)
+                        break;
+
+                    var succeed = await EnsureNextCharsAsync().ConfigureAwait(false);
+                    if (succeed == false)
+                        break;
+                }
+
                 var current = NextChar();
                 switch(current) {
                     case ' ':
@@ -398,12 +330,128 @@ namespace DotLogix.Core.Nodes.Processor {
                         ReverseChar();
                         return GetValueFromString();
                     default:
-                        _valueBuffer.Add(current);
+                        _stringBuilder.Append(current);
                         break;
                 }
             }
 
             return GetValueFromString();
+        }
+
+        private NodeOperation HandleValue(object value) {
+
+            var op = new NodeOperation(NodeOperationTypes.Value, _name, value);
+            _name = null;
+            _allowedCharacters = GetAllowedCharacters(JsonCharacter.ValueDelimiter | JsonCharacter.EndMap, JsonCharacter.ValueDelimiter | JsonCharacter.EndList);
+            return op;
+        }
+
+        private NodeOperation? HandleString(string str) {
+            if (_stateStack.Count > 0 && _stateStack.Peek() == NodeContainerType.Map && _name == null) {
+                _name = str;
+                _allowedCharacters = JsonCharacter.ValueAssignment;
+                return null;
+            }
+
+            var value = new JsonString(str);
+            var op = new NodeOperation(NodeOperationTypes.Value, _name, value);
+            _name = null;
+            _allowedCharacters = GetAllowedCharacters(JsonCharacter.ValueDelimiter | JsonCharacter.EndMap, JsonCharacter.ValueDelimiter | JsonCharacter.EndList);
+            return op;
+        }
+
+        private NodeOperation HandleEndMap() {
+            return HandleEndAny(NodeOperationTypes.EndMap);
+        }
+
+        private NodeOperation HandleEndAny(NodeOperationTypes operationType) {
+            _stateStack.Pop();
+            var op = new NodeOperation(operationType, _name);
+            if(_stateStack.Count == 0) {
+                _allowedCharacters = JsonCharacter.End;
+            }
+
+            _allowedCharacters = GetAllowedCharacters(JsonCharacter.ValueDelimiter | JsonCharacter.EndMap, JsonCharacter.ValueDelimiter | JsonCharacter.EndList);
+            return op;
+        }
+
+        private NodeOperation HandleEndList() {
+            return HandleEndAny(NodeOperationTypes.EndList);
+        }
+
+        private NodeOperation HandleBeginMap() {
+            var op = new NodeOperation(NodeOperationTypes.BeginMap, _name);
+            _name = null;
+            _allowedCharacters = JsonCharacter.String | JsonCharacter.EndMap;
+            _stateStack.Push(NodeContainerType.Map);
+            return op;
+        }
+
+        private NodeOperation HandleBeginList() {
+            var op = new NodeOperation(NodeOperationTypes.BeginList, _name);
+            _name = null;
+            _allowedCharacters = JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other | JsonCharacter.EndList;
+            _stateStack.Push(NodeContainerType.List);
+            return op;
+        }
+
+        private ErrorBehaviour HandleParsingError() {
+            if(_allowedCharacters == JsonCharacter.None || _allowedCharacters == JsonCharacter.End)
+                return ErrorBehaviour.SkipToEnd;
+
+            if(IsTolerantMode) {
+                if(_currentCharacter == JsonCharacter.ValueDelimiter)
+                    return ErrorBehaviour.SkipCharacter;
+                if(_previousCharacter == JsonCharacter.ValueDelimiter && (JsonCharacter.CloseAny & _currentCharacter) != 0)
+                    return ErrorBehaviour.Accept;
+            }
+
+            return ErrorBehaviour.Unhandled;
+        }
+
+        private static bool TryGetValueFromString(StringBuilder stringBuilder, out IJsonPrimitive value)
+        {
+            switch (stringBuilder.Length)
+            {
+                case 0:
+                    value = default;
+                    return false;
+                case 4:
+                    switch (stringBuilder[0])
+                    {
+                        case 'n' when stringBuilder[1] == 'u' && stringBuilder[2] == 'l' && stringBuilder[3] == 'l':
+                            value = JsonPrimitives.Null;
+                            return true;
+                        case 't' when stringBuilder[1] == 'r' && stringBuilder[2] == 'u' && stringBuilder[3] == 'e':
+                            value = JsonPrimitives.True;
+                            return true;
+                    }
+
+                    break;
+                case 5 when stringBuilder[0] == 'f' && stringBuilder[1] == 'a' && stringBuilder[2] == 'l' && stringBuilder[3] == 's' && stringBuilder[4] == 'e':
+                    value = JsonPrimitives.False;
+                    return true;
+            }
+
+            var json = stringBuilder.ToString();
+            value = new JsonNumber(json);
+            return true;
+        }
+
+        private async ValueTask<bool> EnsureNextCharsAsync(int minCharsRemaining = 1)
+        {
+            for (var i = 0; i < _remaining; i++)
+            {
+                _buffer[i] = _buffer[_index + i];
+            }
+
+            if (_canReadFurther)
+            {
+                _index = 0;
+                _remaining += await _readBlockFunc.Invoke(_buffer, _remaining, _buffer.Length - _remaining).ConfigureAwait(false);
+            }
+
+            return _remaining >= minCharsRemaining;
         }
 
         private void ReverseChar()
@@ -412,45 +460,40 @@ namespace DotLogix.Core.Nodes.Processor {
             _remaining++;
         }
 
-        private async ValueTask<JsonCharacter> NextJsonCharacterAsync() {
-            while(_remaining > 0 || (_canReadFurther && await EnsureNextCharsAsync().ConfigureAwait(false)))
-            {
-                var current = NextChar();
-                switch (current)
-                {
-                    case ' ':
-                    case '\t':
-                    case '\r':
-                    case '\n':
-                        break;
-                    case '{':
-                        return JsonCharacter.BeginMap;
-                    case '}':
-                        return JsonCharacter.EndMap;
-                    case '[':
-                        return JsonCharacter.BeginList;
-                    case ']':
-                        return JsonCharacter.EndList;
-                    case '"':
-                        return JsonCharacter.String;
-                    case ':':
-                        return JsonCharacter.ValueAssignment;
-                    case ',':
-                        return JsonCharacter.ValueDelimiter;
-                    case '\0':
-                        return JsonCharacter.End;
-                    default:
-                        ReverseChar();
-                        return JsonCharacter.Other;
-                } 
+        private JsonCharacter GetJsonCharacter() {
+            var current = NextChar();
+            switch(current) {
+                case ' ':
+                case '\t':
+                case '\r':
+                case '\n':
+                    return JsonCharacter.None;
+                case '{':
+                    return JsonCharacter.BeginMap;
+                case '}':
+                    return JsonCharacter.EndMap;
+                case '[':
+                    return JsonCharacter.BeginList;
+                case ']':
+                    return JsonCharacter.EndList;
+                case '"':
+                    return JsonCharacter.String;
+                case ':':
+                    return JsonCharacter.ValueAssignment;
+                case ',':
+                    return JsonCharacter.ValueDelimiter;
+                case '\0':
+                    return JsonCharacter.End;
+                default:
+                    ReverseChar();
+                    return JsonCharacter.Other;
             }
-            return JsonCharacter.End;
         }
 
-        private static JsonCharacter GetAllowedCharacters(Stack<NodeContainerType> stateStack, JsonCharacter forMap, JsonCharacter forList) {
-            if(stateStack.Count == 0)
+        private JsonCharacter GetAllowedCharacters(JsonCharacter forMap, JsonCharacter forList) {
+            if(_stateStack.Count == 0)
                 return JsonCharacter.End;
-            return stateStack.Peek() == NodeContainerType.Map ? forMap : forList;
+            return _stateStack.Peek() == NodeContainerType.Map ? forMap : forList;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -460,9 +503,6 @@ namespace DotLogix.Core.Nodes.Processor {
             _remaining--;
             _index++;
             _position++;
-            //if (_nearQueue.Count > NearQueueSize)
-            //    _nearQueue.Dequeue();
-            //_nearQueue.Enqueue(chr);
 
             if(chr != '\n')
                 return chr;

@@ -11,6 +11,8 @@ using System;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
+using DotLogix.Core.Utils.Naming;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
@@ -35,13 +37,27 @@ namespace DotLogix.Core.Nodes.Converters {
         public TypeSettings TypeSettings { get; }
 
         /// <inheritdoc />
-        public abstract ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
+        public abstract Task WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
+
+        /// <inheritdoc />
+        public virtual async Task<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings)
+        {
+            var node = await reader.ReadNodeAsync().ConfigureAwait(false);
+            return ConvertToObject(node, settings);
+        }
 
         /// <inheritdoc />
         public abstract object ConvertToObject(Node node, IReadOnlyConverterSettings settings);
 
-        protected static string GetMemberName(MemberSettings member, IReadOnlyConverterSettings settings) {
-            return member.Name ?? settings.NamingStrategy?.Rewrite(member.Accessor.Name) ?? member.Accessor.Name;
+        protected static string GetMemberName(MemberSettings member, INamingStrategy strategy)
+        {
+            if (member.Name != null)
+                return member.Name;
+
+            if (strategy != null)
+                return strategy.Rewrite(member.Accessor.Name);
+            
+            return member.Accessor.Name;
         }
     }
 }

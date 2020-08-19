@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Utils.Patterns;
 #endregion
@@ -203,11 +204,14 @@ namespace DotLogix.Core.Nodes {
             var min = range.Min ?? 0;
             var max = range.Max ?? (childCount - 1);
 
-            min = ((min % childCount) + childCount) % childCount;
-            max = ((max % childCount) + childCount) % childCount;
+            if (min.LaysBetween(0, childCount) == false)
+                min = (min % childCount + childCount) % childCount;
 
-            for(var i = min; i <= max; i++)
-                newResults.Add(GetChild(i));
+            if (max.LaysBetween(0, childCount) == false)
+                max = (max % childCount + childCount) % childCount;
+
+            if(max >= min)
+                newResults.AddRange(_nodeList.Skip(min).Take(max - min + 1));
         }
         #endregion
     }

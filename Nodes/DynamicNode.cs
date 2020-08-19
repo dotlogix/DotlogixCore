@@ -127,7 +127,7 @@ namespace DotLogix.Core.Nodes
                 case DynamicNode dynNode:
                     return dynNode.Node;
                 default:
-                    return Nodes.ToNode(value, _settings);
+                    return NodeUtils.ToNode(value, _settings);
             }
         }
 

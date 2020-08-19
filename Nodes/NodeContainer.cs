@@ -35,32 +35,18 @@ namespace DotLogix.Core.Nodes {
         #endregion
 
         #region Descendants
-        public IEnumerable<Node> Descendants() {
-            var currentLevel = new List<IEnumerable<Node>> {Children()};
-            var nextLevel = new List<IEnumerable<Node>>();
 
-            do {
-                foreach(var node in currentLevel.Balance()) {
-                    yield return node;
-                    if(!(node is NodeContainer nodeContainer))
-                        continue;
-                    nextLevel.Add(nodeContainer.Children());
-                }
-
-                var temp = currentLevel;
-                currentLevel = nextLevel;
-                nextLevel = temp;
-                nextLevel.Clear();
-            } while(currentLevel.Count > 0);
+        public IEnumerable<Node> Descendants()
+        {
+            return ChildCount != 0
+                ? Children().EnumerateRecursive(c => (c as NodeContainer)?.Children())
+                : Enumerable.Empty<Node>();
         }
 
         public IEnumerable<TNode> Descendants<TNode>() where TNode : Node {
             return Descendants().OfType<TNode>();
         }
 
-        public TNode NearestDescendant<TNode>() where TNode : Node {
-            return Descendants<TNode>().FirstOrDefault();
-        }
         #endregion
     }
 }

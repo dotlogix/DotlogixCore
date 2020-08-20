@@ -21,16 +21,16 @@ using DotLogix.Core.Utils.Naming;
 
 namespace DotLogix.Core.Nodes.Converters
 {
-    public class MemberNameCacheItem
-    {
-        public MemberSettings Settings { get; }
-        public bool Serialize { get; }
-        public bool Use { get; }
-        public bool UseInCtor { get; }
+    //public class MemberNameCacheItem
+    //{
+    //    public MemberSettings Settings { get; }
+    //    public bool Serialize { get; }
+    //    public bool Use { get; }
+    //    public bool UseInCtor { get; }
 
 
-        public string RewrittenName { get; }
-    }
+    //    public string RewrittenName { get; }
+    //}
 
 
 
@@ -75,7 +75,7 @@ namespace DotLogix.Core.Nodes.Converters
         }
 
         /// <inheritdoc/>
-        public override async Task WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings)
+        public override async ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings)
         {
             var scopedSettings = settings.GetScoped(TypeSettings);
             if (scopedSettings.ShouldEmitValue(instance) == false)
@@ -117,7 +117,7 @@ namespace DotLogix.Core.Nodes.Converters
         }
 
         /// <inheritdoc />
-        public override async Task<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
+        public override async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
             var next = await reader.PeekOperationAsync().ConfigureAwait(false);
             if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null))
                 return default;

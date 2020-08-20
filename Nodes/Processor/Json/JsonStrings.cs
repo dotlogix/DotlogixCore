@@ -308,7 +308,7 @@ namespace DotLogix.Core.Nodes.Processor {
             return new string(chars);
         }
 
-        public static long ParseLong(string str)
+        public static long ParseInt64(string str)
         {
             if (string.IsNullOrEmpty(str))
                 throw new ArgumentException("Parameter can not be null or empty");
@@ -328,7 +328,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
             return neg ? -value : value;
         }
-        public static ulong ParseULong(string str)
+        public static ulong ParseUInt64(string str)
         {
             if (string.IsNullOrEmpty(str))
                 throw new ArgumentException("Parameter can not be null or empty");

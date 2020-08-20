@@ -19,25 +19,25 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         protected string CurrentName { get; set; }
-        protected ConverterSettings ConverterSettings { get; }
+        protected ConverterSettings ConverterSettings { get; set; }
 
         #region Async
 
-        public Task WriteNameAsync(string name)
+        public ValueTask WriteNameAsync(string name)
         {
             CurrentName = name;
-            return Task.CompletedTask;
+            return default;
         }
 
-        public abstract Task WriteBeginMapAsync();
-        public abstract Task WriteEndMapAsync();
+        public abstract ValueTask WriteBeginMapAsync();
+        public abstract ValueTask WriteEndMapAsync();
 
-        public abstract Task WriteBeginListAsync();
-        public abstract Task WriteEndListAsync();
+        public abstract ValueTask WriteBeginListAsync();
+        public abstract ValueTask WriteEndListAsync();
 
-        public abstract Task WriteValueAsync(object value);
+        public abstract ValueTask WriteValueAsync(object value);
 
-        public async Task WriteOperationAsync(NodeOperation operation)
+        public async ValueTask WriteOperationAsync(NodeOperation operation)
         {
             var name = operation.Name ?? CurrentName;
             CurrentName = null;

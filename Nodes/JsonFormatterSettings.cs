@@ -41,5 +41,10 @@ namespace DotLogix.Core.Nodes {
         ///     The options for json parsing
         /// </summary>
         public JsonReaderOptions ReadOptions { get; set; }
+
+        /// <summary>
+        ///     The options for json parsing
+        /// </summary>
+        public JsonWriterOptions WriteOptions { get; set; }
     }
 }

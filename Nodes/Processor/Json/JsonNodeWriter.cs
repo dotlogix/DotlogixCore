@@ -22,6 +22,8 @@ namespace DotLogix.Core.Nodes.Processor {
         private readonly TextWriter _writer;
         private readonly int _bufferSize;
         private readonly JsonFormatterSettings _formatterSettings;
+        private readonly JsonReaderOptions _options;
+        private bool IsSyncMode => (_options & JsonReaderOptions.Sync) != 0;
         private bool _isFirstChild = true;
 
         /// <summary>
@@ -32,13 +34,14 @@ namespace DotLogix.Core.Nodes.Processor {
             _bufferSize = bufferSize;
             _builder = new StringBuilder(bufferSize);
             _formatterSettings = formatterSettings ?? (JsonFormatterSettings)ConverterSettings;
+            _options = _formatterSettings.ReadOptions;
         }
 
 
         #region Async
 
         /// <inheritdoc />
-        public override async Task WriteBeginMapAsync()
+        public override ValueTask WriteBeginMapAsync()
         {
             CheckName(CurrentName, out var appendName);
 
@@ -58,14 +61,26 @@ namespace DotLogix.Core.Nodes.Processor {
             ContainerStack.Push(NodeContainerType.Map);
             _isFirstChild = true;
 
-            if(_builder.Length >= _bufferSize) {
-                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
-                _builder.Clear();
-            }
+            return FlushBufferAsync();
+        }
+
+        private ValueTask FlushBufferAsync() {
+            if (_builder.Length < _bufferSize && ContainerStack.Count != 0)
+                return default;
+
+            var value = _builder.ToString();
+            _builder.Clear();
+
+            if (IsSyncMode)
+                return new ValueTask(_writer.WriteAsync(value));
+
+            _writer.Write(value);
+            return default;
+
         }
 
         /// <inheritdoc />
-        public override async Task WriteEndMapAsync()
+        public override ValueTask WriteEndMapAsync()
         {
             ContainerStack.PopExpected(NodeContainerType.Map);
             _isFirstChild = false;
@@ -74,14 +89,11 @@ namespace DotLogix.Core.Nodes.Processor {
                 WriteIdent();
             _builder.Append('}');
 
-            if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
-                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
-                _builder.Clear();
-            }
+            return FlushBufferAsync();
         }
 
         /// <inheritdoc />
-        public override async Task WriteBeginListAsync()
+        public override ValueTask WriteBeginListAsync()
         {
             CheckName(CurrentName, out var appendName);
 
@@ -101,14 +113,11 @@ namespace DotLogix.Core.Nodes.Processor {
             ContainerStack.Push(NodeContainerType.List);
             _isFirstChild = true;
 
-            if(_builder.Length >= _bufferSize) {
-                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
-                _builder.Clear();
-            }
+            return FlushBufferAsync();
         }
 
         /// <inheritdoc />
-        public override async Task WriteEndListAsync()
+        public override ValueTask WriteEndListAsync()
         {
             ContainerStack.PopExpected(NodeContainerType.List);
             _isFirstChild = false;
@@ -117,14 +126,11 @@ namespace DotLogix.Core.Nodes.Processor {
                 WriteIdent();
             _builder.Append(']');
 
-            if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
-                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
-                _builder.Clear();
-            }
+            return FlushBufferAsync();
         }
 
         /// <inheritdoc />
-        public override async Task WriteValueAsync(object value)
+        public override ValueTask WriteValueAsync(object value)
         {
             CheckName(CurrentName, out var appendName);
 
@@ -142,10 +148,7 @@ namespace DotLogix.Core.Nodes.Processor {
             AppendValueString(value);
             _isFirstChild = false;
 
-            if(_builder.Length >= _bufferSize || ContainerStack.Count == 0) {
-                await _writer.WriteAsync(_builder.ToString()).ConfigureAwait(false);
-                _builder.Clear();
-            }
+            return FlushBufferAsync();
         }
 
         #endregion

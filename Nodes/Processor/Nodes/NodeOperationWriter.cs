@@ -22,47 +22,47 @@ namespace DotLogix.Core.Nodes.Processor {
 
         protected string CurrentName { get; set; }
         
-        public Task WriteNameAsync(string name) {
+        public ValueTask WriteNameAsync(string name) {
             if (CurrentName != null)
                 throw new InvalidOperationException($"Unexpected operation, property name is already set to {CurrentName}");
             CurrentName = name ?? throw new ArgumentNullException(nameof(name));
             return default;
         }
 
-        public Task WriteBeginMapAsync() {
+        public ValueTask WriteBeginMapAsync() {
             _operations.Add(new NodeOperation(NodeOperationTypes.BeginMap, CurrentName));
             CurrentName = null;
             return default;
         }
 
-        public Task WriteEndMapAsync() {
+        public ValueTask WriteEndMapAsync() {
             _operations.Add(new NodeOperation(NodeOperationTypes.EndMap));
             return default;
         }
 
-        public Task WriteBeginListAsync() {
+        public ValueTask WriteBeginListAsync() {
             _operations.Add(new NodeOperation(NodeOperationTypes.BeginList, CurrentName));
             CurrentName = null;
             return default;
         }
 
-        public Task WriteEndListAsync() {
+        public ValueTask WriteEndListAsync() {
             _operations.Add(new NodeOperation(NodeOperationTypes.EndList));
             return default;
         }
 
-        public Task WriteValueAsync(string name, object value) {
+        public ValueTask WriteValueAsync(string name, object value) {
             _operations.Add(new NodeOperation(NodeOperationTypes.Value, name, value));
             return default;
         }
 
-        public Task WriteValueAsync(object value) {
+        public ValueTask WriteValueAsync(object value) {
             _operations.Add(new NodeOperation(NodeOperationTypes.Value, CurrentName, value));
             CurrentName = null;
             return default;
         }
 
-        public Task WriteOperationAsync(NodeOperation operation) {
+        public ValueTask WriteOperationAsync(NodeOperation operation) {
             _operations.Add(operation);
             CurrentName = null;
             return default;

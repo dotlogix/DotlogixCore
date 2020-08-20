@@ -77,7 +77,7 @@ namespace DotLogix.Core.Nodes.Processor {
         private readonly JsonReaderOptions _options;
         private readonly TextReader _reader;
         private readonly bool _canReadFurther;
-        private readonly Func<char[], int, int, Task<int>> _readBlockFunc;
+        private readonly Func<char[], int, int, ValueTask<int>> _readBlockFunc;
 
         private int _line;
         private int _lineStart;
@@ -90,11 +90,12 @@ namespace DotLogix.Core.Nodes.Processor {
 
         private readonly StringBuilder _stringBuilder;
         private bool IsTolerantMode => (_options & JsonReaderOptions.Tolerant) != 0;
-        public string Near => new string(_buffer);
+        private bool IsAsyncMode => (_options & JsonReaderOptions.Sync) != 0;
+        public string Near => new string(_buffer, 0, _index);
 
 
-        private Stack<NodeContainerType> _stateStack = new Stack<NodeContainerType>();
-        private string _name = null;
+        private readonly Stack<NodeContainerType> _stateStack = new Stack<NodeContainerType>();
+        private string _name;
         private JsonCharacter _allowedCharacters = JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other | JsonCharacter.End;
         
         private JsonCharacter _previousCharacter = JsonCharacter.None;
@@ -115,12 +116,18 @@ namespace DotLogix.Core.Nodes.Processor {
         /// </summary>
         public JsonNodeReader(TextReader reader, JsonReaderOptions options = JsonReaderOptions.None, int bufferSize = 1024) {
             _options = options;
-            _readBlockFunc = reader.ReadBlockAsync;
+            _readBlockFunc = ReadBlockAsync;
             _canReadFurther = true;
             _reader = reader;
             _buffer = new char[bufferSize];
         }
-        
+
+        private ValueTask<int> ReadBlockAsync(char[] buffer, int index, int count) {
+            return IsAsyncMode
+                   ? new ValueTask<int>(_reader.ReadBlockAsync(buffer, index, count))
+                   : new ValueTask<int>(_reader.ReadBlock(buffer, index, count));
+        }
+
         protected override void Dispose(bool disposing)
         {
             if(disposing)
@@ -129,7 +136,7 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         /// <inheritdoc />
-        protected override async Task<NodeOperation?> ReadNextAsync() {
+        protected override async ValueTask<NodeOperation?> ReadNextAsync() {
             while(true) {
                 if (_remaining <= 0)
                 {
@@ -203,7 +210,7 @@ namespace DotLogix.Core.Nodes.Processor {
             return null;
         }
 
-        private async Task<string> NextJsonStringAsync() {
+        private async ValueTask<string> NextJsonStringAsync() {
             while(true) {
                 if (_remaining <= 0) {
                     if (_canReadFurther == false)
@@ -297,7 +304,7 @@ namespace DotLogix.Core.Nodes.Processor {
             throw new JsonParsingException("The string never ends", _position, _line, _position - _lineStart, Near);
         }
 
-        private async Task<object> NextJsonValueAsync()
+        private async ValueTask<object> NextJsonValueAsync()
         {
             object GetValueFromString() {
                 var result = TryGetValueFromString(_stringBuilder, out var obj);

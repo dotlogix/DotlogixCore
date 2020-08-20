@@ -20,7 +20,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
         #region Async
 
-        public override Task WriteBeginMapAsync() {
+        public override ValueTask WriteBeginMapAsync() {
             CheckName(CurrentName);
 
             var map = new NodeMap();
@@ -35,13 +35,13 @@ namespace DotLogix.Core.Nodes.Processor {
             return default;
         }
 
-        public override Task WriteEndMapAsync() {
+        public override ValueTask WriteEndMapAsync() {
             ContainerStack.PopExpected(NodeContainerType.Map);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
             return default;
         }
 
-        public override Task WriteBeginListAsync() {
+        public override ValueTask WriteBeginListAsync() {
             CheckName(CurrentName);
 
             var list = new NodeList();
@@ -56,13 +56,13 @@ namespace DotLogix.Core.Nodes.Processor {
             return default;
         }
 
-        public override Task WriteEndListAsync() {
+        public override ValueTask WriteEndListAsync() {
             ContainerStack.PopExpected(NodeContainerType.List);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
             return default;
         }
 
-        public override Task WriteValueAsync(object value) {
+        public override ValueTask WriteValueAsync(object value) {
             CheckName(CurrentName);
 
             var val = new NodeValue(value);

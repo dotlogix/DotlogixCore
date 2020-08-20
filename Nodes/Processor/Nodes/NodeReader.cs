@@ -23,10 +23,10 @@ namespace DotLogix.Core.Nodes.Processor {
             Operations = EnumerateRecursive(node).GetEnumerator();
         }
         
-        protected override Task<NodeOperation?> ReadNextAsync() {
+        protected override ValueTask<NodeOperation?> ReadNextAsync() {
             return Operations.MoveNext()
-                       ? Task.FromResult<NodeOperation?>(Operations.Current)
-                       : Task.FromResult<NodeOperation?>(null);
+                       ? new ValueTask<NodeOperation?>(Operations.Current)
+                       : default;
         }
 
         public IEnumerator<NodeOperation> Operations { get; set; }

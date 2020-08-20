@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Threading.Tasks;
+using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 using DotLogix.Core.Utils.Naming;
@@ -37,10 +38,10 @@ namespace DotLogix.Core.Nodes.Converters {
         public TypeSettings TypeSettings { get; }
 
         /// <inheritdoc />
-        public abstract Task WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
+        public abstract ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
 
         /// <inheritdoc />
-        public virtual async Task<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings)
+        public virtual async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings)
         {
             var node = await reader.ReadNodeAsync().ConfigureAwait(false);
             return ConvertToObject(node, settings);

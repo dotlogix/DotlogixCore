@@ -26,7 +26,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public ArrayNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override async Task WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
+        public override async ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
             var scopedSettings = settings.GetScoped(TypeSettings);
             var childConverter = TypeSettings.ChildSettings.Converter;
             
@@ -54,7 +54,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override async Task<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
+        public override async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
             var next = await reader.PeekOperationAsync().ConfigureAwait(false);
             if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null))
                 return default;

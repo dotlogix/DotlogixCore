@@ -2,7 +2,8 @@
 using System;
 using System.Globalization;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Utils.Naming;
+
 #endregion
 
 namespace DotLogix.Core.Nodes {
@@ -55,11 +56,14 @@ namespace DotLogix.Core.Nodes {
         /// <summary>
         ///     The format provider (invariant by default)
         /// </summary>
-        public INodeConverterResolver Resolver { get; set; } = Nodes.DefaultResolver;
+        public INodeConverterResolver Resolver { get; set; } = NodeUtils.DefaultResolver;
 
         public virtual IReadOnlyConverterSettings GetScoped(TypeSettings typeSettings = null, TypeSettings memberSettings = null) {
-            if ((typeSettings != null && typeSettings.HasOverrides) || (memberSettings != null && memberSettings.HasOverrides))
-                return new ScopedConverterSettings(this, memberSettings, typeSettings);
+            var typeOverrides = typeSettings?.Overrides;
+            var memberOverrides = memberSettings?.Overrides;
+            
+            if (typeOverrides != null || memberOverrides != null)
+                return new ScopedConverterSettings(this, typeOverrides, memberOverrides);
             return this;
         }
 

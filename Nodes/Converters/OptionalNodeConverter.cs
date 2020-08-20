@@ -24,7 +24,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public OptionalNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override Task WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
+        public override ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
             if(!(instance is Optional<TValue> opt))
                 return default;
 
@@ -41,7 +41,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override async Task<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
+        public override async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
             var next = await reader.PeekOperationAsync().ConfigureAwait(false);
             if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null))
                 return new Optional<TValue>(default);

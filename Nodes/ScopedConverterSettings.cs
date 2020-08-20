@@ -49,7 +49,9 @@ namespace DotLogix.Core.Nodes {
         /// <inheritdoc />
         public IReadOnlyConverterSettings GetScoped(TypeSettings typeSettings = null, TypeSettings memberSettings = null)
         {
-            if (typeSettings?.Overrides != null || memberSettings?.Overrides != null)
+            var typeOverrides = typeSettings?.Overrides;
+            var memberOverrides = memberSettings?.Overrides;
+            if (typeOverrides != null || memberOverrides != null)
                 return new ScopedConverterSettings(_userSettings, typeSettings?.Overrides, memberSettings?.Overrides);
             return _userSettings;
         }

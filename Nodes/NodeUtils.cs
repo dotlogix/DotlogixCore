@@ -58,19 +58,19 @@ namespace DotLogix.Core.Nodes {
 
 
         #region WriteTo
-        public static Task WriteToAsync(object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static ValueTask WriteToAsync(object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
             return WriteToAsync(null, instance, instance?.GetType(), writer, settings);
         }
 
-        public static Task WriteToAsync(object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static ValueTask WriteToAsync(object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
             return WriteToAsync(null, instance, instanceType, writer, settings);
         }
 
-        public static Task WriteToAsync(string name, object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static ValueTask WriteToAsync(string name, object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
             return WriteToAsync(name, instance, instance?.GetType(), writer, settings);
         }
 
-        public static async Task WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static async ValueTask WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
             if(string.IsNullOrEmpty(name) == false)
                 await writer.WriteNameAsync(name).ConfigureAwait(false);
 

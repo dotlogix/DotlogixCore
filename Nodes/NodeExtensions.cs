@@ -235,12 +235,12 @@ namespace DotLogix.Core.Nodes {
             return (TNode)Clone((Node)node);
         }
 
-        public static async Task<TNode> ReadNodeAsync<TNode>(this IAsyncNodeReader reader) where TNode : Node
+        public static async ValueTask<TNode> ReadNodeAsync<TNode>(this IAsyncNodeReader reader) where TNode : Node
         {
             return (TNode)(await ReadNodeAsync(reader).ConfigureAwait(false));
         }
         
-        public static async Task<Node> ReadNodeAsync(this IAsyncNodeReader reader)
+        public static async ValueTask<Node> ReadNodeAsync(this IAsyncNodeReader reader)
         {
             var writer = new NodeWriter();
             do
@@ -252,7 +252,7 @@ namespace DotLogix.Core.Nodes {
             return writer.Root;
         }
         
-        public static async Task WriteNodeAsync(this IAsyncNodeWriter writer, Node node)
+        public static async ValueTask WriteNodeAsync(this IAsyncNodeWriter writer, Node node)
         {
             var reader = new NodeReader(node);
             await reader.CopyToAsync(writer).ConfigureAwait(true);

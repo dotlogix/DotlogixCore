@@ -24,7 +24,7 @@ namespace DotLogix.Core.Nodes.Converters {
         public ValueNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override Task WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
+        public override ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
             var scopedSettings = settings.GetScoped(TypeSettings);
             if(scopedSettings.ShouldEmitValue(instance) == false)
                 return default;
@@ -32,7 +32,7 @@ namespace DotLogix.Core.Nodes.Converters {
             return writer.WriteValueAsync(JsonPrimitives.FromObject(instance, settings, DataType));
         }
 
-        public override async Task<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
+        public override async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
             var value = await reader.ReadValueAsync().ConfigureAwait(false);
 
             switch(value) {

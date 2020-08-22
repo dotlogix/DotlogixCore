@@ -2,7 +2,7 @@
 
 namespace CoreTests {
     [TestFixture]
-    public class DataTableTests {
+    public abstract class SimpleTest {
         [SetUp]
         public void Setup() {
         }

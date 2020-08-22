@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using DotLogix.Core;
 using DotLogix.Core.Caching;
-using NUnit.Framework;
 using DotLogix.Core.Extensions;
-using NuGet.Frameworks;
+using NUnit.Framework;
 
-namespace CoreTests {
+namespace CoreTests.Caching {
     [TestFixture]
     public class CacheTests {
         private Cache<string, string> _cache;

@@ -1,6 +1,7 @@
 ﻿using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Rest.Events;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.ResultWriters;
 
 namespace DotLogix.Core.Rest.Services.Routing {
     public class WebServiceRouterSettings {

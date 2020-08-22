@@ -1,8 +1,9 @@
 using System;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Http.Headers;
+using DotLogix.Core.Rest.Services.ResultWriters;
 
-namespace DotLogix.Core.Rest.Services {
+namespace DotLogix.Core.Rest.Services.Results {
     public class RedirectWebServiceResult : IRedirectWebServiceResult {
         /// <inheritdoc />
         public string RedirectTo { get; set; }

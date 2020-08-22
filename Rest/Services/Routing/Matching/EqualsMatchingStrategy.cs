@@ -9,11 +9,10 @@
 #region
 
 using DotLogix.Core.Rest.Http;
-using DotLogix.Core.Rest.Services.Processors;
 
 #endregion
 
-namespace DotLogix.Core.Rest.Services.Routing {
+namespace DotLogix.Core.Rest.Services.Routing.Matching {
     public class EqualsMatchingStrategy : IRouteMatchingStrategy {
         public RouteMatch Match(HttpMethods method, string path) {
             if(((method & AcceptedMethods) != 0) && path.Equals(Pattern))

@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using DotLogix.Core.Collections;
 using DotLogix.Core.Rest.Http;
+using DotLogix.Core.Rest.Services.Routing.Matching;
+
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Routing {

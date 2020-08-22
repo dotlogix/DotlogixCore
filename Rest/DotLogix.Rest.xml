@@ -140,7 +140,7 @@
         </member>
         <member name="M:DotLogix.Core.Rest.Server.Http.WebServiceRouteCollection.Add(System.String,DotLogix.Core.Rest.Server.Routes.IWebServiceRoute)">
             <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"></see>.</summary>
-            <param name="prefix">The prefix</param>
+            <param name="route">The route</param>
             <param name="route">The route to add</param>
         </member>
         <member name="M:DotLogix.Core.Rest.Server.Http.WebServiceRouteCollection.Clear">

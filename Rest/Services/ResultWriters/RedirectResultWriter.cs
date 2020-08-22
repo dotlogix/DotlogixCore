@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
+using DotLogix.Core.Rest.Services.Results;
 
-namespace DotLogix.Core.Rest.Services {
+namespace DotLogix.Core.Rest.Services.ResultWriters {
     public class RedirectResultWriter : PrimitiveResultWriter {
         public static IWebServiceResultWriter Instance { get; } = new RedirectResultWriter();
 

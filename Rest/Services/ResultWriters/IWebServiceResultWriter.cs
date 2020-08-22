@@ -7,10 +7,12 @@
 // ==================================================
 
 #region
+
 using System.Threading.Tasks;
+
 #endregion
 
-namespace DotLogix.Core.Rest.Services {
+namespace DotLogix.Core.Rest.Services.ResultWriters {
     public interface IWebServiceResultWriter {
         Task WriteAsync(WebServiceContext context);
     }

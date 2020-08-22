@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Text;
 using System.Text.RegularExpressions;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Http.Headers;
 using NUnit.Framework;
 
-namespace CoreTests {
+namespace RestTests {
     [TestFixture]
     public class MimeTypeTests {
         

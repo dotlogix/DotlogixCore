@@ -4,11 +4,6 @@ using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Rest.Services.Routing;
 
 namespace DotLogix.Core.Rest.Services {
-    public interface IWebServiceExtension {
-        public string Name { get; }
-        public void Configure(WebServiceSettings settings);
-    }
-
     public class WebServiceSettings {
         private readonly KeyedCollection<Type, IWebServiceExtension> _extensions = new KeyedCollection<Type, IWebServiceExtension>(e => e.GetType());
 

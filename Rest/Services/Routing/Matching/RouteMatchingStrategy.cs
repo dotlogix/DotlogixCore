@@ -6,7 +6,7 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Core.Rest.Services.Routing {
+namespace DotLogix.Core.Rest.Services.Routing.Matching {
     public enum RouteMatchingStrategy {
         Equals,
         StartsWith,

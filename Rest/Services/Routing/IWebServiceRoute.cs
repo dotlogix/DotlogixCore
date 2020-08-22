@@ -11,6 +11,9 @@ using DotLogix.Core.Rest.Events;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.ResultWriters;
+using DotLogix.Core.Rest.Services.Routing.Matching;
+
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Routing {

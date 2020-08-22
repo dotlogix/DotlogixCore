@@ -1,6 +1,6 @@
 using System;
 
-namespace DotLogix.Core.Rest.Services {
+namespace DotLogix.Core.Rest.Services.Results {
     public class WebServiceObjectResult : WebServiceResult, IWebServiceObjectResult {
         /// <inheritdoc />
         public Type ReturnType => ReturnValue.IsDefined ? ReturnValue.Value.GetType() : typeof(object);

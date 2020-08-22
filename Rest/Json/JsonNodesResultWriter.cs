@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services;
+using DotLogix.Core.Rest.Services.ResultWriters;
+
 #endregion
 
 namespace DotLogix.Core.Rest.Json {

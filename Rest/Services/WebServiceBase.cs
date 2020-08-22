@@ -13,6 +13,9 @@ using System.Reflection;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Http.Headers;
 using DotLogix.Core.Rest.Services.Attributes;
+using DotLogix.Core.Rest.Services.Results;
+using DotLogix.Core.Rest.Services.ResultWriters;
+
 #endregion
 
 namespace DotLogix.Core.Rest.Services {

@@ -1,6 +1,6 @@
 using DotLogix.Core.Rest.Http;
 
-namespace DotLogix.Core.Rest.Services.Routing {
+namespace DotLogix.Core.Rest.Services.Routing.Matching {
     public class ContainsMatchingStrategy : IRouteMatchingStrategy {
         public RouteMatch Match(HttpMethods method, string path) {
             if (((method & AcceptedMethods) != 0) && path.Contains(Pattern))

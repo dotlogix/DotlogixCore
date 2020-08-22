@@ -9,6 +9,8 @@
 #region
 #endregion
 
+using DotLogix.Core.Rest.Services.ResultWriters;
+
 namespace DotLogix.Core.Rest.Services.Attributes {
     public class StreamRouteResultWriterAttribute : RouteResultWriterAttribute {
         public StreamRouteResultWriterAttribute() : base(() => StreamResultWriter.Instance) { }

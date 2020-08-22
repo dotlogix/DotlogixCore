@@ -7,10 +7,12 @@
 // ==================================================
 
 #region
+
 using System.Collections.Generic;
+
 #endregion
 
-namespace DotLogix.Core.Rest.Services.Routing {
+namespace DotLogix.Core.Rest.Services.Routing.Matching {
     public class RouteMatch {
         public static readonly RouteMatch Empty = new RouteMatch(false, null, -1, null);
         public bool Success { get; }

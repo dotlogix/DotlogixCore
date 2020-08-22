@@ -9,6 +9,7 @@
 #region
 using System;
 using DotLogix.Core.Attributes;
+using DotLogix.Core.Rest.Services.ResultWriters;
 using DotLogix.Core.Utils;
 #endregion
 

@@ -12,16 +12,12 @@ using DotLogix.Core.Rest.Events;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.ResultWriters;
+using DotLogix.Core.Rest.Services.Routing.Matching;
+
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Routing {
-    public interface IRouteMatchingStrategy {
-        bool IsRooted { get; }
-        string Pattern { get; }
-        HttpMethods AcceptedMethods { get; }
-        RouteMatch Match(HttpMethods method, string path);
-    }
-
     public class WebServiceRoute : IWebServiceRoute {
         public WebServiceRoute(int routeIndex, IWebRequestProcessor requestProcessor, IRouteMatchingStrategy matchingStrategy, int priority) {
             MatchingStrategy = matchingStrategy ?? throw new ArgumentNullException(nameof(matchingStrategy));

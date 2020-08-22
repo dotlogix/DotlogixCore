@@ -8,6 +8,7 @@ using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services.Attributes;
 using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.ResultWriters;
 using DotLogix.Core.Rest.Services.Routing;
 
 namespace DotLogix.Core.Rest.Services {

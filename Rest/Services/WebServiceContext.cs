@@ -15,6 +15,7 @@ using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Http.Context;
 using DotLogix.Core.Rest.Http.Headers;
 using DotLogix.Core.Rest.Services.Parameters;
+using DotLogix.Core.Rest.Services.Results;
 using DotLogix.Core.Rest.Services.Routing;
 #endregion
 

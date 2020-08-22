@@ -1,6 +1,6 @@
 using DotLogix.Core.Rest.Http;
 
-namespace DotLogix.Core.Rest.Services.Routing {
+namespace DotLogix.Core.Rest.Services.Routing.Matching {
     public class FallbackMatchingStrategy : IRouteMatchingStrategy {
         public static IRouteMatchingStrategy Instance { get; } = new FallbackMatchingStrategy();
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DotLogix.Core.Rest.Http;
 
-namespace DotLogix.Core.Rest.Services.Routing {
+namespace DotLogix.Core.Rest.Services.Routing.Matching {
     public class RegexMatchingStrategy : IRouteMatchingStrategy {
         public RouteMatch Match(HttpMethods method, string path) {
             if ((AcceptedMethods & method) == 0)

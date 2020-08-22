@@ -1,7 +1,7 @@
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Utils.Patterns;
 
-namespace DotLogix.Core.Rest.Services.Routing {
+namespace DotLogix.Core.Rest.Services.Routing.Matching {
     public class PatternMatchingStrategy : RegexMatchingStrategy {
         private static readonly PatternParser PatternParser = PatternParser.Default.Clone();
 

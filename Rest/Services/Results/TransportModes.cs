@@ -6,7 +6,7 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Core.Rest.Services {
+namespace DotLogix.Core.Rest.Services.Results {
     public enum TransportModes {
         Raw,
         Base64

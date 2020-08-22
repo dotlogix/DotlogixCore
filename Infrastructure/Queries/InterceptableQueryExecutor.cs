@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 
 namespace DotLogix.Architecture.Infrastructure.Queries {

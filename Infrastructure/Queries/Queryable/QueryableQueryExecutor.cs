@@ -7,6 +7,7 @@
 // ==================================================
 
 #region
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,10 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
+
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries {
+namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     /// <summary>
     /// An implementation of the <see cref="IQueryExecutor{T}"/> interface using an <see cref="IQueryable{T}"/>
     /// </summary>

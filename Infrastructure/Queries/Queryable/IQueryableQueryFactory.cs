@@ -7,11 +7,13 @@
 // ==================================================
 
 #region
+
 using System.Collections.Generic;
 using System.Linq;
+
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries {
+namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     /// <summary>
     /// An interface to represent a factory creating objects used for <see cref="IQuery{T}"/>
     /// </summary>

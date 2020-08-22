@@ -17,6 +17,7 @@ using DotLogix.Architecture.Common.Options;
 using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Utils;
 #endregion

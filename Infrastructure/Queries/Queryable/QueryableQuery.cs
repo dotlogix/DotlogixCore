@@ -7,13 +7,15 @@
 // ==================================================
 
 #region
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries {
+namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     /// <summary>
     /// An implementation of the <see cref="IQuery{T}"/> interface using <see cref="IQueryable{T}"/>
     /// </summary>

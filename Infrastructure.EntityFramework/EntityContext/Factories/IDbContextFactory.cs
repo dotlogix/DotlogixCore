@@ -10,10 +10,12 @@
 #endregion
 
 #region
+
 using Microsoft.EntityFrameworkCore;
+
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
+namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Factories {
     /// <summary>
     ///     An interface to represent a factory to create a <see cref="DbContext" />
     /// </summary>

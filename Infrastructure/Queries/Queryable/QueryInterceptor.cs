@@ -8,7 +8,7 @@
 
 using System;
 
-namespace DotLogix.Architecture.Infrastructure.Queries {
+namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     /// <summary>
     /// An interceptor for <see cref="IQuery{T}"/>
     /// </summary>

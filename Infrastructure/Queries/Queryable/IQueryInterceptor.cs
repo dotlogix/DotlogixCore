@@ -6,7 +6,7 @@
 // LastEdited:  06.06.2019
 // ==================================================
 
-namespace DotLogix.Architecture.Infrastructure.Queries {
+namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     /// <summary>
     ///     An interface to represent an interceptor of a query
     /// </summary>

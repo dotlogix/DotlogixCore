@@ -7,11 +7,13 @@
 // ==================================================
 
 #region
+
 using System;
 using Microsoft.EntityFrameworkCore;
+
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
+namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Factories {
     /// <summary>
     ///     An implementation of the <see cref="IDbContextFactory" /> interface for entity framework
     /// </summary>

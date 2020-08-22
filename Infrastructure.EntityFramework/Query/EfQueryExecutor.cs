@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Queries;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 #pragma warning disable 1591

@@ -7,6 +7,7 @@
 // ==================================================
 
 #region
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ using DotLogix.Core.Extensions;
 #pragma warning disable 1591
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.Queries {
+namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     /// <summary>
     /// A static class providing extension methods for <see cref="IQuery{T}"/>
     /// </summary>

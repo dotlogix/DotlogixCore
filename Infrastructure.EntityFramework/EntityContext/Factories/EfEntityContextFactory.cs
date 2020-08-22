@@ -10,14 +10,16 @@
 #endregion
 
 #region
+
 using System;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 using Microsoft.EntityFrameworkCore;
+
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
+namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Factories {
     /// <summary>
     /// An implementation of the <see cref="IEntityContextFactory"/> for entity framework
     /// </summary>

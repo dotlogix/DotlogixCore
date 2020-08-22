@@ -1,9 +1,9 @@
 ﻿using System;
-using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Interceptors;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Caching;
 
-namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
+namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext.Interceptors {
     
     public class EfCacheQueryResultInterceptor : CacheQueryResultInterceptor {
         private readonly Func<IQueryInterceptionContext, object> _getCacheKeyFunc;

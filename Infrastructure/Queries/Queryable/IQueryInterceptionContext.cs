@@ -1,7 +1,7 @@
 ﻿using System;
 using DotLogix.Core;
 
-namespace DotLogix.Architecture.Infrastructure.Queries {
+namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
     /// <summary>
     /// An interface representing the current context for query interceptors
     /// </summary>

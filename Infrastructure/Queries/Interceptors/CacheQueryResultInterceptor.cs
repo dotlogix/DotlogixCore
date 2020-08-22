@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Caching;
 
 namespace DotLogix.Architecture.Infrastructure.Queries.Interceptors {

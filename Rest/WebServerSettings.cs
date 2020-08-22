@@ -14,68 +14,24 @@ using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Rest {
-    public class WebServerSettings : PrefixedSettings {/// <inheritdoc />
-        public WebServerSettings() : this(null) { }
-        public WebServerSettings(ISettings settings, string prefix = null) : base(settings, prefix) {
-            LogSource ??= Log.CreateSource("WebServer");
-            UrlPrefixes ??= new List<string>();
+    public class WebServerSettings {
+        public bool EnableLogging {
+            get => LogSource.Enabled;
+            set => LogSource.Enabled = value;
         }
+        public ILogSource LogSource { get; set; } = Log.CreateSource("WebServer");
+        public IParameterParser ParameterParser { get; set; } = PrimitiveParameterParser.Default;
+        public ISet<string> UrlPrefixes { get; } = new HashSet<string>();
+
+        public bool EnableConcurrentRequests { get; set; }
+        public int RequestLimit { get; set; }
+        public int WebSocketLimit { get; set; }
 
 
-        public ILogSource LogSource {
-            get => GetWithMemberName<ILogSource>();
-            set => SetWithMemberName(value);
-        }
-
-        public IParameterParser ParameterParser {
-            get => GetWithMemberName(PrimitiveParameterParser.Default);
-            set => SetWithMemberName(value);
-        }
-
-        public ICollection<string> UrlPrefixes {
-            get => GetWithMemberName<ICollection<string>>();
-            set => SetWithMemberName(value);
-        }
-
-        public bool EnableConcurrentRequests {
-            get => GetWithMemberName(true);
-            set => SetWithMemberName(value);
-        }
-
-        public int RequestLimit {
-            get => GetWithMemberName(64);
-            set => SetWithMemberName(value);
-        }
-
-        public int WebSocketLimit {
-            get => GetWithMemberName(64);
-            set => SetWithMemberName(value);
-        }
-
-
-        public bool EnableBodyBuffering {
-            get => GetWithMemberName(true);
-            set => SetWithMemberName(value);
-        }
-
-        public string TempDirectory {
-            get => GetWithMemberName<string>();
-            set => SetWithMemberName(value);
-        }
-
-        public long MaxBodyLength {
-            get => GetWithMemberName(104_857_600L); // 100MB
-            set => SetWithMemberName(value);
-        }
-
-        public long MaxMemoryBufferSize {
-            get => GetWithMemberName(104_857_600L); // 10MB
-            set => SetWithMemberName(value);
-        }
-
-        public long MaxFileBufferSize {
-            get => GetWithMemberName(104_857_600L); // 100MB
-            set => SetWithMemberName(value);
-        }
+        public bool EnableBodyBuffering { get; set; }
+        public string TempDirectory { get; set; }
+        public long MaxBodyLength { get; set; } = 10_485_760L;
+        public long MaxMemoryBufferSize { get; set; } = 10_485_760L;
+        public long MaxFileBufferSize { get; set; } = 104_857_600L;
     }
 }

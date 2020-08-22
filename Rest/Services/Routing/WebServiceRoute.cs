@@ -1,6 +1,6 @@
 // ==================================================
 // Copyright 2018(C) , DotLogix
-// File:  WebServiceRouteBase.cs
+// File:  WebServiceRoute.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
 // Created:  17.02.2018
 // LastEdited:  01.08.2018
@@ -15,14 +15,19 @@ using DotLogix.Core.Rest.Services.Processors;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Routing {
-    public abstract class WebServiceRouteBase : IWebServiceRoute {
-        public string Pattern { get; }
+    public interface IRouteMatchingStrategy {
+        bool IsRooted { get; }
+        string Pattern { get; }
+        HttpMethods AcceptedMethods { get; }
+        RouteMatch Match(HttpMethods method, string path);
+    }
 
-        protected WebServiceRouteBase(int routeIndex, string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor, int priority) {
-            Pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
-            AcceptedRequests = acceptedRequests;
+    public class WebServiceRoute : IWebServiceRoute {
+        public WebServiceRoute(int routeIndex, IWebRequestProcessor requestProcessor, IRouteMatchingStrategy matchingStrategy, int priority) {
+            MatchingStrategy = matchingStrategy ?? throw new ArgumentNullException(nameof(matchingStrategy));
             RequestProcessor = requestProcessor ?? throw new ArgumentNullException(nameof(requestProcessor));
             Priority = priority;
+            MatchingStrategy = matchingStrategy;
             RouteIndex = routeIndex;
             PreProcessors = new WebRequestProcessorCollection();
             PostProcessors = new WebRequestProcessorCollection();
@@ -40,14 +45,18 @@ namespace DotLogix.Core.Rest.Services.Routing {
 
         public WebRequestProcessorCollection PreProcessors { get; }
 
-        public IWebRequestProcessor RequestProcessor { get; }
-        public IWebServiceResultWriter WebServiceResultWriter { get; set; }
-        public bool IsRooted { get; set; }
-        public HttpMethods AcceptedRequests { get; }
+        public IWebRequestProcessor RequestProcessor { get; set; }
+        public IWebServiceResultWriter ResultWriter { get; set; }
+        public bool IsRooted => MatchingStrategy.IsRooted;
+        public IRouteMatchingStrategy MatchingStrategy { get; }
+        public HttpMethods AcceptedRequests => MatchingStrategy.AcceptedMethods;
+        public string Pattern => MatchingStrategy.Pattern;
         public int RouteIndex { get; }
         public int Priority { get; }
 
-        public abstract RouteMatch Match(HttpMethods method, string path);
+        public RouteMatch Match(HttpMethods method, string path) {
+            return MatchingStrategy.Match(method, path);
+        }
 
         public override string ToString() {
             return $"{GetType().Name} ({Pattern})";

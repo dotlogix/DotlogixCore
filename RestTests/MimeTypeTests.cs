@@ -62,7 +62,7 @@ namespace CoreTests {
             Assert.That(mimeType.Attributes, Is.Not.Empty);
 
             string GetExceptionMessage() {
-                return JsonNodes.ToJson(mimeType.Attributes, JsonFormatterSettings.Idented);
+                return JsonUtils.ToJson(mimeType.Attributes, JsonFormatterSettings.Idented);
             }
 
             Assert.That(mimeType.Attributes.Count, Is.EqualTo(5), GetExceptionMessage);

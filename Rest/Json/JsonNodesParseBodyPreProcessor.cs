@@ -29,10 +29,12 @@ namespace DotLogix.Core.Rest.Json {
             var json = await request.ReadStringFromRequestStreamAsync();
             if(json.Length > 1) {
                 try {
-                    var jsonData = await JsonNodes.ToNodeAsync(request.InputStream, request.ContentEncoding);
-                    context.Variables.Add(WebServiceJsonSettings.JsonRawParamName, json);
-                    context.Variables.Add(WebServiceJsonSettings.JsonDataParamName, jsonData);
-                    var formatterSettings = context.Settings.Get(WebServiceJsonSettings.JsonNodesFormatterSettings, JsonFormatterSettings.Idented);
+                    var jsonData = JsonUtils.ToNode(request.InputStream, request.ContentEncoding);
+                    context.Variables.Add(JsonNodesExtension.JsonRawParamName, json);
+                    context.Variables.Add(JsonNodesExtension.JsonDataParamName, jsonData);
+
+                    var extension = context.Settings.GetExtension<JsonNodesExtension>();
+                    var formatterSettings = extension?.FormatterSettings ?? JsonFormatterSettings.Idented;
                     context.ParameterProviders.Add(new JsonNodesParameterProvider(jsonData, formatterSettings));
                 } catch(Exception e) {
                     context.LogSource.Warn(e);

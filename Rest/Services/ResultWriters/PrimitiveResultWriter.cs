@@ -27,17 +27,23 @@ namespace DotLogix.Core.Rest.Services {
             
             if(context.Result.Exception.IsDefined) {
                 await WriteExceptionAsync(context, context.Result.Exception.Value);
-            } else {
-                switch (context.Result) {
-                    case IWebServiceObjectResult requestResult:
-                        await WriteResultAsync(context, requestResult.ReturnValue.GetValueOrDefault());
-                        break;
-                    default:
-                        var httpResponse = context.HttpResponse;
-                        httpResponse.StatusCode = context.Result.StatusCode ?? HttpStatusCodes.Success.Ok;
-                        httpResponse.ContentType = context.Result.ContentType ?? MimeTypes.Text.Plain;
-                        break;
-                }
+                await response.CompleteAsync();
+                return;
+            }
+
+            switch (context.Result) {
+                case IWebServiceObjectResult requestResult:
+                    var value = requestResult.ReturnValue.GetValueOrDefault();
+                    if (value is Exception exception)
+                        await WriteExceptionAsync(context, exception);
+                    else
+                        await WriteResultAsync(context, value);
+                    break;
+                default:
+                    var httpResponse = context.HttpResponse;
+                    httpResponse.StatusCode = context.Result.StatusCode ?? HttpStatusCodes.Success.Ok;
+                    httpResponse.ContentType = context.Result.ContentType ?? MimeTypes.Text.Plain;
+                    break;
             }
             await response.CompleteAsync();
         }

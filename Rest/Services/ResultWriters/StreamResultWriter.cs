@@ -30,33 +30,32 @@ namespace DotLogix.Core.Rest.Services {
                 return;
             }
 
-            var requestResult = context.Result as IWebServiceObjectResult;
-            if(requestResult == null)
-                throw new ArgumentException($"The provided value type {(context.Result != null ? context.Result.GetType().Name : "null")} is not supported. This result writer accepts only values of type \"{nameof(IWebServiceObjectResult)}\"");
-
-            if(requestResult.ReturnValue.IsUndefined) {
-                await response.CompleteAsync();
-                return;
-            }
-
-            var returnValue = requestResult.ReturnValue.Value;
             WebServiceStreamResult contentResult;
-            switch(returnValue) {
+            switch(context.Result) {
                 case WebServiceStreamResult streamResult:
                     contentResult = await GetStreamResult(streamResult);
                     break;
-                case Stream stream:
-                    contentResult = await GetStreamResult(stream);
+                case IWebServiceObjectResult objResult:
+                    var returnValue = objResult.ReturnValue.Value;
+
+                    contentResult = returnValue switch {
+                        WebServiceStreamResult streamValue => await GetStreamResult(streamValue),
+                        Stream stream => await GetStreamResult(stream),
+                        _ => null
+                    };
                     break;
                 default:
-                    await base.WriteResultAsync(context, returnValue);
-                    await response.CompleteAsync();
-                    return;
+                    contentResult = null;
+                    break;
+            }
+
+            if (contentResult == null) {
+                await base.WriteAsync(context);
+                return;
             }
 
             await WriteResultAsync(context, contentResult);
             await response.CompleteAsync();
-            return;
         }
 
         protected virtual async Task WriteResultAsync(WebServiceContext context, WebServiceStreamResult streamResult) {

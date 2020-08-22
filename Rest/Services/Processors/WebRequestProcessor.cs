@@ -22,10 +22,16 @@ namespace DotLogix.Core.Rest.Services.Processors {
     public class WebRequestProcessor : WebRequestProcessorBase {
         public bool IsAsyncMethod { get; }
         public object Target { get; }
+        public Func<object> TargetFactory { get; }
         public DynamicInvoke DynamicInvoke { get; }
 
         public WebRequestProcessor(object target, DynamicInvoke dynamicInvoke, int priority = 0, bool ignoreHandled = true) : base(priority, ignoreHandled) {
             Target = target;
+            DynamicInvoke = dynamicInvoke;
+            IsAsyncMethod = dynamicInvoke.ReturnType.IsAssignableTo(typeof(Task));
+        }
+        public WebRequestProcessor(Func<object> targetFactory, DynamicInvoke dynamicInvoke, int priority = 0, bool ignoreHandled = true) : base(priority, ignoreHandled) {
+            TargetFactory = targetFactory;
             DynamicInvoke = dynamicInvoke;
             IsAsyncMethod = dynamicInvoke.ReturnType.IsAssignableTo(typeof(Task));
         }
@@ -108,7 +114,8 @@ namespace DotLogix.Core.Rest.Services.Processors {
         }
 
         protected virtual async Task<object> InvokeAsync(WebServiceContext context, object[] parameters) {
-            var returnValue = DynamicInvoke.Invoke(Target, parameters);
+            var serviceInstance = Target ?? TargetFactory.Invoke();
+            var returnValue = DynamicInvoke.Invoke(serviceInstance, parameters);
             if(IsAsyncMethod)
                 returnValue = await ((Task)returnValue).UnpackResultAsync();
             return returnValue;

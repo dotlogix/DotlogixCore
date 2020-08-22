@@ -7,7 +7,7 @@ namespace DotLogix.Core.Rest.Events {
         string Name { get; }
         IEnumerable<IHubEventListener> Listeners { get; }
 
-        ValueTask<bool> DispatchAsync(IHubMessage message, CancellationToken token = default);
+        Task<bool> DispatchAsync(IHubMessage message, CancellationToken token = default);
 
         bool Subscribe(IHubEventListener listener, object payload);
         bool Unsubscribe(IHubEventListener listener, object payload);

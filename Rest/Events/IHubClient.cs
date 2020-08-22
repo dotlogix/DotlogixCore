@@ -7,7 +7,7 @@ namespace DotLogix.Core.Rest.Events {
         Guid Guid { get; }
         HubClientStatus Status { get; }
 
-        ValueTask<bool> SendMessageAsync(IHubMessage message, CancellationToken token = default);
-        ValueTask<IHubMessage> ReceiveMessageAsync(CancellationToken token = default);
+        Task<bool> SendMessageAsync(IHubMessage message, CancellationToken token = default);
+        Task<IHubMessage> ReceiveMessageAsync(CancellationToken token = default);
     }
 }

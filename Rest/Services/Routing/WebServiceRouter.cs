@@ -77,7 +77,7 @@ namespace DotLogix.Core.Rest.Services.Routing {
 
             var result = webServiceContext.Result;
             var resultWriter = result.ResultWriter
-                            ?? route.WebServiceResultWriter
+                            ?? route.ResultWriter
                             ?? DefaultResultWriter;
 
             await resultWriter.WriteAsync(webServiceContext);

@@ -31,7 +31,7 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
         }
 
         public override Task AuthenticateAsync(WebServiceContext context, string data) {
-            var formatterSettings = context.Settings.Get(WebServiceJsonSettings.JsonNodesFormatterSettings, JsonFormatterSettings.Idented);
+            var formatterSettings = context.Settings.GetExtension<JsonNodesExtension>()?.FormatterSettings;
 
             var result = JsonWebTokens.TryDeserialize<TPayload>(data, out var token, name => _signingAlgorithms.GetValue(name), formatterSettings);
             if(result == JsonWebTokenResult.Success)

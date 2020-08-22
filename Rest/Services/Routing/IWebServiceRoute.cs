@@ -20,12 +20,13 @@ namespace DotLogix.Core.Rest.Services.Routing {
         WebRequestProcessorCollection PreProcessors { get; }
         WebRequestProcessorCollection PostProcessors { get; }
         IWebRequestProcessor RequestProcessor { get; }
-        IWebServiceResultWriter WebServiceResultWriter { get; set; }
+        IWebServiceResultWriter ResultWriter { get; }
 
 
         int RouteIndex { get; }
+        string Pattern { get; }
         int Priority { get; }
-        bool IsRooted { get; set; }
+        bool IsRooted { get; }
         HttpMethods AcceptedRequests { get; }
         RouteMatch Match(HttpMethods method, string path);
     }

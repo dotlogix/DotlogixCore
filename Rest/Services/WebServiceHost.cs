@@ -8,12 +8,16 @@
 
 #region
 using System;
+using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Events;
+using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services.Attributes;
+using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Routing;
 #endregion
 
@@ -28,13 +32,15 @@ namespace DotLogix.Core.Rest.Services {
 
         public WebServiceHost(WebServiceSettings settings = null) {
             Settings = settings ?? new WebServiceSettings();
-            Router = new WebServiceRouter(Settings.RouterSettings);
-            Server = new AsyncWebServer(Router, Settings.ServerSettings);
+            Router = new WebServiceRouter(Settings.Router);
+            Server = new AsyncWebServer(Router, Settings.Server);
             Services = new WebServiceCollection();
+
+            var typeBuilder = new WebServiceTypeBuilder(typeof(object));
         }
 
         public WebServiceHost(string urlPrefix, WebServiceSettings settings = null) : this(settings) {
-            Settings.ServerSettings.UrlPrefixes.Add(urlPrefix);
+            Settings.Server.UrlPrefixes.Add(urlPrefix);
         }
 
         public void Start() {
@@ -58,49 +64,79 @@ namespace DotLogix.Core.Rest.Services {
         #endregion
 
         #region Services
-        public void RegisterService(IWebService serviceInstance) {
+        public void RegisterService(IWebService serviceInstance, Action<WebServiceTypeBuilder> configureFunc = null) {
             if(Services.TryAdd(serviceInstance) == false)
                 throw new ArgumentException($"A service with name {serviceInstance.Name} is already registered. Choose another name");
 
             var serviceType = serviceInstance.GetType();
-            var methods = serviceType.GetMethods();
-            var count = 0;
 
             LogSource.Trace($"Register webservice {serviceInstance.Name}");
+
+            void ConfigureService(WebServiceTypeBuilder b) {
+                b.UseService(serviceInstance);
+                configureFunc?.Invoke(b);
+            }
+
+            RegisterService(serviceType, ConfigureService);
+            RegisterEvents(serviceInstance, serviceType);
+        }
+        public void RegisterService(Type serviceType, Func<IWebService> serviceFactory, Action<WebServiceTypeBuilder> configureFunc = null) {
+            void ConfigureService(WebServiceTypeBuilder b) {
+                b.UseServiceFactory(serviceFactory);
+                configureFunc?.Invoke(b);
+            }
+
+            RegisterService(serviceType, ConfigureService);
+        }
+        public void RegisterService(Type serviceType, Action<WebServiceTypeBuilder> configureFunc) {
+            var builder = new WebServiceTypeBuilder(serviceType);
+            var methods = serviceType.GetMethods();
             foreach (var methodInfo in methods) {
                 var routeAttribute = methodInfo.GetCustomAttribute<RouteAttribute>();
-                if(routeAttribute == null)
+                if (routeAttribute == null)
                     continue;
-
-                var dynamicInvoke = methodInfo.CreateDynamicInvoke();
-
-                var serviceRoute = routeAttribute.BuildRoute(serviceInstance, _currentRouteIndex++, dynamicInvoke, routeAttribute.Pattern);
-                if(serviceRoute == null)
-                    continue;
-
-                foreach (var preProcessorAttribute in methodInfo.GetCustomAttributes<PreProcessorAttribute>())
-                    serviceRoute.PreProcessors.Add(preProcessorAttribute.CreateProcessor());
-
-                foreach(var postProcessorAttribute in methodInfo.GetCustomAttributes<PostProcessorAttribute>())
-                    serviceRoute.PostProcessors.Add(postProcessorAttribute.CreateProcessor());
-
-                foreach(var descriptorAttribute in methodInfo.GetCustomAttributes<DescriptorAttribute>())
-                    serviceRoute.Descriptors.Add(descriptorAttribute.CreateDescriptor());
-
-                var resultWriterAttribute = methodInfo.GetCustomAttribute<RouteResultWriterAttribute>();
-                if(resultWriterAttribute != null)
-                    serviceRoute.WebServiceResultWriter = resultWriterAttribute.CreateResultWriter();
-
-
-                LogSource.Trace($"Registered webservice route {serviceInstance.Name}.{methodInfo.Name} as {serviceInstance.RoutePrefix ?? ""}{routeAttribute.Pattern}");
-                Router.Routes.Add(serviceRoute, serviceInstance.RoutePrefix ?? "");
-                count++;
+                builder.UseRoute(methodInfo);
             }
+
+            configureFunc.Invoke(builder);
+            RegisterService(builder);
+        }
+        public void RegisterService(WebServiceTypeBuilder builder) {
+            var webService = builder.Build(_currentRouteIndex);
+            foreach (var prefixedRoute in webService.Routes) {
+                var route = prefixedRoute.Route;
+                var prefix = prefixedRoute.Prefix;
+
+                Router.Routes.Add(route, prefix);
+                var descriptor = route.Descriptors.GetCustomDescriptor<MethodDescriptor>();
+                LogSource.Trace($"Registered webservice route {webService.Name}.{descriptor?.Name ?? route.Pattern} as {prefix ?? ""}{route.Pattern}");
+            }
+
+            var count = builder.Routes.Count();
             if(count > 0)
-                LogSource.Debug($"Registered webservice {serviceInstance.Name} with {count} routes");
+                LogSource.Debug($"Registered webservice {webService.Name} with {count} routes");
+            
+            _currentRouteIndex += count;
+        }
 
+        public void RegisterService<TService>(Func<TService> serviceFactory, Action<WebServiceTypeBuilder> configureFunc = null) where TService : class, IWebService {
+            RegisterService(typeof(TService), serviceFactory, configureFunc);
+        }
+        public void RegisterService<TService>(Action<WebServiceTypeBuilder> configureFunc = null) where TService : class, IWebService, new() {
+            RegisterService(new TService(), configureFunc);
+        }
 
-            count = 0;
+        public void RegisterRoute(Action<WebServiceRouteBuilder> configureFunc) {
+            var routeBuilder = new WebServiceRouteBuilder();
+            routeBuilder.UseRootScope(true);
+            configureFunc.Invoke(routeBuilder);
+
+            var route = routeBuilder.Build(_currentRouteIndex++);
+            Router.Routes.Add(route);
+        }
+
+        private void RegisterEvents(IWebService serviceInstance, Type serviceType) {
+            var count = 0;
             var events = serviceType.GetEvents();
             foreach(var eventInfo in events) {
                 var eventAttribute = eventInfo.GetCustomAttribute<WebServiceEventAttributeBase>();
@@ -120,10 +156,6 @@ namespace DotLogix.Core.Rest.Services {
 
             if(count > 0)
                 LogSource.Debug($"Bound {count} events to webservice {serviceInstance.Name}");
-        }
-
-        public void RegisterService<TService>() where TService : class, IWebService, new() {
-            RegisterService(new TService());
         }
         #endregion
     }

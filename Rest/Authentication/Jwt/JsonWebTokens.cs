@@ -23,7 +23,7 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
             header.AddOrReplaceChild("typ", new NodeValue("JWT"));
 
             var headerStr = StringExtensions.EncodeBase64Url(header.ToJson());
-            var payloadStr = StringExtensions.EncodeBase64Url(JsonNodes.ToJson(token.Payload, formatterSettings));
+            var payloadStr = StringExtensions.EncodeBase64Url(JsonUtils.ToJson(token.Payload, formatterSettings));
             var tokenStr = string.Concat(headerStr, ".", payloadStr);
 
             var signatureStr = StringExtensions.EncodeBase64Url(signingAlgorithm.CalculateSignature(Encoding.UTF8.GetBytes(tokenStr)));
@@ -63,7 +63,7 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
             var payloadStr = split[1];
             var signatureStr = split[2];
 
-            var headerNode = JsonNodes.ToNode<NodeMap>(StringExtensions.DecodeBase64Url(headerStr));
+            var headerNode = JsonUtils.ToNode<NodeMap>(StringExtensions.DecodeBase64Url(headerStr));
             if((headerNode.TryGetChildValue("typ", out string typ) == false) || (!string.Equals(typ, "jwt", StringComparison.OrdinalIgnoreCase)))
                 return JsonWebTokenResult.InvalidType;
 
@@ -76,7 +76,7 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
             if(signingAlgorithm.ValidateSignature(unsignedData, signature) == false)
                 return JsonWebTokenResult.InvalidSignature;
 
-            token = new JsonWebToken<TPayload>(headerNode, JsonNodes.FromJson<TPayload>(StringExtensions.DecodeBase64Url(payloadStr), formatterSettings));
+            token = new JsonWebToken<TPayload>(headerNode, JsonUtils.FromJson<TPayload>(StringExtensions.DecodeBase64Url(payloadStr), formatterSettings));
             return JsonWebTokenResult.Success;
         }
 

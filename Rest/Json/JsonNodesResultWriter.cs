@@ -20,7 +20,9 @@ namespace DotLogix.Core.Rest.Json {
         protected JsonNodesResultWriter() { }
         
         protected override async Task WriteResultAsync(WebServiceContext context, object value) {
-            var formatterSettings = context.Settings.Get(WebServiceJsonSettings.JsonNodesFormatterSettings, JsonFormatterSettings.Idented);
+            var extension = context.Settings.GetExtension<JsonNodesExtension>();
+            var formatterSettings = extension?.FormatterSettings ?? JsonFormatterSettings.Idented;
+            
             var httpResponse = context.HttpResponse;
             httpResponse.StatusCode = context.Result.StatusCode ?? HttpStatusCodes.Success.Ok;
             httpResponse.ContentType = context.Result.ContentType ?? MimeTypes.Application.Json;
@@ -33,7 +35,7 @@ namespace DotLogix.Core.Rest.Json {
                 return;
             }
 
-            await JsonNodes.ToJsonAsync(value, httpResponse.OutputStream, Encoding.UTF8, formatterSettings);
+            JsonUtils.ToJson(value, httpResponse.OutputStream, Encoding.UTF8, formatterSettings);
         }
     }
 }

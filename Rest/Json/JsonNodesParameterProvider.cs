@@ -40,7 +40,7 @@ namespace DotLogix.Core.Rest.Json {
             if(parameter.IsDefined(typeof(JsonBodyAttribute)))
                 child = JsonRoot;
             else if(JsonRoot is NodeMap nodeMap) {
-                child = nodeMap.GetChild(FormatterSettings.NamingStrategy.TransformName(parameter.Name));
+                child = nodeMap.GetChild(FormatterSettings.NamingStrategy.Rewrite(parameter.Name));
             }
 
             if (child == null) {

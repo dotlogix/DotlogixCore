@@ -21,54 +21,7 @@ using Array = System.Array;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
-    public class ArrayPool<T>
-    {
-        private readonly List<T[]> _instances;
-        private readonly object _lock = new object();
-
-        public ArrayPool(int poolSize = 20, int minArrayLength = 16, int initialCount = 0)
-        {
-            PoolSize = poolSize;
-            MinArrayLength = minArrayLength;
-            _instances = new List<T[]>(poolSize);
-
-            for (var i = 0; i < initialCount; i++)
-            {
-                _instances.Add(new T[minArrayLength]);
-            }
-        }
-
-        public T[] Rent(int minimumLength)
-        {
-            lock (_lock) {
-                for (var i = _instances.Count - 1; i >= 0; i--) {
-                    var instance = _instances[i];
-                    if (instance.Length < minimumLength)
-                        continue;
-
-                    _instances.RemoveAt(i);
-                    return instance;
-                } 
-            }
-            return new T[Math.Max(MinArrayLength, minimumLength)];
-        }
-
-        public int PoolSize { get; }
-        public int MinArrayLength { get; }
-
-        public void Return(T[] array, bool clear = false)
-        {
-            if(clear)
-                Array.Clear(array, 0, array.Length);
-
-            lock (_lock) {
-                if (_instances.Count < PoolSize)
-                    _instances.Add(array); 
-            }
-        }
-    }
-
-
+    
     public class CharBuffer : IReadOnlyList<char>, IDisposable
     {
         private char[] _buffer;

@@ -17,7 +17,7 @@ namespace DotLogix.Core.Utils.Patterns {
     /// </summary>
     public struct Range {
         private static readonly char[] Enclosures = {'(', '[', '{', ')', ']', '}'};
-        private static readonly Regex RangeRegex = new Regex("^(?:(?<exact>-?\\d+)|(?<min>-?\\d)?\\.\\.(?<max>-?\\d))?$", RegexOptions.Compiled);
+        private static readonly Regex RangeRegex = new Regex("^(?:(?<exact>-?\\d+)|(?<min>-?\\d)?\\.\\.(?<max>-?\\d)?)?$", RegexOptions.Compiled);
 
         /// <summary>
         /// The min value

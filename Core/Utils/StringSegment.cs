@@ -17,7 +17,7 @@ namespace DotLogix.Core.Utils {
         public StringSegment(string buffer, int offset, int count) {
             Buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
             if(offset.LaysBetween(0, buffer.Length) == false)
-                throw new ArgumentOutOfRangeException(nameof(offset), offset, $"Offset is out of range {{Offset: {offset}, Total: {buffer.Length}}}");
+                throw new ArgumentOutOfRangeException(nameof(offset), offset, $"Offset is out of range {{ Offset: {offset}, Total: {buffer.Length} }}");
 
             if(count.LaysBetween(0, buffer.Length - offset) == false)
                 throw new ArgumentOutOfRangeException(nameof(offset), offset, $"Not enough characters left {{ Offset: {offset}, Total: {buffer.Length}, Available: {buffer.Length-offset}, Requested: {count} }}");

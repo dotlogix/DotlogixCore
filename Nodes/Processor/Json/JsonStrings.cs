@@ -10,6 +10,8 @@
 using System;
 using System.Text;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Utils;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
@@ -25,7 +27,7 @@ namespace DotLogix.Core.Nodes.Processor {
         private const int CharFlower = 'f';
 
 
-        private static ArrayPool<char> _charArrayPool = new ArrayPool<char>(initialCount: 10);
+        private static readonly ArrayPool<char> _charArrayPool = new ArrayPool<char>(initialCount: 10);
 
         public static char[] RentBuffer(int minimumLength) {
             return _charArrayPool.Rent(minimumLength);

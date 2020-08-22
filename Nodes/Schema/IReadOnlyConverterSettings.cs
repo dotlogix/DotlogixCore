@@ -1,6 +1,6 @@
 using DotLogix.Core.Utils.Naming;
 
-namespace DotLogix.Core.Nodes {
+namespace DotLogix.Core.Nodes.Schema {
     public interface IReadOnlyConverterSettings {
         /// <summary>
         ///     The time format (u by default)

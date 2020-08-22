@@ -11,6 +11,7 @@ using System;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Factories;
 using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Types;
 #endregion
 

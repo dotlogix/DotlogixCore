@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Utils.Naming;
 

@@ -1,3 +1,5 @@
+using DotLogix.Core.Nodes.Schema;
+
 namespace DotLogix.Core.Nodes.Converters {
     public class MemberNameCacheItem
     {

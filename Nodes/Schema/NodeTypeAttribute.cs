@@ -2,7 +2,7 @@ using System;
 using DotLogix.Core.Nodes.Factories;
 using DotLogix.Core.Utils.Naming;
 
-namespace DotLogix.Core.Nodes {
+namespace DotLogix.Core.Nodes.Schema {
 
     [AttributeUsage(AttributeTargets.Class)]
     public class NodeTypeAttribute : Attribute {

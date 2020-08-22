@@ -1,6 +1,6 @@
 using DotLogix.Core.Utils.Naming;
 
-namespace DotLogix.Core.Nodes {
+namespace DotLogix.Core.Nodes.Schema {
     public interface IConverterSettings : IReadOnlyConverterSettings {
         /// <summary>
         ///     The naming strategy (camelCase by default)

@@ -7,13 +7,15 @@
 // ==================================================
 
 #region
+
 using System;
 using DotLogix.Core.Attributes;
 using DotLogix.Core.Nodes.Converters;
 using DotLogix.Core.Utils;
+
 #endregion
 
-namespace DotLogix.Core.Nodes {
+namespace DotLogix.Core.Nodes.Schema {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class NodeConverterAttribute : InstantiatorAttribute {
         public NodeConverterAttribute(Type singletonType, string propertyName) : base(singletonType, propertyName, typeof(INodeConverter)) { }

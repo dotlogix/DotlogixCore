@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Reflection.Dynamics;
 #endregion
 

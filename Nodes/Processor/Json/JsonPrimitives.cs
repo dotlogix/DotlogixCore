@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes.Processor

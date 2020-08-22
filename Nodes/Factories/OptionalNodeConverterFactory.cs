@@ -10,6 +10,8 @@
 using System;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Converters;
+using DotLogix.Core.Nodes.Schema;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Factories {

@@ -75,7 +75,7 @@
         </member>
         <member name="T:DotLogix.Core.Nodes.Converters.ArrayNodeConverter`1">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter"/> interface to convert arrays
+            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.INodeConverter"/> interface to convert arrays
             </summary>
             <typeparam name="T"></typeparam>
         </member>
@@ -84,7 +84,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.ArrayNodeConverter`1"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.ArrayNodeConverter`1.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.Converters.ArrayNodeConverter`1.Write(System.Object,System.String,DotLogix.Core.Nodes.Processor.INodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.ArrayNodeConverter`1.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -92,7 +92,7 @@
         </member>
         <member name="T:DotLogix.Core.Nodes.Converters.CollectionNodeConverter`1">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter"/> interface to convert arrays
+            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.INodeConverter"/> interface to convert arrays
             </summary>
             <typeparam name="T"></typeparam>
         </member>
@@ -101,40 +101,40 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.CollectionNodeConverter`1"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.CollectionNodeConverter`1.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.Converters.CollectionNodeConverter`1.Write(System.Object,System.String,DotLogix.Core.Nodes.Processor.INodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.CollectionNodeConverter`1.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
-        <member name="T:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter">
+        <member name="T:DotLogix.Core.Nodes.Converters.INodeConverter">
             <summary>
             An interface to represent a node converter
             </summary>
         </member>
-        <member name="P:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter.Type">
+        <member name="P:DotLogix.Core.Nodes.Converters.INodeConverter.Type">
             <summary>
             The type
             </summary>
         </member>
-        <member name="P:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter.DataType">
+        <member name="P:DotLogix.Core.Nodes.Converters.INodeConverter.DataType">
             <summary>
             The data type
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.Converters.INodeConverter.Write(System.Object,System.String,DotLogix.Core.Nodes.Processor.INodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <summary>
             Write the value to the node writer
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.Converters.INodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
             <summary>
             Convert the node to an object of the target type
             </summary>
         </member>
         <member name="T:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter"/> interface to convert key value pairs
+            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.INodeConverter"/> interface to convert key value pairs
             </summary>
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter.#ctor(DotLogix.Core.Types.DataType)">
@@ -142,7 +142,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter.Write(System.Object,System.String,DotLogix.Core.Nodes.Processor.INodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.KeyValuePairNodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -164,7 +164,7 @@
         <member name="P:DotLogix.Core.Nodes.Converters.NodeConverter.DataType">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.NodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.Converters.NodeConverter.Write(System.Object,System.String,DotLogix.Core.Nodes.Processor.INodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.NodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -172,7 +172,7 @@
         </member>
         <member name="T:DotLogix.Core.Nodes.Converters.ObjectNodeConverter">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter"/> interface to convert objects
+            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.INodeConverter"/> interface to convert objects
             </summary>
         </member>
         <member name="P:DotLogix.Core.Nodes.Converters.ObjectNodeConverter.DynamicType">
@@ -185,7 +185,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.ObjectNodeConverter"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.ObjectNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.Converters.ObjectNodeConverter.Write(System.Object,System.String,DotLogix.Core.Nodes.Processor.INodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.ObjectNodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -193,7 +193,7 @@
         </member>
         <member name="T:DotLogix.Core.Nodes.Converters.OptionalNodeConverter`1">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter"/> interface to optional values
+            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.INodeConverter"/> interface to optional values
             </summary>
             <typeparam name="TValue"></typeparam>
         </member>
@@ -202,7 +202,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.OptionalNodeConverter`1"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.OptionalNodeConverter`1.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.Converters.OptionalNodeConverter`1.Write(System.Object,System.String,DotLogix.Core.Nodes.Processor.INodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.OptionalNodeConverter`1.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -210,7 +210,7 @@
         </member>
         <member name="T:DotLogix.Core.Nodes.Converters.ValueNodeConverter">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.IAsyncNodeConverter"/> interface to convert primitives
+            An implementation of the <see cref="T:DotLogix.Core.Nodes.Converters.INodeConverter"/> interface to convert primitives
             </summary>
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.ValueNodeConverter.#ctor(DotLogix.Core.Types.DataType)">
@@ -218,7 +218,7 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Converters.ValueNodeConverter"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Converters.ValueNodeConverter.WriteAsync(System.Object,System.String,DotLogix.Core.Nodes.Processor.IAsyncNodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.Converters.ValueNodeConverter.Write(System.Object,System.String,DotLogix.Core.Nodes.Processor.INodeWriter,DotLogix.Core.Nodes.ConverterSettings)">
             <inheritdoc />
         </member>
         <member name="M:DotLogix.Core.Nodes.Converters.ValueNodeConverter.ConvertToObject(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.ConverterSettings)">
@@ -274,7 +274,7 @@
             Create a new node converter
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Factories.INodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.IAsyncNodeConverter@)">
+        <member name="M:DotLogix.Core.Nodes.Factories.INodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.INodeConverter@)">
             <summary>
             Try to create a new node converter
             </summary>
@@ -284,7 +284,7 @@
             An implementation of the <see cref="T:DotLogix.Core.Nodes.Factories.INodeConverterFactory"/> for key value pairs
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Factories.KeyValuePairNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.IAsyncNodeConverter@)">
+        <member name="M:DotLogix.Core.Nodes.Factories.KeyValuePairNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.INodeConverter@)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Core.Nodes.Factories.ListNodeConverterFactory">
@@ -292,7 +292,7 @@
             An implementation of the <see cref="T:DotLogix.Core.Nodes.Factories.INodeConverterFactory"/> for collection types
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Factories.ListNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.IAsyncNodeConverter@)">
+        <member name="M:DotLogix.Core.Nodes.Factories.ListNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.INodeConverter@)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Core.Nodes.Factories.NodeConverterFactoryBase">
@@ -303,7 +303,7 @@
         <member name="M:DotLogix.Core.Nodes.Factories.NodeConverterFactoryBase.CreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType)">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Core.Nodes.Factories.NodeConverterFactoryBase.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.IAsyncNodeConverter@)">
+        <member name="M:DotLogix.Core.Nodes.Factories.NodeConverterFactoryBase.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.INodeConverter@)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Core.Nodes.Factories.ObjectNodeConverterFactory">
@@ -311,7 +311,7 @@
             An implementation of the <see cref="T:DotLogix.Core.Nodes.Factories.INodeConverterFactory"/> for objects
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Factories.ObjectNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.IAsyncNodeConverter@)">
+        <member name="M:DotLogix.Core.Nodes.Factories.ObjectNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.INodeConverter@)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Core.Nodes.Factories.OptionalNodeConverterFactory">
@@ -319,7 +319,7 @@
             An implementation of the <see cref="T:DotLogix.Core.Nodes.Factories.INodeConverterFactory"/> for optional values
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Factories.OptionalNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.IAsyncNodeConverter@)">
+        <member name="M:DotLogix.Core.Nodes.Factories.OptionalNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.INodeConverter@)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Core.Nodes.Factories.ValueNodeConverterFactory">
@@ -327,7 +327,7 @@
             An implementation of the <see cref="T:DotLogix.Core.Nodes.Factories.INodeConverterFactory"/> for primitives
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Factories.ValueNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.IAsyncNodeConverter@)">
+        <member name="M:DotLogix.Core.Nodes.Factories.ValueNodeConverterFactory.TryCreateConverter(DotLogix.Core.Nodes.NodeTypes,DotLogix.Core.Types.DataType,DotLogix.Core.Nodes.Converters.INodeConverter@)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Core.Nodes.JsonFormatterSettings">
@@ -371,12 +371,12 @@
             Convert json text to node
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToNodeAsync``1(System.IO.TextReader)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToNode``1(System.IO.TextReader)">
             <summary>
             Convert json text to node asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToNodeAsync``1(System.IO.Stream,System.Text.Encoding)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToNode``1(System.IO.Stream,System.Text.Encoding)">
             <summary>
             Convert json text to node asynchronously
             </summary>
@@ -386,12 +386,12 @@
             Convert json text to node
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToNodeAsync(System.IO.TextReader)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToNode(System.IO.TextReader)">
             <summary>
             Convert json text to node asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToNodeAsync(System.IO.Stream,System.Text.Encoding)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToNode(System.IO.Stream,System.Text.Encoding)">
             <summary>
             Convert json text to node asynchronously
             </summary>
@@ -401,17 +401,17 @@
             Convert a node to json text
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJsonAsync(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.JsonFormatterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJson(DotLogix.Core.Nodes.Node,DotLogix.Core.Nodes.JsonFormatterSettings)">
             <summary>
             Convert a node to json text asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJsonAsync(DotLogix.Core.Nodes.Node,System.IO.Stream,System.Text.Encoding,DotLogix.Core.Nodes.JsonFormatterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJson(DotLogix.Core.Nodes.Node,System.IO.Stream,System.Text.Encoding,DotLogix.Core.Nodes.JsonFormatterSettings)">
             <summary>
             Convert a node to json text asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJsonAsync(DotLogix.Core.Nodes.Node,System.IO.TextWriter,DotLogix.Core.Nodes.JsonFormatterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJson(DotLogix.Core.Nodes.Node,System.IO.TextWriter,DotLogix.Core.Nodes.JsonFormatterSettings)">
             <summary>
             Convert a node to json text asynchronously
             </summary>
@@ -426,32 +426,32 @@
             Convert an object to json text
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJsonAsync(System.Object,DotLogix.Core.Nodes.JsonFormatterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJson(System.Object,DotLogix.Core.Nodes.JsonFormatterSettings)">
             <summary>
             Convert an object to json text asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJsonAsync(System.Object,System.IO.Stream,System.Text.Encoding,DotLogix.Core.Nodes.JsonFormatterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJson(System.Object,System.IO.Stream,System.Text.Encoding,DotLogix.Core.Nodes.JsonFormatterSettings)">
             <summary>
             Convert an object to json text asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJsonAsync(System.Object,System.IO.TextWriter,DotLogix.Core.Nodes.JsonFormatterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJson(System.Object,System.IO.TextWriter,DotLogix.Core.Nodes.JsonFormatterSettings)">
             <summary>
             Convert an object to json text asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJsonAsync(System.Object,System.Type,DotLogix.Core.Nodes.JsonFormatterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJson(System.Object,System.Type,DotLogix.Core.Nodes.JsonFormatterSettings)">
             <summary>
             Convert an object to json text asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJsonAsync(System.Object,System.Type,System.IO.Stream,System.Text.Encoding,DotLogix.Core.Nodes.JsonFormatterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJson(System.Object,System.Type,System.IO.Stream,System.Text.Encoding,DotLogix.Core.Nodes.JsonFormatterSettings)">
             <summary>
             Convert an object to json text asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJsonAsync(System.Object,System.Type,System.IO.TextWriter,DotLogix.Core.Nodes.JsonFormatterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.ToJson(System.Object,System.Type,System.IO.TextWriter,DotLogix.Core.Nodes.JsonFormatterSettings)">
             <summary>
             Convert an object to json text asynchronously
             </summary>
@@ -461,12 +461,12 @@
             Convert json text to an instance of object
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.FromJsonAsync``1(System.IO.Stream,System.Text.Encoding,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.FromJson``1(System.IO.Stream,System.Text.Encoding,DotLogix.Core.Nodes.ConverterSettings)">
             <summary>
             Convert json text to an instance of object asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.FromJsonAsync``1(System.IO.TextReader,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.FromJson``1(System.IO.TextReader,DotLogix.Core.Nodes.ConverterSettings)">
             <summary>
             Convert json text to an instance of object asynchronously
             </summary>
@@ -476,12 +476,12 @@
             Convert json text to an instance of object
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.FromJsonAsync(System.IO.TextReader,System.Type,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.FromJson(System.IO.TextReader,System.Type,DotLogix.Core.Nodes.ConverterSettings)">
             <summary>
             Convert json text to an instance of object asynchronously
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.JsonNodes.FromJsonAsync(System.IO.Stream,System.Text.Encoding,System.Type,DotLogix.Core.Nodes.ConverterSettings)">
+        <member name="M:DotLogix.Core.Nodes.JsonNodes.FromJson(System.IO.Stream,System.Text.Encoding,System.Type,DotLogix.Core.Nodes.ConverterSettings)">
             <summary>
             Convert json text to an instance of object asynchronously
             </summary>
@@ -562,72 +562,72 @@
         <member name="M:DotLogix.Core.Nodes.PascalCaseNamingStrategy.TransformIfRequired(System.String,System.Text.StringBuilder)">
             <inheritdoc />
         </member>
-        <member name="T:DotLogix.Core.Nodes.Processor.IAsyncNodeReader">
+        <member name="T:DotLogix.Core.Nodes.Processor.INodeReader">
             <summary>
             An interface to represent node readers
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeReader.CopyToAsync(DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeReader.CopyTo(DotLogix.Core.Nodes.Processor.INodeWriter)">
             <summary>
             Copies all nodes to a node writer
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeReader.ReadAsync">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeReader.Read">
             <summary>
             Read the nodes as node operations
             </summary>
         </member>
-        <member name="T:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter">
+        <member name="T:DotLogix.Core.Nodes.Processor.INodeWriter">
             <summary>
             An interface to represent node writers
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.BeginMapAsync">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.BeginMap">
             <summary>
             Starts a new map node
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.BeginMapAsync(System.String)">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.BeginMap(System.String)">
             <summary>
             Starts a new map node with a name
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.EndMapAsync">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.EndMap">
             <summary>
             End the current map node
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.BeginListAsync">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.BeginList">
             <summary>
             Starts a new list node
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.BeginListAsync(System.String)">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.BeginList(System.String)">
             <summary>
             Starts a new list node with a name
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.EndListAsync">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.EndList">
             <summary>
             End the current list node
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.WriteValueAsync(System.String,System.Object)">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.WriteValue(System.String,System.Object)">
             <summary>
             Writes a primitive value with a name
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.WriteValueAsync(System.Object)">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.WriteValue(System.Object)">
             <summary>
             Writes a primitive value
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.AutoCompleteAsync">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.AutoComplete">
             <summary>
             Auto close all open collections and finish the writing process
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter.ExecuteAsync(DotLogix.Core.Nodes.Processor.NodeOperation)">
+        <member name="M:DotLogix.Core.Nodes.Processor.INodeWriter.Execute(DotLogix.Core.Nodes.Processor.NodeOperation)">
             <summary>
             Execute a node operation
             </summary>
@@ -649,7 +649,7 @@
         </member>
         <member name="T:DotLogix.Core.Nodes.Processor.JsonNodeReader">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Core.Nodes.Processor.IAsyncNodeReader"/> interface to read json text
+            An implementation of the <see cref="T:DotLogix.Core.Nodes.Processor.INodeReader"/> interface to read json text
             </summary>
         </member>
         <member name="T:DotLogix.Core.Nodes.Processor.JsonNodeReader.JsonCharacter">
@@ -720,12 +720,12 @@
         <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeReader.Dispose(System.Boolean)">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeReader.CopyToAsync(DotLogix.Core.Nodes.Processor.IAsyncNodeWriter)">
+        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeReader.CopyTo(DotLogix.Core.Nodes.Processor.INodeWriter)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Core.Nodes.Processor.JsonNodeWriter">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Core.Nodes.Processor.IAsyncNodeWriter"/> interface to write json text
+            An implementation of the <see cref="T:DotLogix.Core.Nodes.Processor.INodeWriter"/> interface to write json text
             </summary>
         </member>
         <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.#ctor(System.IO.TextWriter,DotLogix.Core.Nodes.JsonFormatterSettings,System.Int32)">
@@ -733,19 +733,19 @@
             Creates a new instance of <see cref="T:DotLogix.Core.Nodes.Processor.JsonNodeReader"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.BeginMapAsync(System.String)">
+        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.BeginMap(System.String)">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.EndMapAsync">
+        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.EndMap">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.BeginListAsync(System.String)">
+        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.BeginList(System.String)">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.EndListAsync">
+        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.EndList">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.WriteValueAsync(System.String,System.Object)">
+        <member name="M:DotLogix.Core.Nodes.Processor.JsonNodeWriter.WriteValue(System.String,System.Object)">
             <inheritdoc />
         </member>
         <member name="T:DotLogix.Core.Nodes.Processor.JsonParsingException">

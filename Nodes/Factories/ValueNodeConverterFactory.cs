@@ -8,6 +8,7 @@
 
 #region
 using DotLogix.Core.Nodes.Converters;
+using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Types;
 #endregion
 

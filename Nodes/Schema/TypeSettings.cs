@@ -2,7 +2,7 @@ using DotLogix.Core.Nodes.Converters;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
 
-namespace DotLogix.Core.Nodes {
+namespace DotLogix.Core.Nodes.Schema {
     public class TypeSettings {
         public NodeTypes NodeType { get; set; }
         public DataType DataType { get; set; }

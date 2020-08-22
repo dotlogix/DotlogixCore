@@ -1,3 +1,4 @@
+using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Utils.Naming;
 
 namespace DotLogix.Core.Nodes {

@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Nodes.Schema;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {

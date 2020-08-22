@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Utils.Naming;
 
 #endregion

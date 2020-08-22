@@ -10,7 +10,7 @@ using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
 using DotLogix.Core.Utils.Naming;
 
-namespace DotLogix.Core.Nodes {
+namespace DotLogix.Core.Nodes.Schema {
     public class NodeConverterResolver : INodeConverterResolver {
         protected static IDictionary<Type, TypeSettings> Primitives { get; } = CreatePrimitiveTypeSettings();
 

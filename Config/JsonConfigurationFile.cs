@@ -42,7 +42,7 @@ namespace DotLogix.Core.Config {
             for (var retry = 1; retry <= MaxRetries; retry++) {
                 try {
                     var json = File.ReadAllText(AbsolutePath);
-                    CurrentConfig = JsonNodes.FromJson<TConfig>(json);
+                    CurrentConfig = JsonUtils.FromJson<TConfig>(json);
                     Log.Debug($"Loading attempt {retry} config file \"{AbsolutePath}\" succeeded");
                     return true;
                 } catch(IOException io) {
@@ -67,7 +67,7 @@ namespace DotLogix.Core.Config {
             AutoReload = false;
             EnableFileWatching = false;
             try {
-                var json = JsonNodes.ToJson(CurrentConfig, JsonFormatterSettings.Idented);
+                var json = JsonUtils.ToJson(CurrentConfig, JsonFormatterSettings.Idented);
                 File.WriteAllText(AbsolutePath, json);
                 HasChanged = false;
                 return true;

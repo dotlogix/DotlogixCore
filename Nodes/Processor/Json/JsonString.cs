@@ -1,9 +1,6 @@
-﻿using System.Text;
-
-namespace DotLogix.Core.Nodes.Processor {
+﻿namespace DotLogix.Core.Nodes.Processor {
     public class JsonString : JsonConvertible, IJsonPrimitive
     {
-        public string Value { get; set; }
         public bool EscapeString { get; set; }
         public JsonPrimitiveType Type => JsonPrimitiveType.String;
 
@@ -13,12 +10,12 @@ namespace DotLogix.Core.Nodes.Processor {
             EscapeString = escapeString;
         }
         
-        public void AppendJson(StringBuilder stringBuilder)
+        public void AppendJson(CharBuffer buffer)
         {
             if (EscapeString)
-                JsonStrings.AppendJsonString(stringBuilder, Value, true);
+                JsonStrings.AppendJsonString(buffer, Value, true);
             else
-                stringBuilder.Append(Value);
+                buffer.Append(Value);
         }
 
         public string ToJson()

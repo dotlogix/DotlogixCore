@@ -18,10 +18,10 @@ namespace DotLogix.Core.Nodes.Factories {
         /// <summary>
         /// Create a new node converter
         /// </summary>
-        IAsyncNodeConverter CreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings);
+        INodeConverter CreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings);
         /// <summary>
         /// Try to create a new node converter
         /// </summary>
-        bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter);
+        bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out INodeConverter converter);
     }
 }

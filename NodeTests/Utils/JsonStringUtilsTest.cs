@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using DotLogix.Core.Nodes.Processor;
 using NUnit.Framework;
 
@@ -59,7 +57,7 @@ namespace NodeTests.Utils {
         [TestCase("-1234567", -1234567L)]
         public void ParseLong_Valid_ReturnsExpected(string value, long expected)
         {
-            Assert.That(JsonStrings.ParseLong(value), Is.EqualTo(expected));
+            Assert.That(JsonStrings.ParseInt64(value), Is.EqualTo(expected));
         }
 
 
@@ -70,7 +68,7 @@ namespace NodeTests.Utils {
         [TestCase("")]
         public void ParseLong_Invalid_Throws(string value)
         {
-            Assert.That(() => JsonStrings.ParseLong(value), Throws.Exception);
+            Assert.That(() => JsonStrings.ParseInt64(value), Throws.Exception);
         }
 
         [TestCase(12345L, "12345")]
@@ -94,7 +92,7 @@ namespace NodeTests.Utils {
         [TestCase("12345", 12345UL)]
         public void ParseULong_Valid_ReturnsExpected(string value, ulong expected)
         {
-            Assert.That(JsonStrings.ParseULong(value), Is.EqualTo(expected));
+            Assert.That(JsonStrings.ParseUInt64(value), Is.EqualTo(expected));
         }
 
 
@@ -106,7 +104,7 @@ namespace NodeTests.Utils {
         [TestCase("")]
         public void ParseULong_Invalid_Throws(string value)
         {
-            Assert.That(() => JsonStrings.ParseULong(value), Throws.Exception);
+            Assert.That(() => JsonStrings.ParseUInt64(value), Throws.Exception);
         }
 
         [TestCase("0", 0d)]

@@ -8,14 +8,13 @@
 
 #region
 using System;
-using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
     /// <summary>
-    ///     An implementation of the <see cref="IAsyncNodeConverter" /> interface to convert primitives
+    ///     An implementation of the <see cref="INodeConverter" /> interface to convert primitives
     /// </summary>
     public class ValueNodeConverter : NodeConverter {
         /// <summary>
@@ -24,16 +23,16 @@ namespace DotLogix.Core.Nodes.Converters {
         public ValueNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
+        public override void Write(object instance, INodeWriter writer, IReadOnlyConverterSettings settings) {
             var scopedSettings = settings.GetScoped(TypeSettings);
             if(scopedSettings.ShouldEmitValue(instance) == false)
-                return default;
+                return;
 
-            return writer.WriteValueAsync(JsonPrimitives.FromObject(instance, settings, DataType));
+            writer.WriteValue(JsonPrimitives.FromObject(instance, settings, DataType));
         }
 
-        public override async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
-            var value = await reader.ReadValueAsync().ConfigureAwait(false);
+        public override object Read(INodeReader reader, IReadOnlyConverterSettings settings) {
+            var value = reader.ReadValue();
 
             switch(value) {
                 case IJsonPrimitive primitive:

@@ -1,10 +1,12 @@
-﻿using System.Text;
-using DotLogix.Core.Extensions;
+﻿using DotLogix.Core.Extensions;
 using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes.Processor {
     public class JsonNull : IJsonPrimitive
     {
+        public static string Json {get; } = "null";
+        public static char[] JsonChars { get; } = Json.ToCharArray();
+
         private JsonNull()
         {
         }
@@ -17,14 +19,14 @@ namespace DotLogix.Core.Nodes.Processor {
             return targetType.Type.GetDefaultValue();
         }
 
-        public void AppendJson(StringBuilder stringBuilder)
+        public void AppendJson(CharBuffer buffer)
         {
-            stringBuilder.Append("null");
+            buffer.Append(JsonChars);
         }
 
         public string ToJson()
         {
-            return "null";
+            return Json;
         }
     }
 }

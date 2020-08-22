@@ -8,87 +8,86 @@
 
 #region
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
-    public abstract class NodeReaderBase : IAsyncNodeReader {
+    public abstract class NodeReaderBase : INodeReader {
         private NodeOperation? _next;
         public NodeOperation Current { get; protected set; }
 
-        #region Async
+        #region 
         /// <inheritdoc />
-        public async ValueTask<string> ReadNameAsync() {
-            var next = await PeekOperationAsync().ConfigureAwait(false);
+        public string ReadName() {
+            var next = PeekOperation();
             return next?.Name;
         }
 
-        public ValueTask ReadBeginMapAsync()
+        public void ReadBeginMap()
         {
-            return ReadBeginAnyAsync(NodeOperationTypes.BeginMap);
+            ReadBeginAny(NodeOperationTypes.BeginMap);
         }
 
-        public ValueTask ReadEndMapAsync() {
-            return ReadEndAnyAsync(NodeOperationTypes.EndMap);
+        public void ReadEndMap() {
+            ReadEndAny(NodeOperationTypes.EndMap);
         }
 
-        public ValueTask ReadBeginListAsync() {
-            return ReadBeginAnyAsync(NodeOperationTypes.BeginList);
+        public void ReadBeginList() {
+            ReadBeginAny(NodeOperationTypes.BeginList);
         }
 
-        public ValueTask ReadEndListAsync() {
-            return ReadEndAnyAsync(NodeOperationTypes.EndList);
+        public void ReadEndList() {
+            ReadEndAny(NodeOperationTypes.EndList);
         }
 
-        public async ValueTask<object> ReadValueAsync() {
-            if (await MoveNextAsync().ConfigureAwait(false) && Current.Type == NodeOperationTypes.Value)
+        public object ReadValue() {
+            if (MoveNext() && Current.Type == NodeOperationTypes.Value)
                 return Current.Value;
             throw new InvalidOperationException($"Expected operation {nameof(NodeOperationTypes.Value)} but got {Current.Type}");
         }
 
-        public async ValueTask<NodeOperation> ReadOperationAsync() {
-            if (await MoveNextAsync().ConfigureAwait(false) && Current.Type == NodeOperationTypes.Value)
+        public NodeOperation ReadOperation() {
+            if (MoveNext() && Current.Type == NodeOperationTypes.Value)
                 return Current;
             throw new InvalidOperationException("Expected operation but got none");
         }
 
-        public async ValueTask<NodeOperation?> PeekOperationAsync() {
+        public NodeOperation? PeekOperation() {
             if (_next.HasValue) {
                 return _next.Value;
             }
 
-            _next = await ReadNextAsync().ConfigureAwait(false);
+            _next = ReadNext();
             return _next;
         }
 
-        public async ValueTask CopyToAsync(IAsyncNodeWriter writer)
+        public void CopyTo(INodeWriter writer)
         {
-            while (await MoveNextAsync().ConfigureAwait(false))
-                await writer.WriteOperationAsync(Current).ConfigureAwait(false);
+            while (MoveNext())
+                writer.WriteOperation(Current);
         }
 
-        private async ValueTask ReadBeginAnyAsync(NodeOperationTypes expectedTypes)
+        private void ReadBeginAny(NodeOperationTypes expectedTypes)
         {
-            if (await MoveNextAsync().ConfigureAwait(false) && (Current.Type & expectedTypes) != 0)
+            if (MoveNext() && (Current.Type & expectedTypes) != 0)
                 return;
             throw new InvalidOperationException($"Expected operation {expectedTypes} but got {Current.Type}");
         }
-        private async ValueTask ReadEndAnyAsync(NodeOperationTypes expectedTypes)
+        private void ReadEndAny(NodeOperationTypes expectedTypes)
         {
-            if (await MoveNextAsync().ConfigureAwait(false) && (Current.Type & expectedTypes) != 0)
+            if (MoveNext() && (Current.Type & expectedTypes) != 0)
                 return;
             throw new InvalidOperationException($"Expected operation {expectedTypes} but got {Current.Type}");
         }
 
-        public async ValueTask<bool> MoveNextAsync() {
+        public bool MoveNext() {
             if (_next.HasValue) {
                 Current = _next.Value;
                 _next = null;
                 return true;
             }
 
-            var next = await ReadNextAsync().ConfigureAwait(false);
+            var next = ReadNext();
             if(next.HasValue == false)
                 return false;
 
@@ -97,7 +96,7 @@ namespace DotLogix.Core.Nodes.Processor {
             return true;
         }
 
-        protected abstract ValueTask<NodeOperation?> ReadNextAsync();
+        protected abstract NodeOperation? ReadNext();
 
         #endregion
 

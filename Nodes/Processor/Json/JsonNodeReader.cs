@@ -8,17 +8,219 @@
 
 #region
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Json;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using DotLogix.Core.Extensions;
+using Array = System.Array;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
+    public class ArrayPool<T>
+    {
+        private readonly List<T[]> _instances;
+        private readonly object _lock = new object();
+
+        public ArrayPool(int poolSize = 20, int minArrayLength = 16, int initialCount = 0)
+        {
+            PoolSize = poolSize;
+            MinArrayLength = minArrayLength;
+            _instances = new List<T[]>(poolSize);
+
+            for (var i = 0; i < initialCount; i++)
+            {
+                _instances.Add(new T[minArrayLength]);
+            }
+        }
+
+        public T[] Rent(int minimumLength)
+        {
+            lock (_lock) {
+                for (var i = _instances.Count - 1; i >= 0; i--) {
+                    var instance = _instances[i];
+                    if (instance.Length < minimumLength)
+                        continue;
+
+                    _instances.RemoveAt(i);
+                    return instance;
+                } 
+            }
+            return new T[Math.Max(MinArrayLength, minimumLength)];
+        }
+
+        public int PoolSize { get; }
+        public int MinArrayLength { get; }
+
+        public void Return(T[] array, bool clear = false)
+        {
+            if(clear)
+                Array.Clear(array, 0, array.Length);
+
+            lock (_lock) {
+                if (_instances.Count < PoolSize)
+                    _instances.Add(array); 
+            }
+        }
+    }
+
+
+    public class CharBuffer : IReadOnlyList<char>, IDisposable
+    {
+        private char[] _buffer;
+        private int _capacity;
+        private int _count;
+
+        public int Count => _count;
+        public int Capacity => _capacity;
+
+        public char this[int index] =>
+            index.LaysBetween(0, _count)
+                ? _buffer[index]
+                : throw new ArgumentOutOfRangeException(nameof(index));
+
+        public CharBuffer(char[] buffer, int count = -1)
+        {
+            if (count < 0)
+                count = buffer.Length;
+
+            _buffer = buffer;
+            _count = count;
+            _capacity = buffer.Length;
+        }
+
+        public CharBuffer(string buffer, int offset = 0, int count = -1)
+        {
+            if (count < 0)
+                count = buffer.Length - offset;
+
+            _buffer = JsonStrings.RentBuffer(count);
+            _capacity = _buffer.Length;
+            Append(buffer, offset, count);
+        }
+
+        public CharBuffer(int minCapacity)
+        {
+            _buffer = JsonStrings.RentBuffer(minCapacity);
+            _capacity = _buffer.Length;
+        }
+
+        public CharBuffer Append(char chr)
+        {
+            EnsureCapacity();
+            _buffer[_count] = chr;
+            _count++;
+
+            return this;
+        }
+
+        public CharBuffer Append(char chr, int repeat)
+        {
+            EnsureCapacity(repeat);
+            var end = _count + repeat;
+            for (var i = _count; i < end; i++) {
+                _buffer[i] = chr;
+            }
+
+            _count += repeat;
+
+            return this;
+        }
+
+        public CharBuffer Append(char[] buffer)
+        {
+            return Append(buffer, 0, buffer.Length);
+        }
+
+        public CharBuffer Append(char[] buffer, int offset, int count)
+        {
+            EnsureCapacity(count);
+            Array.Copy(buffer, offset, _buffer, _count, count);
+            _count += count;
+            return this;
+        }
+
+        public CharBuffer Append(string buffer)
+        {
+            return Append(buffer, 0, buffer.Length);
+        }
+
+        public CharBuffer Append(string buffer, int offset, int count)
+        {
+            EnsureCapacity(count);
+            buffer.CopyTo(offset, _buffer, _count, count);
+            _count += count;
+            return this;
+        }
+
+        public void EnsureCapacity(int minRemaining = 1)
+        {
+            var remaining = _capacity - _count;
+            if (remaining >= minRemaining)
+                return;
+
+            var minCapacity = _capacity + Math.Max(_buffer.Length, minRemaining);
+            var array = JsonStrings.RentBuffer(minCapacity);
+            
+            Array.Copy(_buffer, 0, array, 0, _count);
+
+            JsonStrings.ReturnBuffer(_buffer);
+            _buffer = array;
+            _capacity = array.Length;
+        }
+
+        public CharBuffer Clear()
+        {
+            _count = 0;
+            return this;
+        }
+
+        public ArraySegment<char> GetBuffer()
+        {
+            return new ArraySegment<char>(_buffer, 0, _count);
+        }
+
+        public bool Equals(char[] other)
+        {
+            if (other == null || _count != other.Length)
+                return false;
+
+            for (var i = 0; i < _count; i++)
+            {
+                if (_buffer[i] != other[i])
+                    return false;
+            }
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return new string(_buffer, 0, _count);
+        }
+
+        public IEnumerator<char> GetEnumerator()
+        {
+            return _buffer.Take(_count).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public void Dispose()
+        {
+            JsonStrings.ReturnBuffer(_buffer);
+            _buffer = null;
+        }
+    }
+    
     /// <summary>
-    /// An implementation of the <see cref="IAsyncNodeReader"/> interface to read json text
+    /// An implementation of the <see cref="INodeReader"/> interface to read json text
     /// </summary>
     public class JsonNodeReader : NodeReaderBase {
         /// <summary>
@@ -71,13 +273,14 @@ namespace DotLogix.Core.Nodes.Processor {
             OpenAny = BeginList | BeginMap,
             CloseAny = EndList | EndMap,
         }
+        
 
         private readonly char[] _unicodeBuffer = new char[4];
 
         private readonly JsonReaderOptions _options;
-        private readonly TextReader _reader;
+        private TextReader _reader;
         private readonly bool _canReadFurther;
-        private readonly Func<char[], int, int, ValueTask<int>> _readBlockFunc;
+        private readonly Func<char[], int, int,int> _readBlockFunc;
 
         private int _line;
         private int _lineStart;
@@ -87,10 +290,9 @@ namespace DotLogix.Core.Nodes.Processor {
         private readonly char[] _buffer;
         private int _remaining;
         private int _index;
-
-        private readonly StringBuilder _stringBuilder;
+         
+        private CharBuffer _charBuffer;
         private bool IsTolerantMode => (_options & JsonReaderOptions.Tolerant) != 0;
-        private bool IsAsyncMode => (_options & JsonReaderOptions.Sync) != 0;
         public string Near => new string(_buffer, 0, _index);
 
 
@@ -108,42 +310,57 @@ namespace DotLogix.Core.Nodes.Processor {
         {
             _options = options;
             _buffer = json.ToCharArray();
-            _stringBuilder = new StringBuilder(Math.Min(50, json.Length));
+            _charBuffer = new CharBuffer(Math.Min(50, json.Length));
             _remaining = _buffer.Length;
         }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonNodeReader"/>
+        /// </summary>
+        public JsonNodeReader(char[] json, JsonReaderOptions options = JsonReaderOptions.None)
+        {
+            _options = options;
+            _buffer = json;
+            _charBuffer = new CharBuffer(Math.Min(50, json.Length));
+            _remaining = _buffer.Length;
+        }
+
         /// <summary>
         /// Creates a new instance of <see cref="JsonNodeReader"/>
         /// </summary>
         public JsonNodeReader(TextReader reader, JsonReaderOptions options = JsonReaderOptions.None, int bufferSize = 1024) {
             _options = options;
-            _readBlockFunc = ReadBlockAsync;
+            _readBlockFunc = ReadBlock;
             _canReadFurther = true;
             _reader = reader;
             _buffer = new char[bufferSize];
         }
 
-        private ValueTask<int> ReadBlockAsync(char[] buffer, int index, int count) {
-            return IsAsyncMode
-                   ? new ValueTask<int>(_reader.ReadBlockAsync(buffer, index, count))
-                   : new ValueTask<int>(_reader.ReadBlock(buffer, index, count));
+        private int ReadBlock(char[] buffer, int index, int count) {
+            return _reader.ReadBlock(buffer, index, count);
         }
 
         protected override void Dispose(bool disposing)
         {
             if(disposing)
+            {
                 _reader?.Dispose();
+                _charBuffer?.Dispose();
+                _reader = null;
+                _charBuffer = null;
+            }
             base.Dispose(disposing);
         }
 
         /// <inheritdoc />
-        protected override async ValueTask<NodeOperation?> ReadNextAsync() {
+        protected override NodeOperation? ReadNext() {
             while(true) {
                 if (_remaining <= 0)
                 {
                     if (_canReadFurther == false)
                         break;
 
-                    var succeed = await EnsureNextCharsAsync().ConfigureAwait(false);
+                    var succeed = EnsureNextChars();
                     if (succeed == false)
                         break;
                 }
@@ -185,7 +402,7 @@ namespace DotLogix.Core.Nodes.Processor {
                     case JsonCharacter.BeginList:
                         return HandleBeginList();
                     case JsonCharacter.String:
-                        var str = await NextJsonStringAsync().ConfigureAwait(false);
+                        var str = NextJsonString();
                         var op = HandleString(str);
                         if (op.HasValue == false)
                             continue;
@@ -197,7 +414,7 @@ namespace DotLogix.Core.Nodes.Processor {
                         _allowedCharacters = GetAllowedCharacters(JsonCharacter.String, JsonCharacter.BeginMap | JsonCharacter.BeginList | JsonCharacter.String | JsonCharacter.Other);
                         break;
                     case JsonCharacter.Other:
-                        var value = await NextJsonValueAsync().ConfigureAwait(false);
+                        var value = NextJsonValue();
                         return HandleValue(value);
                     default:
                         throw new JsonParsingException("The current state is invalid", _position, _line, _position - _lineStart, Near);
@@ -210,13 +427,13 @@ namespace DotLogix.Core.Nodes.Processor {
             return null;
         }
 
-        private async ValueTask<string> NextJsonStringAsync() {
+        private string NextJsonString() {
             while(true) {
                 if (_remaining <= 0) {
                     if (_canReadFurther == false)
                         break;
 
-                    var succeed = await EnsureNextCharsAsync().ConfigureAwait(false);
+                    var succeed = EnsureNextChars();
                     if (succeed == false)
                         break;
                 }
@@ -224,13 +441,13 @@ namespace DotLogix.Core.Nodes.Processor {
                 var current = NextChar();
                 switch(current) {
                     case '\"':
-                        var json = _stringBuilder.ToString();
-                        _stringBuilder.Clear();
+                        var json = _charBuffer.ToString();
+                        _charBuffer.Clear();
                         return json;
                     case '\\':
-                        if(_remaining < 1 && (_canReadFurther && await EnsureNextCharsAsync().ConfigureAwait(false)) == false)
+                        if(_remaining < 1 && (_canReadFurther && EnsureNextChars()) == false)
                         {
-                            _stringBuilder.Clear();
+                            _charBuffer.Clear();
                             throw new JsonParsingException("The escape sequence '\\' requires at least one following character to be valid.", _position, _line, _position - _lineStart, Near);
                         }
                         current = NextChar();
@@ -257,9 +474,9 @@ namespace DotLogix.Core.Nodes.Processor {
                                 current = '\t';
                                 break;
                             case 'u':
-                                if (_remaining < 4 && (_canReadFurther && await EnsureNextCharsAsync(4).ConfigureAwait(false)) == false)
+                                if (_remaining < 4 && (_canReadFurther && EnsureNextChars(4)) == false)
                                 {
-                                    _stringBuilder.Clear();
+                                    _charBuffer.Clear();
                                     throw new JsonParsingException("The escape sequence '\\u' requires 4 following hex digits to be valid.", _position, _line, _position - _lineStart, Near);
                                 }
 
@@ -269,7 +486,7 @@ namespace DotLogix.Core.Nodes.Processor {
 
                                     if(JsonStrings.IsHex(current) == false)
                                     {
-                                        _stringBuilder.Clear();
+                                        _charBuffer.Clear();
                                         throw new JsonParsingException($"The character '{current}' is not a valid hex character.", _position, _line, _position - _lineStart, Near);
                                     }
 
@@ -279,7 +496,7 @@ namespace DotLogix.Core.Nodes.Processor {
                                 current = JsonStrings.FromCharAsUnicode(_unicodeBuffer, 0);
                                 break;
                             default:
-                                _stringBuilder.Clear();
+                                _charBuffer.Clear();
                                 throw new JsonParsingException($"The character '{current}' can not be escaped.", _position, _line, _position - _lineStart, Near);
                         }
 
@@ -291,26 +508,26 @@ namespace DotLogix.Core.Nodes.Processor {
                                 continue;
                             }
 
-                            _stringBuilder.Clear(); 
+                            _charBuffer.Clear(); 
                             throw new JsonParsingException($"The character '{JsonStrings.ToCharAsUnicode(current)}' is a control character and requires to be escaped to be valid.", _position, _line, _position - _lineStart, Near);
                         }
                         break;
                 }
 
-                _stringBuilder.Append(current);
+                _charBuffer.Append(current);
             }
 
-            _stringBuilder.Clear();
+            _charBuffer.Clear();
             throw new JsonParsingException("The string never ends", _position, _line, _position - _lineStart, Near);
         }
 
-        private async ValueTask<object> NextJsonValueAsync()
+        private object NextJsonValue()
         {
             object GetValueFromString() {
-                var result = TryGetValueFromString(_stringBuilder, out var obj);
-                _stringBuilder.Clear();
+                var result = TryGetValueFromString(_charBuffer, out var obj);
+                _charBuffer.Clear();
                 if (result == false)
-                    throw new JsonParsingException($"Value can not be parsed make sure \"{_stringBuilder}\" is a valid json value", _position, _line, _position - _lineStart, Near);
+                    throw new JsonParsingException($"Value can not be parsed make sure \"{_charBuffer}\" is a valid json value", _position, _line, _position - _lineStart, Near);
                 return obj;
             }
 
@@ -319,7 +536,7 @@ namespace DotLogix.Core.Nodes.Processor {
                     if (_canReadFurther == false)
                         break;
 
-                    var succeed = await EnsureNextCharsAsync().ConfigureAwait(false);
+                    var succeed = EnsureNextChars();
                     if (succeed == false)
                         break;
                 }
@@ -337,7 +554,7 @@ namespace DotLogix.Core.Nodes.Processor {
                         ReverseChar();
                         return GetValueFromString();
                     default:
-                        _stringBuilder.Append(current);
+                        _charBuffer.Append(current);
                         break;
                 }
             }
@@ -416,36 +633,38 @@ namespace DotLogix.Core.Nodes.Processor {
             return ErrorBehaviour.Unhandled;
         }
 
-        private static bool TryGetValueFromString(StringBuilder stringBuilder, out IJsonPrimitive value)
+        private static bool TryGetValueFromString(CharBuffer buffer, out IJsonPrimitive value)
         {
-            switch (stringBuilder.Length)
+            switch (buffer.Count)
             {
                 case 0:
                     value = default;
                     return false;
                 case 4:
-                    switch (stringBuilder[0])
+                    if(buffer.Equals(JsonNull.JsonChars))
                     {
-                        case 'n' when stringBuilder[1] == 'u' && stringBuilder[2] == 'l' && stringBuilder[3] == 'l':
-                            value = JsonPrimitives.Null;
-                            return true;
-                        case 't' when stringBuilder[1] == 'r' && stringBuilder[2] == 'u' && stringBuilder[3] == 'e':
-                            value = JsonPrimitives.True;
-                            return true;
+                        value = JsonPrimitives.Null;
+                        return true;
                     }
 
+                    if (buffer.Equals(JsonBool.JsonTrueChars)) {
+                        value = JsonPrimitives.True;
+                        return true;
+                    }
                     break;
-                case 5 when stringBuilder[0] == 'f' && stringBuilder[1] == 'a' && stringBuilder[2] == 'l' && stringBuilder[3] == 's' && stringBuilder[4] == 'e':
-                    value = JsonPrimitives.False;
-                    return true;
+                case 5:
+                    if (buffer.Equals(JsonBool.JsonFalseChars)) {
+                        value = JsonPrimitives.False;
+                        return true;
+                    }
+                    break;
             }
-
-            var json = stringBuilder.ToString();
-            value = new JsonNumber(json);
+            
+            value = new JsonNumber(buffer.ToString());
             return true;
         }
 
-        private async ValueTask<bool> EnsureNextCharsAsync(int minCharsRemaining = 1)
+        private bool EnsureNextChars(int minCharsRemaining = 1)
         {
             for (var i = 0; i < _remaining; i++)
             {
@@ -455,7 +674,7 @@ namespace DotLogix.Core.Nodes.Processor {
             if (_canReadFurther)
             {
                 _index = 0;
-                _remaining += await _readBlockFunc.Invoke(_buffer, _remaining, _buffer.Length - _remaining).ConfigureAwait(false);
+                _remaining += _readBlockFunc.Invoke(_buffer, _remaining, _buffer.Length - _remaining);
             }
 
             return _remaining >= minCharsRemaining;

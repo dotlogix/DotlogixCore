@@ -8,7 +8,7 @@
 
 #region
 using System;
-using System.Threading.Tasks;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
@@ -18,9 +18,9 @@ namespace DotLogix.Core.Nodes.Processor {
         public Node Root { get; private set; }
         public bool IsComplete => Root != null && ContainerStack.Count == 0;
 
-        #region Async
+        #region 
 
-        public override ValueTask WriteBeginMapAsync() {
+        public override void WriteBeginMap() {
             CheckName(CurrentName);
 
             var map = new NodeMap();
@@ -32,16 +32,14 @@ namespace DotLogix.Core.Nodes.Processor {
 
             CurrentNodeCollection = map;
             ContainerStack.Push(NodeContainerType.Map);
-            return default;
         }
 
-        public override ValueTask WriteEndMapAsync() {
+        public override void WriteEndMap() {
             ContainerStack.PopExpected(NodeContainerType.Map);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
-            return default;
         }
 
-        public override ValueTask WriteBeginListAsync() {
+        public override void WriteBeginList() {
             CheckName(CurrentName);
 
             var list = new NodeList();
@@ -53,16 +51,14 @@ namespace DotLogix.Core.Nodes.Processor {
 
             CurrentNodeCollection = list;
             ContainerStack.Push(NodeContainerType.List);
-            return default;
         }
 
-        public override ValueTask WriteEndListAsync() {
+        public override void WriteEndList() {
             ContainerStack.PopExpected(NodeContainerType.List);
             CurrentNodeCollection = CurrentNodeCollection.Ancestor;
-            return default;
         }
 
-        public override ValueTask WriteValueAsync(object value) {
+        public override void WriteValue(object value) {
             CheckName(CurrentName);
 
             var val = new NodeValue(value);
@@ -71,7 +67,6 @@ namespace DotLogix.Core.Nodes.Processor {
             else
                 AddChild(CurrentName, val);
             CurrentName = null;
-            return default;
         }
 
         #endregion

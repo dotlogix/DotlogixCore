@@ -10,20 +10,18 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
     /// <summary>
-    /// An implementation of the <see cref="IAsyncNodeWriter"/> interface to write json text
+    /// An implementation of the <see cref="INodeWriter"/> interface to write json text
     /// </summary>
     public class JsonNodeWriter : NodeWriterBase {
-        private readonly StringBuilder _builder;
+        private readonly CharBuffer _builder;
         private readonly TextWriter _writer;
         private readonly int _bufferSize;
         private readonly JsonFormatterSettings _formatterSettings;
-        private readonly JsonReaderOptions _options;
-        private bool IsSyncMode => (_options & JsonReaderOptions.Sync) != 0;
         private bool _isFirstChild = true;
 
         /// <summary>
@@ -32,16 +30,15 @@ namespace DotLogix.Core.Nodes.Processor {
         public JsonNodeWriter(TextWriter writer, JsonFormatterSettings formatterSettings = null, int bufferSize = 100) : base(formatterSettings ?? JsonFormatterSettings.Default) {
             _writer = writer;
             _bufferSize = bufferSize;
-            _builder = new StringBuilder(bufferSize);
-            _formatterSettings = formatterSettings ?? (JsonFormatterSettings)ConverterSettings;
-            _options = _formatterSettings.ReadOptions;
+            _builder = new CharBuffer(bufferSize);
+            _formatterSettings = (JsonFormatterSettings)ConverterSettings;
         }
 
 
-        #region Async
+        #region 
 
         /// <inheritdoc />
-        public override ValueTask WriteBeginMapAsync()
+        public override void WriteBeginMap()
         {
             CheckName(CurrentName, out var appendName);
 
@@ -61,26 +58,20 @@ namespace DotLogix.Core.Nodes.Processor {
             ContainerStack.Push(NodeContainerType.Map);
             _isFirstChild = true;
 
-            return FlushBufferAsync();
+            FlushBuffer();
         }
 
-        private ValueTask FlushBufferAsync() {
-            if (_builder.Length < _bufferSize && ContainerStack.Count != 0)
-                return default;
+        private void FlushBuffer() {
+            if (_builder.Count < _bufferSize && ContainerStack.Count != 0)
+                return;
 
             var value = _builder.ToString();
             _builder.Clear();
-
-            if (IsSyncMode)
-                return new ValueTask(_writer.WriteAsync(value));
-
             _writer.Write(value);
-            return default;
-
         }
 
         /// <inheritdoc />
-        public override ValueTask WriteEndMapAsync()
+        public override void WriteEndMap()
         {
             ContainerStack.PopExpected(NodeContainerType.Map);
             _isFirstChild = false;
@@ -89,11 +80,11 @@ namespace DotLogix.Core.Nodes.Processor {
                 WriteIdent();
             _builder.Append('}');
 
-            return FlushBufferAsync();
+            FlushBuffer();
         }
 
         /// <inheritdoc />
-        public override ValueTask WriteBeginListAsync()
+        public override void WriteBeginList()
         {
             CheckName(CurrentName, out var appendName);
 
@@ -113,11 +104,11 @@ namespace DotLogix.Core.Nodes.Processor {
             ContainerStack.Push(NodeContainerType.List);
             _isFirstChild = true;
 
-            return FlushBufferAsync();
+            FlushBuffer();
         }
 
         /// <inheritdoc />
-        public override ValueTask WriteEndListAsync()
+        public override void WriteEndList()
         {
             ContainerStack.PopExpected(NodeContainerType.List);
             _isFirstChild = false;
@@ -126,11 +117,11 @@ namespace DotLogix.Core.Nodes.Processor {
                 WriteIdent();
             _builder.Append(']');
 
-            return FlushBufferAsync();
+            FlushBuffer();
         }
 
         /// <inheritdoc />
-        public override ValueTask WriteValueAsync(object value)
+        public override void WriteValue(object value)
         {
             CheckName(CurrentName, out var appendName);
 
@@ -148,13 +139,13 @@ namespace DotLogix.Core.Nodes.Processor {
             AppendValueString(value);
             _isFirstChild = false;
 
-            return FlushBufferAsync();
+            FlushBuffer();
         }
 
         #endregion
 
         private void WriteIdent() {
-            _builder.AppendLine();
+            _builder.Append('\n');
             if (ContainerStack.Count == 0)
                 return;
 
@@ -165,7 +156,6 @@ namespace DotLogix.Core.Nodes.Processor {
 
         private void AppendName(string name) {
             _builder.Append('"');
-
             JsonStrings.AppendJsonString(_builder, name);
 
             _builder.Append('"').Append(':');
@@ -176,7 +166,7 @@ namespace DotLogix.Core.Nodes.Processor {
             switch (value)
             {
                 case null:
-                    _builder.Append("null");
+                    _builder.Append(JsonNull.JsonChars);
                     return;
                 case IJsonPrimitive primitive:
                     primitive.AppendJson(_builder);

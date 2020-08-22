@@ -9,8 +9,6 @@
 #region
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
 #endregion
 
@@ -224,10 +222,7 @@ namespace DotLogix.Core.Nodes {
         public static Node Clone(this Node node) {
             var reader = new NodeReader(node);
             var writer = new NodeWriter();
-            var task = reader.CopyToAsync(writer);
-            task.ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
+            reader.CopyTo(writer);
             return writer.Root;
         }
 
@@ -235,27 +230,27 @@ namespace DotLogix.Core.Nodes {
             return (TNode)Clone((Node)node);
         }
 
-        public static async ValueTask<TNode> ReadNodeAsync<TNode>(this IAsyncNodeReader reader) where TNode : Node
+        public static TNode ReadNode<TNode>(this INodeReader reader) where TNode : Node
         {
-            return (TNode)(await ReadNodeAsync(reader).ConfigureAwait(false));
+            return (TNode)(ReadNode(reader));
         }
         
-        public static async ValueTask<Node> ReadNodeAsync(this IAsyncNodeReader reader)
+        public static Node ReadNode(this INodeReader reader)
         {
             var writer = new NodeWriter();
             do
             {
-                var operation = await reader.ReadOperationAsync().ConfigureAwait(true);
-                await writer.WriteOperationAsync(operation).ConfigureAwait(true);
+                var operation = reader.ReadOperation();
+                writer.WriteOperation(operation);
             } while (!writer.IsComplete);
 
             return writer.Root;
         }
         
-        public static async ValueTask WriteNodeAsync(this IAsyncNodeWriter writer, Node node)
+        public static void WriteNode(this INodeWriter writer, Node node)
         {
             var reader = new NodeReader(node);
-            await reader.CopyToAsync(writer).ConfigureAwait(true);
+            reader.CopyTo(writer);
         }
     }
 }

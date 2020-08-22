@@ -5,6 +5,11 @@ using DotLogix.Core.Types;
 namespace DotLogix.Core.Nodes.Processor {
     public class JsonBool : IJsonPrimitive
     {
+        public static string JsonTrue { get; } = "true";
+        public static char[] JsonTrueChars { get; } = JsonTrue.ToCharArray();
+        public static string JsonFalse { get; } = "false";
+        public static char[] JsonFalseChars { get; } = JsonFalse.ToCharArray();
+
         private JsonBool(bool value)
         {
             Value = value;
@@ -21,20 +26,20 @@ namespace DotLogix.Core.Nodes.Processor {
                 return Value;
 
             if ((targetType.Flags & DataTypeFlags.String) != 0)
-                return Value.ToString();
+                return ToJson();
 
             throw new NotSupportedException(
                                             $"Primitive {Type} can not be converted to target type {targetType.Type.Name}");
         }
 
-        public void AppendJson(StringBuilder stringBuilder)
+        public void AppendJson(CharBuffer buffer)
         {
-            stringBuilder.Append(ToJson());
+            buffer.Append(Value ? JsonTrueChars : JsonFalseChars);
         }
 
         public string ToJson()
         {
-            return Value ? "true" : "false";
+            return Value ? JsonTrue : JsonFalse;
         }
 
         public JsonPrimitiveType Type => JsonPrimitiveType.Boolean;

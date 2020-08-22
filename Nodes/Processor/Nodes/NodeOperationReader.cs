@@ -8,7 +8,7 @@
 
 #region
 using System.Collections.Generic;
-using System.Threading.Tasks;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
@@ -19,10 +19,8 @@ namespace DotLogix.Core.Nodes.Processor {
             Operations = operations.GetEnumerator();
         }
 
-        protected override ValueTask<NodeOperation?> ReadNextAsync() {
-            return Operations.MoveNext()
-                       ? new ValueTask<NodeOperation?>(Operations.Current)
-                       : default;
+        protected override NodeOperation? ReadNext() {
+            return Operations.MoveNext() ? Operations.Current : default;
         }
 
         protected override void Dispose(bool disposing)

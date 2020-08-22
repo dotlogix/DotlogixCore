@@ -10,14 +10,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
     /// <summary>
-    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert arrays
+    /// An implementation of the <see cref="INodeConverter"/> interface to convert arrays
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class CollectionNodeConverter<T> : NodeConverter {
@@ -40,7 +39,7 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
+        public override void Write(object instance, INodeWriter writer, IReadOnlyConverterSettings settings) {
             var scopedSettings = settings.GetScoped(TypeSettings);
             var childConverter = TypeSettings.ChildSettings.Converter;
 
@@ -48,7 +47,7 @@ namespace DotLogix.Core.Nodes.Converters {
                 return;
 
             if (instance == null) {
-                await writer.WriteValueAsync(null).ConfigureAwait(false);
+                writer.WriteValue(null);
                 return;
             }
 
@@ -57,37 +56,37 @@ namespace DotLogix.Core.Nodes.Converters {
             if (!(instance is IEnumerable<T> values))
                 throw new ArgumentException($"Expected instance of type \"IEnumerable<T>\" got \"{instance.GetType()}\"");
 
-            await writer.WriteBeginListAsync().ConfigureAwait(false);
+            writer.WriteBeginList();
 
             foreach (var value in values) {
-                await childConverter.WriteAsync(value, writer, scopedSettings).ConfigureAwait(false);
+                childConverter.Write(value, writer, scopedSettings);
             }
             
-            await writer.WriteEndListAsync().ConfigureAwait(false);
+            writer.WriteEndList();
         }
 
         /// <inheritdoc />
-        public override async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
-            var next = await reader.PeekOperationAsync().ConfigureAwait(false);
+        public override object Read(INodeReader reader, IReadOnlyConverterSettings settings) {
+            var next = reader.PeekOperation();
             if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null))
                 return default;
 
-            await reader.ReadBeginListAsync().ConfigureAwait(false);
+            reader.ReadBeginList();
 
             var scopedSettings = settings.GetScoped(TypeSettings.ChildSettings);
             var childConverter = TypeSettings.ChildSettings.Converter;
 
             var collection = _ctor.IsDefault ? (ICollection<T>)_ctor.Invoke() : new List<T>();
             while (true) {
-                next = await reader.PeekOperationAsync().ConfigureAwait(false);
+                next = reader.PeekOperation();
                 if (next.HasValue == false || next.Value.Type == NodeOperationTypes.EndList)
                     break;
 
-                var child = (T)await childConverter.ReadAsync(reader, scopedSettings).ConfigureAwait(false);
+                var child = (T)childConverter.Read(reader, scopedSettings);
                 collection.Add(child);
             }
 
-            await reader.ReadEndListAsync().ConfigureAwait(false);
+            reader.ReadEndList();
 
             return Type.IsInstanceOfType(collection)
                        ? collection

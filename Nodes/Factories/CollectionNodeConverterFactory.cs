@@ -51,7 +51,7 @@ namespace DotLogix.Core.Nodes.Factories {
         }
 
         /// <inheritdoc />
-        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter) {
+        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out INodeConverter converter) {
             converter = null;
             if(typeSettings.NodeType != NodeTypes.List)
                 return false;
@@ -84,14 +84,14 @@ namespace DotLogix.Core.Nodes.Factories {
             return true;
         }
 
-        private static IAsyncNodeConverter CreateCollectionConverter(TypeSettings typeSettings) {
+        private static INodeConverter CreateCollectionConverter(TypeSettings typeSettings) {
             var collectionConverterType = typeof(CollectionNodeConverter<>).MakeGenericType(typeSettings.DataType.ElementType);
-            return (IAsyncNodeConverter)Activator.CreateInstance(collectionConverterType, typeSettings);
+            return (INodeConverter)Activator.CreateInstance(collectionConverterType, typeSettings);
         }
 
-        private static IAsyncNodeConverter CreateArrayConverter(TypeSettings typeSettings) {
+        private static INodeConverter CreateArrayConverter(TypeSettings typeSettings) {
             var arrayConverterType = typeof(ArrayNodeConverter<>).MakeGenericType(typeSettings.DataType.ElementType);
-            return (IAsyncNodeConverter)Activator.CreateInstance(arrayConverterType, typeSettings);
+            return (INodeConverter)Activator.CreateInstance(arrayConverterType, typeSettings);
         }
     }
 }

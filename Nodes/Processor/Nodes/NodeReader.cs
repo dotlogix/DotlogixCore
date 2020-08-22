@@ -8,9 +8,7 @@
 
 #region
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 #endregion
 
@@ -23,10 +21,8 @@ namespace DotLogix.Core.Nodes.Processor {
             Operations = EnumerateRecursive(node).GetEnumerator();
         }
         
-        protected override ValueTask<NodeOperation?> ReadNextAsync() {
-            return Operations.MoveNext()
-                       ? new ValueTask<NodeOperation?>(Operations.Current)
-                       : default;
+        protected override NodeOperation? ReadNext() {
+            return Operations.MoveNext() ? Operations.Current : default;
         }
 
         public IEnumerator<NodeOperation> Operations { get; set; }

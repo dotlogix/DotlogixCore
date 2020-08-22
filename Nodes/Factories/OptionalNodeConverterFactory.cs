@@ -18,10 +18,10 @@ namespace DotLogix.Core.Nodes.Factories {
     /// </summary>
     public class OptionalNodeConverterFactory : NodeConverterFactoryBase {
         /// <inheritdoc />
-        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter) {
+        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out INodeConverter converter) {
             if(typeSettings.DataType.Type.IsAssignableToOpenGeneric(typeof(Optional<>), out var genericTypeArguments)) {
                 var collectionConverterType = typeof(OptionalNodeConverter<>).MakeGenericType(genericTypeArguments);
-                converter = (IAsyncNodeConverter)Activator.CreateInstance(collectionConverterType, typeSettings);
+                converter = (INodeConverter)Activator.CreateInstance(collectionConverterType, typeSettings);
                 return true;
             }
 

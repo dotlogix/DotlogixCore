@@ -5,6 +5,5 @@ namespace DotLogix.Core.Nodes.Processor {
     public enum JsonReaderOptions {
         None = 0,
         Tolerant = 1, // << 0
-        Sync = 1 << 1
     }
 }

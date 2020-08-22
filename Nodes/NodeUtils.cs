@@ -8,7 +8,6 @@
 
 #region
 using System;
-using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Factories;
 using DotLogix.Core.Nodes.Processor;
@@ -58,30 +57,30 @@ namespace DotLogix.Core.Nodes {
 
 
         #region WriteTo
-        public static ValueTask WriteToAsync(object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
-            return WriteToAsync(null, instance, instance?.GetType(), writer, settings);
+        public static void WriteTo(object instance, INodeWriter writer, ConverterSettings settings) {
+            WriteTo(null, instance, instance?.GetType(), writer, settings);
         }
 
-        public static ValueTask WriteToAsync(object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
-            return WriteToAsync(null, instance, instanceType, writer, settings);
+        public static void WriteTo(object instance, Type instanceType, INodeWriter writer, ConverterSettings settings) {
+            WriteTo(null, instance, instanceType, writer, settings);
         }
 
-        public static ValueTask WriteToAsync(string name, object instance, IAsyncNodeWriter writer, ConverterSettings settings) {
-            return WriteToAsync(name, instance, instance?.GetType(), writer, settings);
+        public static void WriteTo(string name, object instance, INodeWriter writer, ConverterSettings settings) {
+            WriteTo(name, instance, instance?.GetType(), writer, settings);
         }
 
-        public static async ValueTask WriteToAsync(string name, object instance, Type instanceType, IAsyncNodeWriter writer, ConverterSettings settings) {
+        public static void WriteTo(string name, object instance, Type instanceType, INodeWriter writer, ConverterSettings settings) {
             if(string.IsNullOrEmpty(name) == false)
-                await writer.WriteNameAsync(name).ConfigureAwait(false);
+                writer.WriteName(name);
 
             if(instance == null) {
-                await writer.WriteValueAsync(null).ConfigureAwait(false);
+                writer.WriteValue(null);
                 return;
             }
 
             if(instance is Node node) {
                 var reader = new NodeReader(node);
-                await reader.CopyToAsync(writer).ConfigureAwait(false);
+                reader.CopyTo(writer);
                 return;
             }
 
@@ -89,11 +88,11 @@ namespace DotLogix.Core.Nodes {
                 throw new ArgumentNullException(nameof(instanceType));
 
             if(settings.Resolver.TryResolve(instanceType, out var typeSettings)) {
-                await typeSettings.Converter.WriteAsync(instance, writer, settings).ConfigureAwait(false);
+                typeSettings.Converter.Write(instance, writer, settings);
                 return;
             }
 
-            await writer.WriteValueAsync(null).ConfigureAwait(false);
+            writer.WriteValue(null);
         }
         #endregion
 
@@ -116,10 +115,7 @@ namespace DotLogix.Core.Nodes {
 
             settings ??= ConverterSettings.Default;
             var nodeWriter = new NodeWriter(settings);
-            WriteToAsync(name, instance, instanceType, nodeWriter, settings)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
+            WriteTo(name, instance, instanceType, nodeWriter, settings);
             return nodeWriter.Root;
         }
         #endregion

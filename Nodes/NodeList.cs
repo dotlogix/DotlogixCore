@@ -196,7 +196,7 @@ namespace DotLogix.Core.Nodes {
         }
 
         protected override void AddMatchingNodes(string pattern, List<Node> newResults) {
-            if(Range.TryParse(pattern, out var range) == false)
+            if(Utils.Patterns.Range.TryParse(pattern, out var range) == false)
                 return;
 
             var childCount = ChildCount;

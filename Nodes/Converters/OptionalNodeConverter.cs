@@ -7,14 +7,13 @@
 // ==================================================
 
 #region
-using System;
-using System.Threading.Tasks;
+
 using DotLogix.Core.Nodes.Processor;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
     /// <summary>
-    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to optional values
+    /// An implementation of the <see cref="INodeConverter"/> interface to optional values
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
     public class OptionalNodeConverter<TValue> : NodeConverter {
@@ -24,32 +23,32 @@ namespace DotLogix.Core.Nodes.Converters {
         public OptionalNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
         /// <inheritdoc />
-        public override ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
+        public override void Write(object instance, INodeWriter writer, IReadOnlyConverterSettings settings) {
             if(!(instance is Optional<TValue> opt))
-                return default;
+                return;
 
             if (opt.IsDefined == false)
-                return default;
+                return;
 
             var scopedSettings = settings.GetScoped(TypeSettings.ChildSettings);
             var childConverter = TypeSettings.ChildSettings.Converter;
 
             if (scopedSettings.ShouldEmitValue(opt.Value) == false)
-                return default;
+                return;
 
-            return childConverter.WriteAsync(opt.Value, writer, scopedSettings);
+            childConverter.Write(opt.Value, writer, scopedSettings);
         }
 
         /// <inheritdoc />
-        public override async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
-            var next = await reader.PeekOperationAsync().ConfigureAwait(false);
+        public override object Read(INodeReader reader, IReadOnlyConverterSettings settings) {
+            var next = reader.PeekOperation();
             if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null))
                 return new Optional<TValue>(default);
 
             var scopedSettings = settings.GetScoped(TypeSettings.ChildSettings);
             var childConverter = TypeSettings.ChildSettings.Converter;
 
-            return childConverter.ReadAsync(reader, scopedSettings).ConfigureAwait(false);
+            return childConverter.Read(reader, scopedSettings);
         }
 
         /// <inheritdoc />

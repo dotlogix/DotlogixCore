@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Text;
 using DotLogix.Core.Types;
 
 namespace DotLogix.Core.Nodes.Processor {
@@ -13,9 +12,9 @@ namespace DotLogix.Core.Nodes.Processor {
         
         public JsonPrimitiveType Type => JsonPrimitiveType.Number;
         
-        public void AppendJson(StringBuilder stringBuilder)
+        public void AppendJson(CharBuffer buffer)
         {
-            stringBuilder.Append(Value);
+            buffer.Append(Value);
         }
 
         public string ToJson()

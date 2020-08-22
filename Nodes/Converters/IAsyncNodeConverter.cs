@@ -8,7 +8,6 @@
 
 #region
 using System;
-using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
@@ -17,7 +16,7 @@ namespace DotLogix.Core.Nodes.Converters {
     /// <summary>
     /// An interface to represent a node converter
     /// </summary>
-    public interface IAsyncNodeConverter {
+    public interface INodeConverter {
         /// <summary>
         /// The type
         /// </summary>
@@ -34,12 +33,12 @@ namespace DotLogix.Core.Nodes.Converters {
         /// <summary>
         /// Writes an object value to a node writer
         /// </summary>
-        ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
+        void Write(object instance, INodeWriter writer, IReadOnlyConverterSettings settings);
 
         /// <summary>
         /// Reads an object value from a node reader
         /// </summary>
-        ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings);
+       object Read(INodeReader reader, IReadOnlyConverterSettings settings);
 
         /// <summary>
         /// Convert the node to an object of the target type

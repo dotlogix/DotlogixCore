@@ -8,8 +8,6 @@
 
 #region
 using System;
-using System.Threading.Tasks;
-using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 using DotLogix.Core.Utils.Naming;
@@ -20,7 +18,7 @@ namespace DotLogix.Core.Nodes.Converters {
     /// <summary>
     /// A base class for node converters
     /// </summary>
-    public abstract class NodeConverter : IAsyncNodeConverter {
+    public abstract class NodeConverter : INodeConverter {
         /// <summary>
         /// Creates a new instance of <see cref="NodeConverter"/>
         /// </summary>
@@ -38,12 +36,12 @@ namespace DotLogix.Core.Nodes.Converters {
         public TypeSettings TypeSettings { get; }
 
         /// <inheritdoc />
-        public abstract ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings);
+        public abstract void Write(object instance, INodeWriter writer, IReadOnlyConverterSettings settings);
 
         /// <inheritdoc />
-        public virtual async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings)
+        public virtual object Read(INodeReader reader, IReadOnlyConverterSettings settings)
         {
-            var node = await reader.ReadNodeAsync().ConfigureAwait(false);
+            var node = reader.ReadNode();
             return ConvertToObject(node, settings);
         }
 

@@ -20,7 +20,7 @@ namespace DotLogix.Core.Nodes.Factories {
         /// <summary>
         /// Create a new node converter
         /// </summary>
-        public IAsyncNodeConverter CreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings) {
+        public INodeConverter CreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings) {
             if (TryCreateConverter(resolver, typeSettings, out var converter))
                 return converter;
 
@@ -30,6 +30,6 @@ namespace DotLogix.Core.Nodes.Factories {
         /// <summary>
         /// Try to create a new node converter
         /// </summary>
-        public abstract bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter);
+        public abstract bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out INodeConverter converter);
     }
 }

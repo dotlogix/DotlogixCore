@@ -1,51 +1,51 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 
 namespace DotLogix.Core.Nodes.Processor {
     /// <summary>
     /// An interface to represent node readers
     /// </summary>
-    public interface IAsyncNodeReader {
+    public interface INodeReader : IDisposable {
         /// <summary>
         /// Reads a map start operation with an optional name argument
         /// </summary>
-        ValueTask<string> ReadNameAsync();
+       string ReadName();
         /// <summary>
         /// Reads a map start operation with an optional name argument
         /// </summary>
-        ValueTask ReadBeginMapAsync();
+        void ReadBeginMap();
         /// <summary>
         /// Reads a map end operation
         /// </summary>
-        ValueTask ReadEndMapAsync();
+        void ReadEndMap();
 
         /// <summary>
         /// Reads a list start operation with an optional name argument
         /// </summary>
-        ValueTask ReadBeginListAsync();
+        void ReadBeginList();
         /// <summary>
         /// Reads a list end operation
         /// </summary>
-        ValueTask ReadEndListAsync();
+        void ReadEndList();
 
         /// <summary>
         /// Reads a primitive value token with a name argument
         /// </summary>
-        ValueTask<object> ReadValueAsync();
+       object ReadValue();
 
         /// <summary>
         /// Reads an operation token
         /// </summary>
-        ValueTask<NodeOperation> ReadOperationAsync();
+       NodeOperation ReadOperation();
 
         /// <summary>
         /// Reads an operation token without consuming it
         /// </summary>
-        ValueTask<NodeOperation?> PeekOperationAsync();
+       NodeOperation? PeekOperation();
         
         /// <summary>
         /// Copies all remaining operation tokens to a node writer
         /// </summary>
-        ValueTask CopyToAsync(IAsyncNodeWriter writer);
+        void CopyTo(INodeWriter writer);
 
     }
 }

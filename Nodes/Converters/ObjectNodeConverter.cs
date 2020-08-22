@@ -11,10 +11,8 @@ using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Utils;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using DotLogix.Core.Utils.Naming;
 
 #endregion
@@ -35,7 +33,7 @@ namespace DotLogix.Core.Nodes.Converters
 
 
     /// <summary>
-    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert objects
+    /// An implementation of the <see cref="INodeConverter"/> interface to convert objects
     /// </summary>
     public class ObjectNodeConverter : NodeConverter
     {
@@ -75,18 +73,18 @@ namespace DotLogix.Core.Nodes.Converters
         }
 
         /// <inheritdoc/>
-        public override async ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings)
+        public override void Write(object instance, INodeWriter writer, IReadOnlyConverterSettings settings)
         {
             var scopedSettings = settings.GetScoped(TypeSettings);
             if (scopedSettings.ShouldEmitValue(instance) == false)
                 return;
 
             if(instance == null) {
-                await writer.WriteValueAsync(null).ConfigureAwait(false);
+                writer.WriteValue(null);
                 return;
             }
 
-            await writer.WriteBeginMapAsync().ConfigureAwait(false);
+            writer.WriteBeginMap();
 
             var namingStrategy = scopedSettings.NamingStrategy;
             var memberNames = EnsureMemberNames(namingStrategy);
@@ -99,11 +97,11 @@ namespace DotLogix.Core.Nodes.Converters
                 var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: member);
 
                 var memberValue = member.Accessor.GetValue(instance);
-                await writer.WriteNameAsync(memberNames[i]).ConfigureAwait(false);
-                await member.Converter.WriteAsync(memberValue, writer, scopedMemberSettings).ConfigureAwait(false);
+                writer.WriteName(memberNames[i]);
+                member.Converter.Write(memberValue, writer, scopedMemberSettings);
             }
 
-            await writer.WriteEndMapAsync().ConfigureAwait(false);
+            writer.WriteEndMap();
         }
 
         private string[] EnsureMemberNames(INamingStrategy namingStrategy)
@@ -117,32 +115,35 @@ namespace DotLogix.Core.Nodes.Converters
         }
 
         /// <inheritdoc />
-        public override async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
-            var next = await reader.PeekOperationAsync().ConfigureAwait(false);
+        public override object Read(INodeReader reader, IReadOnlyConverterSettings settings) {
+            var next = reader.PeekOperation();
             if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null))
                 return default;
-            await reader.ReadBeginMapAsync().ConfigureAwait(false);
+            reader.ReadBeginMap();
 
             var instance = Ctor.Invoke();
             var scopedSettings = settings.GetScoped(TypeSettings);
             var memberNames = EnsureMemberNames(scopedSettings.NamingStrategy);
             while (true) {
-                next = await reader.PeekOperationAsync().ConfigureAwait(false);
+                next = reader.PeekOperation();
                 if (next.HasValue == false || next.Value.Type == NodeOperationTypes.EndMap)
                     break;
 
                 var memberIdx = Array.IndexOf(memberNames, next.Value.Name);
+                if (memberIdx < 0)
+                    continue;
+
                 var memberSettings = MemberSettings[memberIdx];
                 if (memberSettings.Accessor.CanWrite == false)
                     continue;
 
                 var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: memberSettings);
 
-                var memberValue = await memberSettings.Converter.ReadAsync(reader, scopedMemberSettings).ConfigureAwait(false);
+                var memberValue = memberSettings.Converter.Read(reader, scopedMemberSettings);
                 memberSettings.Accessor.SetValue(instance, memberValue);
             }
 
-            await reader.ReadEndMapAsync().ConfigureAwait(false);
+            reader.ReadEndMap();
 
             return instance;
         }

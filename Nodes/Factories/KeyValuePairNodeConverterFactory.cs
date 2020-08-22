@@ -18,7 +18,7 @@ namespace DotLogix.Core.Nodes.Factories {
     /// </summary>
     public class KeyValuePairNodeConverterFactory : NodeConverterFactoryBase {
         /// <inheritdoc />
-        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter) {
+        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out INodeConverter converter) {
             converter = null;
 
             if(typeSettings.NodeType != NodeTypes.Map)

@@ -8,7 +8,6 @@
 
 #region
 using System;
-using System.Net.Security;
 using System.Text;
 using DotLogix.Core.Extensions;
 #endregion
@@ -24,6 +23,18 @@ namespace DotLogix.Core.Nodes.Processor {
         private const int CharAlower = 'a';
         private const int CharF = 'F';
         private const int CharFlower = 'f';
+
+
+        private static ArrayPool<char> _charArrayPool = new ArrayPool<char>(initialCount: 10);
+
+        public static char[] RentBuffer(int minimumLength) {
+            return _charArrayPool.Rent(minimumLength);
+        }
+
+        public static void ReturnBuffer(char[] buffer) {
+            _charArrayPool.Return(buffer);
+        }
+
 
         /// <summary>
         /// Unescapes a json formatted string
@@ -106,17 +117,19 @@ namespace DotLogix.Core.Nodes.Processor {
         /// Escapes a json formatted string
         /// </summary>
         public static string EscapeJsonString(string value, bool addQuotes = false) {
-            var sb = new StringBuilder();
-            AppendJsonString(sb, value, addQuotes);
-            return sb.ToString();
+            var buffer = new CharBuffer(value.Length + 2);
+            AppendJsonString(buffer, value, addQuotes);
+            return buffer.ToString();
         }
 
         /// <summary>
         /// Escapes a json formatted string and append it to a string builder
         /// </summary>
-        public static void AppendJsonString(StringBuilder builder, string value, bool addQuotes = false) {
-            if(addQuotes)
-                builder.Append("\"");
+        public static void AppendJsonString(CharBuffer builder, string value, bool addQuotes = false) {
+            builder.EnsureCapacity(value.Length + 2);
+
+            if (addQuotes)
+                builder.Append('\"');
             char[] unicodeBuffer = null;
 
             var safeCharactersCount = 0;

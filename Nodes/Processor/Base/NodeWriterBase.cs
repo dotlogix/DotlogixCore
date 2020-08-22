@@ -8,11 +8,11 @@
 
 #region
 using System;
-using System.Threading.Tasks;
+
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
-    public abstract class NodeWriterBase : IAsyncNodeWriter {
+    public abstract class NodeWriterBase : INodeWriter {
         protected readonly NodeContainerStack ContainerStack = new NodeContainerStack();
         protected NodeWriterBase(ConverterSettings converterSettings = null) {  
             ConverterSettings = converterSettings ?? ConverterSettings.Default;
@@ -21,44 +21,43 @@ namespace DotLogix.Core.Nodes.Processor {
         protected string CurrentName { get; set; }
         protected ConverterSettings ConverterSettings { get; set; }
 
-        #region Async
+        #region 
 
-        public ValueTask WriteNameAsync(string name)
+        public void WriteName(string name)
         {
             CurrentName = name;
-            return default;
         }
 
-        public abstract ValueTask WriteBeginMapAsync();
-        public abstract ValueTask WriteEndMapAsync();
+        public abstract void WriteBeginMap();
+        public abstract void WriteEndMap();
 
-        public abstract ValueTask WriteBeginListAsync();
-        public abstract ValueTask WriteEndListAsync();
+        public abstract void WriteBeginList();
+        public abstract void WriteEndList();
 
-        public abstract ValueTask WriteValueAsync(object value);
+        public abstract void WriteValue(object value);
 
-        public async ValueTask WriteOperationAsync(NodeOperation operation)
+        public void WriteOperation(NodeOperation operation)
         {
             var name = operation.Name ?? CurrentName;
             CurrentName = null;
             if (string.IsNullOrEmpty(name) == false)
-                await WriteNameAsync(name).ConfigureAwait(false);
+                WriteName(name);
 
             switch(operation.Type) {
                 case NodeOperationTypes.BeginMap:
-                    await WriteBeginMapAsync().ConfigureAwait(false);
+                    WriteBeginMap();
                     break;
                 case NodeOperationTypes.EndMap:
-                    await WriteEndMapAsync().ConfigureAwait(false);
+                    WriteEndMap();
                     break;
                 case NodeOperationTypes.BeginList:
-                    await WriteBeginListAsync().ConfigureAwait(false);
+                    WriteBeginList();
                     break;
                 case NodeOperationTypes.EndList:
-                    await WriteEndListAsync().ConfigureAwait(false);
+                    WriteEndList();
                     break;
                 case NodeOperationTypes.Value:
-                    await WriteValueAsync(operation.Value).ConfigureAwait(false);
+                    WriteValue(operation.Value);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -66,5 +65,16 @@ namespace DotLogix.Core.Nodes.Processor {
         }
 
         #endregion
+
+        protected virtual void Dispose(bool disposing)
+        {
+            
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

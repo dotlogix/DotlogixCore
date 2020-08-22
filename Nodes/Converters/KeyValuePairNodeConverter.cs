@@ -9,7 +9,6 @@
 #region
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
@@ -19,7 +18,7 @@ using DotLogix.Core.Utils.Naming;
 
 namespace DotLogix.Core.Nodes.Converters {
     /// <summary>
-    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert key value pairs
+    /// An implementation of the <see cref="INodeConverter"/> interface to convert key value pairs
     /// </summary>
     public class KeyValuePairNodeConverter : NodeConverter {
         private readonly MemberSettings _keySettings;
@@ -41,26 +40,26 @@ namespace DotLogix.Core.Nodes.Converters {
         }
 
         /// <inheritdoc />
-        public override async ValueTask WriteAsync(object instance, IAsyncNodeWriter writer, IReadOnlyConverterSettings settings) {
+        public override void Write(object instance, INodeWriter writer, IReadOnlyConverterSettings settings) {
             var keyFieldValue = _keySettings.Accessor.GetValue(instance);
             var valueFieldValue = _valueSettings.Accessor.GetValue(instance);
 
             var (keyName, valueName) = EnsureMemberNames(settings.NamingStrategy);
 
-            await writer.WriteBeginMapAsync().ConfigureAwait(false);
+            writer.WriteBeginMap();
 
-            await writer.WriteNameAsync(keyName).ConfigureAwait(false);
-            await _keySettings.Converter.WriteAsync(keyFieldValue, writer, settings).ConfigureAwait(false);
+            writer.WriteName(keyName);
+            _keySettings.Converter.Write(keyFieldValue, writer, settings);
 
-            await writer.WriteNameAsync(valueName).ConfigureAwait(false);
-            await _valueSettings.Converter.WriteAsync(valueFieldValue, writer, settings).ConfigureAwait(false);
+            writer.WriteName(valueName);
+            _valueSettings.Converter.Write(valueFieldValue, writer, settings);
 
-            await writer.WriteEndMapAsync().ConfigureAwait(false);
+            writer.WriteEndMap();
         }
 
         /// <inheritdoc />
-        public override async ValueTask<object> ReadAsync(IAsyncNodeReader reader, IReadOnlyConverterSettings settings) {
-            var next = await reader.PeekOperationAsync().ConfigureAwait(false);
+        public override object Read(INodeReader reader, IReadOnlyConverterSettings settings) {
+            var next = reader.PeekOperation();
             if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null))
                 return _defaultCtor.Invoke();
 
@@ -68,16 +67,16 @@ namespace DotLogix.Core.Nodes.Converters {
             Optional<object> value = default;
             var (keyName, valueName) = EnsureMemberNames(settings.NamingStrategy);
 
-            await reader.ReadBeginMapAsync().ConfigureAwait(false);
+            reader.ReadBeginMap();
             for(var i = 0; i < 2; i++) {
-                var name = await reader.ReadNameAsync().ConfigureAwait(false);
+                var name = reader.ReadName();
                 if(key.IsUndefined && name == keyName) {
-                    key = await _keySettings.Converter.ReadAsync(reader, settings).ConfigureAwait(false);
+                    key = _keySettings.Converter.Read(reader, settings);
                 } else if(value.IsUndefined && name == valueName) {
-                    value = await _valueSettings.Converter.ReadAsync(reader, settings).ConfigureAwait(false);
+                    value = _valueSettings.Converter.Read(reader, settings);
                 }
             }
-            await reader.ReadEndMapAsync().ConfigureAwait(false);
+            reader.ReadEndMap();
 
             if (key.IsUndefined)
                 throw new ArgumentException("KeyNode is not defined");

@@ -1,5 +1,5 @@
 ﻿using System;
-using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Nodes.Utils;
 using NUnit.Framework;
 
 namespace NodeTests.Utils {

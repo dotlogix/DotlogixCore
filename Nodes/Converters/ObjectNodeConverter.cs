@@ -7,12 +7,13 @@
 #region
 
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DotLogix.Core.Nodes.Formats;
+using DotLogix.Core.Nodes.Formats.Nodes;
 using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Utils.Naming;
 
@@ -20,27 +21,13 @@ using DotLogix.Core.Utils.Naming;
 
 namespace DotLogix.Core.Nodes.Converters
 {
-    //public class MemberNameCacheItem
-    //{
-    //    public MemberSettings Settings { get; }
-    //    public bool Serialize { get; }
-    //    public bool Use { get; }
-    //    public bool UseInCtor { get; }
-
-
-    //    public string RewrittenName { get; }
-    //}
-
-
-
     /// <summary>
     /// An implementation of the <see cref="INodeConverter"/> interface to convert objects
     /// </summary>
     public class ObjectNodeConverter : NodeConverter
     {
-        private static readonly SelectorEqualityComparer<MemberSettings, DynamicAccessor> SettingsEqualityComparer = new SelectorEqualityComparer<MemberSettings, DynamicAccessor>(s => s.Accessor);
         private static readonly SelectorComparer<MemberSettings, int> SettingsOrderComparer = new SelectorComparer<MemberSettings, int>(s => s.Order ?? int.MaxValue);
-        private Dictionary<INamingStrategy, string[]> MemberNameCache { get; } = new Dictionary<INamingStrategy, string[]>();
+        private Dictionary<INamingStrategy, MemberCache> MemberNameCache { get; } = new Dictionary<INamingStrategy, MemberCache>();
 
         public DynamicCtor Ctor { get; }
         public MemberSettings[] MemberSettings { get; }
@@ -53,24 +40,10 @@ namespace DotLogix.Core.Nodes.Converters
             MemberSettings = memberSettings.AsArray();
 
             Array.Sort(MemberSettings, SettingsOrderComparer);
-
             var dynamicType = typeSettings.DynamicType;
-            if (!dynamicType.HasDefaultConstructor)
-            {
-                throw new ArgumentException($"Type {dynamicType.Name} does not have a default constructor");
-            }
-
-            Ctor = dynamicType.DefaultConstructor;
-
-
-            //foreach (var ctor in dynamicType.Constructors)
-            //{
-            //    if (CanConstructWith(ctor, MemberSettings, out var neededMembers) == false)
-            //        continue;
-            //    Ctor = ctor;
-            //    MembersToDeserialize = MemberSettings.Where(a => a.Accessor.CanWrite).Except(neededMembers, SettingsEqualityComparer).ToArray();
-            //    MembersForCtor = neededMembers;
-            //}
+            Ctor = dynamicType.HasDefaultConstructor
+                       ? dynamicType.DefaultConstructor
+                       : null;
         }
 
         /// <inheritdoc/>
@@ -88,7 +61,7 @@ namespace DotLogix.Core.Nodes.Converters
             writer.WriteBeginMap();
 
             var namingStrategy = scopedSettings.NamingStrategy;
-            var memberNames = EnsureMemberNames(namingStrategy);
+            var memberNames = EnsureNameCache(namingStrategy);
             for (var i = 0; i < MemberSettings.Length; i++)
             {
                 var member = MemberSettings[i];
@@ -98,18 +71,18 @@ namespace DotLogix.Core.Nodes.Converters
                 var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: member);
 
                 var memberValue = member.Accessor.GetValue(instance);
-                writer.WriteName(memberNames[i]);
+                writer.WriteName(memberNames.GetRewrittenName(i));
                 member.Converter.Write(memberValue, writer, scopedMemberSettings);
             }
 
             writer.WriteEndMap();
         }
 
-        private string[] EnsureMemberNames(INamingStrategy namingStrategy)
+        private MemberCache EnsureNameCache(INamingStrategy namingStrategy)
         {
-            string[] CreateMemberNames(INamingStrategy s)
+            MemberCache CreateMemberNames(INamingStrategy s)
             {
-                return MemberSettings.Select(m => GetMemberName(m, s)).ToArray();
+                return new MemberCache(MemberSettings.Select(m => GetMemberName(m, s)).ToArray());
             }
 
             return MemberNameCache.GetOrAdd(namingStrategy, CreateMemberNames);
@@ -118,28 +91,55 @@ namespace DotLogix.Core.Nodes.Converters
         /// <inheritdoc />
         public override object Read(INodeReader reader, IReadOnlyConverterSettings settings) {
             var next = reader.PeekOperation();
-            if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null))
+            if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null)) {
+                reader.ReadOperation();
                 return default;
+            }
+
+            return Ctor != null
+                       ? ReadWithDefaultCtor(reader, settings)
+                       : ReadAutoSelectCtor(reader, settings);
+        }
+
+
+        /// <inheritdoc />
+        public override object ConvertToObject(Node node, IReadOnlyConverterSettings settings)
+        {
+            if (node.Type == NodeTypes.Empty)
+                return default;
+
+            if (!(node is NodeMap nodeMap))
+                throw new ArgumentException($"Expected node of type \"NodeMap\" got \"{node.Type}\"");
+
+            return Ctor != null
+                       ? ConvertToObjectWithDefaultCtor(nodeMap, settings)
+                       : ConvertToObjectAutoSelectCtor(nodeMap, settings);
+        }
+
+        private object ReadWithDefaultCtor(INodeReader reader, IReadOnlyConverterSettings settings) {
             reader.ReadBeginMap();
 
             var instance = Ctor.Invoke();
             var scopedSettings = settings.GetScoped(TypeSettings);
-            var memberNames = EnsureMemberNames(scopedSettings.NamingStrategy);
-            while (true) {
-                next = reader.PeekOperation();
+            var memberNames = EnsureNameCache(scopedSettings.NamingStrategy);
+
+            while (true)
+            {
+                var next = reader.PeekOperation();
                 if (next.HasValue == false || next.Value.Type == NodeOperationTypes.EndMap)
                     break;
 
-                var memberIdx = Array.IndexOf(memberNames, next.Value.Name);
-                if (memberIdx < 0)
+                var memberIdx = memberNames.GetMemberIndex(next.Value.Name);
+                if (memberIdx < 0) {
+                    reader.SkipNode();
                     continue;
+                }
 
                 var memberSettings = MemberSettings[memberIdx];
                 if (memberSettings.Accessor.CanWrite == false)
                     continue;
 
                 var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: memberSettings);
-
                 var memberValue = memberSettings.Converter.Read(reader, scopedMemberSettings);
                 memberSettings.Accessor.SetValue(instance, memberValue);
             }
@@ -149,23 +149,51 @@ namespace DotLogix.Core.Nodes.Converters
             return instance;
         }
 
-        /// <inheritdoc/>
-        public override object ConvertToObject(Node node, IReadOnlyConverterSettings settings)
-        {
-            if (node.Type == NodeTypes.Empty)
-                return default;
-
-            if (!(node is NodeMap nodeMap))
-                throw new ArgumentException($"Expected node of type \"NodeMap\" got \"{node.Type}\"");
+        private object ReadAutoSelectCtor(INodeReader reader, IReadOnlyConverterSettings settings) {
+            
+            reader.ReadBeginMap();
 
             var scopedSettings = settings.GetScoped(TypeSettings);
-            object instance = Ctor.Invoke();
-            //if (Ctor.IsDefault)
-            //    instance = Ctor.Invoke();
-            //else if (TryConstructWith(Ctor, nodeMap, scopedSettings, out instance) == false)
-            //    throw new InvalidOperationException("Object can not be constructed with the given nodes");
+            var memberNames = EnsureNameCache(scopedSettings.NamingStrategy);
 
-            var memberNames = EnsureMemberNames(scopedSettings.NamingStrategy);
+            var memberValues = new object[MemberSettings.Length];
+
+            while (true)
+            {
+                var next = reader.PeekOperation();
+                if (next.HasValue == false || next.Value.Type == NodeOperationTypes.EndMap)
+                    break;
+
+                var memberIdx = memberNames.GetMemberIndex(next.Value.Name);
+                if (memberIdx < 0) {
+                    reader.SkipNode();
+                    continue;
+                }
+
+                var memberSettings = MemberSettings[memberIdx];
+                var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: memberSettings);
+                var memberValue = memberSettings.Converter.Read(reader, scopedMemberSettings);
+                memberValues[memberIdx] = memberValue;
+            }
+
+            reader.ReadEndMap();
+
+            foreach (var ctor in TypeSettings.DynamicType.Constructors)
+            {
+                if (TryConstructWith(ctor, memberValues, out var instance))
+                    return instance;
+            }
+
+            return default;
+        }
+
+        /// <inheritdoc/>
+        private object ConvertToObjectWithDefaultCtor(NodeMap node, IReadOnlyConverterSettings settings)
+        {
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var instance = Ctor.Invoke();
+
+            var memberNames = EnsureNameCache(scopedSettings.NamingStrategy);
             for (var i = 0; i < MemberSettings.Length; i++)
             {
                 var memberSettings = MemberSettings[i];
@@ -174,7 +202,7 @@ namespace DotLogix.Core.Nodes.Converters
 
                 var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: memberSettings);
 
-                var memberNode = nodeMap.GetChild(memberNames[i]);
+                var memberNode = node.GetChild(memberNames.GetRewrittenName(i));
                 if (memberNode == null)
                     continue;
 
@@ -186,42 +214,91 @@ namespace DotLogix.Core.Nodes.Converters
             return instance;
         }
 
-        private bool CanConstructWith(DynamicCtor ctor, MemberSettings[] readableMembers, out MemberSettings[] neededAccessors)
+        /// <inheritdoc/>
+        private object ConvertToObjectAutoSelectCtor(NodeMap node, IReadOnlyConverterSettings settings)
         {
-            neededAccessors = null;
+            var scopedSettings = settings.GetScoped(TypeSettings);
+
+            var memberNames = EnsureNameCache(scopedSettings.NamingStrategy);
+            var memberValues = new object[MemberSettings.Length];
+            for (var i = 0; i < MemberSettings.Length; i++)
+            {
+                var memberSettings = MemberSettings[i];
+                var scopedMemberSettings = scopedSettings.GetScoped(memberSettings: memberSettings);
+
+                var memberNode = node.GetChild(memberNames.GetRewrittenName(i));
+                if (memberNode == null)
+                    continue;
+
+
+                var memberValue = memberSettings.Converter.ConvertToObject(memberNode, scopedMemberSettings);
+                memberValues[i] = memberValue;
+            }
+
+            foreach (var ctor in TypeSettings.DynamicType.Constructors)
+            {
+                if (TryConstructWith(ctor, memberValues, out var instance))
+                    return instance;
+            }
+
+            return default;
+        }
+
+        private bool TryConstructWith(DynamicCtor ctor, object[] values, out object instance) {
+            instance = null;
             var parameters = ctor.Parameters;
             var parameterCount = parameters.Length;
-            var members = new MemberSettings[parameterCount];
+
+            if(parameterCount > values.Length) {
+                return false;
+            }
+
+            var members = new object[parameterCount];
             for (var i = 0; i < parameterCount; i++)
             {
                 var parameter = parameters[i];
-                var member = readableMembers.FirstOrDefault(a => a.Name.Equals(parameter.Name, StringComparison.OrdinalIgnoreCase));
-                if (member == null)
+                var memberIdx = Array.FindIndex(MemberSettings, a => a.Name.Equals(parameter.Name, StringComparison.OrdinalIgnoreCase));
+                if(memberIdx <= 0)
                     return false;
-                members[i] = member;
+
+                var value = values[memberIdx];
+                if(parameter.ParameterType.IsInstanceOfType(value) == false)
+                    return false;
+
+                members[i] = value;
             }
-            neededAccessors = members;
+
+            instance = ctor.Invoke(members);
+            for(var i = 0; i < values.Length; i++) {
+                var memberSettings = MemberSettings[i];
+                if(memberSettings.Accessor.CanWrite == false)
+                    continue;
+
+                memberSettings.Accessor.SetValue(instance, values[i]);
+            }
             return true;
         }
+        
+        private class MemberCache
+        {
+            private readonly string[] _memberNames;
+            private readonly Dictionary<string, int> _memberMap;
 
-        //private bool TryConstructWith(DynamicCtor ctor, NodeMap nodeMap, IReadOnlyConverterSettings settings, out object instance)
-        //{
-        //    instance = null;
+            public MemberCache(string[] memberNames) {
+                _memberNames = memberNames;
+                _memberMap = new Dictionary<string, int>(memberNames.Length, StringComparer.Ordinal);
+                for(var i = 0; i < memberNames.Length; i++) {
+                    _memberMap.Add(memberNames[i], i);
+                }
+            }
 
-        //    var parameterCount = MembersForCtor.Length;
-        //    var parametersForCtor = new object[parameterCount];
-        //    for (var i = 0; i < MembersForCtor.Length; i++)
-        //    {
-        //        var memberSettings = MembersForCtor[i];
-        //        var scopedMemberSettings = settings.GetScoped(memberSettings);
-        //        var memberNode = nodeMap.GetChild(GetMemberName(memberSettings, scopedMemberSettings));
-        //        if (memberNode == null)
-        //            continue;
-        //        parametersForCtor[i] = memberSettings.Converter.ConvertToObject(memberNode, scopedMemberSettings);
-        //    }
+            public int GetMemberIndex(string rewrittenName) {
+                return _memberMap.TryGetValue(rewrittenName, out var index) ? index : -1;
+            }
 
-        //    instance = ctor.Invoke(parametersForCtor);
-        //    return true;
-        //}
+            public string GetRewrittenName(int memberIndex) {
+                return _memberNames[memberIndex];
+            }
+        }
     }
 }

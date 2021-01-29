@@ -10,7 +10,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Nodes.Formats;
+using DotLogix.Core.Nodes.Formats.Nodes;
 using DotLogix.Core.Nodes.Schema;
 
 #endregion
@@ -57,8 +58,10 @@ namespace DotLogix.Core.Nodes.Converters {
         /// <inheritdoc />
         public override object Read(INodeReader reader, IReadOnlyConverterSettings settings) {
             var next = reader.PeekOperation();
-            if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null))
+            if (next.HasValue == false || (next.Value.Type == NodeOperationTypes.Value && next.Value.Value == null)) {
+                reader.ReadOperation();
                 return default;
+            }
 
             reader.ReadBeginList();
 

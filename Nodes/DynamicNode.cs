@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Dynamic;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Nodes.Schema;
 
 namespace DotLogix.Core.Nodes
 {
@@ -17,7 +18,7 @@ namespace DotLogix.Core.Nodes
         public Node Node { get; }
 
         private DynamicNode(Node node, ConverterSettings settings = null) {
-            this._settings = settings ?? new ConverterSettings();
+            this._settings = settings ?? ConverterSettings.Default;
             Node = node;
         }
 

@@ -8,7 +8,7 @@
 
 #region
 using System;
-using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Nodes.Formats.Nodes;
 using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Types;
 #endregion

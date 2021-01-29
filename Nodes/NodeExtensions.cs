@@ -9,7 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
-using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Nodes.Formats.Nodes;
 #endregion
 
 namespace DotLogix.Core.Nodes {
@@ -245,6 +245,16 @@ namespace DotLogix.Core.Nodes {
             } while (!writer.IsComplete);
 
             return writer.Root;
+        }
+        
+        public static void SkipNode(this INodeReader reader)
+        {
+            var writer = new VoidWriter();
+            do
+            {
+                var operation = reader.ReadOperation();
+                writer.WriteOperation(operation);
+            } while (!writer.IsComplete);
         }
         
         public static void WriteNode(this INodeWriter writer, Node node)

@@ -9,29 +9,13 @@
 #region
 using System;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes.Factories;
-using DotLogix.Core.Nodes.Processor;
+using DotLogix.Core.Nodes.Formats.Nodes;
 using DotLogix.Core.Nodes.Schema;
 using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes {
     public static class NodeUtils {
-        public static INodeConverterResolver DefaultResolver => CreateDefaultResolver();
-
-        private static INodeConverterResolver CreateDefaultResolver() {
-            var resolver = new NodeConverterResolver();
-            resolver.Add(new ObjectNodeConverterFactory());
-            resolver.Add(new OptionalNodeConverterFactory());
-            resolver.Add(new CollectionNodeConverterFactory());
-            resolver.Add(new KeyValuePairNodeConverterFactory());
-            resolver.Add(new ValueNodeConverterFactory());
-            return resolver;
-        }
-
-        static NodeUtils() {
-        }
-
         #region NodeTypes
         public static NodeTypes GetNodeType(DataType dataType) {
             if(dataType == null)
@@ -58,19 +42,19 @@ namespace DotLogix.Core.Nodes {
 
 
         #region WriteTo
-        public static void WriteTo(object instance, INodeWriter writer, ConverterSettings settings) {
+        public static void WriteTo(object instance, INodeWriter writer, IReadOnlyConverterSettings settings) {
             WriteTo(null, instance, instance?.GetType(), writer, settings);
         }
 
-        public static void WriteTo(object instance, Type instanceType, INodeWriter writer, ConverterSettings settings) {
+        public static void WriteTo(object instance, Type instanceType, INodeWriter writer, IReadOnlyConverterSettings settings) {
             WriteTo(null, instance, instanceType, writer, settings);
         }
 
-        public static void WriteTo(string name, object instance, INodeWriter writer, ConverterSettings settings) {
+        public static void WriteTo(string name, object instance, INodeWriter writer, IReadOnlyConverterSettings settings) {
             WriteTo(name, instance, instance?.GetType(), writer, settings);
         }
 
-        public static void WriteTo(string name, object instance, Type instanceType, INodeWriter writer, ConverterSettings settings) {
+        public static void WriteTo(string name, object instance, Type instanceType, INodeWriter writer, IReadOnlyConverterSettings settings) {
             if(string.IsNullOrEmpty(name) == false)
                 writer.WriteName(name);
 
@@ -98,19 +82,15 @@ namespace DotLogix.Core.Nodes {
         #endregion
 
         #region ToNode
-        public static Node ToNode(object instance, ConverterSettings settings = null) {
+        public static Node ToNode(object instance, IReadOnlyConverterSettings settings = null) {
             return ToNode(null, instance, instance?.GetType(), settings);
         }
 
-        public static Node ToNode(object instance, Type instanceType, ConverterSettings settings = null) {
+        public static Node ToNode(object instance, Type instanceType, IReadOnlyConverterSettings settings = null) {
             return ToNode(null, instance, instanceType, settings);
         }
 
-        internal static Node ToNode(string name, object instance, ConverterSettings settings = null) {
-            return ToNode(name, instance, instance?.GetType(), settings);
-        }
-
-        internal static Node ToNode(string name, object instance, Type instanceType, ConverterSettings settings = null) {
+        internal static Node ToNode(string name, object instance, Type instanceType, IReadOnlyConverterSettings settings = null) {
             if(instance is Node node)
                 return node;
 
@@ -122,14 +102,14 @@ namespace DotLogix.Core.Nodes {
         #endregion
 
         #region ToObject
-        public static T ToObject<T>(this Node node, ConverterSettings settings = null) {
+        public static T ToObject<T>(this Node node, IReadOnlyConverterSettings settings = null) {
             if(node == null)
                 return default;
             
             return (T)ToObject(node, typeof(T), settings);
         }
 
-        public static object ToObject(this Node node, Type type, ConverterSettings settings = null) {
+        public static object ToObject(this Node node, Type type, IReadOnlyConverterSettings settings = null) {
             if(node == null)
                 return type.GetDefaultValue();
 
@@ -139,7 +119,7 @@ namespace DotLogix.Core.Nodes {
             if(type == typeof(object))
                 return DynamicNode.From(node);
 
-            settings ??= JsonFormatterSettings.Idented;
+            settings ??= ConverterSettings.Default;
 
             return settings.Resolver.TryResolve(type, out var typeSettings)
                        ? typeSettings.Converter.ConvertToObject(node, settings)

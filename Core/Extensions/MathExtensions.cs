@@ -7,7 +7,6 @@
 // ==================================================
 
 using System;
-using DotLogix.Core.Utils.Patterns;
 
 namespace DotLogix.Core.Extensions {
     /// <summary>

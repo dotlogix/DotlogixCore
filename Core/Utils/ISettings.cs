@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using DotLogix.Core.Interfaces;
 
 namespace DotLogix.Core.Utils {
     /// <summary>

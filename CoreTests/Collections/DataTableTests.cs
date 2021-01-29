@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using DotLogix.Core.Collections;
-using DotLogix.Core.Utils.Mappers;
 using NUnit.Framework;
 
 namespace CoreTests.Collections {

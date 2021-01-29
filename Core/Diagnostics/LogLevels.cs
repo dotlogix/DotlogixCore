@@ -7,7 +7,6 @@
 // ==================================================
 
 #region
-using System;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {

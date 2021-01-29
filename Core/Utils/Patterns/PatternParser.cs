@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Interfaces;
@@ -112,6 +113,38 @@ namespace DotLogix.Core.Utils.Patterns {
 
             var succeed = patternType.TryGetRegexPattern(variant, args, out var pattern);
             return succeed ? string.Concat("(?<", name, ">", pattern, ")") : match.Value;
+        }
+
+        /// <summary>
+        /// Extracts the pattern parameter information of a pattern
+        /// </summary>
+        public IEnumerable<PatternParameter> ExtractParameters(string pattern) {
+            return PatternRegex.Matches(pattern).Cast<Match>().Select(ToParameter);
+        }
+        
+        private PatternParameter ToParameter(Match match) {
+            var name = match.Groups["name"].Value;
+            var type = match.Groups["type"].GetValueOrDefault("any");
+            var variant = match.Groups["variant"].GetValueOrDefault();
+            var args = match.Groups["args"].Value.Split('|');
+
+            if(TryGetPattern(type, out var patternType) == false)
+                throw new ArgumentException($"Pattern {name} with type {type} is not registered in default pattern parser");
+
+            var succeed = patternType.TryGetRegexPattern(variant, args, out var pattern);
+            if(succeed) {
+                return new PatternParameter {
+                    Type = patternType,
+                    Name = name,
+                    Variant = variant,
+                    Args = args,
+                    Regex = pattern,
+                    Offset = match.Index,
+                    Count = match.Length
+                };
+            }
+            
+            return null;
         }
 
         /// <summary>

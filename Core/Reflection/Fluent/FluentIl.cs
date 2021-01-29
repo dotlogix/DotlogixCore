@@ -131,13 +131,11 @@ namespace DotLogix.Core.Reflection.Fluent {
                                                   new[] {typeof(object[])},
                                                   module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
+            var result = ilGen.DeclareLocal(declaringType);
             if(constructorInfo == null) {
-                var tmp = ilGen.DeclareLocal(declaringType);
                 ilGen.
-                Ldloca(tmp).
-                Initobj(declaringType).
-                Ldloc(tmp).
-                Box(declaringType);
+                Ldloca(result).
+                Initobj(declaringType);
             } else {
                 var paramTypes = new Type[parameters.Length];
                 for(var i = 0; i < paramTypes.Length; i++) {
@@ -167,7 +165,9 @@ namespace DotLogix.Core.Reflection.Fluent {
                         ilGen.Ldloc(locals[i]);
                 }
 
-                ilGen.Newobj(constructorInfo);
+                ilGen.Newobj(constructorInfo)
+                     .BoxIfNeeded(declaringType)
+                     .Stloc(result);
 
                 for(var i = 0; i < paramTypes.Length; i++) {
                     if(!parameters[i].ParameterType.IsByRef)
@@ -181,7 +181,8 @@ namespace DotLogix.Core.Reflection.Fluent {
                 }
             }
 
-            ilGen.Ret();
+            ilGen.Ldloc(result)
+                 .Ret();
             return (CtorDelegate)dynamicMethod.CreateDelegate(typeof(CtorDelegate));
         }
         #endregion

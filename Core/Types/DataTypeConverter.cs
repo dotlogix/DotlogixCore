@@ -8,26 +8,25 @@
 
 #region
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Types {
     /// <summary>
-    /// A singleton DataTypeConverter
+    ///     A singleton DataTypeConverter
     /// </summary>
     public class DataTypeConverter {
         private readonly Dictionary<Type, DataType> _cachedDataTypes;
         private readonly object _lock = new object();
 
         /// <summary>
-        /// The static singleton instance
+        ///     The static singleton instance
         /// </summary>
         public static DataTypeConverter Instance { get; } = new DataTypeConverter();
 
         /// <summary>
-        /// Get a dictionary of primitive data types
+        ///     Get a dictionary of primitive data types
         /// </summary>
         public IReadOnlyDictionary<Type, DataType> Primitives { get; }
 
@@ -38,21 +37,21 @@ namespace DotLogix.Core.Types {
         }
 
         /// <summary>
-        /// Get a data type of a new instance
+        ///     Get a data type of a new instance
         /// </summary>
         public DataType GetDataType(object instance) {
             return GetDataType(instance?.GetType());
         }
 
         /// <summary>
-        /// Get a data type of a type
+        ///     Get a data type of a type
         /// </summary>
         public DataType GetDataType(Type type) {
             if(type == null)
                 return DataType.EmptyType;
 
-            lock (_lock) {
-                if (_cachedDataTypes.TryGetValue(type, out var dataType))
+            lock(_lock) {
+                if(_cachedDataTypes.TryGetValue(type, out var dataType))
                     return dataType;
 
                 dataType = CreateDataType(type);
@@ -75,9 +74,9 @@ namespace DotLogix.Core.Types {
             if(type.IsEnum) {
                 flags = DataTypeFlags.Primitive | DataTypeFlags.Enum;
                 underlyingType = Enum.GetUnderlyingType(type);
-            } else {
+            } else
                 flags = DataTypeFlags.Complex | DataTypeFlags.Object;
-            }
+
             return new DataType(flags, type, underlyingType);
         }
 

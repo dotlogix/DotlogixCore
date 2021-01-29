@@ -16,7 +16,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
     public partial class FluentIlGenerator {
         #region Objects
         /// <summary>
-        ///     Copies the value type object pointed to by an address to the top of the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldobj"/>
         /// </summary>
         public FluentIlGenerator Ldobj(Type type) {
             IlGenerator.Emit(OpCodes.Ldobj, type);
@@ -24,8 +24,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Initializes each field of the value type at a specified address to a null reference or a 0 of the appropriate
-        ///     primitive type.
+        ///     <inheritdoc cref="OpCodes.Initobj"/>
         /// </summary>
         public FluentIlGenerator Initobj(Type type) {
             IlGenerator.Emit(OpCodes.Initobj, type);
@@ -33,8 +32,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Creates a new object or a new instance of a value type, pushing an object reference (type O) onto the
-        ///     evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Newobj"/>
         /// </summary>
         public FluentIlGenerator Newobj(ConstructorInfo ctorInfo) {
             IlGenerator.Emit(OpCodes.Newobj, ctorInfo);
@@ -42,7 +40,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Copies a value of a specified type from the evaluation stack into a supplied memory address.
+        ///     <inheritdoc cref="OpCodes.Stobj"/>
         /// </summary>
         public FluentIlGenerator Stobj(Type type) {
             IlGenerator.Emit(OpCodes.Stobj, type);
@@ -50,7 +48,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Tests whether an object reference (type O) is a new instance of a particular class.
+        ///     <inheritdoc cref="OpCodes.Isinst"/>
         /// </summary>
         public FluentIlGenerator Isinst(Type type) {
             IlGenerator.Emit(OpCodes.Isinst, type);
@@ -60,7 +58,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         #region Push
         /// <summary>
-        ///     Pushes a null reference (type O) onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldnull"/>
         /// </summary>
         public FluentIlGenerator Ldnull() {
             IlGenerator.Emit(OpCodes.Ldnull);
@@ -68,7 +66,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes a new object reference to a string literal stored in the metadata.
+        ///     <inheritdoc cref="OpCodes.Ldstr"/>
         /// </summary>
         public FluentIlGenerator Ldstr(string value) {
             IlGenerator.Emit(OpCodes.Ldstr, value);
@@ -76,7 +74,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes a supplied value of type int32 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4(int value) {
             IlGenerator.Emit(OpCodes.Ldc_I4, value);
@@ -84,7 +82,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of 0 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_0"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_0() {
             IlGenerator.Emit(OpCodes.Ldc_I4_0);
@@ -92,7 +90,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of 1 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_1"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_1() {
             IlGenerator.Emit(OpCodes.Ldc_I4_1);
@@ -100,7 +98,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of 2 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_2"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_2() {
             IlGenerator.Emit(OpCodes.Ldc_I4_2);
@@ -108,7 +106,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of 3 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_3"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_3() {
             IlGenerator.Emit(OpCodes.Ldc_I4_3);
@@ -116,7 +114,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of 4 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_4"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_4() {
             IlGenerator.Emit(OpCodes.Ldc_I4_4);
@@ -124,7 +122,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of 5 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_5"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_5() {
             IlGenerator.Emit(OpCodes.Ldc_I4_5);
@@ -132,7 +130,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of 6 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_6"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_6() {
             IlGenerator.Emit(OpCodes.Ldc_I4_6);
@@ -140,7 +138,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of 7 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_7"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_7() {
             IlGenerator.Emit(OpCodes.Ldc_I4_7);
@@ -148,7 +146,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of 8 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_8"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_8() {
             IlGenerator.Emit(OpCodes.Ldc_I4_8);
@@ -156,7 +154,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the integer value of -1 onto the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_M1"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_M1() {
             IlGenerator.Emit(OpCodes.Ldc_I4_M1);
@@ -164,7 +162,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the supplied int8 value onto the evaluation stack as an int32, short form.
+        ///     <inheritdoc cref="OpCodes.Ldc_I4_S"/>
         /// </summary>
         public FluentIlGenerator Ldc_I4_S(sbyte value) {
             IlGenerator.Emit(OpCodes.Ldc_I4_S, value);
@@ -172,7 +170,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes a supplied value of type int64 onto the evaluation stack as an int64.
+        ///     <inheritdoc cref="OpCodes.Ldc_I8"/>
         /// </summary>
         public FluentIlGenerator Ldc_I8(long value) {
             IlGenerator.Emit(OpCodes.Ldc_I8, value);
@@ -180,7 +178,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes a supplied value of type float32 onto the evaluation stack as type F (float).
+        ///     <inheritdoc cref="OpCodes.Ldc_R4"/>
         /// </summary>
         public FluentIlGenerator Ldc_R4(float value) {
             IlGenerator.Emit(OpCodes.Ldc_R4, value);
@@ -188,7 +186,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes a supplied value of type float64 onto the evaluation stack as type F (float).
+        ///     <inheritdoc cref="OpCodes.Ldc_R8"/>
         /// </summary>
         public FluentIlGenerator Ldc_R8(double value) {
             IlGenerator.Emit(OpCodes.Ldc_R8, value);

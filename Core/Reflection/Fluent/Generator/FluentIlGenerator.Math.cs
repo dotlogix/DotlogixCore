@@ -13,8 +13,7 @@ using System.Reflection.Emit;
 namespace DotLogix.Core.Reflection.Fluent.Generator {
     public partial class FluentIlGenerator {
         /// <summary>
-        ///     Shifts an integer value to the left (in zeroes) by a specified number of bits, pushing the result onto the
-        ///     evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Shl"/>
         /// </summary>
         public FluentIlGenerator Shl() {
             IlGenerator.Emit(OpCodes.Shl);
@@ -22,8 +21,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Shifts an integer value (in sign) to the right by a specified number of bits, pushing the result onto the
-        ///     evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Shr"/>
         /// </summary>
         public FluentIlGenerator Shr() {
             IlGenerator.Emit(OpCodes.Shr);
@@ -31,8 +29,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Shifts an unsigned integer value (in zeroes) to the right by a specified number of bits, pushing the result
-        ///     onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Shr_Un"/>
         /// </summary>
         public FluentIlGenerator Shr_Un() {
             IlGenerator.Emit(OpCodes.Shr_Un);
@@ -40,7 +37,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Divides two values and pushes the remainder onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Rem"/>
         /// </summary>
         public FluentIlGenerator Rem() {
             IlGenerator.Emit(OpCodes.Rem);
@@ -48,7 +45,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Divides two unsigned values and pushes the remainder onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Rem_Un"/>
         /// </summary>
         public FluentIlGenerator Rem_Un() {
             IlGenerator.Emit(OpCodes.Rem_Un);
@@ -56,7 +53,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Subtracts one value from another and pushes the result onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Sub"/>
         /// </summary>
         public FluentIlGenerator Sub() {
             IlGenerator.Emit(OpCodes.Sub);
@@ -64,8 +61,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Subtracts one integer value from another, performs an overflow check, and pushes the result onto the
-        ///     evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Sub_Ovf"/>
         /// </summary>
         public FluentIlGenerator Sub_Ovf() {
             IlGenerator.Emit(OpCodes.Sub_Ovf);
@@ -73,8 +69,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Subtracts one unsigned integer value from another, performs an overflow check, and pushes the result onto the
-        ///     evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Sub_Ovf_Un"/>
         /// </summary>
         public FluentIlGenerator Sub_Ovf_Un() {
             IlGenerator.Emit(OpCodes.Sub_Ovf_Un);
@@ -82,7 +77,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Adds two values and pushes the result onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Add"/>
         /// </summary>
         public FluentIlGenerator Add() {
             IlGenerator.Emit(OpCodes.Add);
@@ -90,7 +85,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Adds two integers, performs an overflow check, and pushes the result onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Add_Ovf"/>
         /// </summary>
         public FluentIlGenerator Add_Ovf() {
             IlGenerator.Emit(OpCodes.Add_Ovf);
@@ -98,7 +93,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Adds two unsigned integer values, performs an overflow check, and pushes the result onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Add_Ovf_Un"/>
         /// </summary>
         public FluentIlGenerator Add_Ovf_Un() {
             IlGenerator.Emit(OpCodes.Add_Ovf_Un);
@@ -106,8 +101,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Divides two values and pushes the result as a floating-point (type F) or quotient (type int32) onto the
-        ///     evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Div"/>
         /// </summary>
         public FluentIlGenerator Div() {
             IlGenerator.Emit(OpCodes.Div);
@@ -115,7 +109,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Divides two unsigned integer values and pushes the result (int32) onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Div_Un"/>
         /// </summary>
         public FluentIlGenerator Div_Un() {
             IlGenerator.Emit(OpCodes.Div_Un);
@@ -123,7 +117,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Multiplies two values and pushes the result on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Mul"/>
         /// </summary>
         public FluentIlGenerator Mul() {
             IlGenerator.Emit(OpCodes.Mul);
@@ -131,7 +125,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Multiplies two integer values, performs an overflow check, and pushes the result onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Mul_Ovf"/>
         /// </summary>
         public FluentIlGenerator Mul_Ovf() {
             IlGenerator.Emit(OpCodes.Mul_Ovf);
@@ -139,8 +133,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Multiplies two unsigned integer values, performs an overflow check, and pushes the result onto the evaluation
-        ///     stack.
+        ///     <inheritdoc cref="OpCodes.Mul_Ovf_Un"/>
         /// </summary>
         public FluentIlGenerator Mul_Ovf_Un() {
             IlGenerator.Emit(OpCodes.Mul_Ovf_Un);
@@ -148,7 +141,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Negates a value and pushes the result onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Neg"/>
         /// </summary>
         public FluentIlGenerator Neg() {
             IlGenerator.Emit(OpCodes.Neg);

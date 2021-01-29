@@ -15,7 +15,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
     public partial class FluentIlGenerator {
         #region Load
         /// <summary>
-        ///     Finds the value of a field in the object whose reference is currently on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldfld"/>
         /// </summary>
         public FluentIlGenerator Ldfld(FieldInfo fieldInfo) {
             IlGenerator.Emit(OpCodes.Ldfld, fieldInfo);
@@ -23,7 +23,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Finds the address of a field in the object whose reference is currently on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldflda"/>
         /// </summary>
         public FluentIlGenerator Ldflda(FieldInfo fieldInfo) {
             IlGenerator.Emit(OpCodes.Ldflda, fieldInfo);
@@ -31,7 +31,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the value of a static field onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldsfld"/>
         /// </summary>
         public FluentIlGenerator Ldsfld(FieldInfo fieldInfo) {
             IlGenerator.Emit(OpCodes.Ldsfld, fieldInfo);
@@ -39,7 +39,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes the address of a static field onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldsflda"/>
         /// </summary>
         public FluentIlGenerator Ldsflda(FieldInfo fieldInfo) {
             IlGenerator.Emit(OpCodes.Ldsflda, fieldInfo);
@@ -49,7 +49,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         #region Store
         /// <summary>
-        ///     Replaces the value stored in the field of an object reference or pointer with a new value.
+        ///     <inheritdoc cref="OpCodes.Stfld"/>
         /// </summary>
         public FluentIlGenerator Stfld(FieldInfo fieldInfo) {
             IlGenerator.Emit(OpCodes.Stfld, fieldInfo);
@@ -57,7 +57,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Replaces the value of a static field with a value from the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Stsfld"/>
         /// </summary>
         public FluentIlGenerator Stsfld(FieldInfo fieldInfo) {
             IlGenerator.Emit(OpCodes.Stsfld, fieldInfo);

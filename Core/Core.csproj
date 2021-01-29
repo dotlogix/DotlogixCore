@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;</TargetFrameworks>
     <Company>DotLogix</Company>
     <Product>DotLogix Core</Product>
     <PackageId>DotLogix.Core</PackageId>
@@ -13,7 +13,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright (c) 2018 DotLogix</Copyright>
-    <Version>2.2.17</Version>
+    <Version>2.2.75</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Configurations>Debug;Release;</Configurations>
   </PropertyGroup>
@@ -25,6 +25,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Collections\ILayeredCollection.cs" />
+    <Compile Remove="Collections\ILayeredDictionary.cs" />
+    <Compile Remove="Collections\LayeredCollection.cs" />
+    <Compile Remove="Collections\LayeredDictionary.cs" />
+    <Compile Remove="Collections\LinearDictionary.cs" />
     <Compile Remove="Patterns\StateMachine.cs" />
     <Compile Remove="Utils\CommandLineParser.cs" />
   </ItemGroup>

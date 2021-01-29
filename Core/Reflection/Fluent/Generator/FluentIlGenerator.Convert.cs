@@ -15,7 +15,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
     public partial class FluentIlGenerator {
         #region Convert
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to native int.
+        ///     Converts the value on top of the evaluation stack to native int.
         /// </summary>
         public FluentIlGenerator Conv_I() {
             IlGenerator.Emit(OpCodes.Conv_I);
@@ -23,7 +23,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to int8, then extends (pads) it to int32.
+        ///     Converts the value on top of the evaluation stack to int8, then extends (pads) it to int32.
         /// </summary>
         public FluentIlGenerator Conv_I1() {
             IlGenerator.Emit(OpCodes.Conv_I1);
@@ -31,7 +31,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to int16, then extends (pads) it to int32.
+        ///     Converts the value on top of the evaluation stack to int16, then extends (pads) it to int32.
         /// </summary>
         public FluentIlGenerator Conv_I2() {
             IlGenerator.Emit(OpCodes.Conv_I2);
@@ -39,7 +39,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to int32.
+        ///     Converts the value on top of the evaluation stack to int32.
         /// </summary>
         public FluentIlGenerator Conv_I4() {
             IlGenerator.Emit(OpCodes.Conv_I4);
@@ -47,7 +47,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to int64.
+        ///     Converts the value on top of the evaluation stack to int64.
         /// </summary>
         public FluentIlGenerator Conv_I8() {
             IlGenerator.Emit(OpCodes.Conv_I8);
@@ -55,7 +55,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to signed native int, throwing OverflowException on
+        ///     Converts the signed value on top of the evaluation stack to signed native int, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I() {
@@ -64,7 +64,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to signed native int, throwing OverflowException on
+        ///     Converts the unsigned value on top of the evaluation stack to signed native int, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I_Un() {
@@ -73,8 +73,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to signed int8 and extends it to int32, throwing
-        ///     OverflowException on overflow.
+        ///     Converts the signed value on top of the evaluation stack to signed int8 and extends it to int32, throwing
+        ///     OverflowException on overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I1() {
             IlGenerator.Emit(OpCodes.Conv_Ovf_I1);
@@ -82,8 +82,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to signed int8 and extends it to int32, throwing
-        ///     OverflowException on overflow.
+        ///     Converts the unsigned value on top of the evaluation stack to signed int8 and extends it to int32, throwing
+        ///     OverflowException on overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I1_Un() {
             IlGenerator.Emit(OpCodes.Conv_Ovf_I1_Un);
@@ -91,8 +91,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to signed int16 and extending it to int32, throwing
-        ///     OverflowException on overflow.
+        ///     Converts the signed value on top of the evaluation stack to signed int16 and extending it to int32, throwing
+        ///     OverflowException on overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I2() {
             IlGenerator.Emit(OpCodes.Conv_Ovf_I2);
@@ -100,8 +100,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to signed int16 and extends it to int32, throwing
-        ///     OverflowException on overflow.
+        ///     Converts the unsigned value on top of the evaluation stack to signed int16 and extends it to int32, throwing
+        ///     OverflowException on overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I2_Un() {
             IlGenerator.Emit(OpCodes.Conv_Ovf_I2_Un);
@@ -109,7 +109,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to signed int32, throwing OverflowException on
+        ///     Converts the signed value on top of the evaluation stack to signed int32, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I4() {
@@ -118,7 +118,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to signed int32, throwing OverflowException on
+        ///     Converts the unsigned value on top of the evaluation stack to signed int32, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I4_Un() {
@@ -127,7 +127,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to signed int64, throwing OverflowException on
+        ///     Converts the signed value on top of the evaluation stack to signed int64, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I8() {
@@ -136,7 +136,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to signed int64, throwing OverflowException on
+        ///     Converts the unsigned value on top of the evaluation stack to signed int64, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_I8_Un() {
@@ -145,7 +145,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to unsigned native int, throwing OverflowExceptionon
+        ///     Converts the signed value on top of the evaluation stack to unsigned native int, throwing OverflowExceptionon
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U() {
@@ -154,7 +154,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to unsigned native int, throwing
+        ///     Converts the unsigned value on top of the evaluation stack to unsigned native int, throwing
         ///     OverflowExceptionon overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U_Un() {
@@ -163,8 +163,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to unsigned int8 and extends it to int32, throwing
-        ///     OverflowException on overflow.
+        ///     Converts the signed value on top of the evaluation stack to unsigned int8 and extends it to int32, throwing
+        ///     OverflowException on overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U1() {
             IlGenerator.Emit(OpCodes.Conv_Ovf_U1);
@@ -172,8 +172,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to unsigned int8 and extends it to int32, throwing
-        ///     OverflowException on overflow.
+        ///     Converts the unsigned value on top of the evaluation stack to unsigned int8 and extends it to int32, throwing
+        ///     OverflowException on overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U1_Un() {
             IlGenerator.Emit(OpCodes.Conv_Ovf_U1_Un);
@@ -181,8 +181,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to unsigned int16 and extends it to int32, throwing
-        ///     OverflowException on overflow.
+        ///     Converts the signed value on top of the evaluation stack to unsigned int16 and extends it to int32, throwing
+        ///     OverflowException on overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U2() {
             IlGenerator.Emit(OpCodes.Conv_Ovf_U2);
@@ -190,8 +190,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to unsigned int16 and extends it to int32, throwing
-        ///     OverflowException on overflow.
+        ///     Converts the unsigned value on top of the evaluation stack to unsigned int16 and extends it to int32, throwing
+        ///     OverflowException on overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U2_Un() {
             IlGenerator.Emit(OpCodes.Conv_Ovf_U2_Un);
@@ -199,7 +199,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to unsigned int32, throwing OverflowException on
+        ///     Converts the signed value on top of the evaluation stack to unsigned int32, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U4() {
@@ -208,7 +208,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to unsigned int32, throwing OverflowException on
+        ///     Converts the unsigned value on top of the evaluation stack to unsigned int32, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U4_Un() {
@@ -217,7 +217,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the signed value on top of the evaluation stack to unsigned int64, throwing OverflowException on
+        ///     Converts the signed value on top of the evaluation stack to unsigned int64, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U8() {
@@ -226,7 +226,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned value on top of the evaluation stack to unsigned int64, throwing OverflowException on
+        ///     Converts the unsigned value on top of the evaluation stack to unsigned int64, throwing OverflowException on
         ///     overflow.
         /// </summary>
         public FluentIlGenerator Conv_Ovf_U8_Un() {
@@ -235,7 +235,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the unsigned integer value on top of the evaluation stack to float32.
+        ///     Converts the unsigned integer value on top of the evaluation stack to float32.
         /// </summary>
         public FluentIlGenerator Conv_R_Un() {
             IlGenerator.Emit(OpCodes.Conv_R_Un);
@@ -243,7 +243,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to float32.
+        ///     Converts the value on top of the evaluation stack to float32.
         /// </summary>
         public FluentIlGenerator Conv_R4() {
             IlGenerator.Emit(OpCodes.Conv_R4);
@@ -251,7 +251,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to float64.
+        ///     Converts the value on top of the evaluation stack to float64.
         /// </summary>
         public FluentIlGenerator Conv_R8() {
             IlGenerator.Emit(OpCodes.Conv_R8);
@@ -259,7 +259,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to unsigned native int, and extends it to native int.
+        ///     Converts the value on top of the evaluation stack to unsigned native int, and extends it to native int.
         /// </summary>
         public FluentIlGenerator Conv_U() {
             IlGenerator.Emit(OpCodes.Conv_U);
@@ -267,7 +267,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to unsigned int8, and extends it to int32.
+        ///     Converts the value on top of the evaluation stack to unsigned int8, and extends it to int32.
         /// </summary>
         public FluentIlGenerator Conv_U1() {
             IlGenerator.Emit(OpCodes.Conv_U1);
@@ -275,7 +275,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to unsigned int16, and extends it to int32.
+        ///     Converts the value on top of the evaluation stack to unsigned int16, and extends it to int32.
         /// </summary>
         public FluentIlGenerator Conv_U2() {
             IlGenerator.Emit(OpCodes.Conv_U2);
@@ -283,7 +283,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to unsigned int32, and extends it to int32.
+        ///     Converts the value on top of the evaluation stack to unsigned int32, and extends it to int32.
         /// </summary>
         public FluentIlGenerator Conv_U4() {
             IlGenerator.Emit(OpCodes.Conv_U4);
@@ -291,7 +291,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Converts the value on top of the evaluation stack to unsigned int64, and extends it to int64.
+        ///     Converts the value on top of the evaluation stack to unsigned int64, and extends it to int64.
         /// </summary>
         public FluentIlGenerator Conv_U8() {
             IlGenerator.Emit(OpCodes.Conv_U8);
@@ -301,7 +301,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         #region Boxing
         /// <summary>
-        ///     Converts a value type to an object reference (type O).
+        ///     Converts a value type to an object reference (type O).
         /// </summary>
         public FluentIlGenerator Box(Type type) {
             IlGenerator.Emit(OpCodes.Box, type);

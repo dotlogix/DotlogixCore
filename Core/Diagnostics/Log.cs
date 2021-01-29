@@ -9,10 +9,6 @@
 #region
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using System.Threading;
-using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {

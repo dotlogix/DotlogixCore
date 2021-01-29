@@ -14,7 +14,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
     public partial class FluentIlGenerator {
         #region Store
         /// <summary>
-        ///     Stores a value of type native int at a supplied address.
+        ///     <inheritdoc cref="OpCodes.Stind_I"/>
         /// </summary>
         public FluentIlGenerator Stind_I() {
             IlGenerator.Emit(OpCodes.Stind_I);
@@ -22,7 +22,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Stores a value of type int8 at a supplied address.
+        ///     <inheritdoc cref="OpCodes.Stind_I1"/>
         /// </summary>
         public FluentIlGenerator Stind_I1() {
             IlGenerator.Emit(OpCodes.Stind_I1);
@@ -30,7 +30,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Stores a value of type int16 at a supplied address.
+        ///     <inheritdoc cref="OpCodes.Stind_I2"/>
         /// </summary>
         public FluentIlGenerator Stind_I2() {
             IlGenerator.Emit(OpCodes.Stind_I2);
@@ -38,7 +38,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Stores a value of type int32 at a supplied address.
+        ///     <inheritdoc cref="OpCodes.Stind_I4"/>
         /// </summary>
         public FluentIlGenerator Stind_I4() {
             IlGenerator.Emit(OpCodes.Stind_I4);
@@ -46,7 +46,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Stores a value of type int64 at a supplied address.
+        ///     <inheritdoc cref="OpCodes.Stind_I8"/>
         /// </summary>
         public FluentIlGenerator Stind_I8() {
             IlGenerator.Emit(OpCodes.Stind_I8);
@@ -54,7 +54,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Stores a value of type float32 at a supplied address.
+        ///     <inheritdoc cref="OpCodes.Stind_R4"/>
         /// </summary>
         public FluentIlGenerator Stind_R4() {
             IlGenerator.Emit(OpCodes.Stind_R4);
@@ -62,7 +62,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Stores a value of type float64 at a supplied address.
+        ///     <inheritdoc cref="OpCodes.Stind_R8"/>
         /// </summary>
         public FluentIlGenerator Stind_R8() {
             IlGenerator.Emit(OpCodes.Stind_R8);
@@ -70,7 +70,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Stores a object reference value at a supplied address.
+        ///     <inheritdoc cref="OpCodes.Stind_Ref"/>
         /// </summary>
         public FluentIlGenerator Stind_Ref() {
             IlGenerator.Emit(OpCodes.Stind_Ref);
@@ -80,7 +80,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         #region Load
         /// <summary>
-        ///     Loads a value of type native int as a native int onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_I"/>
         /// </summary>
         public FluentIlGenerator Ldind_I() {
             IlGenerator.Emit(OpCodes.Ldind_I);
@@ -88,7 +88,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads a value of type int8 as an int32 onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_I1"/>
         /// </summary>
         public FluentIlGenerator Ldind_I1() {
             IlGenerator.Emit(OpCodes.Ldind_I1);
@@ -96,7 +96,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads a value of type int16 as an int32 onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_I2"/>
         /// </summary>
         public FluentIlGenerator Ldind_I2() {
             IlGenerator.Emit(OpCodes.Ldind_I2);
@@ -104,7 +104,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads a value of type int32 as an int32 onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_I4"/>
         /// </summary>
         public FluentIlGenerator Ldind_I4() {
             IlGenerator.Emit(OpCodes.Ldind_I4);
@@ -112,7 +112,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads a value of type int64 as an int64 onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_I8"/>
         /// </summary>
         public FluentIlGenerator Ldind_I8() {
             IlGenerator.Emit(OpCodes.Ldind_I8);
@@ -120,7 +120,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads a value of type float32 as a type F (float) onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_R4"/>
         /// </summary>
         public FluentIlGenerator Ldind_R4() {
             IlGenerator.Emit(OpCodes.Ldind_R4);
@@ -128,7 +128,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads a value of type float64 as a type F (float) onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_R8"/>
         /// </summary>
         public FluentIlGenerator Ldind_R8() {
             IlGenerator.Emit(OpCodes.Ldind_R8);
@@ -136,7 +136,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads an object reference as a type O (object reference) onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_Ref"/>
         /// </summary>
         public FluentIlGenerator Ldind_Ref() {
             IlGenerator.Emit(OpCodes.Ldind_Ref);
@@ -144,7 +144,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads a value of type unsigned int8 as an int32 onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_U1"/>
         /// </summary>
         public FluentIlGenerator Ldind_U1() {
             IlGenerator.Emit(OpCodes.Ldind_U1);
@@ -152,7 +152,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads a value of type unsigned int16 as an int32 onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_U2"/>
         /// </summary>
         public FluentIlGenerator Ldind_U2() {
             IlGenerator.Emit(OpCodes.Ldind_U2);
@@ -160,7 +160,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads a value of type unsigned int32 as an int32 onto the evaluation stack indirectly.
+        ///     <inheritdoc cref="OpCodes.Ldind_U4"/>
         /// </summary>
         public FluentIlGenerator Ldind_U4() {
             IlGenerator.Emit(OpCodes.Ldind_U4);

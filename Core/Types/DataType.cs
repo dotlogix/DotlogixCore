@@ -13,41 +13,46 @@ using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Types {
     /// <summary>
-    /// A more advanced type information object
+    ///     A more advanced type information object
     /// </summary>
     public class DataType {
         /// <summary>
-        /// The static empty type
+        ///     The static empty type
         /// </summary>
         public static DataType EmptyType { get; } = new DataType(DataTypeFlags.None, null);
 
         /// <summary>
-        /// Flags of the data type
+        ///     Flags of the data type
         /// </summary>
         public DataTypeFlags Flags { get; }
+
         /// <summary>
-        /// The type
+        ///     The type
         /// </summary>
         public Type Type { get; }
+
         /// <summary>
-        /// The underlying type (enums)
+        ///     The underlying type (enums)
         /// </summary>
         public Type UnderlyingType { get; }
+
         /// <summary>
-        /// The element type (collections)
+        ///     The element type (collections)
         /// </summary>
         public Type ElementType { get; }
+
         /// <summary>
-        /// The underlying data type (enums)
+        ///     The underlying data type (enums)
         /// </summary>
         public DataType UnderlyingDataType => UnderlyingType?.ToDataType();
+
         /// <summary>
-        /// The element data type (collections)
+        ///     The element data type (collections)
         /// </summary>
         public DataType ElementDataType => ElementType?.ToDataType();
 
         /// <summary>
-        /// Create a new instance of <see cref="DataType"/>
+        ///     Create a new instance of <see cref="DataType" />
         /// </summary>
         public DataType(DataTypeFlags flags, Type type, Type underlyingType = null, Type elementType = null) {
             Flags = flags;
@@ -57,7 +62,7 @@ namespace DotLogix.Core.Types {
         }
 
         /// <summary>
-        /// Check if the type equals another
+        ///     Check if the type equals another
         /// </summary>
         protected bool Equals(DataType other) {
             return Type == other.Type;

@@ -208,13 +208,16 @@ namespace DotLogix.Core.Extensions {
         ///     Intercepts an enumerable and calling a method for each of the items
         /// </summary>
         /// <param name="source">The source enumerable</param>
-        /// <param name="interceptFunc">The interception method</param>
+        /// <param name="interceptAction">The interception method</param>
         /// <returns></returns>
-        public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Func<T, T> interceptFunc) {
-			return source.Select(interceptFunc);
-		}
+        public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Action<T> interceptAction) {
+	        foreach (var value in source) {
+		        interceptAction(value);
+		        yield return value;
+	        }
+        }
 
-		/// <summary>
+        /// <summary>
 		///     A select, but with an additional argument
 		/// </summary>
 		/// <param name="source">The source enumerable</param>
@@ -227,20 +230,7 @@ namespace DotLogix.Core.Extensions {
 			return source.Select(s => selector(s, with));
 		}
 
-		/// <summary>
-		///     Intercepts an enumerable and calling a method for each of the items
-		/// </summary>
-		/// <param name="source">The source enumerable</param>
-		/// <param name="interceptAction">The interception method</param>
-		/// <returns></returns>
-		public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Action<T> interceptAction) {
-			foreach (var value in source) {
-				interceptAction(value);
-				yield return value;
-			}
-		}
-
-		/// <summary>
+        /// <summary>
 		///     Searches for differences of two enumerables using an equality comparer
 		/// </summary>
 		/// <param name="left">The first enumerable</param>
@@ -592,8 +582,7 @@ namespace DotLogix.Core.Extensions {
                                                                         Func<TValue, TKey> parentKeySelector) where TKey : IComparable {
 			var root = new Hierarchy<TKey, TValue>(default, default);
 			var dict = new Dictionary<TKey, Hierarchy<TKey, TValue>>();
-            var grouped = items.GroupBy(parentKeySelector.Invoke)
-                               .ToList();
+            var grouped = items.GroupBy(parentKeySelector.Invoke).ToList();
 			while (grouped.Count > 0) {
 				var prevCount = grouped.Count;
 				for (var i = prevCount - 1; i >= 0; i--) {

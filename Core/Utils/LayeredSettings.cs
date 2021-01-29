@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DotLogix.Core.Collections;
 
 namespace DotLogix.Core.Utils {
     public class LayeredSettings : CascadingSettings, ILayeredSettings {

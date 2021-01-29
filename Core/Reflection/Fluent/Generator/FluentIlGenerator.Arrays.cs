@@ -17,16 +17,15 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
     /// </summary>
     public partial class FluentIlGenerator {
         /// <summary>
-        ///     Pushes an object reference to a new zero-based, one-dimensional array whose elements are of a specific type
-        ///     onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Newarr"/>
         /// </summary>
         public FluentIlGenerator Newarr(Type elementType) {
-            IlGenerator.Emit(OpCodes.Newarr);
+            IlGenerator.Emit(OpCodes.Newarr, elementType);
             return this;
         }
 
         /// <summary>
-        ///     Pushes the number of elements of a zero-based, one-dimensional array onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldlen"/>
         /// </summary>
         public FluentIlGenerator Ldlen() {
             IlGenerator.Emit(OpCodes.Ldlen);
@@ -35,8 +34,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         #region Load
         /// <summary>
-        ///     Loads the element at a specified array index onto the top of the evaluation stack as the type specified in the
-        ///     instruction.
+        ///     <inheritdoc cref="OpCodes.Ldelem"/>
         /// </summary>
         public FluentIlGenerator Ldelem(Type type) {
             IlGenerator.Emit(OpCodes.Ldelem, type);
@@ -44,8 +42,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element with type native int at a specified array index onto the top of the evaluation stack as
-        ///     a native int.
+        ///     <inheritdoc cref="OpCodes.Ldelem_I"/>
         /// </summary>
         public FluentIlGenerator Ldelem_I() {
             IlGenerator.Emit(OpCodes.Ldelem_I);
@@ -53,7 +50,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element with type int8 at a specified array index onto the top of the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldelem_I1"/>
         /// </summary>
         public FluentIlGenerator Ldelem_I1() {
             IlGenerator.Emit(OpCodes.Ldelem_I1);
@@ -61,15 +58,15 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element with type int16 at a specified array index onto the top of the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldelem_I2"/>
         /// </summary>
         public FluentIlGenerator Ldelem_I2() {
             IlGenerator.Emit(OpCodes.Ldelem_I2);
             return this;
         }
-
+        
         /// <summary>
-        ///     Loads the element with type int32 at a specified array index onto the top of the evaluation stack as an int32.
+        ///     <inheritdoc cref="OpCodes.Ldelem_I4"/>
         /// </summary>
         public FluentIlGenerator Ldelem_I4() {
             IlGenerator.Emit(OpCodes.Ldelem_I4);
@@ -77,7 +74,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element with type int64 at a specified array index onto the top of the evaluation stack as an int64.
+        ///     <inheritdoc cref="OpCodes.Ldelem_I8"/>
         /// </summary>
         public FluentIlGenerator Ldelem_I8() {
             IlGenerator.Emit(OpCodes.Ldelem_I8);
@@ -85,8 +82,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element with type float32 at a specified array index onto the top of the evaluation stack as type
-        ///     F(float).
+        ///     <inheritdoc cref="OpCodes.Ldelem_R4"/>
         /// </summary>
         public FluentIlGenerator Ldelem_R4() {
             IlGenerator.Emit(OpCodes.Ldelem_R4);
@@ -94,8 +90,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element with type float64 at a specified array index onto the top of the evaluation stack as type
-        ///     F(float).
+        ///     <inheritdoc cref="OpCodes.Ldelem_R8"/>
         /// </summary>
         public FluentIlGenerator Ldelem_R8() {
             IlGenerator.Emit(OpCodes.Ldelem_R8);
@@ -103,8 +98,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element containing an object reference at a specified array index onto the top of the evaluation
-        ///     stack as type O (object reference).
+        ///     <inheritdoc cref="OpCodes.Ldelem_Ref"/>
         /// </summary>
         public FluentIlGenerator Ldelem_Ref() {
             IlGenerator.Emit(OpCodes.Ldelem_Ref);
@@ -112,8 +106,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element with type unsigned int8 at a specified array index onto the top of the evaluation stack as
-        ///     an int32.
+        ///     <inheritdoc cref="OpCodes.Ldelem_U1"/>
         /// </summary>
         public FluentIlGenerator Ldelem_U1() {
             IlGenerator.Emit(OpCodes.Ldelem_U1);
@@ -121,8 +114,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element with type unsigned int16 at a specified array index onto the top of the evaluation stack as
-        ///     an int32.
+        ///     <inheritdoc cref="OpCodes.Ldelem_U2"/>
         /// </summary>
         public FluentIlGenerator Ldelem_U2() {
             IlGenerator.Emit(OpCodes.Ldelem_U2);
@@ -130,8 +122,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the element with type unsigned int32 at a specified array index onto the top of the evaluation stack as
-        ///     an int32.
+        ///     <inheritdoc cref="OpCodes.Ldelem_U4"/>
         /// </summary>
         public FluentIlGenerator Ldelem_U4() {
             IlGenerator.Emit(OpCodes.Ldelem_U4);
@@ -139,8 +130,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the address of the array element at a specified array index onto the top of the evaluation stack as type
-        ///     &amp;(managed pointer).
+        ///     <inheritdoc cref="OpCodes.Ldelema"/>
         /// </summary>
         public FluentIlGenerator Ldelema(Type type) {
             IlGenerator.Emit(OpCodes.Ldelema, type);
@@ -150,8 +140,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         #region Store
         /// <summary>
-        ///     Replaces the array element at a given index with the value on the evaluation stack, whose type is specified in
-        ///     the instruction.
+        ///     <inheritdoc cref="OpCodes.Stelem"/>
         /// </summary>
         public FluentIlGenerator Stelem(Type type) {
             IlGenerator.Emit(OpCodes.Stelem, type);
@@ -159,7 +148,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Replaces the array element at a given index with the native int value on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Stelem_I"/>
         /// </summary>
         public FluentIlGenerator Stelem_I() {
             IlGenerator.Emit(OpCodes.Stelem_I);
@@ -167,7 +156,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Replaces the array element at a given index with the int8 value on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Stelem_I1"/>
         /// </summary>
         public FluentIlGenerator Stelem_I1() {
             IlGenerator.Emit(OpCodes.Stelem_I1);
@@ -175,7 +164,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Replaces the array element at a given index with the int16 value on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Stelem_I2"/>
         /// </summary>
         public FluentIlGenerator Stelem_I2() {
             IlGenerator.Emit(OpCodes.Stelem_I2);
@@ -183,7 +172,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Replaces the array element at a given index with the int32 value on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Stelem_I4"/>
         /// </summary>
         public FluentIlGenerator Stelem_I4() {
             IlGenerator.Emit(OpCodes.Stelem_I4);
@@ -191,7 +180,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Replaces the array element at a given index with the int64 value on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Stelem_I8"/>
         /// </summary>
         public FluentIlGenerator Stelem_I8() {
             IlGenerator.Emit(OpCodes.Stelem_I8);
@@ -199,7 +188,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Replaces the array element at a given index with the float32 value on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Stelem_R4"/>
         /// </summary>
         public FluentIlGenerator Stelem_R4() {
             IlGenerator.Emit(OpCodes.Stelem_R4);
@@ -207,7 +196,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Replaces the array element at a given index with the float64 value on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Stelem_R8"/>
         /// </summary>
         public FluentIlGenerator Stelem_R8() {
             IlGenerator.Emit(OpCodes.Stelem_R8);
@@ -215,7 +204,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Replaces the array element at a given index with the object ref value (type O) on the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Stelem_Ref"/>
         /// </summary>
         public FluentIlGenerator Stelem_Ref() {
             IlGenerator.Emit(OpCodes.Stelem_Ref);

@@ -14,7 +14,7 @@ using System.Reflection.Emit;
 namespace DotLogix.Core.Reflection.Fluent.Generator {
     public partial class FluentIlGenerator {
         /// <summary>
-        ///     Exits current method and jumps to specified method.
+        ///     <inheritdoc cref="OpCodes.Jmp"/>
         /// </summary>
         public FluentIlGenerator Jmp(MethodInfo methodInfo) {
             IlGenerator.Emit(OpCodes.Jmp, methodInfo);
@@ -22,7 +22,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Implements a jump table.
+        ///     <inheritdoc cref="OpCodes.Switch"/>
         /// </summary>
         public FluentIlGenerator Switch(params Label[] labels) {
             IlGenerator.Emit(OpCodes.Switch, labels);
@@ -30,8 +30,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control from the filter clause of an exception back to the Common Language Infrastructure (CLI)
-        ///     exception handler.
+        ///     <inheritdoc cref="OpCodes.Endfilter"/>
         /// </summary>
         public FluentIlGenerator Endfilter() {
             IlGenerator.Emit(OpCodes.Endfilter);
@@ -39,8 +38,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control from the fault or finally clause of an exception block back to the Common Language
-        ///     Infrastructure (CLI) exception handler.
+        ///     <inheritdoc cref="OpCodes.Endfinally"/>
         /// </summary>
         public FluentIlGenerator Endfinally() {
             IlGenerator.Emit(OpCodes.Endfinally);
@@ -48,7 +46,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Exits a protected region of code, unconditionally transferring control to a specific target instruction.
+        ///     <inheritdoc cref="OpCodes.Leave"/>
         /// </summary>
         public FluentIlGenerator Leave(Label label) {
             IlGenerator.Emit(OpCodes.Leave, label);
@@ -56,7 +54,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Exits a protected region of code, unconditionally transferring control to a target instruction (short form).
+        ///     <inheritdoc cref="OpCodes.Leave_S"/>
         /// </summary>
         public FluentIlGenerator Leave_S(Label label) {
             IlGenerator.Emit(OpCodes.Leave_S, label);
@@ -65,7 +63,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         #region Branch
         /// <summary>
-        ///     Transfers control to a target instruction if two values are equal.
+        ///     <inheritdoc cref="OpCodes.Beq"/>
         /// </summary>
         public FluentIlGenerator Beq(Label label) {
             IlGenerator.Emit(OpCodes.Beq, label);
@@ -73,7 +71,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if two values are equal.
+        ///     <inheritdoc cref="OpCodes.Beq_S"/>
         /// </summary>
         public FluentIlGenerator Beq_S(Label label) {
             IlGenerator.Emit(OpCodes.Beq_S, label);
@@ -81,7 +79,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if the first value is greater than or equal to the second value.
+        ///     <inheritdoc cref="OpCodes.Bge"/>
         /// </summary>
         public FluentIlGenerator Bge(Label label) {
             IlGenerator.Emit(OpCodes.Bge, label);
@@ -89,8 +87,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if the first value is greater than or equal to the
-        ///     second value.
+        ///     <inheritdoc cref="OpCodes.Bge_S"/>
         /// </summary>
         public FluentIlGenerator Bge_S(Label label) {
             IlGenerator.Emit(OpCodes.Bge_S, label);
@@ -98,8 +95,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if the first value is greater than the second value, when comparing
-        ///     unsigned integer values or unordered float values.
+        ///     <inheritdoc cref="OpCodes.Bge_Un"/>
         /// </summary>
         public FluentIlGenerator Bge_Un(Label label) {
             IlGenerator.Emit(OpCodes.Bge_Un, label);
@@ -107,8 +103,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if the first value is greater than the second value,
-        ///     when comparing unsigned integer values or unordered float values.
+        ///     <inheritdoc cref="OpCodes.Bge_Un_S"/>
         /// </summary>
         public FluentIlGenerator Bge_Un_S(Label label) {
             IlGenerator.Emit(OpCodes.Bge_Un_S, label);
@@ -116,7 +111,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if the first value is greater than the second value.
+        ///     <inheritdoc cref="OpCodes.Bgt"/>
         /// </summary>
         public FluentIlGenerator Bgt(Label label) {
             IlGenerator.Emit(OpCodes.Bgt, label);
@@ -124,7 +119,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if the first value is greater than the second value.
+        ///     <inheritdoc cref="OpCodes.Bgt_S"/>
         /// </summary>
         public FluentIlGenerator Bgt_S(Label label) {
             IlGenerator.Emit(OpCodes.Bgt_S, label);
@@ -132,8 +127,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if the first value is greater than the second value, when comparing
-        ///     unsigned integer values or unordered float values.
+        ///     <inheritdoc cref="OpCodes.Bgt_Un"/>
         /// </summary>
         public FluentIlGenerator Bgt_Un(Label label) {
             IlGenerator.Emit(OpCodes.Bgt_Un, label);
@@ -141,8 +135,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if the first value is greater than the second value,
-        ///     when comparing unsigned integer values or unordered float values.
+        ///     <inheritdoc cref="OpCodes.Bgt_Un_S"/>
         /// </summary>
         public FluentIlGenerator Bgt_Un_S(Label label) {
             IlGenerator.Emit(OpCodes.Bgt_Un_S, label);
@@ -150,7 +143,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if the first value is less than or equal to the second value.
+        ///     <inheritdoc cref="OpCodes.Ble"/>
         /// </summary>
         public FluentIlGenerator Ble(Label label) {
             IlGenerator.Emit(OpCodes.Ble, label);
@@ -158,8 +151,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if the first value is less than or equal to the second
-        ///     value.
+        ///     <inheritdoc cref="OpCodes.Ble_S"/>
         /// </summary>
         public FluentIlGenerator Ble_S(Label label) {
             IlGenerator.Emit(OpCodes.Ble_S, label);
@@ -167,8 +159,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if the first value is less than or equal to the second value, when
-        ///     comparing unsigned integer values or unordered float values.
+        ///     <inheritdoc cref="OpCodes.Ble_Un"/>
         /// </summary>
         public FluentIlGenerator Ble_Un(Label label) {
             IlGenerator.Emit(OpCodes.Ble_Un, label);
@@ -176,8 +167,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if the first value is less than or equal to the second
-        ///     value, when comparing unsigned integer values or unordered float values.
+        ///     <inheritdoc cref="OpCodes.Ble_Un_S"/>
         /// </summary>
         public FluentIlGenerator Ble_Un_S(Label label) {
             IlGenerator.Emit(OpCodes.Ble_Un_S, label);
@@ -185,7 +175,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if the first value is less than the second value.
+        ///     <inheritdoc cref="OpCodes.Blt"/>
         /// </summary>
         public FluentIlGenerator Blt(Label label) {
             IlGenerator.Emit(OpCodes.Blt, label);
@@ -193,7 +183,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if the first value is less than the second value.
+        ///     <inheritdoc cref="OpCodes.Blt_S"/>
         /// </summary>
         public FluentIlGenerator Blt_S(Label label) {
             IlGenerator.Emit(OpCodes.Blt_S, label);
@@ -201,8 +191,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if the first value is less than the second value, when comparing
-        ///     unsigned integer values or unordered float values.
+        ///     <inheritdoc cref="OpCodes.Blt_Un"/>
         /// </summary>
         public FluentIlGenerator Blt_Un(Label label) {
             IlGenerator.Emit(OpCodes.Blt_Un, label);
@@ -210,8 +199,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if the first value is less than the second value, when
-        ///     comparing unsigned integer values or unordered float values.
+        ///     <inheritdoc cref="OpCodes.Blt_Un_S"/>
         /// </summary>
         public FluentIlGenerator Blt_Un_S(Label label) {
             IlGenerator.Emit(OpCodes.Blt_Un_S, label);
@@ -219,8 +207,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction when two unsigned integer values or unordered float values are not
-        ///     equal.
+        ///     <inheritdoc cref="OpCodes.Bne_Un"/>
         /// </summary>
         public FluentIlGenerator Bne_Un(Label label) {
             IlGenerator.Emit(OpCodes.Bne_Un, label);
@@ -228,8 +215,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) when two unsigned integer values or unordered float
-        ///     values are not equal.
+        ///     <inheritdoc cref="OpCodes.Bne_Un_S"/>
         /// </summary>
         public FluentIlGenerator Bne_Un_S(Label label) {
             IlGenerator.Emit(OpCodes.Bne_Un_S, label);
@@ -237,7 +223,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Unconditionally transfers control to a target instruction.
+        ///     <inheritdoc cref="OpCodes.Br"/>
         /// </summary>
         public FluentIlGenerator Br(Label label) {
             IlGenerator.Emit(OpCodes.Br, label);
@@ -245,7 +231,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Unconditionally transfers control to a target instruction (short form).
+        ///     <inheritdoc cref="OpCodes.Br_S"/>
         /// </summary>
         public FluentIlGenerator Br_S(Label label) {
             IlGenerator.Emit(OpCodes.Br_S, label);
@@ -253,7 +239,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Signals the Common Language Infrastructure (CLI) to inform the debugger that a break point has been tripped.
+        ///     <inheritdoc cref="OpCodes.Break"/>
         /// </summary>
         public FluentIlGenerator Break() {
             IlGenerator.Emit(OpCodes.Break);
@@ -261,8 +247,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if value is false, a null reference (Nothing in Visual Basic), or
-        ///     zero.
+        ///     <inheritdoc cref="OpCodes.Brfalse"/>
         /// </summary>
         public FluentIlGenerator Brfalse(Label label) {
             IlGenerator.Emit(OpCodes.Brfalse, label);
@@ -270,7 +255,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if value is false, a null reference, or zero.
+        ///     <inheritdoc cref="OpCodes.Brfalse_S"/>
         /// </summary>
         public FluentIlGenerator Brfalse_S(Label label) {
             IlGenerator.Emit(OpCodes.Brfalse_S, label);
@@ -278,7 +263,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction if value is true, not null, or non-zero.
+        ///     <inheritdoc cref="OpCodes.Brtrue"/>
         /// </summary>
         public FluentIlGenerator Brtrue(Label label) {
             IlGenerator.Emit(OpCodes.Brtrue, label);
@@ -286,7 +271,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Transfers control to a target instruction (short form) if value is true, not null, or non-zero.
+        ///     <inheritdoc cref="OpCodes.Brtrue_S"/>
         /// </summary>
         public FluentIlGenerator Brtrue_S(Label label) {
             IlGenerator.Emit(OpCodes.Brtrue_S, label);

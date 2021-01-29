@@ -13,8 +13,7 @@ using System.Reflection.Emit;
 namespace DotLogix.Core.Reflection.Fluent.Generator {
     public partial class FluentIlGenerator {
         /// <summary>
-        ///     Compares two values. If they are equal, the integer value 1 (int32) is pushed onto the evaluation stack;
-        ///     otherwise 0 (int32) is pushed onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ceq"/>
         /// </summary>
         public FluentIlGenerator Ceq() {
             IlGenerator.Emit(OpCodes.Ceq);
@@ -22,8 +21,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Compares two values. If the first value is greater than the second, the integer value 1 (int32) is pushed onto
-        ///     the evaluation stack; otherwise 0 (int32) is pushed onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Cgt"/>
         /// </summary>
         public FluentIlGenerator Cgt() {
             IlGenerator.Emit(OpCodes.Cgt);
@@ -31,8 +29,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Compares two unsigned or unordered values. If the first value is greater than the second, the integer value 1
-        ///     (int32) is pushed onto the evaluation stack; otherwise 0 (int32) is pushed onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Cgt_Un"/>
         /// </summary>
         public FluentIlGenerator Cgt_Un() {
             IlGenerator.Emit(OpCodes.Cgt_Un);
@@ -40,8 +37,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Compares two values. If the first value is less than the second, the integer value 1 (int32) is pushed onto
-        ///     the evaluation stack; otherwise 0 (int32) is pushed onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Clt"/>
         /// </summary>
         public FluentIlGenerator Clt() {
             IlGenerator.Emit(OpCodes.Clt);
@@ -49,8 +45,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Compares the unsigned or unordered values value1 and value2. If value1 is less than value2, then the integer
-        ///     value 1 (int32) is pushed onto the evaluation stack; otherwise 0 (int32) is pushed onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Clt_Un"/>
         /// </summary>
         public FluentIlGenerator Clt_Un() {
             IlGenerator.Emit(OpCodes.Clt_Un);
@@ -58,7 +53,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Throws ArithmeticException if value is not a finite number.
+        ///     <inheritdoc cref="OpCodes.Ckfinite"/>
         /// </summary>
         public FluentIlGenerator Ckfinite() {
             IlGenerator.Emit(OpCodes.Ckfinite);

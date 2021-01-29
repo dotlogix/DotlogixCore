@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DotLogix.Core.Collections;
-using Microsoft.VisualBasic;
+﻿using DotLogix.Core.Collections;
 using NUnit.Framework;
 
 namespace CoreTests.Collections {

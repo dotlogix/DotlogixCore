@@ -16,7 +16,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
     public partial class FluentIlGenerator {
         #region Values
         /// <summary>
-        ///     Constrains the type on which a virtual method call is made.
+        ///     <inheritdoc cref="OpCodes.Constrained"/>
         /// </summary>
         public FluentIlGenerator Constrained(Type type) {
             IlGenerator.Emit(OpCodes.Constrained, type);
@@ -27,24 +27,31 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         #region Methods
         #region Call
         /// <summary>
-        ///     Calls the method indicated by the passed method descriptor.
+        ///     <inheritdoc cref="OpCodes.Call"/>
         /// </summary>
         public FluentIlGenerator Call(MethodInfo methodInfo) {
             IlGenerator.Emit(OpCodes.Call, methodInfo);
             return this;
         }
+        
+        /// <summary>
+        ///     <inheritdoc cref="OpCodes.Call"/>
+        /// </summary>
+        public FluentIlGenerator Call(ConstructorInfo constructorInfo) {
+            IlGenerator.Emit(OpCodes.Call, constructorInfo);
+            return this;
+        }
 
         /// <summary>
-        ///     Calls the method indicated by the passed method descriptor.
+        ///     <inheritdoc cref="OpCodes.Call"/>
         /// </summary>
-        public FluentIlGenerator Call(MethodInfo methodInfo, Type[] optionalParameterTypes) {
+        public FluentIlGenerator Call(MethodInfo methodInfo, Type[] optionalParameterTypes = null) {
             IlGenerator.EmitCall(OpCodes.Call, methodInfo, optionalParameterTypes);
             return this;
         }
 
         /// <summary>
-        ///     Calls the method indicated on the evaluation stack (as a pointer to an entry point) with arguments described
-        ///     by a calling convention.
+        ///     <inheritdoc cref="OpCodes.Calli"/>
         /// </summary>
         public FluentIlGenerator Calli(CallingConventions callingConvention, Type returnType, Type[] parameterTypes,
                                        Type[] optionalParameterTypes) {
@@ -53,7 +60,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Calls a late-bound method on an object, pushing the return value onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Callvirt"/>
         /// </summary>
         public FluentIlGenerator Callvirt(MethodInfo methodInfo) {
             IlGenerator.Emit(OpCodes.Call, methodInfo);
@@ -61,7 +68,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Calls a late-bound method on an object, pushing the return value onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Callvirt"/>
         /// </summary>
         public FluentIlGenerator Callvirt(MethodInfo methodInfo, Type[] optionalParameterTypes) {
             IlGenerator.EmitCall(OpCodes.Call, methodInfo, optionalParameterTypes);
@@ -71,7 +78,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         #region Load Arg
         /// <summary>
-        ///     Loads an argument (referenced by a specified index value) onto the stack.
+        ///     <inheritdoc cref="OpCodes.Ldarg"/>
         /// </summary>
         public FluentIlGenerator Ldarg(short index) {
             IlGenerator.Emit(OpCodes.Ldarg, index);
@@ -79,7 +86,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the argument at index 0 onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldarg_0"/>
         /// </summary>
         public FluentIlGenerator Ldarg_0() {
             IlGenerator.Emit(OpCodes.Ldarg_0);
@@ -87,7 +94,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the argument at index 1 onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldarg_1"/>
         /// </summary>
         public FluentIlGenerator Ldarg_1() {
             IlGenerator.Emit(OpCodes.Ldarg_1);
@@ -95,7 +102,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the argument at index 2 onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldarg_2"/>
         /// </summary>
         public FluentIlGenerator Ldarg_2() {
             IlGenerator.Emit(OpCodes.Ldarg_2);
@@ -103,7 +110,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the argument at index 3 onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldarg_3"/>
         /// </summary>
         public FluentIlGenerator Ldarg_3() {
             IlGenerator.Emit(OpCodes.Ldarg_3);
@@ -111,7 +118,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Loads the argument (referenced by a specified short form index) onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldarg_S"/>
         /// </summary>
         public FluentIlGenerator Ldarg_S(byte index) {
             IlGenerator.Emit(OpCodes.Ldarg_S, index);
@@ -119,7 +126,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Load an argument address onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldarga"/>
         /// </summary>
         public FluentIlGenerator Ldarga(short index) {
             IlGenerator.Emit(OpCodes.Ldarga, index);
@@ -127,7 +134,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Load an argument address, in short form, onto the evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ldarga_S"/>
         /// </summary>
         public FluentIlGenerator Ldarga_S(byte index) {
             IlGenerator.Emit(OpCodes.Ldarga_S, index);
@@ -137,7 +144,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         #region Store Arg
         /// <summary>
-        ///     Stores the value on top of the evaluation stack in the argument slot at a specified index, short form.
+        ///     <inheritdoc cref="OpCodes.Starg_S"/>
         /// </summary>
         public FluentIlGenerator Starg_S(byte index) {
             IlGenerator.Emit(OpCodes.Starg_S, index);
@@ -145,7 +152,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Stores the value on top of the evaluation stack in the argument slot at a specified index.
+        ///     <inheritdoc cref="OpCodes.Starg"/>
         /// </summary>
         public FluentIlGenerator Starg(short index) {
             IlGenerator.Emit(OpCodes.Starg, index);
@@ -154,7 +161,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         #endregion
 
         /// <summary>
-        ///     Returns an unmanaged pointer to the argument list of the current method.
+        ///     <inheritdoc cref="OpCodes.Arglist"/>
         /// </summary>
         public FluentIlGenerator Arglist() {
             IlGenerator.Emit(OpCodes.Arglist);
@@ -162,8 +169,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Returns from the current method, pushing a return value (if present) from the callee's evaluation stack onto
-        ///     the caller's evaluation stack.
+        ///     <inheritdoc cref="OpCodes.Ret"/>
         /// </summary>
         public FluentIlGenerator Ret() {
             IlGenerator.Emit(OpCodes.Ret);

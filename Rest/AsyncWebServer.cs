@@ -120,14 +120,14 @@ namespace DotLogix.Core.Rest {
                         Settings.LogSource.Error(e);
                 }
             }
-
+            
             while (IsRunning) {
                 try {
                     await _requestSemaphore.WaitAsync(_serverShutdownSource.Token);
                 } catch(OperationCanceledException e) {
                     if(IsRunning == false)
                         continue; // Suppress cancellation because of server shutdown
-                    Log.Error(e);
+                    Settings.LogSource.Error(e);
                 }
 
                 try {
@@ -151,7 +151,7 @@ namespace DotLogix.Core.Rest {
                 } catch(HttpListenerException e) {
                     if(IsRunning == false)
                         continue;
-                    Log.Error(e);
+                    Settings.LogSource.Error(e);
                 }
             }
         }
@@ -180,12 +180,12 @@ namespace DotLogix.Core.Rest {
                 await _webSocketRequestHandler.HandleRequestAsync(webSocketRequest);
             } catch(Exception e) {
                 if (IsRunning)
-                    Log.Error(e);
+                    Settings.LogSource.Error(e);
                 try {
                     webSocketRequest?.Dispose();
                 } catch(Exception ex) {
                     if(IsRunning)
-                        Log.Error(ex);
+                        Settings.LogSource.Error(ex);
                 }
             }
         }
@@ -201,7 +201,7 @@ namespace DotLogix.Core.Rest {
                 if((response.IsCompleted == false) && (httpContext.PreventAutoSend == false))
                     await response.CompleteAsync();
             } catch(Exception e) {
-                Log.Error(e);
+                Settings.LogSource.Error(e);
                 if(httpContext != null)
                     await SendErrorMessageAsync(httpContext.Response, e);
             } finally {

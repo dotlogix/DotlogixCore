@@ -12,7 +12,7 @@ using DotLogix.Core.Rest.Services.ResultWriters;
 using DotLogix.Core.Rest.Services.Routing;
 
 namespace DotLogix.Core.Rest.Services {
-    public class WebServiceTypeBuilder {
+    public class WebServiceBuilder {
         private readonly Dictionary<MethodInfo, WebServiceRouteBuilder> _methodMapping = new Dictionary<MethodInfo, WebServiceRouteBuilder>();
         private readonly List<WebServiceRouteBuilder> _routeBuilders = new List<WebServiceRouteBuilder>();
         public string Name { get; set; }
@@ -23,7 +23,7 @@ namespace DotLogix.Core.Rest.Services {
         public Func<object> ServiceFactory { get; set; }
         public IEnumerable<WebServiceRouteBuilder> Routes => _routeBuilders;
 
-        public WebServiceTypeBuilder(DynamicType serviceType) {
+        public WebServiceBuilder(DynamicType serviceType) {
             ServiceType = serviceType.Type;
             DynamicServiceType = serviceType;
 
@@ -33,21 +33,21 @@ namespace DotLogix.Core.Rest.Services {
                 RoutePrefix = attribute.Route;
             }
         }
-        public WebServiceTypeBuilder(Type serviceType) : this(serviceType.CreateDynamicType()) {
+        public WebServiceBuilder(Type serviceType) : this(serviceType.CreateDynamicType()) {
         }
 
-        public WebServiceTypeBuilder UseName(string name) {
+        public WebServiceBuilder UseName(string name) {
             Name = name;
             return this;
         }
 
-        public WebServiceTypeBuilder UseRoutePrefix(string routePrefix) {
+        public WebServiceBuilder UseRoutePrefix(string routePrefix) {
             RoutePrefix = routePrefix;
             return this;
         }
 
 
-        public WebServiceTypeBuilder UseService(object service) {
+        public WebServiceBuilder UseService(object service) {
             if(_methodMapping.Count > 0)
                 throw new InvalidOperationException("Can not change service instance after configuring routes");
 
@@ -56,7 +56,7 @@ namespace DotLogix.Core.Rest.Services {
             return this;
         } 
 
-        public WebServiceTypeBuilder UseServiceFactory(Func<object> serviceFactory) {
+        public WebServiceBuilder UseService(Func<object> serviceFactory) {
             if (_methodMapping.Count > 0)
                 throw new InvalidOperationException("Can not change service factory after configuring routes");
 
@@ -76,7 +76,7 @@ namespace DotLogix.Core.Rest.Services {
             return UseRoute(methodInfo);
         }
 
-        public WebServiceTypeBuilder UseRoute(string methodName, Action<WebServiceRouteBuilder> configureFunc) {
+        public WebServiceBuilder UseRoute(string methodName, Action<WebServiceRouteBuilder> configureFunc) {
             var routeBuilder = UseRoute(methodName);
             configureFunc?.Invoke(routeBuilder);
             return this;
@@ -98,23 +98,27 @@ namespace DotLogix.Core.Rest.Services {
             return routeBuilder;
         }
 
-        public WebServiceTypeBuilder UseRoute(MethodInfo methodInfo, Action<WebServiceRouteBuilder> configureFunc) {
+        public WebServiceBuilder UseRoute(MethodInfo methodInfo, Action<WebServiceRouteBuilder> configureFunc) {
             var routeBuilder = UseRoute(methodInfo);
             configureFunc?.Invoke(routeBuilder);
             return this;
         }
         
-        public void UseRoute(Action<WebServiceRouteBuilder> configureFunc) {
+        public WebServiceBuilder UseRoute(Action<WebServiceRouteBuilder> configureFunc) {
             var routeBuilder = new WebServiceRouteBuilder();
             configureFunc.Invoke(routeBuilder);
             _routeBuilders.Add(routeBuilder);
+            return this;
         }
 
         public IWebServiceType Build(int serviceRouteOffset) {
-            var webServiceType = Service != null
-                                 ? new WebServiceType(DynamicServiceType, Service) 
-                                 : new WebServiceType(DynamicServiceType, ServiceFactory);
+            Name ??= $"{ServiceType.Name}_{Guid.NewGuid():N}";
+            if (Service == null && ServiceFactory == null)
+                throw new InvalidOperationException("Can not build without a service instance or factory");
 
+            var webServiceType = Service != null
+                                 ? new WebServiceType(Name, RoutePrefix, DynamicServiceType, Service) 
+                                 : new WebServiceType(Name, RoutePrefix, DynamicServiceType, ServiceFactory);
             for(var i = 0; i < _routeBuilders.Count; i++) {
                 var route = _routeBuilders[i];
                 webServiceType.Routes.Add(route.Build(serviceRouteOffset + i), RoutePrefix);
@@ -184,13 +188,13 @@ namespace DotLogix.Core.Rest.Services {
             var resultWriterAttribute = dynamicInvoke
                                        .MethodInfo
                                        .GetCustomAttribute<RouteResultWriterAttribute>();
-            return resultWriterAttribute.CreateResultWriter();
+            return resultWriterAttribute?.CreateResultWriter();
         }
 
         protected virtual IWebRequestProcessor GetRequestProcessor(DynamicInvoke dynamicInvoke) {
             return Service != null
-                       ? new WebRequestProcessor(Service, dynamicInvoke, 0, false)
-                       : new WebRequestProcessor(ServiceFactory, dynamicInvoke, 0, false);
+                       ? new WebRequestProcessor(Service, dynamicInvoke, 0)
+                       : new WebRequestProcessor(ServiceFactory, dynamicInvoke, 0);
         }
 
         protected virtual IEnumerable<IWebRequestProcessor> GetPreProcessors(DynamicInvoke dynamicInvoke) {

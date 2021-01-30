@@ -132,13 +132,13 @@ namespace DotLogix.Core.Rest.Services.Routing {
                     if (match.Success == false)
                         continue;
 
-                    matchLength += match.Length;
-                    overwrite |= bestMatchTotalLength < matchLength;
+                    var currentMatchLength = matchLength + match.Length;
+                    overwrite |= bestMatchTotalLength < currentMatchLength;
 
                     if (overwrite == false)
                         continue;
 
-                    bestMatchTotalLength = matchLength;
+                    bestMatchTotalLength = currentMatchLength;
                     bestMatch = match;
                     bestRoute = webServiceRoute;
                 }

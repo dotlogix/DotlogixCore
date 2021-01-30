@@ -1,4 +1,5 @@
 ﻿using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Formats.Json;
 using DotLogix.Core.Rest.Services;
 
 namespace DotLogix.Core.Rest.Json {
@@ -7,11 +8,11 @@ namespace DotLogix.Core.Rest.Json {
         public const string JsonRawParamName = "nodes.json.jsonRaw";
 
         public string Name => nameof(JsonNodesExtension);
-        public JsonFormatterSettings FormatterSettings { get; }
+        public JsonConverterSettings ConverterSettings { get; }
         public bool UseAsDefault { get; }
 
-        public JsonNodesExtension(JsonFormatterSettings formatterSettings, bool useAsDefault) {
-            FormatterSettings = formatterSettings;
+        public JsonNodesExtension(JsonConverterSettings converterSettings, bool useAsDefault) {
+            ConverterSettings = converterSettings;
             UseAsDefault = useAsDefault;
         }
 

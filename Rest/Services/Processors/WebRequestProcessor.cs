@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Http;
+using DotLogix.Core.Rest.Json;
+using DotLogix.Core.Rest.Services.Descriptors;
+using DotLogix.Core.Rest.Services.Parameters;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors {
@@ -58,26 +61,33 @@ namespace DotLogix.Core.Rest.Services.Processors {
         }
 
         protected virtual bool TryGetParameterValues(WebServiceContext context, out object[] paramValues) {
-            var methodParams = DynamicInvoke.Parameters;
+            var descriptor = context.Route.Descriptors.GetCustomDescriptor<MethodDescriptor>();
+            var methodParams = descriptor.Parameters;
             paramValues = new object[methodParams.Length];
             for (var i = 0; i < paramValues.Length; i++) {
                 var methodParam = methodParams[i];
+
                 if (TryGetParameterValue(context, methodParam, out paramValues[i]) == false)
                     return false;
             }
             return true;
         }
 
-        protected virtual bool TryGetParameterValue(WebServiceContext context, ParameterInfo methodParam, out object paramValue) {
-            for(var i = context.ParameterProviders.Count - 1; i >= 0; i--) {
-                var parameterProvider = context.ParameterProviders[i];
-                if (parameterProvider.TryResolve(context, methodParam, out paramValue)) {
+        protected virtual bool TryGetParameterValue(WebServiceContext context, ParameterDescriptor parameterDescriptor, out object paramValue) {
+            var parameterProviders = context.ParameterProviders;
+            for(var i = parameterProviders.Count - 1; i >= 0; i--) {
+                var parameterProvider = parameterProviders[i];
+
+                if(parameterDescriptor.ProviderFilter?.Invoke(parameterProvider) == false)
+                    continue;
+                
+                if (parameterProvider.TryResolve(context, parameterDescriptor, out paramValue)) {
                     return true;
                 }
             }
 
-            if (methodParam.IsOptional) {
-                paramValue = methodParam.DefaultValue;
+            if (parameterDescriptor.IsOptional) {
+                paramValue = parameterDescriptor.DefaultValue;
                 return true;
             }
             paramValue = null;

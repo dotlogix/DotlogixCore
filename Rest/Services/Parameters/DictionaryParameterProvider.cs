@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Rest.Services.Descriptors;
 
 namespace DotLogix.Core.Rest.Services.Parameters {
     public class DictionaryParameterProvider : IParameterProvider {
@@ -24,10 +25,10 @@ namespace DotLogix.Core.Rest.Services.Parameters {
             return GetSourceFunc(context);
         }
 
-        public bool TryResolve(WebServiceContext context, ParameterInfo parameter, out object paramValue) {
+        public bool TryResolve(WebServiceContext context, ParameterDescriptor parameterDescriptor, out object paramValue) {
             var source = GetSourceFunc(context);
             if(source != null)
-                return source.TryGetValueAs(parameter.Name, parameter.ParameterType, out paramValue);
+                return source.TryGetValueAs(parameterDescriptor.Name, parameterDescriptor.ParameterType, out paramValue);
 
             paramValue = null;
             return false;

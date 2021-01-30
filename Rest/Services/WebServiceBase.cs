@@ -20,20 +20,12 @@ using DotLogix.Core.Rest.Services.ResultWriters;
 
 namespace DotLogix.Core.Rest.Services {
     public abstract class WebServiceBase : IWebService {
-        protected WebServiceBase() : this(null, null) { }
-
-        protected WebServiceBase(string route) : this(null, route) {
-            
+        public string Name {
+            get {
+                var attribute = GetType().GetCustomAttribute<WebServiceAttribute>();
+                return attribute?.Name ?? GetType().Name;
+            }
         }
-
-        protected WebServiceBase(string name, string route) {
-            var attribute = GetType().GetCustomAttribute<WebServiceAttribute>();
-            Name = name ?? attribute?.Name ?? GetType().Name;
-            RoutePrefix = route ?? attribute?.Route ?? throw new ArgumentNullException(nameof(route));
-        }
-
-        public string Name { get; }
-        public string RoutePrefix { get; }
 
         public static WebServiceResult StatusCode(HttpStatusCode statusCode) {
             return new WebServiceResult(statusCode);

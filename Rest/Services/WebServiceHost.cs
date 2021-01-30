@@ -9,20 +9,18 @@
 #region
 using System;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Rest.Events;
-using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services.Attributes;
 using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Routing;
 #endregion
 
 namespace DotLogix.Core.Rest.Services {
-    public class WebServiceHost {
+    public class WebServiceHost : IWebServiceHost {
         private int _currentRouteIndex;
         public WebServiceSettings Settings { get; }
         public ILogSource LogSource => Settings.LogSource;
@@ -32,11 +30,9 @@ namespace DotLogix.Core.Rest.Services {
 
         public WebServiceHost(WebServiceSettings settings = null) {
             Settings = settings ?? new WebServiceSettings();
-            Router = new WebServiceRouter(Settings.Router);
+            Router = new WebServiceRouter(Settings);
             Server = new AsyncWebServer(Router, Settings.Server);
             Services = new WebServiceCollection();
-
-            var typeBuilder = new WebServiceTypeBuilder(typeof(object));
         }
 
         public WebServiceHost(string urlPrefix, WebServiceSettings settings = null) : this(settings) {
@@ -64,7 +60,7 @@ namespace DotLogix.Core.Rest.Services {
         #endregion
 
         #region Services
-        public void RegisterService(IWebService serviceInstance, Action<WebServiceTypeBuilder> configureFunc = null) {
+        public void RegisterService(IWebService serviceInstance, Action<WebServiceBuilder> configureFunc = null) {
             if(Services.TryAdd(serviceInstance) == false)
                 throw new ArgumentException($"A service with name {serviceInstance.Name} is already registered. Choose another name");
 
@@ -72,7 +68,7 @@ namespace DotLogix.Core.Rest.Services {
 
             LogSource.Trace($"Register webservice {serviceInstance.Name}");
 
-            void ConfigureService(WebServiceTypeBuilder b) {
+            void ConfigureService(WebServiceBuilder b) {
                 b.UseService(serviceInstance);
                 configureFunc?.Invoke(b);
             }
@@ -80,16 +76,18 @@ namespace DotLogix.Core.Rest.Services {
             RegisterService(serviceType, ConfigureService);
             RegisterEvents(serviceInstance, serviceType);
         }
-        public void RegisterService(Type serviceType, Func<IWebService> serviceFactory, Action<WebServiceTypeBuilder> configureFunc = null) {
-            void ConfigureService(WebServiceTypeBuilder b) {
-                b.UseServiceFactory(serviceFactory);
+        public void RegisterService(Type serviceType, Func<IWebService> serviceFactory, Action<WebServiceBuilder> configureFunc = null) {
+            void ConfigureService(WebServiceBuilder b) {
+                b.UseService(serviceFactory);
                 configureFunc?.Invoke(b);
             }
 
             RegisterService(serviceType, ConfigureService);
         }
-        public void RegisterService(Type serviceType, Action<WebServiceTypeBuilder> configureFunc) {
-            var builder = new WebServiceTypeBuilder(serviceType);
+        public void RegisterService(Type serviceType, Action<WebServiceBuilder> configureFunc) {
+            var builder = new WebServiceBuilder(serviceType);
+            configureFunc.Invoke(builder);
+            
             var methods = serviceType.GetMethods();
             foreach (var methodInfo in methods) {
                 var routeAttribute = methodInfo.GetCustomAttribute<RouteAttribute>();
@@ -97,11 +95,10 @@ namespace DotLogix.Core.Rest.Services {
                     continue;
                 builder.UseRoute(methodInfo);
             }
-
-            configureFunc.Invoke(builder);
+            
             RegisterService(builder);
         }
-        public void RegisterService(WebServiceTypeBuilder builder) {
+        public void RegisterService(WebServiceBuilder builder) {
             var webService = builder.Build(_currentRouteIndex);
             foreach (var prefixedRoute in webService.Routes) {
                 var route = prefixedRoute.Route;
@@ -109,7 +106,7 @@ namespace DotLogix.Core.Rest.Services {
 
                 Router.Routes.Add(route, prefix);
                 var descriptor = route.Descriptors.GetCustomDescriptor<MethodDescriptor>();
-                LogSource.Trace($"Registered webservice route {webService.Name}.{descriptor?.Name ?? route.Pattern} as {prefix ?? ""}{route.Pattern}");
+                LogSource.Trace($"Registered webservice route {webService.Name}.{descriptor?.DynamicInvoke.Name ?? route.Pattern} as {prefix ?? ""}{route.Pattern}");
             }
 
             var count = builder.Routes.Count();
@@ -119,10 +116,10 @@ namespace DotLogix.Core.Rest.Services {
             _currentRouteIndex += count;
         }
 
-        public void RegisterService<TService>(Func<TService> serviceFactory, Action<WebServiceTypeBuilder> configureFunc = null) where TService : class, IWebService {
+        public void RegisterService<TService>(Func<TService> serviceFactory, Action<WebServiceBuilder> configureFunc = null) where TService : class, IWebService {
             RegisterService(typeof(TService), serviceFactory, configureFunc);
         }
-        public void RegisterService<TService>(Action<WebServiceTypeBuilder> configureFunc = null) where TService : class, IWebService, new() {
+        public void RegisterService<TService>(Action<WebServiceBuilder> configureFunc = null) where TService : class, IWebService, new() {
             RegisterService(new TService(), configureFunc);
         }
 

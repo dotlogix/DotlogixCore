@@ -7,14 +7,17 @@
 // ==================================================
 
 #region
+
 using System;
 using System.IO;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Http.Context;
 using DotLogix.Core.Rest.Http.Headers;
+using DotLogix.Core.Rest.Services.ResultWriters;
+
 #endregion
 
-namespace DotLogix.Core.Rest.Services {
+namespace DotLogix.Core.Rest.Services.Results {
     public class WebServiceStreamResult : IWebServiceResult {
         public Stream Stream { get; set; }
         public int ChunkSize { get; set; } = AsyncHttpResponse.DefaultChunkSize;
@@ -31,6 +34,6 @@ namespace DotLogix.Core.Rest.Services {
         public IWebServiceResultWriter ResultWriter { get; set; } = StreamResultWriter.Instance;
 
         /// <inheritdoc />
-        public Optional<Exception> Exception => null;
+        public Optional<Exception> Exception => default;
     }
 }

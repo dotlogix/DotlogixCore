@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
@@ -16,11 +17,13 @@ using DotLogix.Core.Reflection.Dynamics;
 namespace DotLogix.Core.Rest.Services.Descriptors {
     public class MethodDescriptor : RouteDescriptorBase {
         public DynamicInvoke DynamicInvoke { get; }
+        public ParameterDescriptor[] Parameters { get; }
         public bool IsAsyncMethod { get; }
         public Type ReturnType { get; }
 
         public MethodDescriptor(DynamicInvoke dynamicInvoke) {
             DynamicInvoke = dynamicInvoke;
+            Parameters = dynamicInvoke.Parameters.Select(p => new ParameterDescriptor(p)).ToArray();
             ReturnType = dynamicInvoke.ReturnType;
             if(ReturnType.IsAssignableToOpenGeneric(typeof(Task<>), out var arguments)) {
                 IsAsyncMethod = true;

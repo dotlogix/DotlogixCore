@@ -10,6 +10,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Formats.Json;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services;
 using DotLogix.Core.Rest.Services.ResultWriters;
@@ -23,7 +24,7 @@ namespace DotLogix.Core.Rest.Json {
         
         protected override async Task WriteResultAsync(WebServiceContext context, object value) {
             var extension = context.Settings.GetExtension<JsonNodesExtension>();
-            var formatterSettings = extension?.FormatterSettings ?? JsonFormatterSettings.Idented;
+            var formatterSettings = extension?.ConverterSettings ?? JsonConverterSettings.Idented;
             
             var httpResponse = context.HttpResponse;
             httpResponse.StatusCode = context.Result.StatusCode ?? HttpStatusCodes.Success.Ok;

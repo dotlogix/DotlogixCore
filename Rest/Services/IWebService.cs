@@ -9,6 +9,5 @@
 namespace DotLogix.Core.Rest.Services {
     public interface IWebService {
         string Name { get; }
-        string RoutePrefix { get; }
     }
 }

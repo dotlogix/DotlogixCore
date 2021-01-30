@@ -10,7 +10,6 @@
 using System.Collections.Generic;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Rest.Http.Parameters;
-using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Core.Rest {

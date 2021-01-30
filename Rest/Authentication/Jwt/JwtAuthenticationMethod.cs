@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Authentication.Jwt.Algorithms;
 using DotLogix.Core.Rest.Json;
 using DotLogix.Core.Rest.Services;
@@ -31,7 +30,7 @@ namespace DotLogix.Core.Rest.Authentication.Jwt {
         }
 
         public override Task AuthenticateAsync(WebServiceContext context, string data) {
-            var formatterSettings = context.Settings.GetExtension<JsonNodesExtension>()?.FormatterSettings;
+            var formatterSettings = context.Settings.GetExtension<JsonNodesExtension>()?.ConverterSettings;
 
             var result = JsonWebTokens.TryDeserialize<TPayload>(data, out var token, name => _signingAlgorithms.GetValue(name), formatterSettings);
             if(result == JsonWebTokenResult.Success)

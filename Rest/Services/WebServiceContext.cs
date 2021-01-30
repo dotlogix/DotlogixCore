@@ -25,29 +25,34 @@ namespace DotLogix.Core.Rest.Services {
         public IDictionary<string, object> Variables { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         public static WebServiceContext Current => AsyncCurrent.Value;
 
-        public Guid ContextId { get; } = Guid.NewGuid();
+        public Guid ContextGuid { get; }
+        public List<IParameterProvider> ParameterProviders { get; }
+        public WebServiceSettings Settings { get; }
+        
+        public IWebServiceRoute Route { get; }
+        public IWebServiceResult Result { get; private set; }
+        public ILogSource LogSource { get; }
+
         public IAsyncHttpContext HttpContext { get; }
         public IAsyncHttpRequest HttpRequest => HttpContext.Request;
         public IAsyncHttpResponse HttpResponse => HttpContext.Response;
-        public IWebServiceResult Result { get; private set; }
-        public IWebServiceRoute Route { get; }
-        public List<IParameterProvider> ParameterProviders { get; }
-        public ILogSource LogSource => Settings.LogSource;
-        public WebServiceSettings Settings { get; }
 
 
-        public WebServiceContext(IAsyncHttpContext httpContext, IWebServiceRoute route, List<IParameterProvider> parameterProviders) {
+        public WebServiceContext(IAsyncHttpContext httpContext, IWebServiceRoute route, List<IParameterProvider> parameterProviders, WebServiceSettings settings) {
+            ContextGuid = Guid.NewGuid();
             HttpContext = httpContext;
             Route = route;
             ParameterProviders = parameterProviders;
+            Settings = settings;
             Result = null;
+            LogSource = Settings.LogSource.CreateSource($"request_{ContextGuid:D}");
 
             AsyncCurrent.Value = this;
-
+            
             Variables["webServiceContext"] = this;
             Variables["webServiceRoute"] = route;
             Variables["webServiceResult"] = Result;
-            Variables["webServiceSettings"] = httpContext.Server.Settings;
+            Variables["webServiceSettings"] = Settings;
 
             Variables["httpContext"] = httpContext;
             Variables["httpResponse"] = httpContext.Response;

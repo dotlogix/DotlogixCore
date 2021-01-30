@@ -37,7 +37,7 @@ namespace DotLogix.Core.Rest.Services.Routing.Matching {
 
         public Regex Regex { get; }
         public bool IsRooted { get; }
-        public string Pattern { get; }
+        public string Pattern { get; protected set; }
         public HttpMethods AcceptedMethods { get; }
     }
 }

@@ -20,10 +20,11 @@ using DotLogix.Core.Rest.Services.ResultWriters;
 
 namespace DotLogix.Core.Rest.Services.Routing {
     public class WebServiceRouter : IAsyncHttpRequestHandler {
-        public WebServiceRouterSettings Settings { get; }
+        public WebServiceSettings ServiceSettings { get; }
+        public WebServiceRouterSettings Settings => ServiceSettings.Router;
 
-        public WebServiceRouter(WebServiceRouterSettings settings = null) {
-            Settings = settings ?? new WebServiceRouterSettings();
+        public WebServiceRouter(WebServiceSettings settings = null) {
+            ServiceSettings = settings ?? new WebServiceSettings();
         }
 
         public const string EventSubscriptionParameterName = "$event";
@@ -69,7 +70,7 @@ namespace DotLogix.Core.Rest.Services.Routing {
             parameterProviders.AddRange(globalParameterProviders);
             parameterProviders.AddRange(routeParameterProviders);
 
-            using var webServiceContext = new WebServiceContext(asyncHttpContext, route, parameterProviders);
+            using var webServiceContext = new WebServiceContext(asyncHttpContext, route, parameterProviders, ServiceSettings);
             
             // start of processing
             await ProcessRequest(webServiceContext);

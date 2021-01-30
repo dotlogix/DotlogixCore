@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services.Routing.Matching;
 

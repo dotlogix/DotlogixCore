@@ -7,13 +7,16 @@
 // ==================================================
 
 #region
+
 using System;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Rest.Http;
+using DotLogix.Core.Rest.Services.Results;
+
 #endregion
 
-namespace DotLogix.Core.Rest.Services {
+namespace DotLogix.Core.Rest.Services.ResultWriters {
     public class PrimitiveResultWriter : IWebServiceResultWriter {
         public static IWebServiceResultWriter Instance { get; } = new PrimitiveResultWriter();
 

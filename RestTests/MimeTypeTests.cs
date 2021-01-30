@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Formats.Json;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Http.Headers;
 using NUnit.Framework;
@@ -61,7 +62,7 @@ namespace RestTests {
             Assert.That(mimeType.Attributes, Is.Not.Empty);
 
             string GetExceptionMessage() {
-                return JsonUtils.ToJson(mimeType.Attributes, JsonFormatterSettings.Idented);
+                return JsonUtils.ToJson(mimeType.Attributes, JsonConverterSettings.Idented);
             }
 
             Assert.That(mimeType.Attributes.Count, Is.EqualTo(5), GetExceptionMessage);

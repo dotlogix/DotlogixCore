@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Formats.Json;
 using DotLogix.Core.Rest.Services;
+using DotLogix.Core.Rest.Services.Descriptors;
 using DotLogix.Core.Rest.Services.Parameters;
 
 namespace DotLogix.Core.Rest.Json {
@@ -14,12 +16,12 @@ namespace DotLogix.Core.Rest.Json {
         public ParameterSources Source { get; } = ParameterSources.Body;
 
         public Node JsonRoot { get; }
-        public JsonFormatterSettings FormatterSettings { get; }
+        public JsonConverterSettings ConverterSettings { get; }
 
         /// <inheritdoc />
-        public JsonNodesParameterProvider(Node jsonRoot, JsonFormatterSettings formatterSettings) {
+        public JsonNodesParameterProvider(Node jsonRoot, JsonConverterSettings converterSettings) {
             JsonRoot = jsonRoot;
-            FormatterSettings = formatterSettings;
+            ConverterSettings = converterSettings;
         }
 
         /// <inheritdoc />
@@ -34,22 +36,21 @@ namespace DotLogix.Core.Rest.Json {
             return values;
         }
 
-        public bool TryResolve(WebServiceContext context, ParameterInfo parameter, out object paramValue) {
-            Node child = null;
+        public bool TryResolve(WebServiceContext context, ParameterDescriptor parameterDescriptor, out object paramValue) {
+            var node = JsonRoot;
 
-            if(parameter.IsDefined(typeof(JsonBodyAttribute)))
-                child = JsonRoot;
-            else if(JsonRoot is NodeMap nodeMap) {
-                child = nodeMap.GetChild(FormatterSettings.NamingStrategy.Rewrite(parameter.Name));
+            var parameterName = ConverterSettings.NamingStrategy.Rewrite(parameterDescriptor.Name);
+            if(node is NodeMap nodeMap && nodeMap.TryGetChild(parameterName, out var childNode)) {
+                node = childNode;
             }
 
-            if (child == null) {
+            if (node == null) {
                 paramValue = null;
                 return false;
             }
 
             try {
-                paramValue = child.ToObject(parameter.ParameterType, FormatterSettings);
+                paramValue = node.ToObject(parameterDescriptor.ParameterType, ConverterSettings);
                 return true;
             } catch (Exception e) {
                 context.LogSource.Warn(e);

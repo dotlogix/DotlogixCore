@@ -10,6 +10,7 @@
 using System;
 using System.Threading.Tasks;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Formats.Json;
 using DotLogix.Core.Rest.Http;
 using DotLogix.Core.Rest.Services;
 using DotLogix.Core.Rest.Services.Processors;
@@ -29,12 +30,12 @@ namespace DotLogix.Core.Rest.Json {
             var json = await request.ReadStringFromRequestStreamAsync();
             if(json.Length > 1) {
                 try {
-                    var jsonData = JsonUtils.ToNode(request.InputStream, request.ContentEncoding);
+                    var jsonData = JsonUtils.ToNode(json);
                     context.Variables.Add(JsonNodesExtension.JsonRawParamName, json);
                     context.Variables.Add(JsonNodesExtension.JsonDataParamName, jsonData);
 
                     var extension = context.Settings.GetExtension<JsonNodesExtension>();
-                    var formatterSettings = extension?.FormatterSettings ?? JsonFormatterSettings.Idented;
+                    var formatterSettings = extension?.ConverterSettings ?? JsonConverterSettings.Idented;
                     context.ParameterProviders.Add(new JsonNodesParameterProvider(jsonData, formatterSettings));
                 } catch(Exception e) {
                     context.LogSource.Warn(e);

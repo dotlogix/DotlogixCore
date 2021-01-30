@@ -6,8 +6,6 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-using System.Collections.Generic;
-
 namespace DotLogix.Architecture.Application.Context.Factories {
     /// <summary>
     /// An interface to represent a factory to create <see cref="IApplicationContext"/>

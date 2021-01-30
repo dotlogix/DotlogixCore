@@ -10,11 +10,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Nodes;
+using DotLogix.Core.Nodes.Formats.Json;
 #endregion
 
 namespace DotLogix.Core.Config {
@@ -67,7 +67,7 @@ namespace DotLogix.Core.Config {
             AutoReload = false;
             EnableFileWatching = false;
             try {
-                var json = JsonUtils.ToJson(CurrentConfig, JsonFormatterSettings.Idented);
+                var json = JsonUtils.ToJson(CurrentConfig, JsonConverterSettings.Idented);
                 File.WriteAllText(AbsolutePath, json);
                 HasChanged = false;
                 return true;

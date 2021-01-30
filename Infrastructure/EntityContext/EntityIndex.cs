@@ -9,10 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Core.Collections;
-using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 #endregion
 

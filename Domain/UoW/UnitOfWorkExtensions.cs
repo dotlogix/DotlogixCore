@@ -12,9 +12,8 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.Entities;
+using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Repositories;
-using DotLogix.Core;
-using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Architecture.Domain.UoW {
@@ -26,7 +25,7 @@ namespace DotLogix.Architecture.Domain.UoW {
         /// <summary>
         /// Get a single entity by key
         /// </summary>
-        public static ValueTask<TEntity> GetAsync<TKey, TEntity>(this IUnitOfWorkContext context, TKey key) where TEntity : class, new() {
+        public static Task<TEntity> GetAsync<TKey, TEntity>(this IUnitOfWorkContext context, TKey key) where TEntity : class, new() {
             var repository = context.UseRepository<IRepository<TKey, TEntity>>();
             return repository.GetAsync(key);
         }
@@ -34,7 +33,7 @@ namespace DotLogix.Architecture.Domain.UoW {
         /// <summary>
         /// Get a range of entities by key
         /// </summary>
-        public static ValueTask<IEnumerable<TEntity>> GetRangeAsync<TKey, TEntity>(this IUnitOfWorkContext context, IEnumerable<TKey> keys) where TEntity : class, new() {
+        public static Task<IEnumerable<TEntity>> GetRangeAsync<TKey, TEntity>(this IUnitOfWorkContext context, IEnumerable<TKey> keys) where TEntity : class, new() {
 	        var repository = context.UseRepository<IRepository<TKey, TEntity>>();
 	        return repository.GetRangeAsync(keys);
         }
@@ -42,17 +41,25 @@ namespace DotLogix.Architecture.Domain.UoW {
         /// <summary>
         /// Get all entities
         /// </summary>
-        public static ValueTask<IEnumerable<TEntity>> GetAllAsync<TEntity>(this IUnitOfWorkContext context) where TEntity : class, new() {
+        public static Task<IEnumerable<TEntity>> GetAllAsync<TEntity>(this IUnitOfWorkContext context) where TEntity : class, new() {
             var repository = context.UseRepository<IRepository<TEntity>>();
             return repository.GetAllAsync();
         }
         /// <summary>
         /// Get all entities matching an expression
         /// </summary>
-        public static ValueTask<IEnumerable<TEntity>> WhereAsync<TEntity>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TEntity : class, new() {
-            var repository = context.UseRepository<IRepository<TEntity>>();
-            return repository.WhereAsync(filterExpression);
-		}
+        public static Task<IEnumerable<TEntity>> WhereAsync<TEntity>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TEntity : class, new() {
+	        var repository = context.UseRepository<IRepository<TEntity>>();
+	        return repository.WhereAsync(filterExpression);
+        }
+        
+        /// <summary>
+        /// Get all entities matching an expression
+        /// </summary>
+        public static Task<IEnumerable<TEntity>> WhereAsync<TEntity>(this IUnitOfWorkContext context, IQueryModifier<TEntity> modifier) where TEntity : class, new() {
+	        var repository = context.UseRepository<IRepository<TEntity>>();
+	        return repository.WhereAsync(modifier);
+        }
 
         #endregion
 
@@ -60,7 +67,7 @@ namespace DotLogix.Architecture.Domain.UoW {
 		/// <summary>
 		/// Add a single entity to the set
 		/// </summary>
-		public static ValueTask<TEntity> AddAsync<TEntity>(this IUnitOfWorkContext context, TEntity entity) where TEntity : class, new() {
+		public static Task<TEntity> AddAsync<TEntity>(this IUnitOfWorkContext context, TEntity entity) where TEntity : class, new() {
             var repository = context.UseRepository<IRepository<TEntity>>();
             return repository.AddAsync(entity);
             
@@ -68,7 +75,7 @@ namespace DotLogix.Architecture.Domain.UoW {
         /// <summary>
         /// Add a range of entities to the set
         /// </summary>
-        public static ValueTask<IEnumerable<TEntity>> AddRangeAsync<TEntity>(this IUnitOfWorkContext context, IEnumerable<TEntity> entities) where TEntity : class, new() {
+        public static Task<IEnumerable<TEntity>> AddRangeAsync<TEntity>(this IUnitOfWorkContext context, IEnumerable<TEntity> entities) where TEntity : class, new() {
             var repository = context.UseRepository<IRepository<TEntity>>();
             return repository.AddRangeAsync(entities);
         }
@@ -80,7 +87,7 @@ namespace DotLogix.Architecture.Domain.UoW {
         /// <summary>
         /// Queries the matching entity and remove it
         /// </summary>
-        public static ValueTask<TEntity> RemoveAsync<TKey, TEntity>(this IUnitOfWorkContext context, TKey key) where TEntity : class, ISimpleEntity, new() {
+        public static Task<TEntity> RemoveAsync<TKey, TEntity>(this IUnitOfWorkContext context, TKey key) where TEntity : class, ISimpleEntity, new() {
 	        var repository = context.UseRepository<IRepository<TKey, TEntity>>();
 	        return repository.RemoveByKeyAsync(key);
         }
@@ -88,7 +95,7 @@ namespace DotLogix.Architecture.Domain.UoW {
         /// <summary>
         /// Queries the matching entity and remove it
         /// </summary>
-        public static ValueTask<IEnumerable<TEntity>> RemoveRangeAsync<TKey, TEntity>(this IUnitOfWorkContext context, IEnumerable<TKey> keys) where TEntity : class, new() {
+        public static Task<IEnumerable<TEntity>> RemoveRangeAsync<TKey, TEntity>(this IUnitOfWorkContext context, IEnumerable<TKey> keys) where TEntity : class, new() {
 			var repository = context.UseRepository<IRepository<TKey, TEntity>>();
 			return repository.RemoveByKeyAsync(keys);
 		}
@@ -96,7 +103,7 @@ namespace DotLogix.Architecture.Domain.UoW {
         /// <summary>
         /// Queries the matching entities and remove them
         /// </summary>
-        public static ValueTask<IEnumerable<TEntity>> RemoveWhereAsync<TEntity>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TEntity : class, ISimpleEntity, new() {
+        public static Task<IEnumerable<TEntity>> RemoveWhereAsync<TEntity>(this IUnitOfWorkContext context, Expression<Func<TEntity, bool>> filterExpression) where TEntity : class, ISimpleEntity, new() {
 	        var repository = context.UseRepository<IRepository<TEntity>>();
 	        return repository.RemoveWhereAsync(filterExpression);
         }

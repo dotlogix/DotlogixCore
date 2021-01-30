@@ -7,7 +7,6 @@
 // ==================================================
 
 #region
-using System.Collections.Generic;
 using DotLogix.Architecture.Domain.Services;
 using DotLogix.Architecture.Domain.UoW;
 #endregion

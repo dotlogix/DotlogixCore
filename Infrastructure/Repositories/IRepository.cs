@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using DotLogix.Architecture.Infrastructure.Queries;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {
@@ -30,32 +31,35 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         /// <summary>
         /// Get all entities
         /// </summary>
-        ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get all entities matching an expression
         /// </summary>
-        ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Add a single entity to the set
         /// </summary>
-        ValueTask<TEntity> AddAsync(TEntity entity);
+        Task<TEntity> AddAsync(TEntity entity);
 
         /// <summary>
         /// Add a range of entities to the set
         /// </summary>
-        ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities);
+        Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities);
 
         /// <summary>
         /// Remove a single entity from the set
         /// </summary>
-        ValueTask<TEntity> RemoveAsync(TEntity entity);
+        Task<TEntity> RemoveAsync(TEntity entity);
 
         /// <summary>
         /// Remove a range of entities from the set
         /// </summary>
-        ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities);
+        Task<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities);
+
+        /// <inheritdoc />
+        Task<IEnumerable<TEntity>> WhereAsync(IQueryModifier<TEntity> filter, CancellationToken cancellationToken = default);
     }
 
     /// <summary>
@@ -65,11 +69,11 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
 		/// <summary>
 		/// Get a single entity by key
 		/// </summary>
-		ValueTask<TEntity> GetAsync(TKey key, CancellationToken cancellationToken = default);
+		Task<TEntity> GetAsync(TKey key, CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Get a range of entities by key
 		/// </summary>
-		ValueTask<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<TKey> keys, CancellationToken cancellationToken = default);
+		Task<IEnumerable<TEntity>> GetRangeAsync(IEnumerable<TKey> keys, CancellationToken cancellationToken = default);
     }
 }

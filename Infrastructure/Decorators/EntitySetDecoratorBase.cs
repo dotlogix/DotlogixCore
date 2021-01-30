@@ -7,16 +7,11 @@
 // ==================================================
 
 #region
-
-using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
-using DotLogix.Core;
+using DotLogix.Architecture.Infrastructure.Repositories;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Decorators {
@@ -42,32 +37,32 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
         public IEntityContext EntityContext { get; }
 
         /// <inheritdoc />
-		public virtual ValueTask<TEntity> AddAsync(TEntity entity) {
+		public virtual Task<TEntity> AddAsync(TEntity entity) {
             return BaseEntitySet.AddAsync(entity);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities) {
+        public virtual Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities) {
             return BaseEntitySet.AddRangeAsync(entities);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<TEntity> RemoveAsync(TEntity entity) {
+        public virtual Task<TEntity> RemoveAsync(TEntity entity) {
             return BaseEntitySet.RemoveAsync(entity);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities) {
+        public virtual Task<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities) {
             return BaseEntitySet.RemoveRangeAsync(entities);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<TEntity> ReAttachAsync(TEntity entity) {
+        public virtual Task<TEntity> ReAttachAsync(TEntity entity) {
             return BaseEntitySet.ReAttachAsync(entity);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities) {
+        public virtual Task<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities) {
             return BaseEntitySet.ReAttachRangeAsync(entities);
         }
 
@@ -76,6 +71,11 @@ namespace DotLogix.Architecture.Infrastructure.Decorators {
         {
 	        var query = BaseEntitySet.Query();
 	        return query;
+        }
+
+        public IQuery<TEntity> Query(params IQueryModifier<TEntity>[] filters) {
+            var query = BaseEntitySet.Query(filters);
+            return query;
         }
     }
 }

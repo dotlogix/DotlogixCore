@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using DotLogix.Core.Collections;
 using DotLogix.Core.Reflection.Dynamics;
-using DotLogix.Core.Utils;
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
     /// <summary>

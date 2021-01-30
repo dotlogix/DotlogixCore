@@ -9,10 +9,9 @@
 #region
 using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
-
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
+namespace DotLogix.Architecture.Infrastructure.EntityFramework.Queries {
     /// <summary>
     /// An implementation of the <see cref="IQueryableQueryFactory"/> for entity framework
     /// </summary>

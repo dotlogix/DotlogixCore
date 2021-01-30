@@ -9,10 +9,6 @@
 #region
 using System;
 using System.IO;
-using System.Threading;
-using DotLogix.Core.Diagnostics;
-using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes;
 #endregion
 
 namespace DotLogix.Core.Config {

@@ -9,7 +9,6 @@
 #region
 using System;
 using System.Threading.Tasks;
-using DotLogix.Core.Utils;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {

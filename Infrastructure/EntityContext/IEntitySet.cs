@@ -7,13 +7,10 @@
 // ==================================================
 
 #region
-using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.Queries;
+using DotLogix.Architecture.Infrastructure.Repositories;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
@@ -33,12 +30,12 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
         /// <summary>
         /// Add a single entity to the set
         /// </summary>
-        ValueTask<TEntity> AddAsync(TEntity entity);
+        Task<TEntity> AddAsync(TEntity entity);
 
         /// <summary>
         /// Add a range of entities to the set
         /// </summary>
-        ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities);
+        Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities);
 
         #endregion
 
@@ -47,12 +44,12 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
         /// <summary>
         /// Remove a single entity from the set
         /// </summary>
-        ValueTask<TEntity> RemoveAsync(TEntity entity);
+        Task<TEntity> RemoveAsync(TEntity entity);
 
         /// <summary>
         /// Remove a range of entities from the set
         /// </summary>
-        ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities);
+        Task<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities);
 
         #endregion
 
@@ -61,12 +58,12 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
         /// <summary>
         /// Reattach a single entity to the underlying change tracker
         /// </summary>
-        ValueTask<TEntity> ReAttachAsync(TEntity entity);
+        Task<TEntity> ReAttachAsync(TEntity entity);
 
         /// <summary>
         /// Reattach a range of entities to the underlying change tracker
         /// </summary>
-        ValueTask<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities);
+        Task<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities);
 
         #endregion
 
@@ -75,6 +72,11 @@ namespace DotLogix.Architecture.Infrastructure.EntityContext {
         /// Create a linq style query to allow more advanced requests to the entity set
         /// </summary>
         IQuery<TEntity> Query();
+
+        /// <summary>
+        /// Create a linq style query to allow more advanced requests to the entity set
+        /// </summary>
+        IQuery<TEntity> Query(params IQueryModifier<TEntity>[] filters);
         #endregion
     }
 }

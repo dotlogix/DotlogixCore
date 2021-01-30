@@ -13,7 +13,7 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryType>git</RepositoryType>
 		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
-		<Version>2.2.3</Version>
+		<Version>2.2.75</Version>
 		<PackageTags>nge</PackageTags>
 		<Configurations>Debug;Release;</Configurations>
 	</PropertyGroup>

@@ -2,8 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using DotLogix.Architecture.Infrastructure.EntityContext;
-using DotLogix.Architecture.Infrastructure.EntityFramework.Query;
+using DotLogix.Architecture.Infrastructure.EntityFramework.Queries;
 using DotLogix.Architecture.Infrastructure.Queries;
+using DotLogix.Architecture.Infrastructure.Repositories;
 using DotLogix.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,51 +42,66 @@ namespace DotLogix.Architecture.Infrastructure.EntityFramework.EntityContext {
         }
         
         /// <inheritdoc />
-        public virtual async ValueTask<TEntity> AddAsync(TEntity entity) {
-            var asyncResult = await DbSet.AddAsync(entity);
-            return asyncResult.Entity;
+        public virtual Task<TEntity> AddAsync(TEntity entity) {
+            var entry = DbSet.Add(entity);
+            return Task.FromResult(entry.Entity);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities)
+        public virtual Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities)
         {
-	        var collection = entities.AsCollection();
-			var asyncResult = DbSet.AddRangeAsync(collection)
-			                        .ContinueWith(e => collection.AsEnumerable(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously);
-			return new ValueTask<IEnumerable<TEntity>>(asyncResult);
+            entities = entities.AsCollection();
+            DbSet.AddRange(entities);
+            return Task.FromResult(entities);
 		}
 
         /// <inheritdoc />
-        public virtual ValueTask<TEntity> RemoveAsync(TEntity entity)
+        public virtual Task<TEntity> RemoveAsync(TEntity entity)
         {
 	        var entry = DbSet.Remove(entity);
-			return new ValueTask<TEntity>(entry.Entity);
+			return Task.FromResult(entry.Entity);
 		}
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities)
+        public virtual Task<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities)
         {
-	        var collection = entities.AsCollection();
-			DbSet.RemoveRange(collection);
-            return new ValueTask<IEnumerable<TEntity>>(collection);
+            entities = entities.AsCollection();
+			DbSet.RemoveRange(entities);
+            return Task.FromResult(entities);
 		}
 
         /// <inheritdoc />
-        public virtual ValueTask<TEntity> ReAttachAsync(TEntity entity) {
-            var  entry = DbSet.Attach(entity);
-            return new ValueTask<TEntity>(entry.Entity);
+        public virtual Task<TEntity> ReAttachAsync(TEntity entity) {
+            var entry = DbSet.Attach(entity);
+            return Task.FromResult(entry.Entity);
 		}
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities) {
-            var collection = entities.AsCollection();
-            DbSet.AttachRange(collection);
-            return new ValueTask<IEnumerable<TEntity>>(collection);
+        public virtual Task<IEnumerable<TEntity>> ReAttachRangeAsync(IEnumerable<TEntity> entities) {
+            entities = entities.AsCollection();
+            DbSet.AttachRange(entities);
+            return Task.FromResult(entities);
 		}
 
         /// <inheritdoc />
         public virtual IQuery<TEntity> Query() {
             return EfQueryableQueryFactory.Instance.CreateQuery(DbSet);
+        }
+
+        /// <summary>
+        /// Create a linq style query to allow more advanced requests to the entity set
+        /// </summary>
+        public virtual IQuery<TEntity> Query(params IQueryModifier<TEntity>[] filters) {
+            var query = Query();
+            switch (filters.Length)
+            {
+                case 0:
+                    return query;
+                case 1:
+                    return filters[0].Apply(EntityContext, query);
+                default:
+                    return filters.Aggregate(query, (q, f) => f.Apply(EntityContext, q));
+            }
         }
     }
 }

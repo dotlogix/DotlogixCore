@@ -9,7 +9,6 @@
 #region
 using DotLogix.Architecture.Domain.Context;
 using DotLogix.Architecture.Domain.UoW;
-using DotLogix.Core.Diagnostics;
 #endregion
 
 namespace DotLogix.Architecture.Domain.Services {

@@ -9,18 +9,12 @@
 #region
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.Attributes;
-using DotLogix.Architecture.Infrastructure.Decorators;
-using DotLogix.Architecture.Infrastructure.Entities;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
-using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {
@@ -48,34 +42,37 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
-            var task = Query().ToEnumerableAsync(cancellationToken);
-            return new ValueTask<IEnumerable<TEntity>>(task);
+        public virtual Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) {
+            return Query().ToEnumerableAsync(cancellationToken);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
-            var task = Query().Where(filterExpression).ToEnumerableAsync(cancellationToken);
-            return new ValueTask<IEnumerable<TEntity>>(task);
+        public virtual Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> filterExpression, CancellationToken cancellationToken = default) {
+            return Query().Where(filterExpression).ToEnumerableAsync(cancellationToken);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<TEntity> AddAsync(TEntity entity) {
+        public virtual Task<IEnumerable<TEntity>> WhereAsync(IQueryModifier<TEntity> filter, CancellationToken cancellationToken = default) {
+            return Query(filter).ToEnumerableAsync(cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public virtual Task<TEntity> AddAsync(TEntity entity) {
             return EntitySet.AddAsync(entity);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities) {
+        public virtual Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities) {
             return EntitySet.AddRangeAsync(entities);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<TEntity> RemoveAsync(TEntity entity) {
+        public virtual Task<TEntity> RemoveAsync(TEntity entity) {
             return EntitySet.RemoveAsync(entity);
         }
 
         /// <inheritdoc />
-        public virtual ValueTask<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities) {
+        public virtual Task<IEnumerable<TEntity>> RemoveRangeAsync(IEnumerable<TEntity> entities) {
             return EntitySet.RemoveRangeAsync(entities);
         }
 
@@ -85,6 +82,14 @@ namespace DotLogix.Architecture.Infrastructure.Repositories {
         /// </summary>
         protected virtual IQuery<TEntity> Query() {
             return EntitySet.Query();
+        }
+
+        /// <summary>
+        /// Create a linq style query to allow more advanced requests to the entity set
+        /// </summary>
+        protected virtual IQuery<TEntity> Query(params IQueryModifier<TEntity>[] filters)
+        {
+            return EntitySet.Query(filters);
         }
     }
 }

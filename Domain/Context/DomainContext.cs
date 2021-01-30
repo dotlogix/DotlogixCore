@@ -7,8 +7,6 @@
 // ==================================================
 
 #region
-using System;
-using System.Collections.Generic;
 using DotLogix.Architecture.Domain.Services;
 using DotLogix.Architecture.Domain.Services.Providers;
 using DotLogix.Architecture.Domain.UoW;

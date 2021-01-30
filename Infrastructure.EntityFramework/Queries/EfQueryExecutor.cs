@@ -17,10 +17,11 @@ using DotLogix.Architecture.Infrastructure.Queries;
 using DotLogix.Architecture.Infrastructure.Queries.Queryable;
 using DotLogix.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
+
 #pragma warning disable 1591
 #endregion
 
-namespace DotLogix.Architecture.Infrastructure.EntityFramework.Query {
+namespace DotLogix.Architecture.Infrastructure.EntityFramework.Queries {
     /// <summary>
     /// An implementation of the <see cref="IQueryExecutor{T}"/> for entity framework
     /// </summary>

@@ -8,8 +8,6 @@
 
 #region
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using DotLogix.Architecture.Infrastructure.EntityContext;
 using DotLogix.Core.Extensions;

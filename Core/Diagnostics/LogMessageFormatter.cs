@@ -8,6 +8,7 @@
 
 #region
 using System.IO;
+using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
@@ -15,18 +16,13 @@ namespace DotLogix.Core.Diagnostics {
     /// A console formatter
     /// </summary>
     public class LogMessageFormatter : ILogMessageFormatter {
-        public static LogMessageFormatter Default { get; } = new LogMessageFormatter();
-
-        private LogMessageFormatter() {
-        }
-
         /// <inheritdoc />
-        public bool Format(LogMessage message, TextWriter writer) {
-            writer.WriteLine($"{message.TimeStamp:G} - {message.LogLevel:G}, Class: {message.ClassName}, Method: {message.MethodName}, Thread: {message.MethodName}");
+        public bool Write(TextWriter writer, LogMessage message) {
+            writer.WriteLine($"{message.TimeStamp:G} - {message.LogLevel:G}, Class: {message.ClassName}, Method: {message.MethodName}, Thread: {message.ThreadName}");
 
             if(message.Context != null && message.Context.Count > 0) {
                 writer.WriteLine("Context:");
-                foreach (var kv in message.Context) {
+                foreach (var kv in message.Context.OrderBy(kv => kv.Key)) {
                     writer.WriteLine($"  - {kv.Key}: {kv.Value}");
                 }
             }

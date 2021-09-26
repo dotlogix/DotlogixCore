@@ -17,7 +17,7 @@
         <member name="P:DotLogix.Architecture.Domain.Context.DomainContext.Variables">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Context.DomainContext.#ctor(DotLogix.Architecture.Domain.Services.Providers.IDomainServiceProvider)">
+        <member name="M:DotLogix.Architecture.Domain.Context.DomainContext.#ctor(DotLogix.Architecture.WebServices.Providers.IDomainServiceProvider)">
             <summary>
             Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Context.DomainContext"/>
             </summary>
@@ -35,7 +35,7 @@
             The internal domain context provider
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Context.Factories.DomainContextFactory.#ctor(DotLogix.Architecture.Domain.Services.Providers.IDomainServiceProvider)">
+        <member name="M:DotLogix.Architecture.Domain.Context.Factories.DomainContextFactory.#ctor(DotLogix.Architecture.WebServices.Providers.IDomainServiceProvider)">
             <summary>
             Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Context.Factories.DomainContextFactory"/>
             </summary>
@@ -273,125 +273,125 @@
             An interface for simple models implementing the <see cref="T:DotLogix.Architecture.Common.Options.IGuid"/> interface
             </summary>
         </member>
-        <member name="T:DotLogix.Architecture.Domain.Services.DomainServiceBase">
+        <member name="T:DotLogix.Architecture.WebServices.DomainServiceBase">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Architecture.Domain.Services.IDomainService"/> interface
+            An implementation of the <see cref="T:DotLogix.Architecture.WebServices.IDomainService"/> interface
             </summary>
         </member>
-        <member name="P:DotLogix.Architecture.Domain.Services.DomainServiceBase.DomainContext">
+        <member name="P:DotLogix.Architecture.WebServices.DomainServiceBase.DomainContext">
             <summary>
             The internal domain context
             </summary>
         </member>
-        <member name="P:DotLogix.Architecture.Domain.Services.DomainServiceBase.UowContextFactory">
+        <member name="P:DotLogix.Architecture.WebServices.DomainServiceBase.UowContextFactory">
             <summary>
             The internal unit of work factory
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.DomainServiceBase.#ctor(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
+        <member name="M:DotLogix.Architecture.WebServices.DomainServiceBase.#ctor(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
             <summary>
-            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Services.DomainServiceBase"/>
+            Creates a new instance of <see cref="T:DotLogix.Architecture.WebServices.DomainServiceBase"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.DomainServiceBase.BeginContext">
+        <member name="M:DotLogix.Architecture.WebServices.DomainServiceBase.BeginContext">
             <summary>
             Begin a new unit of work context
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.DomainServiceBase.UseService``1(DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
+        <member name="M:DotLogix.Architecture.WebServices.DomainServiceBase.UseService``1(DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
             <summary>
             Get another service running in a nested unit of work context
             </summary>
         </member>
-        <member name="T:DotLogix.Architecture.Domain.Services.Factories.DomainServiceFactory">
+        <member name="T:DotLogix.Architecture.WebServices.Factories.DomainServiceFactory">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Architecture.Domain.Services.Factories.IDomainServiceFactory"/>
+            An implementation of the <see cref="T:DotLogix.Architecture.WebServices.Factories.IDomainServiceFactory"/>
             </summary>
         </member>
-        <member name="P:DotLogix.Architecture.Domain.Services.Factories.DomainServiceFactory.CreateDomainServiceFunc">
+        <member name="P:DotLogix.Architecture.WebServices.Factories.DomainServiceFactory.CreateDomainServiceFunc">
             <summary>
             The internal callback to create the new instance
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Factories.DomainServiceFactory.#ctor(System.Func{DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory,DotLogix.Architecture.Domain.Services.IDomainService})">
+        <member name="M:DotLogix.Architecture.WebServices.Factories.DomainServiceFactory.#ctor(System.Func{DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory,DotLogix.Architecture.WebServices.IDomainService})">
             <summary>
-            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Services.Factories.DomainServiceFactory"/>
+            Creates a new instance of <see cref="T:DotLogix.Architecture.WebServices.Factories.DomainServiceFactory"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Factories.DomainServiceFactory.Create(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
+        <member name="M:DotLogix.Architecture.WebServices.Factories.DomainServiceFactory.Create(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
             <inheritdoc />
         </member>
-        <member name="T:DotLogix.Architecture.Domain.Services.Factories.DynamicDomainServiceFactory">
+        <member name="T:DotLogix.Architecture.WebServices.Factories.DynamicDomainServiceFactory">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Architecture.Domain.Services.Factories.IDomainServiceFactory"/> using reflection and il code to create instances
+            An implementation of the <see cref="T:DotLogix.Architecture.WebServices.Factories.IDomainServiceFactory"/> using reflection and il code to create instances
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Factories.DynamicDomainServiceFactory.#ctor(DotLogix.Core.Reflection.Dynamics.DynamicCtor)">
+        <member name="M:DotLogix.Architecture.WebServices.Factories.DynamicDomainServiceFactory.#ctor(DotLogix.Core.Reflection.Dynamics.DynamicCtor)">
             <summary>
-            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Services.Factories.DynamicDomainServiceFactory"/>
+            Creates a new instance of <see cref="T:DotLogix.Architecture.WebServices.Factories.DynamicDomainServiceFactory"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Factories.DynamicDomainServiceFactory.Create(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
+        <member name="M:DotLogix.Architecture.WebServices.Factories.DynamicDomainServiceFactory.Create(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Factories.DynamicDomainServiceFactory.CreateFor``1">
+        <member name="M:DotLogix.Architecture.WebServices.Factories.DynamicDomainServiceFactory.CreateFor``1">
             <summary>
-            Create a new <see cref="T:DotLogix.Architecture.Domain.Services.Factories.DynamicDomainServiceFactory"/> using a constructor with the shape .ctor(<see cref="T:DotLogix.Architecture.Domain.Context.IDomainContext"/>, <see cref="T:DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory"/>)
+            Create a new <see cref="T:DotLogix.Architecture.WebServices.Factories.DynamicDomainServiceFactory"/> using a constructor with the shape .ctor(<see cref="T:DotLogix.Architecture.Domain.Context.IDomainContext"/>, <see cref="T:DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory"/>)
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Factories.DynamicDomainServiceFactory.CreateFor(System.Type)">
+        <member name="M:DotLogix.Architecture.WebServices.Factories.DynamicDomainServiceFactory.CreateFor(System.Type)">
             <summary>
-            Create a new <see cref="T:DotLogix.Architecture.Domain.Services.Factories.DynamicDomainServiceFactory"/> using a constructor with the shape .ctor(<see cref="T:DotLogix.Architecture.Domain.Context.IDomainContext"/>, <see cref="T:DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory"/>)
+            Create a new <see cref="T:DotLogix.Architecture.WebServices.Factories.DynamicDomainServiceFactory"/> using a constructor with the shape .ctor(<see cref="T:DotLogix.Architecture.Domain.Context.IDomainContext"/>, <see cref="T:DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory"/>)
             </summary>
         </member>
-        <member name="T:DotLogix.Architecture.Domain.Services.Factories.IDomainServiceFactory">
+        <member name="T:DotLogix.Architecture.WebServices.Factories.IDomainServiceFactory">
             <summary>
-            An interface representing a factory to create <see cref="T:DotLogix.Architecture.Domain.Services.IDomainService"/>
+            An interface representing a factory to create <see cref="T:DotLogix.Architecture.WebServices.IDomainService"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Factories.IDomainServiceFactory.Create(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
+        <member name="M:DotLogix.Architecture.WebServices.Factories.IDomainServiceFactory.Create(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
             <summary>
-            Creates a new instance of <see cref="T:DotLogix.Architecture.Domain.Services.IDomainService"/>
+            Creates a new instance of <see cref="T:DotLogix.Architecture.WebServices.IDomainService"/>
             </summary>
         </member>
-        <member name="T:DotLogix.Architecture.Domain.Services.IDomainService">
+        <member name="T:DotLogix.Architecture.WebServices.IDomainService">
             <summary>
             A non generic marker interface for domain services
             </summary>
         </member>
-        <member name="T:DotLogix.Architecture.Domain.Services.Providers.DomainServiceProvider">
+        <member name="T:DotLogix.Architecture.WebServices.Providers.DomainServiceProvider">
             <summary>
-            An implementation of the <see cref="T:DotLogix.Architecture.Domain.Services.Providers.IDomainServiceProvider"/> interface
+            An implementation of the <see cref="T:DotLogix.Architecture.WebServices.Providers.IDomainServiceProvider"/> interface
             </summary>
         </member>
-        <member name="P:DotLogix.Architecture.Domain.Services.Providers.DomainServiceProvider.ServiceFactories">
+        <member name="P:DotLogix.Architecture.WebServices.Providers.DomainServiceProvider.ServiceFactories">
             <summary>
             The internal registered service factories
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Providers.DomainServiceProvider.Create``1(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
+        <member name="M:DotLogix.Architecture.WebServices.Providers.DomainServiceProvider.Create``1(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
             <inheritdoc />
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Providers.DomainServiceProvider.RegisterFactory(System.Type,DotLogix.Architecture.Domain.Services.Factories.IDomainServiceFactory)">
+        <member name="M:DotLogix.Architecture.WebServices.Providers.DomainServiceProvider.RegisterFactory(System.Type,DotLogix.Architecture.WebServices.Factories.IDomainServiceFactory)">
             <summary>
             Register a new factory
             </summary>
             <param name="domainServiceType"></param>
             <param name="factory"></param>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Providers.DomainServiceProvider.RegisterFactory(System.Type)">
+        <member name="M:DotLogix.Architecture.WebServices.Providers.DomainServiceProvider.RegisterFactory(System.Type)">
             <summary>
-            Create a new <see cref="T:DotLogix.Architecture.Domain.Services.Factories.DynamicDomainServiceFactory"/> using a constructor with the shape .ctor(<see cref="T:DotLogix.Architecture.Domain.Context.IDomainContext"/>, <see cref="T:DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory"/>)
+            Create a new <see cref="T:DotLogix.Architecture.WebServices.Factories.DynamicDomainServiceFactory"/> using a constructor with the shape .ctor(<see cref="T:DotLogix.Architecture.Domain.Context.IDomainContext"/>, <see cref="T:DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory"/>)
             </summary>
         </member>
-        <member name="T:DotLogix.Architecture.Domain.Services.Providers.IDomainServiceProvider">
+        <member name="T:DotLogix.Architecture.WebServices.Providers.IDomainServiceProvider">
             <summary>
-            An interface representing a provider for <see cref="T:DotLogix.Architecture.Domain.Services.IDomainService"/>
+            An interface representing a provider for <see cref="T:DotLogix.Architecture.WebServices.IDomainService"/>
             </summary>
         </member>
-        <member name="M:DotLogix.Architecture.Domain.Services.Providers.IDomainServiceProvider.Create``1(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
+        <member name="M:DotLogix.Architecture.WebServices.Providers.IDomainServiceProvider.Create``1(DotLogix.Architecture.Domain.Context.IDomainContext,DotLogix.Architecture.Domain.UoW.IUnitOfWorkContextFactory)">
             <summary>
-            Create a new instance of a <see cref="T:DotLogix.Architecture.Domain.Services.IDomainService"/>
+            Create a new instance of a <see cref="T:DotLogix.Architecture.WebServices.IDomainService"/>
             </summary>
         </member>
         <member name="T:DotLogix.Architecture.Domain.UoW.IUnitOfWork">

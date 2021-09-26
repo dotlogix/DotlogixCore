@@ -8,7 +8,6 @@
 
 #region
 using System;
-using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
@@ -16,74 +15,20 @@ namespace DotLogix.Core.Diagnostics {
     /// A static logging interface
     /// </summary>
     public static class Log {
-        private static readonly ParallelLogger ParallelLogger = ParallelLogger.Instance;
         /// <summary>
         /// The global logger instance
         /// </summary>
-        public static ILogger Logger => ParallelLogger;
-
+        public static ILogSourceProvider LogSourceProvider { get; set; } = new LogSourceProvider(BroadcastLogger.Instance, _ => LogLevel);
+        
         /// <summary>
         /// Gets or sets the default logger source (name = "Default")
         /// </summary>
-        public static ILogSource Default { get; set; } = new LogSource("Default", ParallelLogger, () => LogLevel) { StackFramesToSkip = 3 };
-
+        public static ILogSource Default => LogSourceProvider.Create("Default");
+        
         /// <summary>
-        /// The level to log messages
+        /// Gets or sets the default log level
         /// </summary>
-        public static LogLevels LogLevel {
-            get => ParallelLogger.CurrentLogLevel;
-            set => ParallelLogger.CurrentLogLevel = value;
-        }
-
-        /// <summary>
-        /// Initialize the log instance
-        /// </summary>
-        /// <returns></returns>
-        public static bool Initialize() {
-            return ParallelLogger.Initialize();
-        }
-
-        /// <summary>
-        /// Attach loggers to the log instance
-        /// </summary>
-        /// <param name="loggers"></param>
-        /// <returns></returns>
-        public static bool AttachLoggers(params ILogger[] loggers) {
-            return ParallelLogger.AttachLogger(loggers);
-        }
-
-        /// <summary>
-        /// Attach loggers to the log instance
-        /// </summary>
-        /// <param name="loggers"></param>
-        /// <returns></returns>
-        public static bool AttachLoggers(IEnumerable<ILogger> loggers) {
-            return ParallelLogger.AttachLogger(loggers);
-        }
-
-        /// <summary>
-        /// Detach some loggers from the log instance
-        /// </summary>
-        /// <param name="loggers"></param>
-        /// <returns></returns>
-        public static bool DetachLoggers(params ILogger[] loggers) {
-            return ParallelLogger.DetachLogger(loggers);
-        }
-        /// <summary>
-        /// Detach some loggers from the log instance
-        /// </summary>
-        /// <param name="loggers"></param>
-        /// <returns></returns>
-        public static bool DetachLoggers(IEnumerable<ILogger> loggers) {
-            return ParallelLogger.DetachLogger(loggers);
-        }
-        /// <summary>
-        /// Shutdown the log instance
-        /// </summary>
-        /// <returns></returns>
-        public static bool Shutdown() {
-            return ParallelLogger.Shutdown();
-        }
+        public static LogLevels LogLevel { get; set; }
 
         /// <summary>
         /// Write a trace message to the loggers
@@ -189,47 +134,10 @@ namespace DotLogix.Core.Diagnostics {
         }
 
         /// <summary>
-        /// Creates a custom logger source with an optional log level override
+        /// Creates a custom logger source
         /// </summary>
-        public static ILogSource CreateSource(string name, LogLevels? customLogLevel = null) {
-            if(customLogLevel.HasValue)
-                return new LogSource(name, ParallelLogger, customLogLevel.Value);
-            return new LogSource(name, ParallelLogger, () => LogLevel);
-        }
-        
-        /// <summary>
-        /// Creates a custom logger source with an optional log level override
-        /// </summary>
-        public static ILogSource CreateSource(string name, Func<LogLevels?> getCustomLogLevelFunc) {
-            return new LogSource(name, ParallelLogger, () => getCustomLogLevelFunc.Invoke() ?? ParallelLogger.CurrentLogLevel);
-        }
-        
-        /// <summary>
-        /// Creates a custom logger source with an optional log level override
-        /// </summary>
-        public static ILogSource CreateSource(string name, Func<LogLevels> getCustomLogLevelFunc) {
-            return new LogSource(name, ParallelLogger, getCustomLogLevelFunc);
-        }
-
-        /// <summary>
-        /// Creates a custom logger source with an optional log level override
-        /// </summary>
-        public static ILogSource CreateSource<T>(LogLevels? customLogLevel) {
-            return CreateSource(typeof(T).Name, customLogLevel);
-        }
-
-        /// <summary>
-        /// Creates a custom logger source with an optional log level override
-        /// </summary>
-        public static ILogSource CreateSource<T>(Func<LogLevels> getCustomLogLevelFunc = null) {
-            return CreateSource(typeof(T).Name, getCustomLogLevelFunc);
-        }
-
-        /// <summary>
-        /// Creates a custom logger source with a log level override
-        /// </summary>
-        public static ILogSource CreateSource<T>(Func<LogLevels?> getCustomLogLevelFunc) {
-            return CreateSource(typeof(T).Name, getCustomLogLevelFunc);
+        public static ILogSource CreateSource(string name) {
+            return LogSourceProvider.Create(name);
         }
     }
 }

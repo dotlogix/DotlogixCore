@@ -74,8 +74,8 @@ namespace DotLogix.Core.Utils.Mappers {
             if(sourceAccessor == null || targetAccessor == null)
                 return this;
 
-            var valueGetter = new DynamicValueGetter<TSource, TSourceValue>(sourceAccessor);
-            var valueSetter = new DynamicValueSetter<TTarget, TTargetValue>(targetAccessor);
+            var valueGetter = new PropertyValueGetter<TSource, TSourceValue>(sourceAccessor);
+            var valueSetter = new PropertyValueSetter<TTarget, TTargetValue>(targetAccessor);
             return Map(sourceProperty, targetProperty, valueGetter, valueSetter, configure);
         }
 

@@ -20,6 +20,34 @@ namespace DotLogix.Core.Extensions {
 	/// A static class providing extension methods for <see cref="IEnumerable{T}"/>
 	/// </summary>
 	public static class EnumerableExtensions {
+		/// <summary>
+		///     Appends one or more values to the enumerable
+		/// </summary>
+		public static IEnumerable<T> Append<T>(this IEnumerable<T> source, params T[] items) where T : class {
+			return source.Concat(items);
+		}
+
+		/// <summary>
+		///     Appends one or more values to the enumerable
+		/// </summary>
+		public static IEnumerable<T> Append<T>(this IEnumerable<T> source, IEnumerable<T> items) where T : class {
+			return source.Concat(items);
+		}
+
+		/// <summary>
+		///     Prepends one or more values to the enumerable
+		/// </summary>
+		public static IEnumerable<T> Prepend<T>(this IEnumerable<T> source, params T[] items) where T : class {
+			return items.Concat(source);
+		}
+
+		/// <summary>
+		///     Prepends one or more values to the enumerable
+		/// </summary>
+		public static IEnumerable<T> Prepend<T>(this IEnumerable<T> source, IEnumerable<T> items) where T : class {
+			return items.Concat(source);
+		}
+		
         /// <summary>
         ///     Skips null values
         /// </summary>
@@ -45,9 +73,7 @@ namespace DotLogix.Core.Extensions {
         /// <param name="source">The initial enumerable</param>
         /// <returns></returns>
         public static IEnumerable<object> SkipDefault(this IEnumerable<object> source) {
-            return source.Where(s => Equals(s,
-                                            s?.GetType()
-                                             .GetDefaultValue()));
+            return source.Where(s => Equals(s, s?.GetType().GetDefaultValue()));
 		}
 
 		/// <summary>
@@ -116,10 +142,10 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="conditionFunc">A method to check if the current value should be yield</param>
 		/// <param name="yieldInitial">A flag if the initial value should be yield or skipped</param>
 		/// <returns></returns>
-        public static IEnumerable<T> EnumerateUntil<T>(this T initialValue,
-                                                       Func<T, T> selectNextFunc,
-                                                       Func<T, bool> conditionFunc,
-                                                       bool yieldInitial = false) {
+		public static IEnumerable<T> EnumerateUntil<T>(this T initialValue,
+		                                               Func<T, T> selectNextFunc,
+		                                               Func<T, bool> conditionFunc,
+		                                               bool yieldInitial = false) {
 			if (yieldInitial)
 				yield return initialValue;
 
@@ -137,8 +163,28 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="value">The value</param>
 		/// <returns></returns>
 		public static T[] Initialize<T>(this T[] array, T value) {
-			for (var i = 0; i < array.Length; i++)
-				array[i] = value;
+			return Initialize(array, value, 0, array.Length);
+		}
+
+		/// <summary>
+		///     Initializes every element of the <see cref="T:System.Array"></see> with the provided value.
+		/// </summary>
+		/// <param name="array">The array</param>
+		/// <param name="value">The value</param>
+		/// <param name="index">The start index</param>
+		/// <param name="count">The amount of elements to set</param>
+		/// <returns></returns>
+		public static T[] Initialize<T>(this T[] array, T value, int index, int count) {
+			var currentCount = Math.Min(count, 8);
+			var offset = index;
+			for (; offset < currentCount; offset++)
+				array[offset] = value;
+			
+			while(offset < array.Length) {
+				Array.Copy(array, index, array, offset, Math.Min(currentCount, array.Length - offset));
+				offset += currentCount;
+				currentCount <<= 1;
+			}
 			return array;
 		}
 
@@ -330,32 +376,38 @@ namespace DotLogix.Core.Extensions {
 #endif
 
 		/// <summary>
-		///     Converts a enumerable to a list, but checks if it is already a list
+		///     Converts a enumerable to a list, if it is not a compatible type already it will be copied to new list
 		/// </summary>
 		public static List<T> AsList<T>(this IEnumerable<T> enumerable) {
-			if (enumerable is List<T> list)
-				return list;
-
-			return new List<T>(enumerable);
+			return enumerable.CastOrConvert(Enumerable.ToList);
 		}
 
 		/// <summary>
-		///     Converts a enumerable to a collection, but checks if it is already a collection
+		///     Converts a enumerable to a collection, if it is not a compatible type already it will be copied to a new collection
 		/// </summary>
 		public static ICollection<T> AsCollection<T>(this IEnumerable<T> enumerable) {
-			if (enumerable is ICollection<T> collection)
-				return collection;
-
-			return new List<T>(enumerable);
+			return enumerable.CastOrConvert<IEnumerable<T>, ICollection<T>>(Enumerable.ToList);
 		}
 
 		/// <summary>
-		///     Converts a enumerable to an array, but checks if it is already an array
+		///     Converts a enumerable to a readonly collection, if it is not a compatible type already it will be copied a new collection
+		/// </summary>
+		public static IReadOnlyCollection<T> AsReadOnlyCollection<T>(this IEnumerable<T> enumerable) {
+			return enumerable.CastOrConvert<IEnumerable<T>, IReadOnlyCollection<T>>(Enumerable.ToList);
+		}
+
+		/// <summary>
+		///     Converts a enumerable to a readonly collection, if it is not a compatible type already it will be copied a new collection
+		/// </summary>
+		public static IReadOnlyList<T> AsReadOnlyList<T>(this IEnumerable<T> enumerable) {
+			return enumerable.CastOrConvert<IEnumerable<T>, IReadOnlyList<T>>(Enumerable.ToList);
+		}
+
+		/// <summary>
+		///     Converts a enumerable to an array, if it is not an array already it will be copied a new array
 		/// </summary>
 		public static T[] AsArray<T>(this IEnumerable<T> enumerable) {
-			if (enumerable is T[] array)
-				return array;
-			return enumerable.ToArray();
+			return enumerable.CastOrConvert(Enumerable.ToArray);
 		}
 
 		/// <summary>
@@ -379,6 +431,35 @@ namespace DotLogix.Core.Extensions {
 		/// </summary>
 		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable) {
 			return Shuffle(enumerable, new Random());
+		}
+
+		/// <summary>
+		///     Copies an enumerable of items to an array
+		/// </summary>
+		/// <param name="source">The source enumerable</param>
+		/// <param name="target">The target array</param>
+		/// <param name="index">The start array index</param>
+		/// <param name="count">The amount of items to copy</param>
+		/// <returns></returns>
+		public static void ApplyTo<T>(this IEnumerable<T> source, T[] target, int index = 0, int count = -1) {
+			if(count == -1) {
+				count = target.Length - index;
+			}
+
+			if(source is ICollection<T> list && count >= list.Count) {
+				list.CopyTo(target, index);
+				return;
+			}
+			
+			if(source is Queue<T> queue && count >= queue.Count) {
+				queue.CopyTo(target, index);
+				return;
+			}
+			
+			using var enumerator = source.GetEnumerator();
+			for(var i = 0; i < count && enumerator.MoveNext(); i++) {
+				target[index + i] = enumerator.Current;
+			}
 		}
 
 		/// <summary>

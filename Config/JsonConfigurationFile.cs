@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2018(C) , DotLogix
+// Copyright 2014-2021(C), DotLogix
 // File:  JsonConfigurationFile.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  05.04.2018
-// LastEdited:  01.08.2018
+// Created: 22.08.2020 13:51
+// LastEdited:  26.09.2021 22:27
 // ==================================================
 
 #region
@@ -13,7 +13,6 @@ using System.IO;
 using System.Threading.Tasks;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Nodes.Formats.Json;
 #endregion
 

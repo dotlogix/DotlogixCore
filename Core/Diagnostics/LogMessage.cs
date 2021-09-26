@@ -63,7 +63,7 @@ namespace DotLogix.Core.Diagnostics {
         /// <summary>
         /// The context
         /// </summary>
-        public List<KeyValuePair<string, string>> Context { get; set; }
+        public Dictionary<string, string> Context { get; set; }
         
         /// <summary>
         /// The optional exception

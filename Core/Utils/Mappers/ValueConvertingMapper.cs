@@ -1,24 +1,25 @@
 ﻿using System;
 
 namespace DotLogix.Core.Utils.Mappers {
-    public class ValueConvertingMapper<TSource, TSourceValue, TTarget, TTargetValue> : IMapper<TSource, TTarget> {
+    public class ValueConvertingMapper<TSource, TSourceValue, TTarget, TTargetValue> : ValueMapperBase<TSource, TSourceValue, TTarget, TTargetValue> {
         public IValueGetter<TSource, TSourceValue> Getter { get; }
         public IValueSetter<TTarget, TTargetValue> Setter { get; }
-        public Func<TSourceValue, TTargetValue> ConvertValueFunc { get; }
+        public Func<TSourceValue, TTargetValue> Converter { get; }
 
         /// <summary>
-        ///     Initialisiert eine neue Instanz der <see cref="T:System.Object" />-Klasse.
+        ///     Creates a new instance of <see cref="ValueConvertingMapper"/>
         /// </summary>
-        public ValueConvertingMapper(IValueGetter<TSource, TSourceValue> getter, IValueSetter<TTarget, TTargetValue> setter, Func<TSourceValue, TTargetValue> convertValueFunc) {
+        public ValueConvertingMapper(IValueGetter<TSource, TSourceValue> getter, IValueSetter<TTarget, TTargetValue> setter, Func<TSourceValue, TTargetValue> converter) {
             Getter = getter;
             Setter = setter;
-            ConvertValueFunc = convertValueFunc;
+            Converter = converter;
         }
 
-        public void Map(TSource source, TTarget target) {
+        /// <inheritdoc />
+        public override void Map(TSource source, TTarget target) {
             if(Getter.TryGet(source, out var value) == false)
                 return;
-            Setter.TrySet(target, ConvertValueFunc.Invoke(value));
+            Setter.TrySet(target, Converter.Invoke(value));
         }
     }
 }

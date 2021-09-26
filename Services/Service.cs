@@ -9,6 +9,7 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -69,7 +70,7 @@ namespace DotLogix.Core.Services {
         ///     A callback to stop the service
         /// </summary>
         protected virtual void OnStop() {
-            Log.Shutdown();
+            BroadcastLogger.Instance.Shutdown();
         }
 
         /// <summary>
@@ -90,15 +91,14 @@ namespace DotLogix.Core.Services {
         protected virtual void InitializeLoggers(string[] args) {
             var loggers = new List<ILogger>();
             if(LogDirectory != null)
-                loggers.Add(new FileLogger(LogDirectory));
+                loggers.Add(new FileLogger { LogFile = Path.Combine(LogDirectory, $"{DateTime.UtcNow:s}.log") });
 
             if(Mode == ApplicationMode.UserInteractive && args.Contains("--no-console-log") == false)
-                loggers.Add(new ConsoleLogger(150, 30));
+                loggers.Add(new ConsoleLogger());
 
             if(loggers.Count > 0) {
-                Log.LogLevel = LogLevels.Trace;
-                Log.AttachLoggers(loggers);
-                Log.Initialize();
+                BroadcastLogger.Instance.AttachLogger(loggers);
+                BroadcastLogger.Instance.Initialize();
             }
         }
 
@@ -215,7 +215,7 @@ namespace DotLogix.Core.Services {
         ///     A callback to handle a user command
         /// </summary>
         protected virtual ConsoleCommandResult OnCommand(string command, CommandArgs args) {
-            if(Commands.TryGet(command, out var cmd)) {
+            if(Commands.TryGetValue(command, out var cmd)) {
                 if((args.Unnamed.Count == 1) && (args.Unnamed[0] == "help")) {
                     Console.WriteLine(cmd.HelpText ?? cmd.Description);
                     return ConsoleCommandResult.CommandCompleted;

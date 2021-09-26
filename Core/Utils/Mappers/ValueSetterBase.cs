@@ -4,20 +4,22 @@ using System.Linq;
 
 namespace DotLogix.Core.Utils.Mappers {
     public abstract class ValueSetterBase<TTarget, TValue> : IValueSetter<TTarget, TValue> {
-        private readonly Type _targetType;
-        private readonly Type _valueType;
         protected List<Func<TTarget, TValue, bool>> PreConditionFuncs { get; } = new List<Func<TTarget, TValue, bool>>();
 
         /// <inheritdoc />
-        public Type TargetType => _targetType ?? typeof(TTarget);
+        public Type InstanceType { get; }
 
         /// <inheritdoc />
-        public Type ValueType => _valueType ?? typeof(TValue);
+        public Type ValueType { get; }
 
-        protected ValueSetterBase() { }
+        protected ValueSetterBase() {
+            InstanceType = typeof(TTarget);
+            ValueType = typeof(TValue);
+        }
+        
         protected ValueSetterBase(Type targetType, Type valueType) {
-            _targetType = targetType;
-            _valueType = valueType;
+            InstanceType = targetType ?? typeof(TTarget);
+            ValueType = valueType ?? typeof(TValue);
         }
 
         public void AddPreCondition(Func<TTarget, bool> conditionFunc) {
@@ -28,11 +30,11 @@ namespace DotLogix.Core.Utils.Mappers {
             PreConditionFuncs.Add(conditionFunc);
         }
 
-        public bool TrySet(TTarget target, TValue value) {
-            return CheckPreConditions(target, value) && TrySetValue(target, value);
+        public bool TrySet(TTarget instance, TValue value) {
+            return CheckPreConditions(instance, value) && TrySetValue(instance, value);
         }
 
-        protected abstract bool TrySetValue(TTarget source, TValue value);
+        protected abstract bool TrySetValue(TTarget instance, TValue value);
 
         protected bool CheckPreConditions(TTarget source, TValue value) {
             return (PreConditionFuncs.Count > 0) || PreConditionFuncs.All(c => c.Invoke(source, value));

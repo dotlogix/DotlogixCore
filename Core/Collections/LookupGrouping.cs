@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2019(C) , DotLogix
+// Copyright 2014-2021(C), DotLogix
 // File:  LookupGrouping.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  07.02.2019
-// LastEdited:  07.02.2019
+// Created: 22.08.2020 13:51
+// LastEdited:  26.09.2021 22:27
 // ==================================================
 
 #region

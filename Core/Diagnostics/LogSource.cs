@@ -5,57 +5,25 @@ using System.Threading;
 using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Diagnostics {
-    public sealed class LogSource : ILogSource {
-        private readonly Func<LogLevels> _getCustomLogLevelFunc;
+    public class LogSource : ILogSource {
+        private readonly Func<string, LogLevels> _getLogLevel;
+
         /// <inheritdoc />
         public string Name { get; }
+
         /// <inheritdoc />
         public ILogger Logger { get; }
 
         /// <inheritdoc />
-        public bool Enabled { get; set; } = true;
-
-        /// <inheritdoc />
-        public ILogSource Parent { get; }
-
-        /// <inheritdoc />
-        public LogLevels LogLevel => _getCustomLogLevelFunc.Invoke();
+        public LogLevels LogLevel => _getLogLevel?.Invoke(Name) ?? Diagnostics.Log.LogLevel;
 
         public int StackFramesToSkip { get; set; } = 2;
 
-        /// <inheritdoc />
-        private LogSource(string name, ILogSource parent, LogLevels? logLevel, ILogger target = null) : this(name, parent, logLevel.HasValue ? () => logLevel : default(Func<LogLevels?>), target) {
+        public LogSource(string name, ILogger logger, Func<string, LogLevels> getLogLevel = null) {
+            _getLogLevel = getLogLevel;
+            Name = name;
+            Logger = logger;
         }
-
-        /// <inheritdoc />
-        private LogSource(string name, ILogSource parent, Func<LogLevels?> getCustomLogLevelFunc = null, ILogger target = null) {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
-            Logger = target ?? parent.Logger ?? throw new ArgumentNullException(nameof(target));
-
-            if (getCustomLogLevelFunc != null) {
-                _getCustomLogLevelFunc = () => {
-                                             var currentLogLevel = getCustomLogLevelFunc.Invoke();
-                                             if(currentLogLevel.HasValue)
-                                                 return (LogLevels)Math.Max((int)Parent.LogLevel, (int)currentLogLevel.Value);
-                                             return Parent.LogLevel;
-                                         };
-            } else {
-                _getCustomLogLevelFunc = () => Parent.LogLevel;
-            }
-        }
-
-        /// <inheritdoc />
-        public LogSource(string name, ILogger target, LogLevels logLevel) : this(name, target, () => logLevel) {
-        }
-
-        /// <inheritdoc />
-        public LogSource(string name, ILogger target, Func<LogLevels> getCustomLogLevelFunc) {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Logger = target ?? throw new ArgumentNullException(nameof(target));
-            _getCustomLogLevelFunc = getCustomLogLevelFunc ?? throw new ArgumentNullException(nameof(getCustomLogLevelFunc));
-        }
-
 
         #region LogSource
 
@@ -257,11 +225,6 @@ namespace DotLogix.Core.Diagnostics {
         }
         #endregion
 
-        #region Logger
-
-        bool ILogger.Initialize() => true;
-        bool ILogger.Shutdown() => true;
-
         /// <inheritdoc />
         public bool Log(LogMessage message) {
             if (IsLoggingDisabled(message.LogLevel))
@@ -271,31 +234,6 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(message);
             return true;
         }
-
-        #endregion
-
-        #region CreateSource
-        /// <inheritdoc />
-        public ILogSource CreateSource(string name, LogLevels? customLogLevel = null) {
-            return new LogSource(name, this, customLogLevel);
-        }
-
-        /// <inheritdoc />
-        public ILogSource CreateSource(string name, Func<LogLevels?> getCustomLogLevelFunc) {
-            return new LogSource(name, this, getCustomLogLevelFunc);
-        }
-
-        /// <inheritdoc />
-        public ILogSource CreateSource<T>(LogLevels? customLogLevel = null) {
-            return new LogSource(typeof(T).Name, this, customLogLevel);
-        }
-
-        /// <inheritdoc />
-        public ILogSource CreateSource<T>(Func<LogLevels?> getCustomLogLevelFunc) {
-            return new LogSource(typeof(T).Name, this, getCustomLogLevelFunc);
-        }
-
-        #endregion
 
         private LogMessage CreateLogMessage(LogLevels logLevel, string message, int framesToSkip) {
             var frame = new StackFrame(framesToSkip);
@@ -321,7 +259,99 @@ namespace DotLogix.Core.Diagnostics {
         }
 
         private bool IsLoggingDisabled(LogLevels logLevel) {
-            return LogLevel > logLevel && Enabled;
+            return LogLevel > logLevel;
+        }
+    }
+    public class LogSource<T> : ILogSource<T> {
+        private readonly ILogSource _logSource;
+        public LogSource(ILogSourceProvider provider) {
+            _logSource = provider.Create(typeof(T).FullName, 3);
+        }
+
+        public string Name => _logSource.Name;
+
+        public LogLevels LogLevel => _logSource.LogLevel;
+
+        public ILogger Logger => _logSource.Logger;
+
+        public void Trace(string message) {
+            _logSource.Trace(message);
+        }
+
+        public void Trace(Func<string> messageFunc) {
+            _logSource.Trace(messageFunc);
+        }
+
+        public void Debug(string message) {
+            _logSource.Debug(message);
+        }
+
+        public void Debug(Func<string> messageFunc) {
+            _logSource.Debug(messageFunc);
+        }
+
+        public void MethodEnter() {
+            _logSource.MethodEnter();
+        }
+
+        public void MethodExit() {
+            _logSource.MethodExit();
+        }
+
+        public void Info(string message) {
+            _logSource.Info(message);
+        }
+
+        public void Info(Func<string> messageFunc) {
+            _logSource.Info(messageFunc);
+        }
+
+        public void Warn(string message) {
+            _logSource.Warn(message);
+        }
+
+        public void Warn(Exception exception) {
+            _logSource.Warn(exception);
+        }
+
+        public void Warn(Func<string> messageFunc) {
+            _logSource.Warn(messageFunc);
+        }
+
+        public void Error(string message) {
+            _logSource.Error(message);
+        }
+
+        public void Error(Func<string> messageFunc) {
+            _logSource.Error(messageFunc);
+        }
+
+        public void Error(Exception exception) {
+            _logSource.Error(exception);
+        }
+
+        public void Critical(Exception exception) {
+            _logSource.Critical(exception);
+        }
+
+        public void Critical(string message) {
+            _logSource.Critical(message);
+        }
+
+        public void Critical(Func<string> messageFunc) {
+            _logSource.Critical(messageFunc);
+        }
+
+        public void Custom(LogLevels logLevel, string methodName, string className, string threadName, string message, Exception exception = null) {
+            _logSource.Custom(logLevel, methodName, className, threadName, message, exception);
+        }
+
+        public void Custom(LogLevels logLevel, string methodName, string className, string threadName, Func<string> messageFunc, Exception exception = null) {
+            _logSource.Custom(logLevel, methodName, className, threadName, messageFunc, exception);
+        }
+
+        public bool Log(LogMessage message) {
+            return _logSource.Log(message);
         }
     }
 }

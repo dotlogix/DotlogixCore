@@ -17,6 +17,8 @@ namespace DotLogix.Core.Diagnostics {
         /// <inheritdoc />
         public string Name { get; }
 
+        public LogLevels LogLevel { get; set; }
+
         /// <inheritdoc />
         public virtual bool Initialize() {
             return true;

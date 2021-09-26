@@ -103,13 +103,6 @@ namespace DotLogix.Core.Extensions {
         #endregion
 
         #region Get
-        /// <summary>
-        ///     Tries to get value from an <see cref="IDictionary{TKey,TValue}" /><br></br>
-        ///     If the key is not found the method returns the default value.
-        /// </summary>
-        public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue defaultValue = default) {
-            return dict.TryGetValue(key, out var value) ? value : defaultValue;
-        }
 
         /// <summary>
         ///     Tries to get value from an <see cref="IDictionary{TKey,TValue}" /> and convert it to the target type<br></br>
@@ -129,7 +122,7 @@ namespace DotLogix.Core.Extensions {
         ///     Tries to get value from an <see cref="IDictionary{TKey,TValue}" /> and convert it to the target type<br></br>
         ///     If the key is not found or the value is not convertible to the target type the method returns the default value.
         /// </summary>
-        public static TValue GetValueAs<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key, TValue defaultValue) {
+        public static TValue GetValueOrDefaultAs<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key, TValue defaultValue) {
             return dict.TryGetValue(key, out var obj) && obj.TryConvertTo(out TValue value) ? value : defaultValue;
         }
 

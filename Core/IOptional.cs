@@ -29,6 +29,11 @@
         object Value { get; }
 
         /// <summary>
+        /// Get the value or throw if undefined
+        /// </summary>
+        object GetValue();
+        
+        /// <summary>
         /// Get the value or a default value if undefined
         /// </summary>
         object GetValueOrDefault(object defaultValue = default);
@@ -37,6 +42,16 @@
         /// Tries to get the value
         /// </summary>
         bool TryGetValue(out object defaultValue);
+        
+        /// <summary>
+        /// Throws if the value is undefined
+        /// </summary>
+        void ThrowIfUndefined();
+        
+        /// <summary>
+        /// Throws if the value is undefined or default
+        /// </summary>
+        void ThrowIfUndefinedOrDefault();
     }
 
     /// <inheritdoc />
@@ -45,12 +60,17 @@
         /// The value
         /// </summary>
         new TValue Value { get; }
-
+        
         /// <summary>
         /// Get the value or a default value if undefined
         /// </summary>
         TValue GetValueOrDefault(TValue defaultValue = default);
 
+        /// <summary>
+        /// Get the value or throw if undefined
+        /// </summary>
+        new TValue GetValue();
+        
         /// <summary>
         /// Tries to get the value
         /// </summary>

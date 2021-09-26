@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2018(C) , DotLogix
+// Copyright 2014-2021(C), DotLogix
 // File:  ICachePolicy.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  01.08.2018
+// Created: 22.08.2020 13:51
+// LastEdited:  26.09.2021 22:27
 // ==================================================
 
 #region

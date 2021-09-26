@@ -1,4 +1,12 @@
-﻿using System;
+﻿// ==================================================
+// Copyright 2014-2021(C), DotLogix
+// File:  DataTable.cs
+// Author:  Alexander Schill <alexander@schillnet.de>.
+// Created: 22.08.2020 13:51
+// LastEdited:  26.09.2021 22:27
+// ==================================================
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;

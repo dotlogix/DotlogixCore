@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Company>DotLogix</Company>
     <Product>DotLogix Core</Product>
     <PackageId>DotLogix.Core.Services</PackageId>
@@ -8,13 +8,13 @@
     <AssemblyName>DotLogix.Services</AssemblyName>
     <RootNamespace>DotLogix.Core.Services</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
+    <RepositoryUrl>https://github.com/dotlogix/DotLogixCore</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright (c) 2018 DotLogix</Copyright>
-    <Version>2.2.75</Version>
-		<Configurations>Debug;Release;</Configurations>
+     <Version>2.3.29</Version>
+     <Configurations>Debug;Release;</Configurations>
 	</PropertyGroup>
 
   <PropertyGroup>
@@ -31,6 +31,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="WebServices.Core" />
   </ItemGroup>
 
   <Target Name="CopyPackage" AfterTargets="Pack">

@@ -18,6 +18,20 @@ namespace DotLogix.Core.Extensions {
     /// </summary>
     public static class ExpressionExtensions {
         /// <summary>
+        ///     Compiles and invokes the expression
+        /// </summary>
+        public static T Evaluate<T>(this Expression expression, params object[] parameters) {
+            return Evaluate(expression, parameters) is T t ? t : default;
+        }
+
+        /// <summary>
+        ///     Compiles and invokes the expression
+        /// </summary>
+        public static object Evaluate(this Expression expression, params object[] parameters) {
+            return (expression as LambdaExpression)?.Compile().DynamicInvoke(parameters);
+        }
+        
+        /// <summary>
         ///     Gets the target member of a expression
         /// </summary>
         /// <typeparam name="TSource"></typeparam>

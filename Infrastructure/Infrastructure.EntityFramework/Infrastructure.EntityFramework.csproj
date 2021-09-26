@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+	<TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <AssemblyName>DotLogix.Infrastructure.EntityFramework</AssemblyName>
+    <RootNamespace>DotLogix.Infrastructure.EntityFramework</RootNamespace>
+    <Company>DotLogix</Company>
+    <Product>DotLogix Architecture</Product>
+    <PackageId>DotLogix.Architecture.Infrastructure.EntityFramework</PackageId>
+    <Authors>DotLogix</Authors>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<RepositoryUrl>https://github.com/dotlogix/DotLogixCore</RepositoryUrl>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	<RepositoryType>git</RepositoryType>
+	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+     <Version>2.3.29</Version>
+	</PropertyGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>..\assemblies\docs\DotLogix.Infrastructure.EntityFramework.xml</DocumentationFile>
+    <WarningsAsErrors>NU1605;</WarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.6" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Core\Infrastructure.Core.csproj" />
+  </ItemGroup>
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <ItemGroup>
+      <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+      <AssemblyFiles Include="bin\$(Configuration)\**\*.*" Exclude="**\*.deps.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+    <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\..\nuget\$(Configuration)" />
+  </Target>
+</Project>

@@ -1,9 +1,9 @@
 // ==================================================
-// Copyright 2018(C) , DotLogix
+// Copyright 2014-2021(C), DotLogix
 // File:  ConsoleLogger.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  21.02.2018
-// LastEdited:  01.08.2018
+// Created: 22.08.2020 13:51
+// LastEdited:  26.09.2021 22:27
 // ==================================================
 
 #region
@@ -16,38 +16,27 @@ namespace DotLogix.Core.Diagnostics {
     /// A console logger implementation
     /// </summary>
     public class ConsoleLogger : LoggerBase {
-        private readonly int _bufferHeight;
-        private readonly int _consoleHeight;
-        private readonly int _consoleWidth;
+        public int BufferHeight { get; set; } = Console.BufferHeight;
+        public int ConsoleHeight { get; set; } = Console.WindowHeight;
+        public int ConsoleWidth { get; set; } = Console.WindowWidth;
+        public ILogMessageFormatter Formatter { get; set; } = new LogMessageFormatter();
 
         /// <summary>
         /// Creates a new instance of <see cref="ConsoleLogger"/>
         /// </summary>
-        /// <param name="consoleWidth"></param>
-        /// <param name="consoleHeight"></param>
-        /// <param name="bufferHeight"></param>
-        public ConsoleLogger(int consoleWidth, int consoleHeight, int bufferHeight = 2000) : base("ConsoleLogger") {
-            _bufferHeight = bufferHeight;
-            _consoleWidth = Math.Min(consoleWidth, Console.LargestWindowWidth);
-            _consoleHeight = Math.Min(consoleHeight, Console.LargestWindowHeight);
+        public ConsoleLogger() : base("ConsoleLogger") {
         }
 
         /// <inheritdoc />
         public override bool Initialize() {
-            if((Console.WindowWidth == _consoleWidth)
-               && (Console.WindowHeight == _consoleHeight)
-               && (Console.BufferHeight == _bufferHeight)
-               && (Console.BufferWidth == _consoleWidth))
-                return true;
-
 #if NETSTANDARD
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-                Console.SetWindowSize(_consoleWidth, _consoleHeight);
-                Console.SetBufferSize(_consoleWidth, _bufferHeight);
+                Console.SetWindowSize(ConsoleWidth, ConsoleHeight);
+                Console.SetBufferSize(ConsoleWidth, BufferHeight);
             }
 #else
-            Console.SetWindowSize(_consoleWidth, _consoleHeight);
-            Console.SetBufferSize(_consoleWidth, _bufferHeight);
+            Console.SetWindowSize(ConsoleWidth, ConsoleHeight);
+            Console.SetBufferSize(ConsoleWidth, BufferHeight);
 #endif
             return true;
         }
@@ -55,33 +44,31 @@ namespace DotLogix.Core.Diagnostics {
         /// <inheritdoc />
         public override bool Log(LogMessage message) {
             var currentColor = Console.ForegroundColor;
+            var errorColor = GetErrorColor(message);
+
+            Console.ForegroundColor = errorColor;
+            Formatter.Write(Console.Out, message);
+            Console.ForegroundColor = currentColor;
+            return true;
+        }
+
+        protected virtual ConsoleColor GetErrorColor(LogMessage message) {
             switch(message.LogLevel) {
                 case LogLevels.Trace:
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    break;
+                    return ConsoleColor.Gray;
                 case LogLevels.Debug:
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    break;
+                    return ConsoleColor.Cyan;
                 case LogLevels.Info:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    break;
+                    return ConsoleColor.White;
                 case LogLevels.Warning:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    break;
+                    return ConsoleColor.Yellow;
                 case LogLevels.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
+                    return ConsoleColor.Red;
                 case LogLevels.Critical:
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    break;
+                    return ConsoleColor.Magenta;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            LogMessageFormatter.Default.Format(message, Console.Out);
-
-            Console.ForegroundColor = currentColor;
-            return true;
         }
     }
 }

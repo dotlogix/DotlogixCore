@@ -46,20 +46,20 @@ namespace DotLogix.Core.Utils {
         /// <summary>
         /// Values only occuring left
         /// </summary>
-        public IEnumerable<TLeft> LeftOnly { get; }
+        public IReadOnlyCollection<TLeft> LeftOnly { get; }
         /// <summary>
         /// Values occuring in both
         /// </summary>
-        public IEnumerable<DiffValue> Intersect { get; }
+        public IReadOnlyCollection<DiffValue> Intersect { get; }
         /// <summary>
         /// Values only occuring right
         /// </summary>
-        public IEnumerable<TRight> RightOnly { get; }
+        public IReadOnlyCollection<TRight> RightOnly { get; }
 
         /// <summary>
         /// Creates a new instance of <see cref="DiffEnumerable{TLeft, TRight}"/>
         /// </summary>
-        public DiffEnumerable(IEnumerable<TLeft> leftOnly, IEnumerable<DiffValue> intersect, IEnumerable<TRight> rightOnly) {
+        public DiffEnumerable(IReadOnlyCollection<TLeft> leftOnly, IReadOnlyCollection<DiffValue> intersect, IReadOnlyCollection<TRight> rightOnly) {
             LeftOnly = leftOnly;
             Intersect = intersect;
             RightOnly = rightOnly;

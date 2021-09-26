@@ -16,10 +16,11 @@ namespace DotLogix.Core {
     /// A class to define optional value types
     /// </summary>
     public struct Optional<TValue> : IOptional<TValue>{
+
         /// <summary>
         /// A static generic value representing the undefined state
         /// </summary>
-        public static Optional<TValue> Undefined => new Optional<TValue>();
+        public static Optional<TValue> Undefined => new();
         /// <inheritdoc />
         public bool IsDefined { get; }
 
@@ -30,6 +31,11 @@ namespace DotLogix.Core {
         /// <inheritdoc />
         public bool IsUndefinedOrDefault => (IsDefined == false) || Equals(Value, default(TValue));
         object IOptional.Value => Value;
+
+
+        object IOptional.GetValue() {
+            return GetValue();
+        }
 
         object IOptional.GetValueOrDefault(object defaultValue) {
             return GetValueOrDefault((TValue)defaultValue);
@@ -57,6 +63,10 @@ namespace DotLogix.Core {
             Value = value;
         }
 
+        /// <inheritdoc />
+        public TValue GetValue() {
+            return IsDefined ? Value : throw new Exception("A value is required, but not defined");
+        }
 
         /// <inheritdoc />
         public TValue GetValueOrDefault(TValue defaultValue = default) {
@@ -69,12 +79,22 @@ namespace DotLogix.Core {
             return IsDefined;
         }
 
+        /// <inheritdoc />
+        public void ThrowIfUndefined() {
+            throw new Exception("A value is required, but not defined");
+        }
+
+        /// <inheritdoc />
+        public void ThrowIfUndefinedOrDefault() {
+            throw new Exception("A value is required, but not defined or equals the default value");
+        }
+
         /// <summary>
         /// Converts a value to a wrapped representation
         /// </summary>
         /// <param name="value"></param>
         public static implicit operator Optional<TValue>(TValue value) {
-            return new Optional<TValue>(value);
+            return new(value);
         }
 
 
@@ -96,7 +116,7 @@ namespace DotLogix.Core {
         /// <param name="other"></param>
         /// <returns></returns>
         public bool Equals(Optional<TValue> other) {
-            return (IsDefined == other.IsDefined) && (IsDefined==false || EqualityComparer<TValue>.Default.Equals(Value, other.Value));
+            return (IsDefined == other.IsDefined) && (IsDefined == false || EqualityComparer<TValue>.Default.Equals(Value, other.Value));
         }
 
         /// <summary>
@@ -115,15 +135,12 @@ namespace DotLogix.Core {
         ///     otherwise, false.
         /// </returns>
         public override bool Equals(object obj) {
-            switch(obj) {
-                case null:
-                    return Equals(Value, null);
-                case Optional<TValue> optional:
-                    return Equals(optional);
-                case TValue value:
-                    return Equals(value);
-            }
-            return false;
+            return obj switch {
+                null => Equals(Value, null),
+                Optional<TValue> optional => Equals(optional),
+                TValue value => Equals(value),
+                _ => false
+            };
         }
 
         /// <summary>Returns the hash code for this instance.</summary>

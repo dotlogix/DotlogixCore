@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0; netstandard2.1</TargetFrameworks>
     <Company>DotLogix</Company>
     <Product>DotLogix Core</Product>
     <PackageId>DotLogix.Core</PackageId>
@@ -8,12 +8,12 @@
     <AssemblyName>DotLogix.Core</AssemblyName>
     <RootNamespace>DotLogix.Core</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
+    <RepositoryUrl>https://github.com/dotlogix/DotLogixCore</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright (c) 2018 DotLogix</Copyright>
-    <Version>2.2.75</Version>
+     <Version>2.3.29</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Configurations>Debug;Release;</Configurations>
   </PropertyGroup>
@@ -32,13 +32,62 @@
     <Compile Remove="Collections\LinearDictionary.cs" />
     <Compile Remove="Patterns\StateMachine.cs" />
     <Compile Remove="Utils\CommandLineParser.cs" />
+    <Compile Update="Expressions\Builders\LambdaBuilders.Lambda.cs">
+      <DependentUpon>LambdaBuilders.Lambda.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Expressions\Builders\LambdaBuilders.Querable.cs">
+      <DependentUpon>LambdaBuilders.Querable.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Expressions\Builders\LambdaBuilders.Call.cs">
+      <DependentUpon>LambdaBuilders.Call.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Expressions\Builders\LambdaBuilders.Enumerable.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LambdaBuilders.Enumerable.cs</LastGenOutput>
+    </None>
+    <None Update="Expressions\Builders\LambdaBuilders.Calls.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LambdaBuilders.Calls.cs</LastGenOutput>
+    </None>
+    <None Update="Expressions\Builders\LambdaBuilder.Queryable.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>LambdaBuilder.Queryable.cs</LastGenOutput>
+    </None>
+    <None Update="Expressions\Builders\LambdaBuilders.Call.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LambdaBuilders.Call.cs</LastGenOutput>
+    </None>
+    <None Update="Expressions\Builders\LambdaBuilders.CallExtension.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LambdaBuilders.CallExtension.cs</LastGenOutput>
+    </None>
+    <None Update="Expressions\Builders\LambdaBuilders.CallStatic.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LambdaBuilders.CallStatic.cs</LastGenOutput>
+    </None>
+    <None Update="Expressions\Builders\LambdaBuilders.Inline.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LambdaBuilders.Inline.cs</LastGenOutput>
+    </None>
+    <None Update="Expressions\Builders\LambdaBuilders.Lambda.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LambdaBuilders.Lambda.cs</LastGenOutput>
+    </None>
+    <None Update="Expressions\Builders\LambdaBuilders.Querable.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LambdaBuilders.Querable.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
   <Target Name="CopyPackage" AfterTargets="Pack">

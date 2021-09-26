@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <Company>DotLogix</Company>
+        <Product>DotLogix WebServices AspCore</Product>
+        <PackageId>DotLogix.WebServices.AspCore</PackageId>
+        <Authors>DotLogix</Authors>
+        <AssemblyName>DotLogix.WebServices.AspCore</AssemblyName>
+        <RootNamespace>DotLogix.WebServices.AspCore</RootNamespace>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <RepositoryUrl>https://github.com/dotlogix/DotLogixCore</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <RepositoryType>git</RepositoryType>
+        <Copyright>Copyright (c) 2018 DotLogix</Copyright>
+        <Version>2.3.29</Version>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Configurations>Debug;Release;</Configurations>
+        <OutputType>Library</OutputType>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+        <HintPath>..\..\..\..\..\..\..\..\..\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.1.3\ref\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\Core.csproj" />
+      <ProjectReference Include="..\..\Infrastructure.Core\Infrastructure.Core.csproj" />
+      <ProjectReference Include="..\WebServices.Authentication\WebServices.Authentication.csproj" />
+      <ProjectReference Include="..\WebServices.Core\WebServices.Core.csproj" />
+      <ProjectReference Include="..\WebServices.EntityFramework\WebServices.EntityFramework.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.15" />
+    </ItemGroup>
+
+    <Target Name="CopyPackage" AfterTargets="Pack">
+        <ItemGroup>
+            <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+            <AssemblyFiles Include="bin\$(Configuration)\**\*.*" Exclude="**\*.deps.json" />
+        </ItemGroup>
+        <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+        <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\..\nuget\$(Configuration)" />
+    </Target>
+</Project>

@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2019(C) , DotLogix
+// Copyright 2014-2021(C), DotLogix
 // File:  KeyedCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  15.08.2018
-// LastEdited:  07.02.2019
+// Created: 22.08.2020 13:51
+// LastEdited:  26.09.2021 22:27
 // ==================================================
 
 #region
@@ -13,7 +13,6 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using DotLogix.Core.Extensions;
 
 #endregion
 
@@ -39,7 +38,7 @@ namespace DotLogix.Core.Collections {
 		/// </summary>
 		/// <param name="key">The key</param>
 		/// <returns></returns>
-		public TValue this[TKey key] => InnerDictionary[key];
+		public TValue this[TKey key] => Get(key);
 
 		/// <summary>
 		/// Creates a new instance of <see cref="KeyedCollection{TKey,TValue}"/>
@@ -82,8 +81,6 @@ namespace DotLogix.Core.Collections {
 			InnerDictionary = new ConcurrentDictionary<TKey, TValue>(values.ToDictionary(keySelector, equalityComparer));
 		}
 
-		/// <inheritdoc />
-
 		/// <summary>
 		/// The keys of the collection
 		/// </summary>
@@ -94,7 +91,6 @@ namespace DotLogix.Core.Collections {
 		/// </summary>
 		public IEnumerable<KeyValuePair<TKey, TValue>> Pairs => InnerDictionary.ToList();
 
-
 		#region ICollection
 
 		/// <summary>
@@ -102,7 +98,8 @@ namespace DotLogix.Core.Collections {
 		/// </summary>
 		public int Count => InnerDictionary.Count;
 
-		public bool IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>)InnerDictionary).IsReadOnly;
+		/// <inheritdoc />
+		bool ICollection<TValue>.IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>)InnerDictionary).IsReadOnly;
 
 		/// <inheritdoc />
 		public void CopyTo(TValue[] array, int arrayIndex) {
@@ -145,106 +142,78 @@ namespace DotLogix.Core.Collections {
 
 		#endregion
 
-		#region ICollection of object
-
-		public void Add(object item) {
-			if (!(item is TValue value))
-				throw new Exception($"The value is not assignable to target type {typeof(TValue).GetFriendlyName()}");
-			if (TryAdd(value) == false)
-				throw new Exception("A value with this key already exists");
-		}
-
-		public bool Remove(object item) {
-			if (!(item is TValue value))
-				throw new Exception($"The value is not assignable to target type {typeof(TValue).GetFriendlyName()}");
-			return Remove(value);
-		}
-
-		public bool Contains(object item) {
-			if (!(item is TValue value))
-				throw new Exception($"The value is not assignable to target type {typeof(TValue).GetFriendlyName()}");
-			return Contains(value);
-		}
-
-		#endregion
+		/// <summary>
+		/// Get a value by key
+		/// </summary>
+		public TValue Get(TKey key, TValue defaultValue = default) { return InnerDictionary.TryGetValue(key, out var value) ? value : defaultValue; }
 
 		/// <summary>
-		/// Tries to add a value to the collection
+		/// Get a range of values by key
 		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public bool TryAdd(TValue value) { return InnerDictionary.TryAdd(KeySelector.Invoke(value), value); }
-
-		/// <summary>
-		/// Tries to add a value to the collection
-		/// </summary>
-		/// <param name="values"></param>
-		/// <returns></returns>
-		public void TryAdd(IEnumerable<TValue> values) {
-			foreach (var value in values)
-				TryAdd(value);
+		public IEnumerable<TValue> Get(IEnumerable<TKey> keys) {
+			foreach(var key in keys) {
+				if(InnerDictionary.TryGetValue(key, out var value)) {
+					yield return value;
+				}
+			}
 		}
 
 		/// <summary>
-		/// Get the existing item or adds a new one matched by their keys
+		/// Tries to get a value by key
 		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
+		public bool TryGetValue(TKey key, out TValue value) { return InnerDictionary.TryGetValue(key, out value); }
+
+		/// <summary>
+		/// Get an existing item or add a new one if necessary
+		/// </summary>
 		public TValue GetOrAdd(TValue value) { return InnerDictionary.GetOrAdd(KeySelector.Invoke(value), value); }
 
 		/// <summary>
-		/// Get the existing item or adds a new one matched by their keys
+		/// Get a range of existing items or add a new ones if necessary
 		/// </summary>
-		/// <param name="values"></param>
-		/// <returns></returns>
 		public IEnumerable<TValue> GetOrAdd(IEnumerable<TValue> values) { return values.Select(GetOrAdd).ToList(); }
 
 		/// <summary>
 		/// Add or update a value to the collection
 		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
 		public void AddOrUpdate(TValue value) { InnerDictionary[KeySelector.Invoke(value)] = value; }
 
 		/// <summary>
 		/// Add or update a value to the collection
 		/// </summary>
-		/// <param name="values"></param>
-		/// <returns></returns>
 		public void AddOrUpdate(IEnumerable<TValue> values) {
 			foreach (var value in values)
 				AddOrUpdate(value);
 		}
 
 		/// <summary>
-		/// Tries to get a value by key
+		/// Tries to add a value to the collection
 		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public bool TryGet(TKey key, out TValue value) { return InnerDictionary.TryGetValue(key, out value); }
+		public bool TryAdd(TValue value) { return InnerDictionary.TryAdd(KeySelector.Invoke(value), value); }
 
+		/// <summary>
+		/// Tries to add a value to the collection
+		/// </summary>
+		public void TryAdd(IEnumerable<TValue> values) {
+			foreach (var value in values)
+				TryAdd(value);
+		}
+		
 		/// <summary>
 		/// Tries to remove the value with the matching key
 		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
 		public bool TryRemoveKey(TKey key) { return InnerDictionary.TryRemove(key, out var _); }
 
 		/// <summary>
 		/// Tries to remove the value with the matching key
 		/// </summary>
-		/// <param name="keys"></param>
-		/// <returns></returns>
-		public bool TryRemoveKey(IEnumerable<TKey> keys) {
-			return keys.Aggregate(true, (current, value) => current & TryRemoveKey(value));
+		public int TryRemoveKey(IEnumerable<TKey> keys) {
+			return keys.Count(TryRemoveKey);
 		}
 
 		/// <summary>
 		/// Checks if a key exists in the collection
 		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
 		public bool ContainsKey(TKey key) { return InnerDictionary.ContainsKey(key); }
 	}
 }

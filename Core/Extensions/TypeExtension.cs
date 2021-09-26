@@ -24,6 +24,39 @@ namespace DotLogix.Core.Extensions {
     /// </summary>
     public static class TypeExtension {
         private static readonly ConcurrentDictionary<Type, object> DefaultValues = new ConcurrentDictionary<Type, object>();
+        private static readonly Dictionary<Type, string> PrimitiveTypeNames = new Dictionary<Type, string> {
+            {typeof(byte), "byte"},
+            {typeof(sbyte), "sbyte"},
+            {typeof(short), "short"},
+            {typeof(ushort), "ushort"},
+            {typeof(int), "int"},
+            {typeof(uint), "uint"},
+            {typeof(long), "long"},
+            {typeof(ulong), "ulong"},
+            {typeof(float), "float"},
+            {typeof(double), "double"},
+            {typeof(decimal), "decimal"},
+            {typeof(bool), "bool"},
+            {typeof(char), "char"},
+            
+            {typeof(byte?), "byte?"},
+            {typeof(sbyte?), "sbyte?"},
+            {typeof(short?), "short?"},
+            {typeof(ushort?), "ushort?"},
+            {typeof(int?), "int?"},
+            {typeof(uint?), "uint?"},
+            {typeof(long?), "long?"},
+            {typeof(ulong?), "ulong?"},
+            {typeof(float?), "float?"},
+            {typeof(double?), "double?"},
+            {typeof(decimal?), "decimal?"},
+            {typeof(bool?), "bool?"},
+            {typeof(char?), "char?"},
+        
+            {typeof(object), "object"},
+            {typeof(string), "string"},
+            {typeof(void), "void"}
+        };
 
         /// <summary>
         ///     Gets the properties of a type ordered by the inheritance level (deepest first)
@@ -146,7 +179,7 @@ namespace DotLogix.Core.Extensions {
                 return true;
             }
 
-            if(sourceType.IsAssignableToOpenGeneric(typeof(IEnumerable<>), out var genericTypeArguments)) {
+            if(sourceType.IsAssignableToGeneric(typeof(IEnumerable<>), out var genericTypeArguments)) {
                 elementType = genericTypeArguments[0];
                 return true;
             }
@@ -177,17 +210,30 @@ namespace DotLogix.Core.Extensions {
         /// <param name="type">The type</param>
         /// <returns></returns>
         public static string GetFriendlyName(this Type type) {
-            var friendlyName = type.Name;
-            if(type.IsGenericType == false)
-                return friendlyName;
+            if(type == null) {
+                return null;
+            }
 
-            var iBacktick = friendlyName.IndexOf('`');
-            if(iBacktick <= 0)
-                return friendlyName;
-            friendlyName = friendlyName.Remove(iBacktick);
-            var generic = type.GetGenericArguments().Length;
-            friendlyName += $"<{new string(',', generic - 1)}>";
-            return friendlyName;
+            if(PrimitiveTypeNames.TryGetValue(type, out var typeName)) {
+                return typeName;
+            }
+            
+            typeName = type.Name;
+            if(type.IsGenericType == false) {
+                return typeName;
+            }
+
+            if(type.IsAssignableToGeneric(typeof(Nullable<>), out var genericArguments)) {
+                return GetFriendlyName(genericArguments[0]) + "?";
+            }
+
+            genericArguments = type.GetGenericArguments();
+            var count = typeName.IndexOf('`');
+            var sb = new StringBuilder(typeName, 0, count, count + genericArguments.Length + 1);
+            sb.Append('<');
+            sb.Append(',', genericArguments.Length - 1);
+            sb.Append('>');
+            return sb.ToString();
         }
 
         /// <summary>
@@ -197,15 +243,29 @@ namespace DotLogix.Core.Extensions {
         /// <param name="type">The type</param>
         /// <returns></returns>
         public static string GetFriendlyGenericName(this Type type) {
-            var friendlyName = type.Name;
-            if(type.IsGenericType == false)
-                return friendlyName;
+            if(type == null) {
+                return null;
+            }
 
-            var genericArguments = type.GetGenericArguments();
-            var sb = new StringBuilder(friendlyName, 0, friendlyName.Length - genericArguments.Length, friendlyName.Length);
+            if(PrimitiveTypeNames.TryGetValue(type, out var typeName)) {
+                return typeName;
+            }
+            
+            typeName = type.Name;
+            if(type.IsGenericType == false) {
+                return typeName;
+            }
+
+            if(type.IsAssignableToGeneric(typeof(Nullable<>), out var genericArguments)) {
+                return GetFriendlyGenericName(genericArguments[0]) + "?";
+            }
+
+            genericArguments = type.GetGenericArguments();
+            var count = typeName.IndexOf('`');
+            var sb = new StringBuilder(typeName, 0, count, typeName.Length);
             sb.Append('<');
-            var typeParameters = type.GetGenericArguments().Select(GetFriendlyName);
-            sb.Append(string.Join(", ", typeParameters));
+            var typeParameters = genericArguments.Select(GetFriendlyGenericName);
+            sb.AppendJoin(", ", typeParameters);
             sb.Append('>');
             return sb.ToString();
         }
@@ -238,14 +298,16 @@ namespace DotLogix.Core.Extensions {
         /// <param name="sourceType">The type to check</param>
         /// <param name="targetType">The open generic type</param>
         /// <returns></returns>
-        public static bool IsAssignableToOpenGeneric(this Type sourceType, Type targetType) {
-            if((sourceType.IsConstructedGenericType == false) || (targetType.IsGenericTypeDefinition == false))
+        public static bool IsAssignableToGeneric(this Type sourceType, Type targetType) {
+            if(targetType.IsGenericTypeDefinition == false)
                 return false;
 
-            var genericTypeDefinition = sourceType.GetGenericTypeDefinition();
-            if(genericTypeDefinition == targetType)
-                return true;
-
+            if(sourceType.IsConstructedGenericType) {
+                var genericTypeDefinition = sourceType.GetGenericTypeDefinition();
+                if(genericTypeDefinition == targetType)
+                    return true;
+            }
+            
             var targetCandidates = targetType.IsInterface
                                        ? GetInterfacesAssignableTo(sourceType, true, true)
                                        : GetBaseTypes(sourceType, true, true);
@@ -260,29 +322,61 @@ namespace DotLogix.Core.Extensions {
         /// <param name="targetType">The open generic type</param>
         /// <param name="genericTypeArguments">The generic arguments of the constructed generic type</param>
         /// <returns></returns>
-        public static bool IsAssignableToOpenGeneric(this Type sourceType, Type targetType,
-                                                     out Type[] genericTypeArguments) {
+        public static bool IsAssignableToGeneric(this Type sourceType, Type targetType, out Type[] genericTypeArguments) {
             genericTypeArguments = null;
-            if((sourceType.IsConstructedGenericType == false) || (targetType.IsGenericTypeDefinition == false))
+            if(targetType.IsGenericTypeDefinition == false)
                 return false;
 
 
-            var genericTypeDefinition = sourceType.GetGenericTypeDefinition();
-            if(genericTypeDefinition == targetType) {
-                genericTypeArguments = sourceType.GetGenericArguments();
-                return true;
+            if(sourceType.IsConstructedGenericType) {
+                var genericTypeDefinition = sourceType.GetGenericTypeDefinition();
+                if(genericTypeDefinition == targetType) {
+                    genericTypeArguments = sourceType.GetGenericArguments();
+                    return true;
+                }
             }
 
             var targetCandidates = targetType.IsInterface
                                        ? GetInterfacesAssignableTo(sourceType, false, true)
                                        : GetBaseTypes(sourceType, false, true);
-            var genericTargetType =
-            targetCandidates.FirstOrDefault(candidate => candidate.GetGenericTypeDefinition() == targetType);
+            var genericTargetType = targetCandidates.FirstOrDefault(candidate => candidate.GetGenericTypeDefinition() == targetType);
             if(genericTargetType == null)
                 return false;
 
             genericTypeArguments = genericTargetType.GetGenericArguments();
             return true;
+        }
+        #endregion
+
+        #region MyRegion
+        /// <inheritdoc cref="Type.GetMethod(string, Type[])"/>
+        public static MethodInfo GetMethod(this Type sourceType, string methodName, params Type[] typeDefinitions) {
+            return sourceType.GetMethod(methodName, typeDefinitions);
+        }
+        
+        /// <inheritdoc cref="Type.GetMethod(string, Type[])"/>
+        public static MethodInfo GetGenericMethod(this Type sourceType, string methodName, params Type[] typeDefinitions) {
+            foreach(var candidate in sourceType.GetRuntimeMethods().Where(m => m.IsGenericMethod && m.Name == methodName)) {
+                var parameters = candidate.GetParameters();
+                if(parameters.Length != typeDefinitions.Length)
+                    continue;
+
+                var valid = true;
+                for(var i = 0; i < parameters.Length && valid; i++) {
+                    var expectedType = typeDefinitions[i];
+                    var parameterType = parameters[i].ParameterType;
+
+                    valid = expectedType.IsGenericTypeDefinition
+                                ? parameterType.IsAssignableToGeneric(expectedType)
+                                : parameterType.IsAssignableTo(expectedType);
+                }
+
+                if(valid) {
+                    return candidate;
+                }
+            }
+
+            return null;
         }
         #endregion
 

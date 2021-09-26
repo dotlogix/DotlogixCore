@@ -17,6 +17,7 @@ namespace DotLogix.Core.Utils.Mappers {
             _conversionFunc = conversionFunc;
             return this;
         }
+        
         public ValueMapBuilder<TSource, TSourceValue, TTarget, TTargetValue> ConvertWith(TypeConverter converter) {
             if(converter.CanConvertFrom(typeof(TSourceValue)))
                 _conversionFunc = v => (TTargetValue)converter.ConvertFrom(v);

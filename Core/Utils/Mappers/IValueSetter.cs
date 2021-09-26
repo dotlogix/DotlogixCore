@@ -4,11 +4,11 @@ namespace DotLogix.Core.Utils.Mappers {
     /// <summary>
     /// An interface representation value setters
     /// </summary>
-    public interface IValueSetter<TTarget, TValue> { 
+    public interface IValueSetter<T, TValue> { 
         /// <summary>
         /// The source type
         /// </summary>
-        Type TargetType { get; }
+        Type InstanceType { get; }
 
         /// <summary>
         /// The value type
@@ -18,14 +18,14 @@ namespace DotLogix.Core.Utils.Mappers {
         /// <summary>
         /// Add a pre-conditions executed before a value will be set
         /// </summary>
-        void AddPreCondition(Func<TTarget, bool> conditionFunc);
+        void AddPreCondition(Func<T, bool> conditionFunc);
         /// <summary>
         /// Add a pre-conditions executed before a value will be set
         /// </summary>
-        void AddPreCondition(Func<TTarget, TValue, bool> conditionFunc);
+        void AddPreCondition(Func<T, TValue, bool> conditionFunc);
         /// <summary>
         /// Tries to set a value
         /// </summary>
-        bool TrySet(TTarget target, TValue value);
+        bool TrySet(T instance, TValue value);
     }
 }

@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Company>DotLogix</Company>
+        <Product>DotLogix WebServices Core</Product>
+        <PackageId>DotLogix.WebServices.Core</PackageId>
+        <Authors>DotLogix</Authors>
+        <AssemblyName>DotLogix.WebServices.Core</AssemblyName>
+        <RootNamespace>DotLogix.WebServices.Core</RootNamespace>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <RepositoryUrl>https://github.com/dotlogix/DotLogixCore</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <RepositoryType>git</RepositoryType>
+        <Copyright>Copyright (c) 2018 DotLogix</Copyright>
+        <Version>2.3.29</Version>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Configurations>Debug;Release;</Configurations>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\Common.csproj" />
+    </ItemGroup>
+
+    <Target Name="CopyPackage" AfterTargets="Pack">
+        <ItemGroup>
+            <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+            <AssemblyFiles Include="bin\$(Configuration)\**\*.*" Exclude="**\*.deps.json" />
+        </ItemGroup>
+        <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+        <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\..\nuget\$(Configuration)" />
+    </Target>
+</Project>

@@ -1,0 +1,69 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly Name="C:\Program Files\dotnet\sdk\5.0.301\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\assemblies\Release\DotLogix.Core\netstandard2.0\DotLogix.Core.dll" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using DotLogix.Core.Extensions;
+
+namespace DotLogix.Core.Expressions {
+    public static partial class LambdaBuilders {
+        public static LambdaBuilder<TResult> CallStatic<TResult>(Type type, string methodName, params LambdaBuilder[] args) {
+            return CallStatic<TResult>(type, methodName, args.AsEnumerable());
+        }
+
+        public static LambdaBuilder<TResult> CallStatic<TResult>(Type type, string methodName, IEnumerable<LambdaBuilder> args) {
+            args = args.AsReadOnlyCollection();
+            return CallStatic<TResult>(ResolveStaticMethod(type, methodName, args), args);
+        }
+
+        public static LambdaBuilder<TResult> CallStatic<TResult>(MethodInfo methodInfo, params LambdaBuilder[] args) {
+            return CallStatic<TResult>(methodInfo, args.AsEnumerable());
+        }
+
+        public static LambdaBuilder<TResult> CallStatic<TResult>(MethodInfo methodInfo, IEnumerable<LambdaBuilder> args) {
+            if(methodInfo.ReturnType != typeof(TResult)) {
+                throw new ArgumentException($"Expected method return type {typeof(TResult).Name}, but got {methodInfo.ReturnType.Name}");
+            }
+
+            var parameters = methodInfo.GetParameters();
+            var arguments = new Expression[parameters.Length];
+            var idx = 0;
+            foreach(var arg in args) {
+                var parameterType = parameters[idx].ParameterType;
+                var argument = arg.Cast(parameterType);
+                arguments[idx] = argument.Body;
+                idx++;
+            }
+
+            if(idx < parameters.Length && parameters[idx].IsOptional == false) {
+                throw new ArgumentException($"Not enough parameters. Expected {parameters.Length}, but got {idx}");
+            }
+
+            return Expression.Call(methodInfo, arguments);
+        }
+
+        public static LambdaBuilder<TResult> CallStatic<TResult>(Func<TResult> methodFunc) {
+            return CallStatic<TResult>(methodFunc.Method);
+        }
+
+<#
+    for (var i = 1; i <= 10; i++)
+    {
+        var range = Enumerable.Range(1, i).ToList();
+        var genericNames = string.Join(", ", range.Select(r => $"T{r}").Append("TResult"));
+        var paramNames = string.Join(", ", range.Select(r => $"LambdaBuilder<T{r}> arg{r}"));
+        var argNames = string.Join(", ", range.Select(r => $"arg{r}"));
+#>
+        public static LambdaBuilder<TResult> CallStatic<<#=genericNames#>>(Func<<#=genericNames#>> methodFunc, <#=paramNames#>) {
+            return CallStatic<TResult>(methodFunc.Method, <#=argNames#>);
+        }
+<#
+    }
+
+#>
+    }
+}

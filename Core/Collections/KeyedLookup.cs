@@ -1,9 +1,9 @@
 ﻿// ==================================================
-// Copyright 2019(C) , DotLogix
+// Copyright 2014-2021(C), DotLogix
 // File:  KeyedLookup.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  15.08.2018
-// LastEdited:  07.02.2019
+// Created: 22.08.2020 13:51
+// LastEdited:  26.09.2021 22:27
 // ==================================================
 
 #region

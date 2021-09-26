@@ -1,26 +1,21 @@
 ﻿using System;
 
 namespace DotLogix.Core.Diagnostics {
-    public interface ILogSource : ILogger {
+    public interface ILogSource {
         /// <summary>
-        /// The logger target
+        /// The name of the log source
         /// </summary>
-        public ILogger Logger { get; }
-
+        string Name { get; }
+        
         /// <summary>
-        /// Enables or disables this log source
-        /// </summary>
-        public bool Enabled { get; set; }
-
-        /// <summary>
-        /// The parent logger source
-        /// </summary>
-        public ILogSource Parent { get; }
-
-        /// <summary>
-        /// The current log level
+        /// The log level
         /// </summary>
         LogLevels LogLevel { get; }
+
+        /// <summary>
+        /// The target logger
+        /// </summary>
+        ILogger Logger { get; }
 
         /// <summary>
         /// Write a trace message
@@ -122,23 +117,13 @@ namespace DotLogix.Core.Diagnostics {
         void Custom(LogLevels logLevel, string methodName, string className, string threadName, Func<string> messageFunc, Exception exception = null);
         
         /// <summary>
-        /// Creates a nested logger source with an optional log level override
+        /// Callback to receive messages
         /// </summary>
-        public ILogSource CreateSource(string name, LogLevels? customLogLevel = null);
+        /// <param name="message"></param>
+        /// <returns></returns>
+        bool Log(LogMessage message);
+    }
 
-        /// <summary>
-        /// Creates a nested logger source with an optional log level override
-        /// </summary>
-        public ILogSource CreateSource(string name, Func<LogLevels?> getCustomLogLevelFunc);
-
-        /// <summary>
-        /// Creates a nested logger source with an optional log level override
-        /// </summary>
-        public ILogSource CreateSource<T>(LogLevels? customLogLevel = null);
-
-        /// <summary>
-        /// Creates a nested logger source with an optional log level override
-        /// </summary>
-        public ILogSource CreateSource<T>(Func<LogLevels?> getCustomLogLevelFunc);
+    public interface ILogSource<T> : ILogSource {
     }
 }

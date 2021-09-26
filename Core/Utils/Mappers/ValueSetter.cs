@@ -14,8 +14,8 @@ namespace DotLogix.Core.Utils.Mappers {
         }
 
 
-        protected override bool TrySetValue(TTarget source, TValue value) {
-            _setterFunc.Invoke(source, value);
+        protected override bool TrySetValue(TTarget instance, TValue value) {
+            _setterFunc.Invoke(instance, value);
             return true;
         }
     }

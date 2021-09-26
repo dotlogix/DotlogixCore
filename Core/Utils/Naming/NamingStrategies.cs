@@ -12,6 +12,10 @@ namespace DotLogix.Core.Utils.Naming {
     /// </summary>
     public static class NamingStrategies {
         /// <summary>
+        ///     A naming strategy without any logic
+        /// </summary>
+        public static INamingStrategy None { get; } = new IdentityNamingStrategy();
+        /// <summary>
         ///     A camelCase naming strategy
         /// </summary>
         public static INamingStrategy CamelCase { get; } = new CamelCaseNamingStrategy();

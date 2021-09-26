@@ -4,11 +4,11 @@ namespace DotLogix.Core.Utils.Mappers {
     /// <summary>
     /// An interface representation value resolvers
     /// </summary>
-    public interface IValueGetter<TSource, TValue> {
+    public interface IValueGetter<T, TValue> {
         /// <summary>
         /// The source type
         /// </summary>
-        Type SourceType { get; }
+        Type InstanceType { get; }
         
         /// <summary>
         /// The value type
@@ -18,14 +18,14 @@ namespace DotLogix.Core.Utils.Mappers {
         /// <summary>
         /// Add a pre-conditions executed before a value will be resolved
         /// </summary>
-        void AddPreCondition(Func<TSource, bool> conditionFunc);
+        void AddPreCondition(Func<T, bool> conditionFunc);
         /// <summary>
         /// Add a post-conditions executed after a value has been resolved
         /// </summary>
-        void AddPostCondition(Func<TSource, TValue, bool> conditionFunc);
+        void AddPostCondition(Func<T, TValue, bool> conditionFunc);
         /// <summary>
         /// Tries to resolve a value
         /// </summary>
-        bool TryGet(TSource source, out TValue value);
+        bool TryGet(T instance, out TValue value);
     }
 }

@@ -16,9 +16,9 @@ namespace DotLogix.Core.Diagnostics {
         /// <summary>
         /// Formats a log message
         /// </summary>
-        /// <param name="logMessage"></param>
         /// <param name="writer"></param>
+        /// <param name="logMessage"></param>
         /// <returns></returns>
-        bool Format(LogMessage logMessage, TextWriter writer);
+        bool Write(TextWriter writer, LogMessage logMessage);
     }
 }

@@ -1,4 +1,4 @@
-image: microsoft/dotnet:latest
+image: mcr.microsoft.com/dotnet/sdk:latest
 
 stages:
     - build
@@ -14,11 +14,11 @@ build-job:
     stage: build
     script:
         - echo "Restore solution ..."
-        - "dotnet restore $solution -c $configuration"
+        - "dotnet restore $solution -p:Configuration=$configuration"
         - echo "Building solution ..."
-        - "dotnet build $solution -c $configuration -p:Version=$version -p:GeneratePackageOnBuild='false' --no-restore"
-        - echo "Creating nuget packages ..."        
-        - "dotnet pack $solution -c $configuration -p:Version=$version --no-build"
+        - "dotnet build $solution -p:Configuration=$configuration -p:Version=$version -p:GeneratePackageOnBuild='false' --no-restore"
+        - echo "Creating nuget packages ..."
+        - "dotnet pack $solution -p:Configuration=$configuration -p:Version=$version --no-build"
     artifacts:
         paths:
         - assemblies
@@ -29,14 +29,8 @@ unit-test-job:
     script:
         - echo "Executing unit tests ..."
         - "dotnet test $solution"
-    artifacts:
-        paths:
-        - nuget
 
 publish-job:
     stage: deploy
     script:
         - echo "Publishing nuget packages ..."
-    artifacts:
-        paths:
-        - nuget

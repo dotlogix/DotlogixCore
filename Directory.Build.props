@@ -16,17 +16,21 @@
 	<VersionSuffix>preview-0002</VersionSuffix>
   </PropertyGroup>
 
-  <Target Name="CopyAssemblies" AfterTargets="Compile">
+  <Target Name="CopyAssemblies" AfterTargets="AfterBuild">
     <ItemGroup>
-      <AssemblyFiles Include="bin\$(Configuration)\**\$(TargetName).*" Exclude="**\*.deps.json;**\*.nupkg" />
+      <AssemblyFiles Include="bin/$(Configuration)/**/$(TargetName).*" Exclude="**/*.deps.json;**/*.nupkg;**/*Tests*" />
     </ItemGroup>
-    <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'$(SolutionDir)\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+	<Message Importance="High" Text="Copy assemblies to $(SolutionDir)assemblies/$(Configuration)" />
+	<Message Importance="High" Text="TargetName = $(TargetName)" />
+	<Message Importance="High" Text="Files = @(AssemblyFiles)" />
+    <Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="$(SolutionDir)assemblies/$(Configuration)" />
   </Target>  
 
   <Target Name="CopyPackage" AfterTargets="Pack">
     <ItemGroup>
-      <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+      <PackageFiles Include="bin/$(Configuration)/*.nupkg" />
     </ItemGroup>
-    <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(SolutionDir)\nuget\$(Configuration)" />
+	<Message Importance="High" Text="Copy nuget packages to $(SolutionDir)nuget/$(Configuration)" />
+    <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(SolutionDir)nuget/$(Configuration)" />
   </Target>  
 </Project>

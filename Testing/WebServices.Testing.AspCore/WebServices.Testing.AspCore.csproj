@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <AssemblyName>DotLogix.WebServices.Testing.AspCore</AssemblyName>
+        <RootNamespace>DotLogix.WebServices.Testing.AspCore</RootNamespace>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\WebServices\WebServices.Adapters\WebServices.Adapters.csproj" />
+      <ProjectReference Include="..\..\WebServices\WebServices.AspCore\WebServices.AspCore.csproj" />
+      <ProjectReference Include="..\WebServices.Testing.Core\WebServices.Testing.Core.csproj" />
+      <ProjectReference Include="..\WebServices.Testing.EntityFramework\WebServices.Testing.EntityFramework.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.4" />
+    </ItemGroup>
+</Project>

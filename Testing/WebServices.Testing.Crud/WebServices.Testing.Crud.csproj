@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\Common\Common.csproj" />
+      <ProjectReference Include="..\..\WebServices\WebServices.AspCore\WebServices.AspCore.csproj" />
+      <ProjectReference Include="..\WebServices.Testing.AspCore\WebServices.Testing.AspCore.csproj" />
+      <ProjectReference Include="..\WebServices.Testing.EntityFramework\WebServices.Testing.EntityFramework.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Mvc.Core" />
+    </ItemGroup>
+
+</Project>

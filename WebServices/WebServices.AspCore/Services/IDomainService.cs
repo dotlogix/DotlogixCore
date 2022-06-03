@@ -14,22 +14,22 @@ namespace DotLogix.WebServices.AspCore.Services {
 
         #region Create
         public Task<TResponse> CreateAsync(TCreate request);
-        public Task<ICollection<TResponse>> CreateAsync(IEnumerable<TCreate> requests);
+        public Task<ICollection<TResponse>> CreateRangeAsync(IEnumerable<TCreate> requests);
         #endregion
 
         #region Patch
         public Task<TResponse> PatchAsync(TPatch request);
-        public Task<ICollection<TResponse>> PatchAsync(IEnumerable<TPatch> requests);
+        public Task<ICollection<TResponse>> PatchRangeAsync(IEnumerable<TPatch> requests);
         #endregion
 
         #region Ensure
         public Task<TResponse> EnsureAsync(TEnsure requests);
-        public Task<ICollection<TResponse>> EnsureAsync(IEnumerable<TEnsure> requests);
+        public Task<ICollection<TResponse>> EnsureRangeAsync(IEnumerable<TEnsure> requests);
         #endregion
 
         #region Remove
         public Task<bool> RemoveAsync(Guid guid);
-        public Task<int> RemoveAsync(IEnumerable<Guid> guids);
+        public Task<int> RemoveRangeAsync(IEnumerable<Guid> guids);
         #endregion
     }
     

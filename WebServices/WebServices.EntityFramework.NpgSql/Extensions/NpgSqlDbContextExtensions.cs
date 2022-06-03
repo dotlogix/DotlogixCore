@@ -11,7 +11,6 @@ namespace DotLogix.WebServices.EntityFramework.Extensions
         {
             // Required for pg-extensions to work properly
             await database.OpenConnectionAsync();
-
             if (database.GetDbConnection() is NpgsqlConnection npgsqlConnection)
             {
                 npgsqlConnection.ReloadTypes();

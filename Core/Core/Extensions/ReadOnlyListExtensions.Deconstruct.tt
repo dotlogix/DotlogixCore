@@ -1,0 +1,38 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly Name="C:\Program Files\dotnet\sdk\6.0.101\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Assemblies\Release\DotLogix.Core\netstandard2.0\DotLogix.Core.dll" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using DotLogix.Core.Extensions;
+
+namespace DotLogix.Core.Extensions {
+    public static partial class ReadOnlyListExtensions {
+<#
+    for (var i = 1; i <= 10; i++)
+    {
+#>
+        public static void Deconstruct<T>(this IReadOnlyList<T> values, out T item1<#for(var j = 1; j < i; j++) {#>, out T item<#=j+1#><#}#>) {
+            EnsureLength(values, <#=i#>);
+<#
+            for(int j = 0; j < i; j++) {
+#>
+            item<#=j+1#> = values[<#=j#>];
+<#
+            }
+#>
+        }
+
+<#
+    }
+#>
+        private static void EnsureLength<T>(IReadOnlyList<T> values, int required){
+            if(values.Count > required) {
+                throw new IndexOutOfRangeException($"Can not deconstruct an array with {array.Count} elements to a tuple with {required} items");          
+            }
+        }
+    }
+}

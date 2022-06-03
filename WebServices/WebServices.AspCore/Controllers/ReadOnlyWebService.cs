@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using DotLogix.Common.Features;
 using DotLogix.WebServices.AspCore.Services;
-using DotLogix.WebServices.Core.Terms;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotLogix.WebServices.AspCore.Controllers {

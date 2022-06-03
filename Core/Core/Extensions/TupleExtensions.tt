@@ -1,0 +1,40 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly Name="C:\Program Files\dotnet\sdk\6.0.101\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Assemblies\Release\DotLogix.Core\netstandard2.0\DotLogix.Core.dll" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using DotLogix.Core.Extensions;
+
+namespace DotLogix.Core.Extensions {
+    public static partial class TupleExtensions {
+<#
+    for (var i = 2; i <= 10; i++)
+    {
+#>
+        public static T[] ToArray<T>(this (T<#for(var j = 1; j < i; j++) {#>, T<#}#>) tuple) {
+            var array = new T[<#=i#>];
+            (array[0]<#for(var j = 1; j < i; j++) {#>, array[<#=j#>]<#}#>) = tuple;
+            return array;
+        }
+
+<#
+    }
+
+    for (var i = 2; i <= 10; i++)
+    {
+#>
+        public static object[] ToObjectArray<T1<# for(var j = 2; j <= i; j++) { #>, T<#=j#><# }#>>(this (T1<# for(var j = 2; j <= i; j++) { #>, T<#=j#><# }#>) tuple) {
+            var array = new object[<#=i#>];
+            (array[0]<#for(var j = 1; j < i; j++) {#>, array[<#=j#>]<#}#>) = tuple;
+            return array;
+        }
+
+<#
+    }
+#>
+    }
+}

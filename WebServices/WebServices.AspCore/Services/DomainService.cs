@@ -7,9 +7,9 @@ using DotLogix.Common;
 using DotLogix.Common.Features;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Utils.Mappers;
-using DotLogix.Infrastructure.Queries;
 using DotLogix.WebServices.Core.Errors;
 using DotLogix.WebServices.Core.Terms;
+using DotLogix.WebServices.EntityFramework.Database;
 using DotLogix.WebServices.EntityFramework.Repositories;
 #endregion
 
@@ -18,7 +18,7 @@ namespace DotLogix.WebServices.AspCore.Services {
         where TEntity : class, IGuid, new()
         where TResponse : class, IGuid, new()
         where TEnsure : class, IGuid {
-        protected DomainService(IGenericRepository<Guid, TEntity> repository) : base(repository) {}
+        protected DomainService(IRepository<Guid, TEntity> repository) : base(repository) {}
 
         protected override Task<TResponse> CreateEntityAsync(TEnsure requests, TEntity entity = default) {
             return EnsureEntityAsync(requests, entity);
@@ -33,7 +33,7 @@ namespace DotLogix.WebServices.AspCore.Services {
         where TEntity : class, IGuid, new()
         where TResponse : class, IGuid, new()
         where TEnsure : class, IGuid {
-        protected DomainService(IGenericRepository<Guid, TEntity> repository) : base(repository) {}
+        protected DomainService(IRepository<Guid, TEntity> repository) : base(repository) {}
         
         protected override Task<TResponse> CreateEntityAsync(TEnsure requests, TEntity entity = default) {
             return EnsureEntityAsync(requests, entity);
@@ -58,7 +58,7 @@ namespace DotLogix.WebServices.AspCore.Services {
         protected IMapper<TPatch, TEntity> PatchMapper => _patchMapper ??= ConfigurePatchMapper();
 
 
-        protected DomainService(IGenericRepository<Guid, TEntity> repository)
+        protected DomainService(IRepository<Guid, TEntity> repository)
             : base(repository) {
         }
 
@@ -73,7 +73,7 @@ namespace DotLogix.WebServices.AspCore.Services {
             return true;
         }
 
-        public virtual async Task<int> RemoveAsync(IEnumerable<Guid> guids) {
+        public virtual async Task<int> RemoveRangeAsync(IEnumerable<Guid> guids) {
             var entities = await Repository.GetRangeAsync(guids);
             var count = 0;
             foreach(var entity in entities) {
@@ -84,9 +84,9 @@ namespace DotLogix.WebServices.AspCore.Services {
             return count;
         }
         
-        public virtual async Task<bool> RemoveEntityAsync(TEntity entity) {
-            await Repository.RemoveAsync(entity);
-            return true;
+        public virtual Task<bool> RemoveEntityAsync(TEntity entity) {
+            Repository.Remove(entity);
+            return Task.FromResult(true);
         }
         #endregion
 
@@ -109,7 +109,7 @@ namespace DotLogix.WebServices.AspCore.Services {
             return await CreateEntityAsync(request);
         }
 
-        public virtual async Task<ICollection<TResponse>> CreateAsync(IEnumerable<TCreate> requests) {
+        public virtual async Task<ICollection<TResponse>> CreateRangeAsync(IEnumerable<TCreate> requests) {
             requests = requests.AsCollection();
             var keys = requests.GetUniqueKeys();
             var entities = await Repository.GetRangeAsync(keys);
@@ -144,7 +144,7 @@ namespace DotLogix.WebServices.AspCore.Services {
         protected virtual async Task<TResponse> CreateEntityAsync(TCreate requests, TEntity entity = null) {
             if(entity == null) {
                 entity = CreateMapper.Map(requests);
-                await Repository.AddAsync(entity);
+                Repository.Add(entity);
             } else {
                 CreateMapper.Map(requests, entity);
             }
@@ -166,7 +166,7 @@ namespace DotLogix.WebServices.AspCore.Services {
             return await EnsureEntityAsync(requests, entity);
         }
 
-        public virtual async Task<ICollection<TResponse>> EnsureAsync(IEnumerable<TEnsure> requests) {
+        public virtual async Task<ICollection<TResponse>> EnsureRangeAsync(IEnumerable<TEnsure> requests) {
             requests = requests.AsCollection();
             var entities = await Repository.GetRangeAsync(requests.GetUniqueKeys());
             var diff = requests.Diff(r => r.EnsureGuid(), entities, e => e.Guid);
@@ -195,7 +195,7 @@ namespace DotLogix.WebServices.AspCore.Services {
         protected virtual async Task<TResponse> EnsureEntityAsync(TEnsure requests, TEntity entity = null) {
             if(entity == null) {
                 entity = EnsureMapper.Map(requests);
-                await Repository.AddAsync(entity);
+                Repository.Add(entity);
             } else {
                 EnsureMapper.Map(requests, entity);
             }
@@ -218,7 +218,7 @@ namespace DotLogix.WebServices.AspCore.Services {
             return await PatchEntityAsync(request, entity);
         }
 
-        public virtual async Task<ICollection<TResponse>> PatchAsync(IEnumerable<TPatch> requests) {
+        public virtual async Task<ICollection<TResponse>> PatchRangeAsync(IEnumerable<TPatch> requests) {
             requests = requests.AsCollection();
             var entities = await Repository.GetRangeAsync(requests.GetUniqueKeys());
             var diff = requests.Diff(r => r.EnsureGuid(), entities, e => e.Guid);
@@ -275,7 +275,7 @@ namespace DotLogix.WebServices.AspCore.Services {
         where TCreate : class, IGuid
         where TEnsure : class, IGuid
         where TPatch : class, IGuid {
-        protected DomainService(IGenericRepository<Guid, TEntity> repository) : base(repository) {
+        protected DomainService(IRepository<Guid, TEntity> repository) : base(repository) {
         }
 
         public virtual async Task<ICollection<TResponse>> GetFilteredAsync(TFilter filter) {
@@ -301,6 +301,6 @@ namespace DotLogix.WebServices.AspCore.Services {
                 Values = await ToModelsAsync(paginationResult.Values),
             };
         }
-        protected abstract IQueryModifier<TEntity, TEntity> ToQueryModifier(TFilter filter);
+        protected abstract IEntityQuery<TEntity, TEntity> ToQueryModifier(TFilter filter);
     }
 }

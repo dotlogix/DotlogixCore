@@ -1,30 +1,33 @@
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using DotLogix.Core.Diagnostics;
+using DotLogix.Core.Extensions;
 using DotLogix.WebServices.Core.Options;
 using Microsoft.Extensions.Options;
 
 namespace DotLogix.WebServices.Core.Diagnostics {
-    public class ConfigLogSourceProvider : LogSourceProviderBase, IDisposable{
-        private readonly IDisposable _handler;
+    public class ConfigLogSourceProvider : LogSourceProviderBase, IDisposable {
+        private readonly IDisposable _optionChangeSubscription;
         private readonly IOptionsMonitor<LoggerOptions> _options;
-        private ConcurrentDictionary<string, LogLevels> _cache;
 
+        private readonly object _cacheLock = new();
+        private readonly Dictionary<string, LogLevels> _cache = new();
+        private LogLevels _defaultLogLevel;
         public LoggerOptions Options => _options.CurrentValue;
 
         public ConfigLogSourceProvider(ILogger logger, IOptionsMonitor<LoggerOptions> options) : base(logger) {
             _options = options;
-            _cache = new ConcurrentDictionary<string, LogLevels>(options.CurrentValue.Sources);
-            _handler = options.OnChange((o) => {
-                                 _cache = new ConcurrentDictionary<string, LogLevels>(o.Sources);
-                             });
+            _optionChangeSubscription = options.OnChange(LoggerOptions_OnChange);
+            LoggerOptions_OnChange(options.CurrentValue);
         }
 
-        protected override LogLevels GetLogLevel(string name) {
-            return GetLogLevelRecursive(name, _cache);
+        protected override LogLevels GetLogLevel(ILogSource logSource) {
+            lock(_cacheLock) {
+                return GetLogLevelRecursive(logSource.Name, _cache);
+            }
         }
 
-        private LogLevels GetLogLevelRecursive(string name, ConcurrentDictionary<string, LogLevels> cache) {
+        private LogLevels GetLogLevelRecursive(string name, IDictionary<string, LogLevels> cache) {
             if(cache.TryGetValue(name, out var logLevel)) {
                 return logLevel;
             }
@@ -34,14 +37,28 @@ namespace DotLogix.WebServices.Core.Diagnostics {
                 var parentName = name.Substring(0, index);
                 logLevel = GetLogLevelRecursive(parentName, cache);
             } else {
-                logLevel = Options.LogLevel;
+                logLevel = _defaultLogLevel;
             }
 
-            return cache.GetOrAdd(name, logLevel);
+            cache[name] = logLevel;
+            return logLevel;
         }
 
+        private void LoggerOptions_OnChange(LoggerOptions newOptions) {
+            lock(_cacheLock) {
+                if(newOptions is null) {
+                    _defaultLogLevel = LogLevels.Info;
+                    _cache.Clear();
+                } else {
+                    _defaultLogLevel = newOptions.LogLevel;
+                    _cache.Clear();
+                    _cache.AddRange(newOptions.Sources);
+                }
+            }
+        }
+        
         public void Dispose() {
-            _handler?.Dispose();
+            _optionChangeSubscription?.Dispose();
         }
     }
 }

@@ -1,0 +1,89 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly Name="C:\Program Files\dotnet\sdk\6.0.101\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Assemblies\Release\DotLogix.Core\netstandard2.0\DotLogix.Core.dll" #>
+<#@ import namespace="System.Linq" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using DotLogix.Core.Extensions;
+
+namespace DotLogix.Core.Expressions {
+    public static partial class Lambdas {
+#region ToLambda
+        public static Expression<TDelegate> ToLambda<TDelegate>(this Lambda instance, params ParameterExpression[] parameters) where TDelegate : Delegate {
+            return ToLambda<TDelegate>(instance, parameters.AsEnumerable());
+        }
+
+        public static Expression<TDelegate> ToLambda<TDelegate>(this Lambda instance, IEnumerable<ParameterExpression> parameters) where TDelegate : Delegate {
+            var arguments = typeof(TDelegate).GetGenericArguments();
+            var parameterList = parameters.AsReadOnlyList();
+
+            if(arguments.Length - 1 != parameterList.Count) {
+                throw new ArgumentException($"Invalid amount of parameters, expected {arguments.Length} but got {parameterList.Count}", nameof(parameters));
+            }
+            
+            return Expression.Lambda<TDelegate>(instance.Body, parameterList);
+        }
+
+<#
+    for (var i = 0; i <= 10; i++)
+    {
+        var range = Enumerable.Range(1, i).ToList();
+        var genericNames = string.Join(", ", range.Select(r => $"T{r}").Append("TResult"));
+        var paramNames = string.Join(", ", range.Select(r => $"ParameterExpression arg{r}"));
+        var argNames = string.Join(", ", range.Select(r => $"arg{r}"));
+#>
+        public static Expression<Func<<#=genericNames#>>> ToLambda<<#=genericNames#>>(this Lambda<TResult> instance<#=paramNames.Length > 0 ? ", "+ paramNames : ""#>) {
+            return ToLambda<Func<<#=genericNames#>>>(instance<#=argNames.Length > 0 ? ", "+argNames : ""#>);
+        }
+<#
+    }
+#>
+#endregion
+
+#region Compile
+<#
+    for (var i = 0; i <= 10; i++)
+    {
+        var range = Enumerable.Range(1, i).ToList();
+        var genericNames = string.Join(", ", range.Select(r => $"T{r}").Append("TResult"));
+        var paramNames = string.Join(", ", range.Select(r => $"ParameterExpression arg{r}"));
+        var argNames = string.Join(", ", range.Select(r => $"arg{r}"));
+#>
+        public static Func<<#=genericNames#>> Compile<<#=genericNames#>>(this Lambda<TResult> instance<#=paramNames.Length > 0 ? ", "+ paramNames : ""#>) {
+            return ToLambda<Func<<#=genericNames#>>>(instance<#=argNames.Length > 0 ? ", "+argNames : ""#>).Compile();
+        }
+<#
+    }
+#>
+#endregion
+
+#region Evaluate
+        public static TResult Evaluate<TResult>(this Expression instance) {
+            return Expression.Lambda<Func<TResult>>(instance).Compile().Invoke();
+        }
+        public static object Evaluate(this LambdaExpression instance, params object[] parameters) {
+            return instance.Compile().DynamicInvoke(parameters);
+        }
+        public static TResult Evaluate<TResult>(this LambdaExpression instance, params object[] parameters) {
+            return (TResult)Evaluate(instance, parameters);
+        }
+<#
+    for (var i = 0; i <= 10; i++)
+    {
+        var range = Enumerable.Range(1, i).ToList();
+        var genericNames = string.Join(", ", range.Select(r => $"T{r}").Append("TResult"));
+        var paramNames = string.Join(", ", range.Select(r => $"T{r} arg{r}"));
+        var argNames = string.Join(", ", range.Select(r => $"arg{r}"));
+#>
+        public static TResult Evaluate<<#=genericNames#>>(this Expression<Func<<#=genericNames#>>> instance<#=paramNames.Length > 0 ? ", "+ paramNames : ""#>) {
+            return instance.Compile().Invoke(<#=argNames#>);
+        }
+<#
+    }
+#>
+#endregion
+    }
+}

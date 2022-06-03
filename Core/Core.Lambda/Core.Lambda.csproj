@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <AssemblyName>DotLogix.Core.Lambda</AssemblyName>
+        <RootNamespace>DotLogix.Core</RootNamespace>
+        <PackageId>DotLogix.Core.Lambda</PackageId>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+        <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
+        <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Core\Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Expressions\Builders\Lambda.Call.tt">
+            <Generator>TextTemplatingFileGenerator</Generator>
+            <LastGenOutput>Lambda.Call.cs</LastGenOutput>
+        </None>
+        <None Update="Expressions\Builders\Lambda.Enumerable.tt">
+            <Generator>TextTemplatingFileGenerator</Generator>
+            <LastGenOutput>Lambda.Enumerable.cs</LastGenOutput>
+        </None>
+        <None Update="Expressions\Builders\Lambda.Inline.tt">
+            <Generator>TextTemplatingFileGenerator</Generator>
+            <LastGenOutput>Lambda.Inline.cs</LastGenOutput>
+        </None>
+        <None Update="Expressions\Builders\Lambda.Lambda.tt">
+            <Generator>TextTemplatingFileGenerator</Generator>
+            <LastGenOutput>Lambda.Lambda.cs</LastGenOutput>
+        </None>
+        <None Update="Expressions\Builders\Lambda.Math.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>Lambda.Math.cs</LastGenOutput>
+        </None>
+        <None Update="Expressions\Builders\Lambda.Querable.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>Lambdas.Querable.cs</LastGenOutput>
+        </None>
+        <None Update="Expressions\Builders\Lambda.Strings.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>Lambda.Strings.cs</LastGenOutput>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Expressions\Builders\Lambda.Call.cs">
+        <DependentUpon>Lambda.Call.tt</DependentUpon>
+      </Compile>
+    </ItemGroup>
+</Project>

@@ -9,7 +9,6 @@ namespace DotLogix.WebServices.Core.Terms {
         public Optional<T> Min { get; set; }
         public Optional<T> Max { get; set;}
         
-
         public static implicit operator RangeTerm<T>(T value) {
             return new RangeTerm<T> {
                 Min = value,

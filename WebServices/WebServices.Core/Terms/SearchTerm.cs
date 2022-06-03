@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 namespace DotLogix.WebServices.Core.Terms {
     [JsonConverter(typeof(SearchTermJsonConverter))]
     public class SearchTerm {
-        public string Pattern { get; set; }
+        public ManyTerm<string> Pattern { get; set; }
         public SearchTermMode Mode { get; set; }
         public double? FuzzyThreshold { get; set; }
         public bool IgnoreCase { get; set; }
@@ -16,39 +16,43 @@ namespace DotLogix.WebServices.Core.Terms {
         private StringComparison StringComparison => IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         private RegexOptions RegexOptions => IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
 
-        public static SearchTerm EqualTo(string pattern, bool ignoreCase = false) {
+        public static SearchTerm EqualTo(ManyTerm<string> pattern, bool ignoreCase = false) {
             return new SearchTerm {Pattern = pattern, IgnoreCase = ignoreCase, Mode = SearchTermMode.Equals};
         }
 
-        public static SearchTerm StartsWith(string pattern, bool ignoreCase = false) {
+        public static SearchTerm StartsWith(ManyTerm<string> pattern, bool ignoreCase = false) {
             return new SearchTerm {Pattern = pattern, IgnoreCase = ignoreCase, Mode = SearchTermMode.StartsWith};
         }
 
-        public static SearchTerm Contains(string pattern, bool ignoreCase = false) {
+        public static SearchTerm Contains(ManyTerm<string> pattern, bool ignoreCase = false) {
             return new SearchTerm {Pattern = pattern, IgnoreCase = ignoreCase, Mode = SearchTermMode.Contains};
         }
 
-        public static SearchTerm EndsWith(string pattern, bool ignoreCase = false) {
+        public static SearchTerm EndsWith(ManyTerm<string> pattern, bool ignoreCase = false) {
             return new SearchTerm {Pattern = pattern, IgnoreCase = ignoreCase, Mode = SearchTermMode.EndsWith};
         }
 
-        public static SearchTerm Regex(string pattern, bool ignoreCase = false) {
+        public static SearchTerm Regex(ManyTerm<string> pattern, bool ignoreCase = false) {
             return new SearchTerm {Pattern = pattern, IgnoreCase = ignoreCase, Mode = SearchTermMode.Regex};
         }
 
-        public static SearchTerm Like(string pattern, bool ignoreCase = false) {
+        public static SearchTerm Like(ManyTerm<string> pattern, bool ignoreCase = false) {
             return new SearchTerm {Pattern = pattern, IgnoreCase = ignoreCase, Mode = SearchTermMode.Like};
         }
         
-        public static SearchTerm Wildcard(string pattern, bool ignoreCase = false) {
+        public static SearchTerm Wildcard(ManyTerm<string> pattern, bool ignoreCase = false) {
             return new SearchTerm {Pattern = pattern, IgnoreCase = ignoreCase, Mode = SearchTermMode.Wildcard};
         }
 
-        public static SearchTerm Fuzzy(string pattern, double fuzzyThreshold) {
+        public static SearchTerm Fuzzy(ManyTerm<string> pattern, double fuzzyThreshold) {
             return new SearchTerm {Pattern = pattern, IgnoreCase = true, Mode = SearchTermMode.Fuzzy, FuzzyThreshold = fuzzyThreshold};
         }
 
         public static implicit operator SearchTerm(string value) {
+            return EqualTo(value);
+        }
+        
+        public static implicit operator SearchTerm(ManyTerm<string> value) {
             return EqualTo(value);
         }
     }

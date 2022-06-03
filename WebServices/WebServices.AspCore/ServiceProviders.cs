@@ -14,7 +14,7 @@ namespace DotLogix.WebServices.AspCore {
         public static IServiceProvider RequestServices => _getRequestServices.Invoke();
         public static HttpContext HttpContext => GetApplicationService<IHttpContextAccessor>()?.HttpContext;
         
-        public static ILogger Logger => GetApplicationService<ILogger>();
+        public static ILogTarget LogTarget => GetApplicationService<ILogTarget>();
         public static ILogSourceProvider LogSourceProvider => GetApplicationService<ILogSourceProvider>();
         
         public static T GetService<T>(bool required = false) where T : class => (RequestServices ?? ApplicationServices)?.GetService<T>(required);

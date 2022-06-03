@@ -1,0 +1,152 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly Name="C:\Program Files\dotnet\sdk\6.0.101\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Assemblies\Release\DotLogix.Core\netstandard2.0\DotLogix.Core.dll" #>
+<#@ import namespace="System.Linq" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using DotLogix.Core.Extensions;
+
+namespace DotLogix.Core.Expressions {
+    public static partial class Lambdas {
+        public static Lambda<TResult> Call<TResult>(this Lambda instance, string methodName, params Lambda[] args) {
+            return Call<TResult>(instance, methodName, args.AsEnumerable());
+        }
+
+        public static Lambda<TResult> Call<TResult>(this Lambda instance, string methodName, IEnumerable<Lambda> args) {
+            args = args.AsReadOnlyCollection();
+            return Call<TResult>(instance, ResolveMethod(instance, methodName, args), args);
+        }
+
+        public static Lambda<TResult> Call<TResult>(this Lambda instance, MethodInfo methodInfo, params Lambda[] args) {
+            return Call<TResult>(instance, methodInfo, args.AsReadOnlyCollection());
+        }
+
+        public static Lambda<TResult> Call<TResult>(this Lambda instance, MethodInfo methodInfo, IEnumerable<Lambda> args) {
+            if(methodInfo.ReturnType != typeof(TResult)) {
+                throw new ArgumentException($"Expected method return type {typeof(TResult).Name}, but got {methodInfo.ReturnType.Name}");
+            }
+
+            var parameters = methodInfo.GetParameters();
+            var arguments = new Expression[parameters.Length];
+            var idx = 0;
+            foreach(var arg in args) {
+                var parameterType = parameters[idx].ParameterType;
+                var argument = arg.Cast(parameterType);
+                arguments[idx] = argument.Body;
+                idx++;
+            }
+
+            if(idx < parameters.Length && parameters[idx].IsOptional == false) {
+                throw new ArgumentException($"Not enough parameters. Expected {parameters.Length}, but got {idx}");
+            }
+
+            return Expression.Call(instance.Body, methodInfo, args.Select(a => a.Body).ToArray());
+        }
+
+<#
+    for(var i = 0; i <= 10; i++) {
+        var range = Enumerable.Range(1, i).ToList();
+        var genericNames = string.Join(", ", range.Select(r => $"T{r}").Append("TResult"));
+        var paramNames = string.Join(", ", range.Select(r => $"Lambda<T{r}> arg{r}"));
+        var argNames = string.Join(", ", range.Select(r => $"arg{r}"));
+#>
+        public static Lambda<TResult> Call<<#= genericNames #>>(this Lambda instance, Func<<#= genericNames #>> method<#= paramNames.Length > 0 ? ", " + paramNames : "" #>) {
+            return Call<TResult>(instance, method.Method<#= argNames.Length > 0 ? ", " + argNames : "" #>);
+        }
+
+<#
+    }
+
+    for(var i = 0; i <= 10; i++) {
+        var range = Enumerable.Range(1, i).ToList();
+        var genericNames = string.Join(", ", range.Select(r => $"T{r}").Prepend("T").Append("TResult"));
+        var paramNames = string.Join(", ", range.Select(r => $"Lambda<T{r}> arg{r}"));
+        var argNames = string.Join(", ", range.Select(r => $"arg{r}"));
+#>
+        public static Lambda<TResult> CallStatic<<#= genericNames #>>(this Lambda<T> instance, Func<<#= genericNames #>> method<#= paramNames.Length > 0 ? ", " + paramNames : "" #>) {
+            return CallStatic<TResult>(method.Method, instance<#= argNames.Length > 0 ? ", " + argNames : "" #>);
+        }
+
+<#
+    }
+#>
+        public static Lambda<TResult> CallStatic<TResult>(Type type, string methodName, params Lambda[] args) {
+            return CallStatic<TResult>(type, methodName, args.AsEnumerable());
+        }
+
+        public static Lambda<TResult> CallStatic<TResult>(Type type, string methodName, IEnumerable<Lambda> args) {
+            args = args.AsReadOnlyCollection();
+            return CallStatic<TResult>(ResolveStaticMethod(type, methodName, args), args);
+        }
+
+        public static Lambda<TResult> CallStatic<TResult>(MethodInfo methodInfo, params Lambda[] args) {
+            return CallStatic<TResult>(methodInfo, args.AsEnumerable());
+        }
+
+        public static Lambda<TResult> CallStatic<TResult>(MethodInfo methodInfo, IEnumerable<Lambda> args) {
+            if(methodInfo.ReturnType != typeof(TResult)) {
+                throw new ArgumentException($"Expected method return type {typeof(TResult).Name}, but got {methodInfo.ReturnType.Name}");
+            }
+
+            var parameters = methodInfo.GetParameters();
+            var arguments = new Expression[parameters.Length];
+            var idx = 0;
+            foreach(var arg in args) {
+                var parameterType = parameters[idx].ParameterType;
+                var argument = arg.Cast(parameterType);
+                arguments[idx] = argument.Body;
+                idx++;
+            }
+
+            if(idx < parameters.Length && parameters[idx].IsOptional == false) {
+                throw new ArgumentException($"Not enough parameters. Expected {parameters.Length}, but got {idx}");
+            }
+
+            return Expression.Call(methodInfo, args.Select(a => a.Body).ToArray());
+        }
+
+        public static Lambda<TResult> CallStatic<TResult>(Func<TResult> methodFunc) {
+            return CallStatic<TResult>(methodFunc.Method);
+        }
+
+<#
+    for(var i = 1; i <= 10; i++) {
+        var range = Enumerable.Range(1, i).ToList();
+        var genericNames = string.Join(", ", range.Select(r => $"T{r}").Append("TResult"));
+        var paramNames = string.Join(", ", range.Select(r => $"Lambda<T{r}> arg{r}"));
+        var argNames = string.Join(", ", range.Select(r => $"arg{r}"));
+#>
+        public static Lambda<TResult> CallStatic<<#= genericNames #>>(Func<<#= genericNames #>> methodFunc, <#= paramNames #>) {
+            return CallStatic<TResult>(methodFunc.Method, <#= argNames #>);
+        }
+
+<#
+    }
+#>
+        #region Helpers
+   
+        private static MethodInfo ResolveMethod(Lambda instance, string methodName, IEnumerable<Lambda> lambdaBuilders) {
+            var types = lambdaBuilders.Select(b => b.Type).ToArray();
+#if NETSTANDARD2_1
+            return instance.Type.GetMethod(methodName, 0, BindingFlags.Instance, default, CallingConventions.Any, types, default);
+#else
+            return instance.Type.GetMethod(methodName, BindingFlags.Instance, default, CallingConventions.Any, types, default);
+#endif
+        }
+
+        private static MethodInfo ResolveStaticMethod(Type type, string methodName, IEnumerable<Lambda> lambdaBuilders) {
+            var types = lambdaBuilders.Select(b => b.Type).ToArray();
+#if NETSTANDARD2_1
+            return type.GetMethod(methodName, 0, BindingFlags.Static, default, CallingConventions.Any, types, default);
+#else
+            return type.GetMethod(methodName, BindingFlags.Static, default, CallingConventions.Any, types, default);
+#endif
+        }
+
+        #endregion
+    }
+}

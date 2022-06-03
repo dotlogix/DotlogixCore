@@ -1,0 +1,37 @@
+<#@ template language="C#" #>
+<#@ include file="MethodTemplates.ttinclude" once="true"#>
+<#
+    var type = typeof(Queryable);
+    var methods = type
+            .GetMethods(BindingFlags.Public|BindingFlags.Static)
+            .OrderBy(m => m.Name)
+            .ThenBy(m => m.GetGenericArguments().Length)
+            .ThenBy(m => m.GetParameters().Length);
+#>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Linq.Expressions;
+
+namespace DotLogix.Core.Expressions {
+    [SuppressMessage("ReSharper", "RedundantTypeArgumentsOfMethod")]
+    public static partial class Lambdas {        
+        public static Lambda<IQueryable<T>> FromQueryable<T>(IQueryable<T> value) {
+            return From<IQueryable<T>>(value.Expression);
+        }
+        public static Lambda<IQueryable> FromQueryable(IQueryable value) {
+            return From<IQueryable>(value.Expression);
+        }
+
+<#
+    PushIndent();
+    foreach (var method in methods) {
+        WriteStaticMethod(method, true);
+        WriteLine();
+    }
+    PopIndent();
+#>
+    }
+}

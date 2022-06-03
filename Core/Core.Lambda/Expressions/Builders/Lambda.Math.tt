@@ -1,0 +1,138 @@
+<#@ template language="C#" #>
+<#@ include file="MethodTemplates.ttinclude" once="true"#>
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
+
+namespace DotLogix.Core.Expressions {
+    [SuppressMessage("ReSharper", "RedundantTypeArgumentsOfMethod")]
+    public static partial class Lambdas {
+<#
+    var operatorNames = new[] {"Add", "Subtract", "Divide", "Multiply", "Modulo", "Power"}; 
+    var bitwiseOperatorNames = new[] {"And", "Or", "ExclusiveOr"};
+    var raiseToInt = new[] {"sbyte", "byte", "short", "ushort"};
+    var preserveType = new[] {"int", "uint", "long", "ulong", "float", "double"};
+    var bitPreserveType = new[] {"int", "uint", "long", "ulong"};
+
+    foreach(var operatorName in operatorNames) {
+        foreach(var typeName in raiseToInt) {
+#>
+        public static Lambda<int> <#=operatorName#>(this Lambda<<#= typeName #>> instance, Lambda<<#= typeName #>> other) {
+            return Expression.<#=operatorName#>(instance, other);
+        }
+
+<#
+        }
+    
+        foreach(var typeName in preserveType) {
+#>
+        public static Lambda<<#= typeName #>> <#=operatorName#>(this Lambda<<#= typeName #>> instance, Lambda<<#= typeName #>> other) {
+            return Expression.<#=operatorName#>(instance, other);
+        }
+
+<#
+        }
+    }
+    
+    
+    
+    foreach(var operatorName in bitwiseOperatorNames) {
+        foreach(var typeName in raiseToInt) {
+#>
+        public static Lambda<int> <#=operatorName#>(this Lambda<<#= typeName #>> instance, Lambda<<#= typeName #>> other) {
+            return Expression.<#=operatorName#>(instance, other);
+        }
+
+<#
+        }
+    
+        foreach(var typeName in bitPreserveType) {
+#>
+        public static Lambda<<#= typeName #>> <#=operatorName#>(this Lambda<<#= typeName #>> instance, Lambda<<#= typeName #>> other) {
+            return Expression.<#=operatorName#>(instance, other);
+        }
+
+<#
+        }
+    }
+    
+    
+    
+    foreach(var typeName in raiseToInt) {
+#>
+        public static Lambda<int> LeftShift(this Lambda<<#=typeName#>> instance, Lambda<int> other) {
+            return Expression.LeftShift(instance, other);
+        }
+
+<#
+    }
+    
+    foreach(var typeName in bitPreserveType) {
+#>
+        public static Lambda<<#= typeName #>> LeftShift(this Lambda<<#= typeName #>> instance, Lambda<int> other) {
+            return Expression.LeftShift(instance, other);
+        }
+
+<#
+    }
+    
+    foreach(var typeName in raiseToInt) {
+#>
+        public static Lambda<int> RightShift(this Lambda<<#=typeName#>> instance, Lambda<int> other) {
+            return Expression.RightShift(instance, other);
+        }
+
+<#
+    }
+    
+    foreach(var typeName in bitPreserveType) {
+#>
+        public static Lambda<<#= typeName #>> RightShift(this Lambda<<#= typeName #>> instance, Lambda<int> other) {
+            return Expression.RightShift(instance, other);
+        }
+
+<#
+    }
+    
+    foreach(var typeName in raiseToInt) {
+#>
+        public static Lambda<int> Not(this Lambda<<#=typeName#>> instance) {
+            return Expression.Not(instance);
+        }
+
+<#
+    }
+    
+    foreach(var typeName in preserveType) {
+#>
+        public static Lambda<<#= typeName #>> Not(this Lambda<<#= typeName #>> instance) {
+            return Expression.Not(instance);
+        }
+
+<#
+    }
+    
+    
+    
+    foreach(var typeName in raiseToInt) {
+#>
+        public static Lambda<int> Negate(this Lambda<<#=typeName#>> instance) {
+            return Expression.Negate(instance);
+        }
+
+<#
+    }
+    
+    foreach(var typeName in preserveType) {
+        if(typeName.StartsWith("u")) {
+            continue;
+        }
+#>
+        public static Lambda<<#= typeName #>> Negate(this Lambda<<#= typeName #>> instance) {
+            return Expression.Negate(instance);
+        }
+
+<#
+    }
+#>
+    }
+}

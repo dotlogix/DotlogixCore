@@ -6,9 +6,9 @@ using DotLogix.Common.Features;
 using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Utils.Mappers;
-using DotLogix.Infrastructure.Queries;
 using DotLogix.WebServices.Core.Errors;
 using DotLogix.WebServices.Core.Terms;
+using DotLogix.WebServices.EntityFramework.Database;
 using DotLogix.WebServices.EntityFramework.Repositories;
 
 namespace DotLogix.WebServices.AspCore.Services {
@@ -16,13 +16,10 @@ namespace DotLogix.WebServices.AspCore.Services {
         where TEntity : class, IGuid, new()
         where TResponse : class, IGuid, new() {
         private static IMapper<TEntity, TResponse> _mapper;
-        private ILogSource _logger;
-
-        protected ILogSource Logger => _logger ??= ServiceProviders.LogSourceProvider.Create(GetType().FullName);
         protected IMapper<TEntity, TResponse> EntityMapper => _mapper ??= ConfigureEntityMapper();
-        protected IGenericRepository<Guid, TEntity> Repository { get; }
+        protected IRepository<Guid, TEntity> Repository { get; }
 
-        public ReadOnlyDomainService(IGenericRepository<Guid, TEntity> repository) {
+        public ReadOnlyDomainService(IRepository<Guid, TEntity> repository) {
             Repository = repository;
         }
 
@@ -74,7 +71,7 @@ namespace DotLogix.WebServices.AspCore.Services {
     public abstract class ReadOnlyDomainService<TEntity, TResponse, TFilter> : ReadOnlyDomainService<TEntity, TResponse>, IReadOnlyDomainService<TResponse, TFilter>
         where TEntity : class, IGuid, new()
         where TResponse : class, IGuid, new() {
-        public ReadOnlyDomainService(IGenericRepository<Guid, TEntity> repository) : base(repository) {
+        public ReadOnlyDomainService(IRepository<Guid, TEntity> repository) : base(repository) {
         }
 
         public virtual async Task<ICollection<TResponse>> GetFilteredAsync(TFilter filter) {
@@ -101,6 +98,6 @@ namespace DotLogix.WebServices.AspCore.Services {
             };
         }
 
-        protected abstract IQueryModifier<TEntity, TEntity> ToQueryModifier(TFilter filter);
+        protected abstract IEntityQuery<TEntity, TEntity> ToQueryModifier(TFilter filter);
     }
 }

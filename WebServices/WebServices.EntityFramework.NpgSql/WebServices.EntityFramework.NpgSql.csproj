@@ -1,41 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <Company>DotLogix</Company>
-        <Product>DotLogix WebServices EntityFramework</Product>
-        <PackageId>DotLogix.WebServices.EntityFramework.Npgsql</PackageId>
-        <Authors>DotLogix</Authors>
+        <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>DotLogix.WebServices.EntityFramework.Npgsql</AssemblyName>
         <RootNamespace>DotLogix.WebServices.EntityFramework</RootNamespace>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <RepositoryUrl>https://github.com/dotlogix/DotLogixCore</RepositoryUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <RepositoryType>git</RepositoryType>
-        <Copyright>Copyright (c) 2018 DotLogix</Copyright>
-        <Version>2.3.29</Version>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <Configurations>Debug;Release;</Configurations>
+        <PackageId>DotLogix.WebServices.EntityFramework.Npgsql</PackageId>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Core\Core.csproj" />
-        <ProjectReference Include="..\WebServices.Core\WebServices.Core.csproj" />
-        <ProjectReference Include="..\WebServices.EntityFramework\WebServices.EntityFramework.csproj" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.6" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Trigrams" Version="5.0.6" />
+      <ProjectReference Include="..\..\Core\Core.Lambda\Core.Lambda.csproj" />
+      <ProjectReference Include="..\..\Core\Core\Core.csproj" />
+      <ProjectReference Include="..\WebServices.Core\WebServices.Core.csproj" />
+      <ProjectReference Include="..\WebServices.EntityFramework\WebServices.EntityFramework.csproj" />
     </ItemGroup>
-
-    <Target Name="CopyPackage" AfterTargets="Pack">
-        <ItemGroup>
-            <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
-            <AssemblyFiles Include="bin\$(Configuration)\**\*.*" Exclude="**\*.deps.json" />
-        </ItemGroup>
-        <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
-        <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\..\nuget\$(Configuration)" />
-    </Target>
 </Project>

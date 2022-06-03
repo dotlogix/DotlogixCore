@@ -1,0 +1,142 @@
+<#@ template language="C#" #>
+<#@ include file="Templates.Extensions.ttinclude" once="true"#>
+<#@ assembly name="System.Core" #>
+<#@ assembly Name="C:\Program Files\dotnet\sdk\6.0.101\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Core\Core.Lambda\bin\Release\netstandard2.0\DotLogix.Core.Lambda.dll" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Linq.Expressions" #>
+<#@ import namespace="DotLogix.Core.Expressions" #>
+<#+
+    public void WriteStaticMethod(MethodInfo method, bool asExtension = false, bool preserveExpressions = false)
+    {
+        var parameters = method.GetParameters();
+        if (preserveExpressions == false && parameters.Any(p => typeof(Expression).IsAssignableFrom(p.ParameterType)))
+        {
+            WriteStaticMethod(method, asExtension, true);
+            WriteLine();
+        }
+        
+        PushIndent();
+        WriteInheritSummary(method);
+        Write("public static Lambda<");
+        WriteGenericTypeName(method.ReturnType);
+        Write("> ");
+        Write(method.Name);
+
+        if(method.IsGenericMethod) {
+            Write("<");
+            WriteGenericArguments(method, false, "<", ">");
+            Write(">");
+        }
+        
+        Write("(");
+        if(asExtension && parameters.Length > 0) {
+            Write("this ");
+        }
+        WriteTransformParameters(method, p => ToLambdaParameter(p, preserveExpressions), true, false, "<", ">");
+        WriteLine(") {");
+        
+        PushIndent();
+        Write("return CallStatic(");
+        WriteGenericTypeName(method.ReflectedType);
+        Write(".");
+        Write(method.Name);
+        if(method.IsGenericMethod) {
+            Write("<");
+            WriteGenericArguments(method, false, "<", ">");
+            Write(">");
+        }
+        
+        if(parameters.Length > 0) {
+            Write(", ");
+            WriteJoin(", ", parameters.Select(p => {
+                                                  return preserveExpressions && typeof(Expression).IsAssignableFrom(p.ParameterType)
+                                                             ? $"Quote({p.Name})"
+                                                             : p.Name;
+                                              }));
+        }
+        
+        WriteLine(");");
+        PopIndent();
+        WriteLine("}");
+        PopIndent();
+    }
+    
+    public void WriteInstanceMethod(MethodInfo method, bool asExtension = false, bool preserveExpressions = false, string createDummyInstance = null)
+    {
+        var parameters = method.GetParameters();
+        if (preserveExpressions == false && parameters.Any(p => typeof(Expression).IsAssignableFrom(p.ParameterType)))
+        {
+            WriteStaticMethod(method, asExtension, true);
+            WriteLine();
+        }
+        
+        PushIndent();
+        WriteInheritSummary(method);
+        Write("public static ");
+        WriteGenericTypeName(typeof(Lambda<>).MakeGenericType(method.ReturnType));
+        Write(" ");
+        Write(method.Name);
+        
+        if(method.IsGenericMethod) {
+            Write("<");
+            WriteGenericArguments(method, false, "<", ">");
+            Write(">");
+        }
+        
+        Write("(");
+        if(asExtension) {
+            Write("this ");
+            WriteGenericTypeName(typeof(Lambda<>).MakeGenericType(method.ReflectedType));
+            Write(" instance");
+        }
+        if(parameters.Length > 0) {
+            Write(", ");
+            WriteTransformParameters(method, p => ToLambdaParameter(p, preserveExpressions), true, false, "<", ">");
+        }
+        WriteLine(") {");
+        
+        PushIndent();
+        Write("return Call(instance, ");
+
+        if(createDummyInstance != null) {
+            Write(createDummyInstance);
+        } else if(method.ReflectedType!.IsValueType) {
+            Write("default(");
+            WriteGenericTypeName(method.ReflectedType);
+            Write(")");
+        } else {
+            Write("new ");
+            WriteGenericTypeName(method.ReflectedType);
+            Write("()");
+        }
+        
+        Write(".");
+        Write(method.Name);
+        if(method.IsGenericMethod) {
+            Write("<");
+            WriteGenericArguments(method, false, "<", ">");
+            Write(">");
+        }
+        
+        if(parameters.Length > 0) {
+            Write(", ");
+            WriteJoin(", ", parameters.Select(p => {
+                                                  return preserveExpressions && typeof(Expression).IsAssignableFrom(p.ParameterType)
+                                                             ? $"Quote({p.Name})"
+                                                             : p.Name;
+                                              }));
+        }
+        
+        WriteLine(");");
+        PopIndent();
+        WriteLine("}");
+        PopIndent();
+    }
+
+    private Type ToLambdaParameter(Type parameterType, bool preserveExpressions) {
+        return preserveExpressions && typeof(Expression).IsAssignableFrom(parameterType)
+                   ? parameterType
+                   : typeof(Lambda<>).MakeGenericType(parameterType);
+    }
+#>

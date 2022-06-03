@@ -1,35 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-        <Company>DotLogix</Company>
-        <Product>DotLogix WebServices Authentication</Product>
-        <PackageId>DotLogix.WebServices.Authentication</PackageId>
-        <Authors>DotLogix</Authors>
+        <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>DotLogix.WebServices.Authentication</AssemblyName>
         <RootNamespace>DotLogix.WebServices.Authentication</RootNamespace>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <RepositoryUrl>https://github.com/dotlogix/DotLogixCore</RepositoryUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <RepositoryType>git</RepositoryType>
-        <Copyright>Copyright (c) 2018 DotLogix</Copyright>
-        <Version>2.3.29</Version>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <Configurations>Debug;Release;</Configurations>
+        <PackageId>DotLogix.WebServices.Authentication</PackageId>
         <OutputType>Library</OutputType>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
+    
     <ItemGroup>
-      <ProjectReference Include="..\..\Core\Core.csproj" />
-      <ProjectReference Include="..\WebServices.Core\WebServices.Core.csproj" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.17.0" />
     </ItemGroup>
-
-    <Target Name="CopyPackage" AfterTargets="Pack">
-        <ItemGroup>
-            <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
-            <AssemblyFiles Include="bin\$(Configuration)\**\*.*" Exclude="**\*.deps.json" />
-        </ItemGroup>
-        <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
-        <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\..\nuget\$(Configuration)" />
-    </Target>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\..\Core\Core\Core.csproj" />
+        <ProjectReference Include="..\WebServices.Core\WebServices.Core.csproj" />
+    </ItemGroup>
 </Project>

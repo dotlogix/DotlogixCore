@@ -17,7 +17,7 @@ namespace DotLogix.WebServices.AspCore.Services {
         where TResponse : class, IGuid, new() {
         protected ICacheProvider CacheProvider { get; }
 
-        public StaticDomainService(ICacheProvider cacheProvider, IGenericRepository<Guid, TEntity> repository)
+        public StaticDomainService(ICacheProvider cacheProvider, IRepository<Guid, TEntity> repository)
             : base(repository) {
             CacheProvider = cacheProvider;
         }

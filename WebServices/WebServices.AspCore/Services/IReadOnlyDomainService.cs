@@ -9,8 +9,8 @@ namespace DotLogix.WebServices.AspCore.Services {
         where TResponse : class, IGuid {
         #region Get
         public Task<TResponse> GetAsync(Guid guid);
-        public Task<ICollection<TResponse>> GetAllAsync();
         public Task<ICollection<TResponse>> GetRangeAsync(IEnumerable<Guid> guids);
+        public Task<ICollection<TResponse>> GetAllAsync();
         #endregion
     }
     

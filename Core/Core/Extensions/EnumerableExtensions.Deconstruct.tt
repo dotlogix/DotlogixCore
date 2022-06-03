@@ -1,0 +1,38 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly Name="C:\Program Files\dotnet\sdk\6.0.101\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Assemblies\Release\DotLogix.Core\netstandard2.0\DotLogix.Core.dll" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using DotLogix.Core.Extensions;
+
+namespace DotLogix.Core.Extensions {
+    public static partial class EnumerableExtensions {
+<#
+    for (var i = 1; i <= 10; i++)
+    {
+#>
+        public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1<#for(var j = 1; j < i; j++) {#>, out T item<#=j+1#><#}#>) {
+            using var enumerator = enumerable.GetEnumerator();
+<#
+            for(var j = 0; j < i; j++) {
+#>
+            item<#=j+1#> = EnsureNext(enumerator, <#=j+1#>, <#=i#>);
+<#
+            }
+#>
+        }
+<#
+    }
+#>
+        private static T EnsureNext<T>(IEnumerator<T> enumerator, int count, int required){
+            if(enumerator.MoveNext() == false) {
+                throw new IndexOutOfRangeException($"Can not deconstruct an enumerable with {count} elements to a tuple with {required} items");          
+            }
+            return enumerator.Current;
+        }
+    }
+}

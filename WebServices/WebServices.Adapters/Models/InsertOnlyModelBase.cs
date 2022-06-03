@@ -6,6 +6,7 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
+
 using DotLogix.Common.Features;
 
 namespace DotLogix.WebServices.Adapters.Models {

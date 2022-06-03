@@ -1,0 +1,71 @@
+<#@ template language="C#" #>
+<#@ include file="MethodTemplates.ttinclude" once="true"#>
+<#
+    var type = typeof(string);
+    var methods = type
+            .GetMethods(BindingFlags.Public|BindingFlags.Static|BindingFlags.Instance|BindingFlags.DeclaredOnly)
+            .Where(m => m.IsSpecialName == false && (m.IsStatic || m.Name != "Equals"))
+            .OrderBy(m => m.Name)
+            .ThenBy(m => m.GetGenericArguments().Length)
+            .ThenBy(m => m.GetParameters().Length);
+#>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+
+namespace DotLogix.Core.Expressions {
+    [SuppressMessage("ReSharper", "RedundantTypeArgumentsOfMethod")]
+    public static partial class Lambdas {
+        private const string DummyInstance = "";
+<#
+    var blacklist = new HashSet<string> {
+        nameof(string.Clone),
+        nameof(string.Copy),
+        nameof(string.Compare),
+        nameof(string.CompareOrdinal),
+        nameof(string.CompareTo),
+        nameof(string.ToString),
+        nameof(string.GetHashCode),
+        nameof(string.GetType),
+        nameof(string.GetTypeCode),
+        nameof(string.GetEnumerator),
+        nameof(string.Insert),
+        nameof(string.Intern),
+        nameof(string.IsInterned),
+        nameof(string.IsNormalized),
+        nameof(string.Normalize),
+        nameof(string.ToLowerInvariant),
+        nameof(string.ToUpperInvariant),
+        nameof(string.LastIndexOfAny),
+        nameof(string.IndexOfAny),
+        nameof(string.ToCharArray)
+    };
+    PushIndent();
+    foreach (var method in methods) {
+        if(blacklist.Contains(method.Name))
+            continue;
+        
+        if(method.ReturnType == typeof(void))
+            continue;
+
+        var usesObjectParams = method.GetParameters().Any(p => p.ParameterType == typeof(object) || p.ParameterType == typeof(object[]));
+        if(usesObjectParams) {
+            continue;
+        }
+        
+        if(method.IsStatic) {
+            WriteStaticMethod(method, true);
+        } else {
+            
+            WriteInstanceMethod(method, true, createDummyInstance: "DummyInstance");
+        }
+        WriteLine();
+    }
+    PopIndent();
+#>
+    }
+}

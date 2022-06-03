@@ -1,18 +1,42 @@
-image: mcr.microsoft.com/dotnet/core/sdk:3.1
+image: microsoft/dotnet:latest
 
 stages:
     - build
     - test
+    - deploy
 
 variables:
     solution: "Core.sln"
     configuration: "Release"
     version: "1.0.0"
 
-build:
+build-job:
     stage: build
+    script:
+        - echo "Restore solution ..."
+        - "dotnet restore $solution -c $configuration"
+        - echo "Building solution ..."
+        - "dotnet build $solution -c $configuration -p:Version=$version -p:GeneratePackageOnBuild='false' --no-restore"
+        - echo "Creating nuget packages ..."        
+        - "dotnet pack $solution -c $configuration -p:Version=$version --no-build"
+    artifacts:
+        paths:
+        - assemblies
+        - nuget
+
+unit-test-job:
+    stage: test
+    script:
+        - echo "Executing unit tests ..."
+        - "dotnet test $solution"
     artifacts:
         paths:
         - nuget
+
+publish-job:
+    stage: deploy
     script:
-        - "dotnet build $solution -c $configuration -p:Version=$version"
+        - echo "Publishing nuget packages ..."
+    artifacts:
+        paths:
+        - nuget

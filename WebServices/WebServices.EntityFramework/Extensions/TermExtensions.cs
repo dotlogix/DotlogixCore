@@ -9,38 +9,39 @@ using DotLogix.WebServices.Core.Terms;
 namespace DotLogix.WebServices.EntityFramework.Extensions {
     public static class TermExtensions {
         private static readonly IReadOnlyCollection<MethodInfo> Methods = typeof(TermExtensions).GetRuntimeMethods().AsReadOnlyCollection();
-    
+
+        public static ManyTerm<T> ToManyTerm<T>(this IEnumerable<T> values) => new(values);
+
         public static bool Matches(this SearchTerm term, string value) {
-            var pattern = term.Pattern;
+            IEnumerable<string> patterns = term.Pattern;
             var comparison = term.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             switch(term.Mode) {
                 case SearchTermMode.Equals: {
-                    return string.Equals(value, pattern, comparison);
+                    return patterns.Any(pattern => string.Equals(value, pattern, comparison));
                 }
                 case SearchTermMode.StartsWith: {
-                    return value.StartsWith(pattern, comparison);
+                    return patterns.Any(pattern => value.StartsWith(pattern, comparison));
                 }
                 case SearchTermMode.Contains: {
-                    return value.IndexOf(pattern, comparison) >= 0;
+                    return patterns.Any(pattern => value.IndexOf(pattern, comparison) >= 0);
                 }
                 case SearchTermMode.EndsWith: {
-                    return value.EndsWith(pattern, comparison);
+                    return patterns.Any(pattern => value.EndsWith(pattern, comparison));
                 }
                 case SearchTermMode.Fuzzy: {
-                    var distance = value.GetLevenshteinDistance(value);
+                    var distance = patterns.Min(value.GetLevenshteinDistance);
                     return distance < (1 - term.FuzzyThreshold);
                 }
                 case SearchTermMode.Like: {
-                    pattern = "^" + pattern.Replace("%", ".*").Replace("_", ".") + "$";
+                    patterns = patterns.Select(pattern => "^" + pattern.Replace("%", ".*").Replace("_", ".") + "$");
                     goto case SearchTermMode.Regex;
                 }
                 case SearchTermMode.Wildcard: {
-                    pattern = "^" + pattern.Replace("*", ".*").Replace("_", ".") + "$";
+                    patterns = patterns.Select(pattern => "^" + pattern.Replace("*", ".*").Replace("_", ".") + "$");
                     goto case SearchTermMode.Regex;
                 }
                 case SearchTermMode.Regex: {
-                    var regex = new Regex(pattern, term.IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
-                    return regex.IsMatch(value);
+                    return patterns.Any(pattern => Regex.IsMatch(value, pattern, term.IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
                 }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(term.Mode), "The provided filter type is not supported");
@@ -54,25 +55,22 @@ namespace DotLogix.WebServices.EntityFramework.Extensions {
         }
         
         public static bool Matches<T>(this ManyTerm<T> term, T value) {
-            switch(term.Count) {
-                case 0:
-                    return true;
-                case 1:
-                    return Equals(term.Values[0], value);
-                default:
-                    return term.Values.Contains(value);
-            }
+            return term.Count switch {
+                0 => true,
+                1 => Equals(term.Values[0], value),
+                _ => term.Values.Contains(value)
+            };
         }
 
         public static MethodInfo GetTermMethodInfo(Type expectedTermType) {
             return Methods
                .FirstOrDefault(m => {
-                                   var termType = m.GetParameters().FirstOrDefault()?.ParameterType;
-                                   return expectedTermType.IsGenericTypeDefinition
-                                              ? termType.IsAssignableToGeneric(expectedTermType)
-                                              : termType.IsAssignableTo(expectedTermType);
-                               }
-                              );
+                        var termType = m.GetParameters().FirstOrDefault()?.ParameterType;
+                        return expectedTermType.IsGenericTypeDefinition
+                            ? termType.IsAssignableToGeneric(expectedTermType)
+                            : termType.IsAssignableTo(expectedTermType);
+                    }
+                );
         }
     }
 }

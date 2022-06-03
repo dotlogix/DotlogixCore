@@ -1,0 +1,76 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly Name="C:\Program Files\dotnet\sdk\6.0.101\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Assemblies\Debug\DotLogix.Core\netstandard2.0\DotLogix.Core.dll" #>
+<#@ import namespace="System.Linq" #>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using DotLogix.Core.Expressions;
+
+namespace DotLogix.Core.Expressions {
+    public static partial class Lambdas {
+        public static Lambda<TResult> Invoke<TResult>(LambdaExpression expression, params Lambda[] args) {
+            return Invoke(expression, args.AsEnumerable()).Body;
+        }
+
+        public static Lambda<TResult> Invoke<TResult>(LambdaExpression expression, IEnumerable<Lambda> args) {
+            return Invoke(expression, args).Body;
+        }
+
+        public static Lambda Invoke(LambdaExpression expression, params Lambda[] args) {
+            return Invoke(expression, args.AsEnumerable());
+        }
+
+        public static Lambda Invoke(LambdaExpression expression, IEnumerable<Lambda> args) {
+            var rewriter = new RewritingExpressionVisitor();
+            var parameters = expression.Parameters;
+            var idx = 0;
+            foreach(var arg in args) {
+                var parameter = parameters[idx];
+                var argument = arg.Cast(parameter.Type);
+                rewriter.RewriteParameter(parameter, argument.Body);
+                idx++;
+            }
+
+            if(idx < parameters.Count) {
+                throw new ArgumentException($"Not enough parameters. Expected {parameters.Count}, but got {idx}");
+            }
+
+            return rewriter.Visit(expression.Body);
+        }
+
+<#
+    for (var i = 0; i <= 10; i++)
+    {
+        var range = Enumerable.Range(1, i).ToList();
+        var genericNames = string.Join(", ", range.Select(r => $"T{r}").Append("TResult"));
+        var paramNames = string.Join(", ", range.Select(r => $"Lambda<T{r}> arg{r}"));
+        var argNames = string.Join(", ", range.Select(r => $"arg{r}"));
+#>
+        public static Lambda<TResult> Invoke<<#=genericNames#>>(Expression<Func<<#=genericNames#>>> expression<#=paramNames.Length > 0 ? ", "+ paramNames : ""#>) {
+            return Invoke<TResult>((LambdaExpression)expression<#=argNames.Length > 0 ? ", "+argNames : ""#>);
+        }
+
+<#
+    }
+
+    for (var i = 1; i <= 10; i++)
+    {
+        var range = Enumerable.Range(1, i).ToList();
+        var genericNames = string.Join(", ", range.Select(r => $"T{r}").Append("TResult"));
+        var paramNames = string.Join(", ", range.Skip(1).Select(r => $"Lambda<T{r}> arg{r}"));
+        var argNames = string.Join(", ", range.Select(r => $"arg{r}"));
+#>
+        public static Lambda<TResult> Invoke<<#=genericNames#>>(this Lambda<T1> arg1, Expression<Func<<#=genericNames#>>> expression<#=paramNames.Length > 0 ? ", "+ paramNames : ""#>) {
+            return Invoke<TResult>((LambdaExpression)expression<#=argNames.Length > 0 ? ", "+argNames : ""#>);
+        }
+
+<#
+    }
+
+#>
+    }
+}

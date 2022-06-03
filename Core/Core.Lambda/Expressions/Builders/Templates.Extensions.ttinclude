@@ -1,0 +1,260 @@
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Reflection" #>
+<#+
+    private static readonly string Indent = new(' ', 4);
+    private static readonly Dictionary<Type, string> PrimitiveTypeNames = new() {
+        {typeof(byte), "byte"},
+        {typeof(sbyte), "sbyte"},
+        {typeof(short), "short"},
+        {typeof(ushort), "ushort"},
+        {typeof(int), "int"},
+        {typeof(uint), "uint"},
+        {typeof(long), "long"},
+        {typeof(ulong), "ulong"},
+        {typeof(float), "float"},
+        {typeof(double), "double"},
+        {typeof(decimal), "decimal"},
+        {typeof(bool), "bool"},
+        {typeof(char), "char"},
+            
+        {typeof(byte?), "byte?"},
+        {typeof(sbyte?), "sbyte?"},
+        {typeof(short?), "short?"},
+        {typeof(ushort?), "ushort?"},
+        {typeof(int?), "int?"},
+        {typeof(uint?), "uint?"},
+        {typeof(long?), "long?"},
+        {typeof(ulong?), "ulong?"},
+        {typeof(float?), "float?"},
+        {typeof(double?), "double?"},
+        {typeof(decimal?), "decimal?"},
+        {typeof(bool?), "bool?"},
+        {typeof(char?), "char?"},
+        
+        {typeof(object), "object"},
+        {typeof(string), "string"},
+        {typeof(void), "void"}
+    };
+
+    /// <summary>
+    ///     Appends an additional 4 space indent to the current one
+    /// </summary>
+    public void PushIndent() {
+        PushIndent(Indent);
+    }
+
+    /// <summary>
+    ///     Writes a line end character
+    /// </summary>
+    public void WriteLine() {
+        WriteLine("");
+    }
+    
+    /// <summary>
+    ///     Appends some values to a t4 template and places a separator between each item
+    /// </summary>
+    public void WriteJoin<T>(string separator, IEnumerable<T> values) {
+        if(values == null) {
+            throw new ArgumentNullException(nameof(values));
+        }
+
+        separator ??= string.Empty;
+        using var enumerator = values.GetEnumerator();
+
+        if(!enumerator.MoveNext()) {
+            return;
+        }
+
+        if(enumerator.Current != null) {
+            Write(enumerator.Current.ToString());
+        }
+
+        while(enumerator.MoveNext()) {
+            Write(separator);
+            if(enumerator.Current != null) {
+                Write(enumerator.Current.ToString());
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Appends multiple copies of a string segment to a t4 template
+    /// </summary>
+    public void Write(string segment, int repeat) {
+        if(segment == null || repeat <= 0) {
+            return;
+        }
+        
+        for(var i = 0; i < repeat; i++) {
+            Write(segment);
+        }
+    }
+
+    /// <summary>
+    ///     Appends a part of a string to the t4 template
+    /// </summary>
+    public void WriteSubstring(string value, int startIndex) {
+        Write(value.Substring(startIndex));
+    }
+
+    /// <summary>
+    ///     Appends a part of a string to the t4 template
+    /// </summary>
+    public void WriteSubstring(string value, int startIndex, int count) {
+        Write(value.Substring(startIndex, count));
+    }
+    
+    /// <summary>
+    ///     Appends an inherit doc summary for the provided type
+    /// </summary>
+    public void WriteInheritSummary(Type type) {
+        Write("/// <inheritdoc cref=\"");
+        WriteGenericTypeName(type, false, "{", "}");
+        WriteLine("\"/>");
+    }
+    
+    /// <summary>
+    ///     Appends an inherit doc summary for the provided method
+    /// </summary>
+    public void WriteInheritSummary(MethodInfo methodInfo) {
+        Write("/// <inheritdoc cref=\"");
+        WriteGenericTypeName(methodInfo.ReflectedType, true, "{", "}");
+        Write(".");
+        Write(methodInfo.Name);
+        if(methodInfo.IsGenericMethod) {
+            Write("{");
+            WriteGenericArguments(methodInfo, false, "{", "}");
+            Write("}");
+        }
+        Write("(");
+        WriteParameters(methodInfo, false, true, "{", "}");
+        Write(")");
+        WriteLine("\"/>");
+    }
+
+    private void WriteGenericArguments(MethodInfo methodInfo, bool includeNamespace, string enclosureStart, string enclosureEnd) {
+        var genericArguments = methodInfo.GetGenericArguments();
+        if(genericArguments.Length == 0)
+            return;
+        
+        WriteGenericTypeName(genericArguments[0], includeNamespace, enclosureStart, enclosureEnd);
+        for(var i = 1; i < genericArguments.Length; i++) {
+            Write(", ");
+            WriteGenericTypeName(genericArguments[i], includeNamespace, enclosureStart, enclosureEnd);
+        }
+    }
+    private void WriteGenericArguments(Type type, bool includeNamespace, string enclosureStart, string enclosureEnd) {
+        var genericArguments = type.GetGenericArguments();
+        if(genericArguments.Length == 0)
+            return;
+
+        WriteGenericTypeName(genericArguments[0], includeNamespace, enclosureStart, enclosureEnd);
+        for(var i = 1; i < genericArguments.Length; i++) {
+            Write(", ");
+            WriteGenericTypeName(genericArguments[i], includeNamespace, enclosureStart, enclosureEnd);
+        }
+    }
+    private void WriteParameters(MethodInfo methodInfo, bool includeNames, bool includeNamespace, string enclosureStart, string enclosureEnd) {
+        var parameters = methodInfo.GetParameters();
+        if(parameters.Length == 0)
+            return;
+        
+        WriteGenericTypeName(parameters[0].ParameterType, includeNamespace, enclosureStart, enclosureEnd);
+        if(includeNames) {
+            Write(" ");
+            Write(parameters[0].Name);
+        }
+        
+        for(var i = 1; i < parameters.Length; i++) {
+            Write(", ");
+            WriteGenericTypeName(parameters[i].ParameterType, includeNamespace, enclosureStart, enclosureEnd);
+            if(includeNames) {
+                Write(" ");
+                Write(parameters[i].Name);
+            }
+        }
+    }
+    private void WriteTransformParameters(MethodInfo methodInfo, Func<Type, Type> transformParameter, bool includeNames, bool includeNamespace, string enclosureStart, string enclosureEnd) {
+        var parameters = methodInfo.GetParameters();
+        if(parameters.Length == 0)
+            return;
+        
+        WriteGenericTypeName(transformParameter.Invoke(parameters[0].ParameterType), includeNamespace, enclosureStart, enclosureEnd);
+        if(includeNames) {
+            Write(" ");
+            Write(parameters[0].Name);
+        }
+        
+        for(var i = 1; i < parameters.Length; i++) {
+            Write(", ");
+            WriteGenericTypeName(transformParameter.Invoke(parameters[i].ParameterType), includeNamespace, enclosureStart, enclosureEnd);
+            if(includeNames) {
+                Write(" ");
+                Write(parameters[i].Name);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Appends an inherit doc summary for the provided method
+    /// </summary>
+    public void WriteInheritSummary(MemberInfo memberInfo) {
+        Write("/// <inheritdoc cref=\"");
+        WriteGenericTypeName(memberInfo.ReflectedType, false, "{", "}");
+        Write(".");
+        Write(memberInfo.Name);
+        WriteLine("\"/>");
+    }
+    
+    /// <summary>
+    ///     Writes the generic type name
+    /// </summary>
+    public void WriteGenericTypeName(Type type) {
+        WriteGenericTypeName(type, false, "<", ">");
+    }
+    
+    /// <summary>
+    ///     Writes the generic type name
+    /// </summary>
+    public void WriteGenericTypeName(Type type, bool includeNamespace, string enclosureStart, string enclosureEnd) {
+        if(type == null) {
+            return;
+        }
+            
+        if(type.IsGenericParameter) {
+            Write(type.Name);
+            return;
+        }
+
+        if(PrimitiveTypeNames.TryGetValue(type, out var typeName)) {
+            Write(typeName);
+            return;
+        }
+        
+        typeName = type.Name;
+        if(type.IsGenericType == false) {
+            if(includeNamespace) {
+                Write(type.Namespace);
+                Write(".");
+            }
+            Write(typeName);
+            return;
+        }
+        
+        if(type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+            WriteGenericTypeName(type.GetGenericArguments()[0], includeNamespace, enclosureStart, enclosureEnd);
+            Write("?");
+            return;
+        }
+        
+        if(includeNamespace) {
+            Write(type.Namespace);
+            Write(".");
+        }
+        
+        Write(typeName.Substring(0, typeName.IndexOf('`')));
+        Write(enclosureStart);
+        WriteGenericArguments(type, includeNamespace, enclosureStart, enclosureEnd);
+        Write(enclosureEnd);
+    }
+#>

@@ -1,0 +1,32 @@
+<#@ template language="C#" #>
+<#@ include file="MethodTemplates.ttinclude" once="true"#>
+<#@ import namespace="DotLogix.Core.Expressions" #>
+<#
+    var type = typeof(Enumerable);
+    var methods = type
+            .GetMethods(BindingFlags.Public|BindingFlags.Static)
+            .Where(m => m.Name != "ToHashSet")
+            .OrderBy(m => m.Name)
+            .ThenBy(m => m.GetGenericArguments().Length)
+            .ThenBy(m => m.GetParameters().Length);
+#>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
+namespace DotLogix.Core.Expressions {
+    [SuppressMessage("ReSharper", "RedundantTypeArgumentsOfMethod")]
+    public static partial class Lambdas {
+<#
+    PushIndent();
+    foreach (var method in methods)
+    {
+        WriteStaticMethod(method, true);
+        WriteLine();
+    }
+    PopIndent();
+#>
+    }
+}

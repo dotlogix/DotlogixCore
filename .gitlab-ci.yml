@@ -1,7 +1,6 @@
 image: mcr.microsoft.com/dotnet/sdk:latest
 
 variables:
-  VERSION: "1.0.0"
   CONFIGURATION: "Release"
   SOLUTION_NAME: "Core.sln"
   OBJECTS_PATH: '**/obj'
@@ -27,9 +26,9 @@ dotnet-build:
     stage: build
     script:
         - echo "Restoring nuget packages for solution $SOLUTION_NAME ..."
-        - 'dotnet restore $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION -p:Version=$VERSION --packages $NUGET_DEPENDENCIES_PATH'
+        - 'dotnet restore $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION --packages $NUGET_DEPENDENCIES_PATH'
         - echo "Building solution $SOLUTION_NAME ..."
-        - "dotnet build $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION -p:Version=$VERSION -p:GeneratePackageOnBuild='false' --no-restore"
+        - "dotnet build $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION -p:GeneratePackageOnBuild='false' --no-restore"
     artifacts:
         expire_in: 1h
         paths:
@@ -42,7 +41,7 @@ dotnet-pack:
     needs: [dotnet-build]
     script:
         - echo "Creating nuget packages for solution $SOLUTION_NAME ..."
-        - "dotnet pack $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION -p:Version=$VERSION --no-build"
+        - "dotnet pack $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION --no-build"
     artifacts:
         expire_in: 1h
         paths:
@@ -55,7 +54,7 @@ dotnet-test:
     needs: [dotnet-build]
     script:
         - echo "Executing tests of solution $SOLUTION_NAME ..."
-        - "dotnet test $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION -p:Version=$VERSION --no-build"
+        - "dotnet test $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION --no-build"
     dependencies:
         - dotnet-build
 

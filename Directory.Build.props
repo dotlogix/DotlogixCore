@@ -21,8 +21,6 @@
       <AssemblyFiles Include="bin/$(Configuration)/**/$(TargetName).*" Exclude="**/*.deps.json;**/*.nupkg;**/*Tests*" />
     </ItemGroup>
 	<Message Importance="High" Text="Copy assemblies to $(SolutionDir)assemblies/$(Configuration)" />
-	<Message Importance="High" Text="TargetName = $(TargetName)" />
-	<Message Importance="High" Text="Files = @(AssemblyFiles)" />
     <Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="$(SolutionDir)assemblies/$(Configuration)" />
   </Target>  
 

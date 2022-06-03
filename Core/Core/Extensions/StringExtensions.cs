@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using DotLogix.Core.Types;
 using DotLogix.Core.Utils;
 #endregion
@@ -820,68 +821,32 @@ namespace DotLogix.Core.Extensions {
 
             return value.Substring(0, idx);
         }
-        
+
         public static IEnumerable<string> ExtractNGrams(this string source, int n = 3) {
-                const int nWordStart = 2;
-                const int nWordEnd = 2;
-                var chars = source.ToCharArray();
-                var words = new List<ArraySegment<char>>();
-                
-                var startIndex = 0;
-                for(var i = 0; i < chars.Length; i++) {
-                    var chr = chars[i];
-                    if(char.IsLetter(chr)) {
-                        continue;
-                    }
-
-                    if(startIndex < i) {
-                        var segment = new ArraySegment<char>(chars, startIndex, i - startIndex);
-                        words.Add(segment);
-                    }
-                    startIndex = i + 1;
-                }
-                
-                if(startIndex < chars.Length) {
-                    var segment = new ArraySegment<char>(chars, startIndex, chars.Length - startIndex);
-                    words.Add(segment);
-                }
-
-                var sb = new StringBuilder(n * 3 + 2);
-                for(var i = 0; i < words.Count; i++) {
-                    var word = words[i];
-
-                    sb.Clear();
-                    sb.EnsureCapacity(nWordStart + word.Count + nWordEnd);
+            var sb = new StringBuilder();
+            var seekWord = true;
+            var remaining = 0;
+            for(var i = 0; i < source.Length; i++) {
+                var chr = source[i];
+                if(chr.LaysBetween('0', '9') || chr.LaysBetween('a', 'z') || chr.LaysBetween('A', 'Z')) {
+                    seekWord = false;
+                    remaining++;
+                    sb.Append(chr);
                     
-                    sb.Append(' ', nWordStart);
-                    Append(sb, word);
+                    while(remaining >= n) {
+                        yield return sb.ToString(sb.Length - remaining, n);
+                        remaining--;
+                    }
+                } else if(seekWord == false) {
                     sb.Append(' ');
-
-                    var nextCharCount = 0;
-                    if(i < words.Count - 1) {
-                        var next = words[i + 1];
-                        nextCharCount = Math.Min(nWordEnd, next.Count);
-                        Append(sb, next, 0, nextCharCount);
-                    }
-
-                    for(var j = 0; j < sb.Length - n; j++) {
-                        var str = sb.ToString(j, n);
-                        yield return str;
-                    }
-
-                    sb.Replace(' ', sb.Length - nWordEnd, nextCharCount);
-                    if(nWordEnd > nextCharCount) {
-                        sb.Append(' ', nWordEnd - nextCharCount);
-                    }
-                    
-                    for(var j = 0; j < nWordEnd; j++) {
-                        var str = sb.ToString(sb.Length - n - j, n);
-                        yield return str;
-                    }
+                    seekWord = true;
+                    remaining++;
+                    sb.Remove(0, sb.Length - remaining);
                 }
             }
-        
-        
+        }
+
+
         /// <summary>
         ///     Extracts word parts (A-Za-z0-9) out of a provided value
         /// </summary>

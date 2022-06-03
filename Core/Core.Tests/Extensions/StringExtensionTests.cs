@@ -6,29 +6,21 @@ namespace CoreTests.Extensions {
     [TestFixture]
     public class StringExtensionTests {
         [Test]
-        public void GetTrigramDistance() {
-            var testString = "chateau  blanc";
-            var expected = new HashSet<string> {"  c", " ch", "cha", "hat", "ate", "tea", "eau", "au ", "u  ", "  b"," bl","bla", "lan", "anc", "nc "};
+        public void GetTrigramDistance_ChateauBlanc() {
+            const string testString = "chateau blanc";
+            var expected = new HashSet<string> {"cha", "hat", "ate", "tea", "eau", "au ", "u b"," bl","bla", "lan", "anc"};
             var actual = testString.ExtractNGrams();
             
             Assert.That(actual, Is.EquivalentTo(expected));
-//            
-//            
-//            
-//            
-//            
-//            var trigramStr2 = str2.ExtractNGrams();
-//            
-//            
-//            
-//            var hammingDistance = str1.GetHammingDistance(str2 + " ");
-//            var levenshteinDistance = str1.GetLevenshteinDistance(str2);
-//            var damerauLevenshteinDistance = str1.GetDamerauLevenshteinDistance(str2);
-//            
-//            Assert.True(true);
+        }
+        
+        [Test]
+        public void GetTrigramDistance_TheQuickRedFox() {
+            const string testString = "the quick red fox";
+            var expected = new HashSet<string> {"the", "he ", "e q", " qu", "qui", "uic", "ick", "ck ", "k r", " re", "red", "ed ", "d f", " fo", "fox"};
+            var actual = testString.ExtractNGrams();
             
-            
-            
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
     }
 }

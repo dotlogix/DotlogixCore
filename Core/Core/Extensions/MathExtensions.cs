@@ -159,7 +159,7 @@ namespace DotLogix.Core.Extensions {
         }
         #endregion
 
-        private static uint[] PowersOf10 = {
+        private static readonly uint[] PowersOf10 = {
             1,
             10,
             100,
@@ -172,7 +172,7 @@ namespace DotLogix.Core.Extensions {
             1000000000
         };
 
-        private static ulong[] PowersOf10L = {
+        private static readonly ulong[] PowersOf10L = {
             1,
             10,
             100,
@@ -264,21 +264,14 @@ namespace DotLogix.Core.Extensions {
                     if (value < PowersOf10L[i])
                         return i;
                 }
-            }
-            else
-            {
-                for (var i = 0; i < 10; i++) {
-                    if (value <= PowersOf10L[i])
-                        return i;
-                }
+                return PowersOf10L.Length;
             }
 
-
-            return PowersOf10L.Length;
-            //var index = Array.BinarySearch(PowersOf10L, 0, PowersOf10L.Length, value);
-            //if (index < 0)
-            //    return ~index;
-            //return index + 1;
+            for (var i = 0; i < 10; i++) {
+                if (value < PowersOf10L[i])
+                    return i;
+            }
+            return 10;
         }
 
 

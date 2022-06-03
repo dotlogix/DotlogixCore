@@ -1,57 +1,70 @@
 image: mcr.microsoft.com/dotnet/sdk:latest
 
+variables:
+  VERSION: "1.0.0"
+  CONFIGURATION: "Release"
+  SOLUTION_NAME: "Core.sln"
+  OBJECTS_PATH: '**/obj'
+  BINARIES_PATH: '**/bin'
+  ASSEMBLIES_PATH: 'assemblies/**'
+  NUGET_PACKAGES_PATH: 'nuget/**'
+  NUGET_DEPENDENCIES_PATH: '.nuget'
+
+cache:
+  key: "$CI_JOB_STAGE-$CI_COMMIT_REF_SLUG"
+  paths:
+    - '$OBJECTS_PATH/project.assets.json'
+    - '$OBJECTS_PATH/*.csproj.nuget.*'
+    - '$NUGET_DEPENDENCIES_PATH'
+  policy: pull-push
+
 stages:
     - build
     - test
     - deploy
 
-variables:
-    solution: "Core.sln"
-    configuration: "Release"
-    version: "1.0.0"
-
-dotnet-restore:
-    stage: build
-    script:
-        - echo "Restore solution ..."
-        - "dotnet restore $solution -p:Configuration=$configuration"
-    artifacts:
-        paths:
-        - packages
-
 dotnet-build:
     stage: build
-    needs: [dotnet-restore]
     script:
-        - echo "Building solution ..."
-        - "dotnet build $solution -p:Configuration=$configuration -p:Version=$version -p:GeneratePackageOnBuild='false' --no-restore"
+        - echo "Restoring nuget packages for solution $SOLUTION_NAME ..."
+        - 'dotnet restore $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION -p:Version=$VERSION --packages $NUGET_DEPENDENCIES_PATH'
+        - echo "Building solution $SOLUTION_NAME ..."
+        - "dotnet build $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION -p:Version=$VERSION -p:GeneratePackageOnBuild='false' --no-restore"
     artifacts:
+        expire_in: 1h
         paths:
-        - "**/bin/"
-        - assemblies
+        - $OBJECTS_PATH
+        - $BINARIES_PATH
+        - $ASSEMBLIES_PATH
+
+dotnet-pack:
+    stage: build
+    needs: [dotnet-build]
+    script:
+        - echo "Creating nuget packages for solution $SOLUTION_NAME ..."
+        - "dotnet pack $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION -p:Version=$VERSION --no-build"
+    artifacts:
+        expire_in: 1h
+        paths:
+        - $NUGET_PACKAGES_PATH
+    dependencies:
+        - dotnet-build
 
 dotnet-test:
     stage: test
     needs: [dotnet-build]
     script:
-        - echo "Executing unit tests ..."
-        - "dotnet test $solution -p:Configuration=$configuration -p:Version=$version --no-build"
-
-
-dotnet-pack:
-    stage: deploy
-    needs: [dotnet-build]
-    script:
-        - echo "Creating nuget packages ..."
-        - "dotnet pack $solution -p:Configuration=$configuration -p:Version=$version --no-build"
-    artifacts:
-        paths:
-        - nuget
+        - echo "Executing tests of solution $SOLUTION_NAME ..."
+        - "dotnet test $SOLUTION_NAME -p:CONFIGURATION=$CONFIGURATION -p:Version=$VERSION --no-build"
+    dependencies:
+        - dotnet-build
 
 nuget-publish:
     stage: deploy
-    needs: [dotnet-pack]
+    needs: [dotnet-pack, dotnet-test]
     script:
-        - echo "Publishing nuget packages ..."
+        - echo "Publishing nuget packages for solution $SOLUTION_NAME ..."
         - dotnet nuget add source "${CI_API_V4_URL}/projects/5/packages/nuget/index.json" --name gitlab --username gitlab-ci-token --password $CI_JOB_TOKEN --store-password-in-clear-text
-        - dotnet nuget push "nuget/*.nupkg" --source gitlab
+        - dotnet nuget push "$NUGET_PACKAGES_PATH/*.nupkg" --source gitlab
+    dependencies:
+        - dotnet-pack

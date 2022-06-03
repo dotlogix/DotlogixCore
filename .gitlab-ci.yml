@@ -10,31 +10,48 @@ variables:
     configuration: "Release"
     version: "1.0.0"
 
-build-job:
+dotnet-restore:
     stage: build
     script:
         - echo "Restore solution ..."
         - "dotnet restore $solution -p:Configuration=$configuration"
+    artifacts:
+        paths:
+        - packages
+
+dotnet-build:
+    stage: build
+    needs: [dotnet-restore]
+    script:
         - echo "Building solution ..."
         - "dotnet build $solution -p:Configuration=$configuration -p:Version=$version -p:GeneratePackageOnBuild='false' --no-restore"
+    artifacts:
+        paths:
+        - "**/bin/"
+        - assemblies
+
+dotnet-test:
+    stage: test
+    needs: [dotnet-build]
+    script:
+        - echo "Executing unit tests ..."
+        - "dotnet test $solution -p:Configuration=$configuration -p:Version=$version --no-build"
+
+
+dotnet-pack:
+    stage: deploy
+    needs: [dotnet-build]
+    script:
         - echo "Creating nuget packages ..."
         - "dotnet pack $solution -p:Configuration=$configuration -p:Version=$version --no-build"
     artifacts:
         paths:
-        - assemblies
         - nuget
 
-unit-test-job:
-    stage: test
-    script:
-        - echo "Executing unit tests ..."
-        - "dotnet test $solution"
-
-publish-job:
+nuget-publish:
     stage: deploy
+    needs: [dotnet-pack]
     script:
         - echo "Publishing nuget packages ..."
         - dotnet nuget add source "${CI_API_V4_URL}/projects/5/packages/nuget/index.json" --name gitlab --username gitlab-ci-token --password $CI_JOB_TOKEN --store-password-in-clear-text
         - dotnet nuget push "nuget/*.nupkg" --source gitlab
-    
-        

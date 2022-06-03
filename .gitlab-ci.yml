@@ -34,3 +34,7 @@ publish-job:
     stage: deploy
     script:
         - echo "Publishing nuget packages ..."
+        - dotnet nuget add source "${CI_API_V4_URL}/projects/5/packages/nuget/index.json" --name gitlab --username gitlab-ci-token --password $CI_JOB_TOKEN --store-password-in-clear-text
+        - dotnet nuget push "nuget/*.nupkg" --source gitlab
+    
+        

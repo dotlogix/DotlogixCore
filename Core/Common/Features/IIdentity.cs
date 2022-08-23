@@ -9,14 +9,14 @@
 #region
 #endregion
 
-namespace DotLogix.Common.Features {
+namespace DotLogix.Common.Features; 
+
+/// <summary>
+///     An interface to force an id
+/// </summary>
+public interface IIdentity {
     /// <summary>
-    ///     An interface to force an id
+    ///     The id
     /// </summary>
-    public interface IIdentity {
-        /// <summary>
-        ///     The id
-        /// </summary>
-        int Id { get; set; }
-    }
+    int Id { get; set; }
 }

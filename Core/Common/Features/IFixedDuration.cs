@@ -10,14 +10,14 @@
 using System;
 #endregion
 
-namespace DotLogix.Common.Features {
+namespace DotLogix.Common.Features; 
+
+/// <summary>
+///     An interface to represent durations
+/// </summary>
+public interface IFixedDuration : IDuration {
     /// <summary>
-    ///     An interface to represent durations
+    ///     The end of the duration in universal time
     /// </summary>
-    public interface IFixedDuration : IDuration {
-        /// <summary>
-        ///     The end of the duration in universal time
-        /// </summary>
-        new DateTime UntilUtc { get; set; }
-    }
+    new DateTime UntilUtc { get; set; }
 }

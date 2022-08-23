@@ -1,15 +1,15 @@
 ﻿using NUnit.Framework;
 
-namespace Core.Tests {
-    [TestFixture]
-    public abstract class SimpleTest {
-        [SetUp]
-        public void Setup() {
-        }
+namespace Core.Tests; 
 
-        [Test]
-        public void TestMethod() {
+[TestFixture]
+public abstract class SimpleTest {
+    [SetUp]
+    public void Setup() {
+    }
+
+    [Test]
+    public void TestMethod() {
             
-        }
     }
 }

@@ -1,21 +1,21 @@
 ﻿using DotLogix.Core.Reflection.Dynamics;
 
-namespace DotLogix.Core.Utils.Mappers {
+namespace DotLogix.Core.Utils.Mappers; 
+
+/// <inheritdoc />
+public class PropertyValueSetter<TTarget, TValue> : ValueSetterBase<TTarget, TValue> {
+    public DynamicAccessor Accessor { get; }
+
     /// <inheritdoc />
-    public class PropertyValueSetter<TTarget, TValue> : ValueSetterBase<TTarget, TValue> {
-        public DynamicAccessor Accessor { get; }
+    public PropertyValueSetter(DynamicAccessor accessor) : base(accessor.ReflectedType, accessor.ValueType) {
+        Accessor = accessor;
+    }
 
-        /// <inheritdoc />
-        public PropertyValueSetter(DynamicAccessor accessor) : base(accessor.ReflectedType, accessor.ValueType) {
-            Accessor = accessor;
-        }
-
-        protected override bool TrySetValue(TTarget instance, TValue value) {
-            if(instance == null)
-                return false;
+    protected override bool TrySetValue(TTarget instance, TValue value) {
+        if(instance == null)
+            return false;
             
-            Accessor.SetValue(instance, value);
-            return true;
-        }
+        Accessor.SetValue(instance, value);
+        return true;
     }
 }

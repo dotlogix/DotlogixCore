@@ -10,16 +10,16 @@
 using System;
 #endregion
 
-namespace DotLogix.Core {
+namespace DotLogix.Core; 
+
+/// <summary>
+/// A typed cloneable interface
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface ICloneable<out T> : ICloneable {
     /// <summary>
-    /// A typed cloneable interface
+    /// Clone object
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface ICloneable<out T> : ICloneable {
-        /// <summary>
-        /// Clone object
-        /// </summary>
-        /// <returns></returns>
-        new T Clone();
-    }
+    /// <returns></returns>
+    new T Clone();
 }

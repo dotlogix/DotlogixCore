@@ -10,24 +10,31 @@
 using System.Collections.Generic;
 #endregion
 
-namespace DotLogix.Core.Caching {
-    /// <summary>
-    /// An event args with the discarded items
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    public class CacheItemsDiscardedEventArgs<TKey, TValue> {
-        /// <summary>
-        /// The discarded items
-        /// </summary>
-        public IReadOnlyList<CacheItem<TKey, TValue>> DiscardedItems { get; }
+namespace DotLogix.Core.Caching; 
 
-        /// <summary>
-        /// Creates a new instance of <see cref="CacheItemsDiscardedEventArgs{TKey,TValue}"/>
-        /// </summary>
-        /// <param name="discardedItems"></param>
-        public CacheItemsDiscardedEventArgs(IReadOnlyList<CacheItem<TKey, TValue>> discardedItems) {
-            DiscardedItems = discardedItems;
-        }
+/// <summary>
+/// EventArgs used for discarded cache items
+/// </summary>
+/// <typeparam name="TKey"></typeparam>
+/// <typeparam name="TValue"></typeparam>
+public class CacheItemsDiscardedEventArgs<TKey, TValue> {
+    /// <summary>
+    /// The reason why the cache items were discarded
+    /// </summary>
+    public CacheItemDiscardReason Reason { get; }
+
+    /// <summary>
+    /// The discarded items
+    /// </summary>
+    public IReadOnlyList<CacheItemDiscardedEventArgs<TKey, TValue>> DiscardedItems { get; }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="CacheItemsDiscardedEventArgs{TKey,TValue}"/>
+    /// </summary>
+    /// <param name="discardedItems"></param>
+    /// <param name="reason"></param>
+    public CacheItemsDiscardedEventArgs(IReadOnlyList<CacheItemDiscardedEventArgs<TKey, TValue>> discardedItems, CacheItemDiscardReason reason = CacheItemDiscardReason.Expired) {
+        DiscardedItems = discardedItems;
+        Reason = reason;
     }
 }

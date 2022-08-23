@@ -8,10 +8,10 @@
 
 using System.Text.RegularExpressions;
 
-namespace DotLogix.Core.Expressions {
-    public static partial class Lambdas {
-        public static Lambda<bool> MatchesRegex(this Lambda<string> value, string regexPattern, RegexOptions options) {
-            return value.CallStatic<string, string, RegexOptions, bool>(Regex.IsMatch, regexPattern, options);
-        }
+namespace DotLogix.Core.Expressions; 
+
+public static partial class Lambdas {
+    public static Lambda<bool> MatchesRegex(this Lambda<string> value, string regexPattern, RegexOptions options) {
+        return value.CallStatic<string, string, RegexOptions, bool>(Regex.IsMatch, regexPattern, options);
     }
 }

@@ -10,16 +10,16 @@
 using System;
 #endregion
 
-namespace DotLogix.Core.Caching {
+namespace DotLogix.Core.Caching; 
+
+/// <summary>
+///     A common interface for cache policies
+/// </summary>
+public interface ICachePolicy {
     /// <summary>
-    ///     A common interface for cache policies
+    /// A callback method to check if an item should be dropped
     /// </summary>
-    public interface ICachePolicy {
-        /// <summary>
-        /// A callback method to check if an item should be dropped
-        /// </summary>
-        /// <param name="timeStampUtc">The timestamp when the check is happening</param>
-        /// <returns></returns>
-        bool HasExpired(DateTime timeStampUtc);
-    }
+    /// <param name="timeStampUtc">The timestamp when the check is happening</param>
+    /// <returns></returns>
+    bool HasExpired(DateTime timeStampUtc);
 }

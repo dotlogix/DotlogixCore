@@ -6,7 +6,7 @@
 // LastEdited:  25.06.2022 03:33
 // ==================================================
 
-namespace DotLogix.Common.Features {
-    public interface IMeta : ICreatedMeta, IModifiedMeta, IDeletedMeta {
-    }
+namespace DotLogix.Common.Features; 
+
+public interface IMeta : ICreatedMeta, IModifiedMeta, IDeletedMeta {
 }

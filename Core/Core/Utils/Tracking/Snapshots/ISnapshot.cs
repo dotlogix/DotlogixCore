@@ -10,43 +10,43 @@
 using System.Collections.Generic;
 #endregion
 
-namespace DotLogix.Core.Utils.Tracking.Snapshots {
+namespace DotLogix.Core.Utils.Tracking.Snapshots; 
+
+/// <summary>
+/// A change tracking snapshot of an object
+/// </summary>
+public interface ISnapshot {
     /// <summary>
-    /// A change tracking snapshot of an object
+    /// The target value
     /// </summary>
-    public interface ISnapshot {
-        /// <summary>
-        /// The target value
-        /// </summary>
-        object Target { get; }
+    object Target { get; }
 
-        /// <summary>
-        /// The old values
-        /// </summary>
-        IReadOnlyDictionary<string, object> OldValues { get; }
+    /// <summary>
+    /// The old values
+    /// </summary>
+    IReadOnlyDictionary<string, object> OldValues { get; }
 
-        /// <summary>
-        /// The current values
-        /// </summary>
-        IReadOnlyDictionary<string, object> CurrentValues { get; }
+    /// <summary>
+    /// The current values
+    /// </summary>
+    IReadOnlyDictionary<string, object> CurrentValues { get; }
 
-        /// <summary>
-        /// The changed values
-        /// </summary>
-        IReadOnlyDictionary<string, object> ChangedValues { get; }
+    /// <summary>
+    /// The changed values
+    /// </summary>
+    IReadOnlyDictionary<string, object> ChangedValues { get; }
 
-        /// <summary>
-        /// Detect if a change has occured
-        /// </summary>
-        /// <returns></returns>
-        bool DetectChanges();
-        /// <summary>
-        /// Accept changes
-        /// </summary>
-        void AcceptChanges();
-        /// <summary>
-        /// Revert changes
-        /// </summary>
-        void RevertChanges();
-    }
+    /// <summary>
+    /// Detect if a change has occured
+    /// </summary>
+    /// <returns></returns>
+    bool DetectChanges();
+    /// <summary>
+    /// Accept changes
+    /// </summary>
+    void AcceptChanges();
+    /// <summary>
+    /// Revert changes
+    /// </summary>
+    void RevertChanges();
 }

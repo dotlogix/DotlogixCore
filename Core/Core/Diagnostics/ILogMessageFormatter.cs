@@ -8,24 +8,24 @@
 
 using System.IO;
 
-namespace DotLogix.Core.Diagnostics {
+namespace DotLogix.Core.Diagnostics; 
+
+/// <summary>
+/// An interface for log message formatters
+/// </summary>
+public interface ILogMessageFormatter {
     /// <summary>
-    /// An interface for log message formatters
+    /// Formats a log message
     /// </summary>
-    public interface ILogMessageFormatter {
-        /// <summary>
-        /// Formats a log message
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="logMessage"></param>
-        /// <returns></returns>
-        bool FormatTo(TextWriter writer, LogMessage logMessage);
+    /// <param name="writer"></param>
+    /// <param name="logMessage"></param>
+    /// <returns></returns>
+    bool FormatTo(TextWriter writer, LogMessage logMessage);
         
-        /// <summary>
-        /// Formats a log message
-        /// </summary>
-        /// <param name="logMessage"></param>
-        /// <returns></returns>
-        string Format(LogMessage logMessage);
-    }
+    /// <summary>
+    /// Formats a log message
+    /// </summary>
+    /// <param name="logMessage"></param>
+    /// <returns></returns>
+    string Format(LogMessage logMessage);
 }

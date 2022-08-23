@@ -10,27 +10,27 @@
 using System;
 #endregion
 
-namespace DotLogix.Core.Reflection.Dynamics {
+namespace DotLogix.Core.Reflection.Dynamics; 
+
+/// <summary>
+/// Value accessing rights
+/// </summary>
+[Flags]
+public enum ValueAccessModes {
     /// <summary>
-    /// Value accessing rights
+    /// None
     /// </summary>
-    [Flags]
-    public enum ValueAccessModes {
-        /// <summary>
-        /// None
-        /// </summary>
-        None = 0,
-        /// <summary>
-        /// Read
-        /// </summary>
-        Read = 1 << 0,
-        /// <summary>
-        /// Write
-        /// </summary>
-        Write = 1 << 1,
-        /// <summary>
-        /// Read or Write
-        /// </summary>
-        ReadWrite = Read | Write
-    }
+    None = 0,
+    /// <summary>
+    /// Read
+    /// </summary>
+    Read = 1 << 0,
+    /// <summary>
+    /// Write
+    /// </summary>
+    Write = 1 << 1,
+    /// <summary>
+    /// Read or Write
+    /// </summary>
+    ReadWrite = Read | Write
 }

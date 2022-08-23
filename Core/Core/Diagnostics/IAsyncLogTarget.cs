@@ -9,24 +9,24 @@
 using System;
 using System.Threading.Tasks;
 
-namespace DotLogix.Core.Diagnostics {
-    /// <summary>
-    /// An interface to receive log messages asynchronously
-    /// </summary>
-    public interface IAsyncLogTarget : IAsyncDisposable {
-        /// <summary>
-        /// The name of the log target
-        /// </summary>
-        string Name { get; }
-        
-        /// <summary>
-        /// Writes a log entry asynchronously
-        /// </summary>
-        ValueTask LogAsync(LogMessage message);
+namespace DotLogix.Core.Diagnostics; 
 
-        /// <summary>
-        /// Clears all buffers for this logger and causes any buffered messages to be processed asynchronously.
-        /// </summary>
-        ValueTask FlushAsync();
-    }
+/// <summary>
+/// An interface to receive log messages asynchronously
+/// </summary>
+public interface IAsyncLogTarget : IAsyncDisposable {
+    /// <summary>
+    /// The name of the log target
+    /// </summary>
+    string Name { get; }
+        
+    /// <summary>
+    /// Writes a log entry asynchronously
+    /// </summary>
+    ValueTask LogAsync(LogMessage message);
+
+    /// <summary>
+    /// Clears all buffers for this logger and causes any buffered messages to be processed asynchronously.
+    /// </summary>
+    ValueTask FlushAsync();
 }

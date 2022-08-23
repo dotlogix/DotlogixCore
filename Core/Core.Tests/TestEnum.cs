@@ -1,6 +1,6 @@
-namespace Core.Tests {
-    public enum TestEnum {
-        Test,
-        Test2
-    }
+namespace Core.Tests; 
+
+public enum TestEnum {
+    Test,
+    Test2
 }

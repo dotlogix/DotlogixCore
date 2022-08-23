@@ -10,19 +10,19 @@
 using System;
 #endregion
 
-namespace DotLogix.Common.Features {
-    /// <summary>
-    ///     An interface to represent durations
-    /// </summary>
-    public interface IDuration {
-        /// <summary>
-        ///     The start of the duration in universal time
-        /// </summary>
-        DateTime FromUtc { get; set; }
+namespace DotLogix.Common.Features; 
 
-        /// <summary>
-        ///     The end of the duration in universal time
-        /// </summary>
-        DateTime? UntilUtc { get; set; }
-    }
+/// <summary>
+///     An interface to represent durations
+/// </summary>
+public interface IDuration {
+    /// <summary>
+    ///     The start of the duration in universal time
+    /// </summary>
+    DateTime FromUtc { get; set; }
+
+    /// <summary>
+    ///     The end of the duration in universal time
+    /// </summary>
+    DateTime? UntilUtc { get; set; }
 }

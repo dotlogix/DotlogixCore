@@ -6,30 +6,30 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Core.Utils.Tracking.Entries {
+namespace DotLogix.Core.Utils.Tracking.Entries; 
+
+/// <summary>
+/// The change tracking state of an entry
+/// </summary>
+public enum TrackedState {
     /// <summary>
-    /// The change tracking state of an entry
+    /// Detached
     /// </summary>
-    public enum TrackedState {
-        /// <summary>
-        /// Detached
-        /// </summary>
-        Detached,
-        /// <summary>
-        /// Unchanged
-        /// </summary>
-        Unchanged,
-        /// <summary>
-        /// Modified
-        /// </summary>
-        Modified,
-        /// <summary>
-        /// Added
-        /// </summary>
-        Added,
-        /// <summary>
-        /// Deleted
-        /// </summary>
-        Deleted
-    }
+    Detached,
+    /// <summary>
+    /// Unchanged
+    /// </summary>
+    Unchanged,
+    /// <summary>
+    /// Modified
+    /// </summary>
+    Modified,
+    /// <summary>
+    /// Added
+    /// </summary>
+    Added,
+    /// <summary>
+    /// Deleted
+    /// </summary>
+    Deleted
 }

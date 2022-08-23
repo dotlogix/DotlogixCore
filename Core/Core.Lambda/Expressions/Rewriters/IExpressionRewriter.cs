@@ -9,21 +9,21 @@
 using System;
 using System.Linq.Expressions;
 
-namespace DotLogix.Core.Expressions.Rewriters {
-    public interface IExpressionRewriter
-    {
-        Expression Rewrite(Expression expression);
+namespace DotLogix.Core.Expressions.Rewriters; 
+
+public interface IExpressionRewriter
+{
+    Expression Rewrite(Expression expression);
+}
+
+public class ExpressionRewriter : IExpressionRewriter {
+    private readonly Func<Expression, Expression> _rewrite;
+
+    public ExpressionRewriter(Func<Expression, Expression> rewrite) {
+        _rewrite = rewrite;
     }
 
-    public class ExpressionRewriter : IExpressionRewriter {
-        private readonly Func<Expression, Expression> _rewrite;
-
-        public ExpressionRewriter(Func<Expression, Expression> rewrite) {
-            _rewrite = rewrite;
-        }
-
-        public Expression Rewrite(Expression expression) {
-            return _rewrite.Invoke(expression);
-        }
+    public Expression Rewrite(Expression expression) {
+        return _rewrite.Invoke(expression);
     }
 }

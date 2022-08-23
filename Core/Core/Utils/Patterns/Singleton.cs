@@ -6,17 +6,17 @@
 // LastEdited:  06.02.2019
 // ==================================================
 
-namespace DotLogix.Core.Utils.Patterns {
-    /// <summary>
-    /// A generic trick to create typed singletons
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class Singleton<T> where T : class, new() {
-        private static T _instance;
+namespace DotLogix.Core.Utils.Patterns; 
 
-        /// <summary>
-        /// The instance
-        /// </summary>
-        public static T Instance => _instance ??= new T();
-    }
+/// <summary>
+/// A generic trick to create typed singletons
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public class Singleton<T> where T : class, new() {
+    private static T _instance;
+
+    /// <summary>
+    /// The instance
+    /// </summary>
+    public static T Instance => _instance ??= new T();
 }

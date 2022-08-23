@@ -6,22 +6,22 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Core.Utils.Plugins {
+namespace DotLogix.Core.Utils.Plugins; 
+
+/// <summary>
+/// The loading state of a plugin assembly
+/// </summary>
+public enum PluginState {
     /// <summary>
-    /// The loading state of a plugin assembly
+    /// None
     /// </summary>
-    public enum PluginState {
-        /// <summary>
-        /// None
-        /// </summary>
-        None,
-        /// <summary>
-        /// Loaded
-        /// </summary>
-        Loaded,
-        /// <summary>
-        /// Failed
-        /// </summary>
-        Failed
-    }
+    None,
+    /// <summary>
+    /// Loaded
+    /// </summary>
+    Loaded,
+    /// <summary>
+    /// Failed
+    /// </summary>
+    Failed
 }

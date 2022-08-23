@@ -10,19 +10,19 @@
 using System.Reflection;
 #endregion
 
-namespace DotLogix.Core.Reflection.Dynamics {
-    /// <summary>
-    /// A representation of a field
-    /// </summary>
-    public sealed class DynamicField : DynamicAccessor {
-        /// <summary>
-        /// The original field info
-        /// </summary>
-        public FieldInfo FieldInfo { get; }
+namespace DotLogix.Core.Reflection.Dynamics; 
 
-        internal DynamicField(FieldInfo fieldInfo, DynamicGetter getter, DynamicSetter setter) :
-            base(fieldInfo, setter, getter, fieldInfo.FieldType, AccessorTypes.Field) {
-            FieldInfo = fieldInfo;
-        }
+/// <summary>
+/// A representation of a field
+/// </summary>
+public sealed class DynamicField : DynamicAccessor {
+    /// <summary>
+    /// The original field info
+    /// </summary>
+    public FieldInfo FieldInfo { get; }
+
+    internal DynamicField(FieldInfo fieldInfo, DynamicGetter getter, DynamicSetter setter) :
+        base(fieldInfo, setter, getter, fieldInfo.FieldType, AccessorTypes.Field) {
+        FieldInfo = fieldInfo;
     }
 }

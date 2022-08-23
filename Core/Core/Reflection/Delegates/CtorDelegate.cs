@@ -6,10 +6,10 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Core.Reflection.Delegates {
-    /// <summary>
-    /// A delegate to represent constructors
-    /// </summary>
-    /// <param name="parameters"></param>
-    public delegate object CtorDelegate(object[] parameters);
-}
+namespace DotLogix.Core.Reflection.Delegates; 
+
+/// <summary>
+/// A delegate to represent constructors
+/// </summary>
+/// <param name="parameters"></param>
+public delegate object CtorDelegate(object[] parameters);

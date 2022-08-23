@@ -6,14 +6,14 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Core.Reflection.Delegates {
-    /// <summary>
-    /// A delegate to represent getters
-    /// </summary>
-    public delegate object GetterDelegate(object instance);
+namespace DotLogix.Core.Reflection.Delegates; 
 
-    /// <summary>
-    /// A delegate to represent getters
-    /// </summary>
-    public delegate TProperty GetterDelegate<in TInstance, out TProperty>(TInstance instance);
-}
+/// <summary>
+/// A delegate to represent getters
+/// </summary>
+public delegate object GetterDelegate(object instance);
+
+/// <summary>
+/// A delegate to represent getters
+/// </summary>
+public delegate TProperty GetterDelegate<in TInstance, out TProperty>(TInstance instance);

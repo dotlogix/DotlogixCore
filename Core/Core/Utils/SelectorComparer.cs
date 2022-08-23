@@ -11,19 +11,19 @@ using System;
 using System.Collections.Generic;
 #endregion
 
-namespace DotLogix.Core.Utils {
+namespace DotLogix.Core.Utils; 
+
+/// <inheritdoc />
+public class SelectorComparer<T, TKey> : IComparer<T> where TKey : IComparable {
+    private readonly Func<T, TKey> _comparableSelector;
+
     /// <inheritdoc />
-    public class SelectorComparer<T, TKey> : IComparer<T> where TKey : IComparable {
-        private readonly Func<T, TKey> _comparableSelector;
+    public SelectorComparer(Func<T, TKey> comparableSelector) {
+        _comparableSelector = comparableSelector;
+    }
 
-        /// <inheritdoc />
-        public SelectorComparer(Func<T, TKey> comparableSelector) {
-            _comparableSelector = comparableSelector;
-        }
-
-        /// <inheritdoc />
-        public int Compare(T x, T y) {
-            return _comparableSelector.Invoke(x).CompareTo(_comparableSelector.Invoke(y));
-        }
+    /// <inheritdoc />
+    public int Compare(T x, T y) {
+        return _comparableSelector.Invoke(x).CompareTo(_comparableSelector.Invoke(y));
     }
 }

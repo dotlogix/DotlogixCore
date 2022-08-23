@@ -6,14 +6,14 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Common.Features {
+namespace DotLogix.Common.Features; 
+
+/// <summary>
+///     An interface to force a title
+/// </summary>
+public interface ITitled {
     /// <summary>
-    ///     An interface to force a title
+    ///     The title
     /// </summary>
-    public interface ITitled {
-        /// <summary>
-        ///     The title
-        /// </summary>
-        string Title { get; set; }
-    }
+    string Title { get; set; }
 }

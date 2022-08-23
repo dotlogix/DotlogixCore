@@ -1,11 +1,11 @@
-namespace DotLogix.Core.Utils.Naming {
+namespace DotLogix.Core.Utils.Naming; 
+
+/// <summary>
+///     An interface to represent naming strategies
+/// </summary>
+public interface INamingStrategy {
     /// <summary>
-    ///     An interface to represent naming strategies
+    ///     Rewrites the name according to the naming strategy
     /// </summary>
-    public interface INamingStrategy {
-        /// <summary>
-        ///     Rewrites the name according to the naming strategy
-        /// </summary>
-        string Rewrite(string name);
-    }
+    string Rewrite(string name);
 }

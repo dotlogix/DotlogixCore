@@ -10,14 +10,14 @@
 using System;
 #endregion
 
-namespace DotLogix.Common.Features {
+namespace DotLogix.Common.Features; 
+
+/// <summary>
+///     An interface to force a guid key
+/// </summary>
+public interface IGuid {
     /// <summary>
-    ///     An interface to force a guid key
+    ///     The guid
     /// </summary>
-    public interface IGuid {
-        /// <summary>
-        ///     The guid
-        /// </summary>
-        Guid Guid { get; set; }
-    }
+    Guid Guid { get; set; }
 }

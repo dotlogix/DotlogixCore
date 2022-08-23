@@ -10,10 +10,10 @@
 using System;
 #endregion
 
-namespace DotLogix.Core.Utils.Tracking.Entries {
-    /// <summary>
-    /// Don't track this property
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
-    public class IgnoreChangesAttribute : Attribute { }
-}
+namespace DotLogix.Core.Utils.Tracking.Entries; 
+
+/// <summary>
+/// Don't track this property
+/// </summary>
+[AttributeUsage(AttributeTargets.Property)]
+public class IgnoreChangesAttribute : Attribute { }

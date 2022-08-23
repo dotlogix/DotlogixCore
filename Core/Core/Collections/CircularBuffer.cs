@@ -12,54 +12,54 @@ using System.Collections;
 using System.Collections.Generic;
 #endregion
 
-namespace DotLogix.Core.Collections {
-    public class CircularBuffer<T> : IReadOnlyCollection<T> {
-        private readonly Queue<T> _queue;
+namespace DotLogix.Core.Collections; 
 
-        /// <inheritdoc />
-        public int Count => _queue.Count;
+public class CircularBuffer<T> : IReadOnlyCollection<T> {
+    private readonly Queue<T> _queue;
 
-        public int Capacity { get; }
+    /// <inheritdoc />
+    public int Count => _queue.Count;
 
-        public bool AllowOverride { get; }
+    public int Capacity { get; }
 
-        public CircularBuffer(int capacity, bool allowOverride = true) {
-            AllowOverride = allowOverride;
-            Capacity = capacity;
-            _queue = new Queue<T>(capacity);
-        }
+    public bool AllowOverride { get; }
 
-        /// <inheritdoc />
-        public IEnumerator<T> GetEnumerator() {
-            return _queue.GetEnumerator();
-        }
+    public CircularBuffer(int capacity, bool allowOverride = true) {
+        AllowOverride = allowOverride;
+        Capacity = capacity;
+        _queue = new Queue<T>(capacity);
+    }
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
-        }
+    /// <inheritdoc />
+    public IEnumerator<T> GetEnumerator() {
+        return _queue.GetEnumerator();
+    }
 
-        public T Peek() {
-            return _queue.Peek();
-        }
+    IEnumerator IEnumerable.GetEnumerator() {
+        return GetEnumerator();
+    }
 
-        public void Push(T item) {
-            if(_queue.Count >= Capacity) {
-                if(AllowOverride) {
-                    _queue.Dequeue();
-                } else {
-                    throw new InvalidOperationException("Capacity reached");
-                }
+    public T Peek() {
+        return _queue.Peek();
+    }
+
+    public void Push(T item) {
+        if(_queue.Count >= Capacity) {
+            if(AllowOverride) {
+                _queue.Dequeue();
+            } else {
+                throw new InvalidOperationException("Capacity reached");
             }
-
-            _queue.Enqueue(item);
         }
 
-        public T Pop() {
-            return _queue.Dequeue();
-        }
+        _queue.Enqueue(item);
+    }
 
-        public void Clear() {
-            _queue.Clear();
-        }
+    public T Pop() {
+        return _queue.Dequeue();
+    }
+
+    public void Clear() {
+        _queue.Clear();
     }
 }

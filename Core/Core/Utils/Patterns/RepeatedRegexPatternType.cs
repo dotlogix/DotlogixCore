@@ -10,30 +10,30 @@
 using System.Collections.Generic;
 #endregion
 
-namespace DotLogix.Core.Utils.Patterns {
+namespace DotLogix.Core.Utils.Patterns; 
+
+/// <inheritdoc />
+public class RepeatedRegexPatternType : RegexPatternType {
+    /// <summary>
+    /// Creates a new instance of <see cref="RepeatedRegexPatternType"/>
+    /// </summary>
+    public RepeatedRegexPatternType(string name, string defaultVariant, IReadOnlyDictionary<string, string> patternVariants) : base(name, defaultVariant, patternVariants) { }
+    /// <summary>
+    /// Creates a new instance of <see cref="RepeatedRegexPatternType"/>
+    /// </summary>
+    public RepeatedRegexPatternType(string name, string pattern) : base(name, pattern) { }
+
     /// <inheritdoc />
-    public class RepeatedRegexPatternType : RegexPatternType {
-        /// <summary>
-        /// Creates a new instance of <see cref="RepeatedRegexPatternType"/>
-        /// </summary>
-        public RepeatedRegexPatternType(string name, string defaultVariant, IReadOnlyDictionary<string, string> patternVariants) : base(name, defaultVariant, patternVariants) { }
-        /// <summary>
-        /// Creates a new instance of <see cref="RepeatedRegexPatternType"/>
-        /// </summary>
-        public RepeatedRegexPatternType(string name, string pattern) : base(name, pattern) { }
+    public override bool TryGetRegexPattern(string variant, string[] args, out string pattern) {
+        if(base.TryGetRegexPattern(variant, args, out pattern) == false)
+            return false;
 
-        /// <inheritdoc />
-        public override bool TryGetRegexPattern(string variant, string[] args, out string pattern) {
-            if(base.TryGetRegexPattern(variant, args, out pattern) == false)
-                return false;
-
-            if((args.Length == 0) || (Range.TryParse(args[0], out var range) == false)) {
-                pattern = string.Concat(pattern, "+?");
-                return true;
-            }
-
-            pattern = string.Concat(pattern, range.ToRegexRange());
+        if((args.Length == 0) || (Range.TryParse(args[0], out var range) == false)) {
+            pattern = string.Concat(pattern, "+?");
             return true;
         }
+
+        pattern = string.Concat(pattern, range.ToRegexRange());
+        return true;
     }
 }

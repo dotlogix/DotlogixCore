@@ -6,14 +6,14 @@
 // LastEdited:  25.06.2022 03:42
 // ==================================================
 
-namespace DotLogix.Common.Features {
+namespace DotLogix.Common.Features; 
+
+/// <summary>
+///     An interface to force an id
+/// </summary>
+public interface ILongIdentity {
     /// <summary>
-    ///     An interface to force an id
+    ///     The id
     /// </summary>
-    public interface ILongIdentity {
-        /// <summary>
-        ///     The id
-        /// </summary>
-        long Id { get; set; }
-    }
+    long Id { get; set; }
 }

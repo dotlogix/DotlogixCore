@@ -8,24 +8,24 @@
 
 using System;
 
-namespace DotLogix.Core.Diagnostics {
+namespace DotLogix.Core.Diagnostics; 
+
+/// <summary>
+/// An interface to receive log messages
+/// </summary>
+public interface ILogTarget : IDisposable  {
     /// <summary>
-    /// An interface to receive log messages
+    /// The name of the log target
     /// </summary>
-    public interface ILogTarget : IDisposable  {
-        /// <summary>
-        /// The name of the log target
-        /// </summary>
-        string Name { get; }
+    string Name { get; }
 
-        /// <summary>
-        /// Writes a log entry
-        /// </summary>
-        void Log(LogMessage message);
+    /// <summary>
+    /// Writes a log entry
+    /// </summary>
+    void Log(LogMessage message);
 
-        /// <summary>
-        /// Clears all buffers for this log target and causes any buffered messages to be processed.
-        /// </summary>
-        void Flush();
-    }
+    /// <summary>
+    /// Clears all buffers for this log target and causes any buffered messages to be processed.
+    /// </summary>
+    void Flush();
 }

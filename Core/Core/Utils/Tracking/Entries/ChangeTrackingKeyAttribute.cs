@@ -10,10 +10,10 @@
 using System;
 #endregion
 
-namespace DotLogix.Core.Utils.Tracking.Entries {
-    /// <summary>
-    /// Set this property as key for change tracking index 
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
-    public class ChangeTrackingKeyAttribute : Attribute { }
-}
+namespace DotLogix.Core.Utils.Tracking.Entries; 
+
+/// <summary>
+/// Set this property as key for change tracking index 
+/// </summary>
+[AttributeUsage(AttributeTargets.Property)]
+public class ChangeTrackingKeyAttribute : Attribute { }

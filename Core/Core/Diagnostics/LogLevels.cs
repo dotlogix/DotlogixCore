@@ -9,42 +9,42 @@
 #region
 #endregion
 
-namespace DotLogix.Core.Diagnostics {
+namespace DotLogix.Core.Diagnostics; 
+
+/// <summary>
+/// Log levels
+/// </summary>
+public enum LogLevels {
     /// <summary>
-    /// Log levels
+    /// Unknown / internal messages
     /// </summary>
-    public enum LogLevels {
-        /// <summary>
-        /// Unknown / internal messages
-        /// </summary>
-        Unknown = 0,
-        /// <summary>
-        /// Trace messages
-        /// </summary>
-        Trace = 1,
-        /// <summary>
-        /// Debug messages
-        /// </summary>
-        Debug = 2,
-        /// <summary>
-        /// Info messages
-        /// </summary>
-        Info = 3,
-        /// <summary>
-        /// Warning messages
-        /// </summary>
-        Warning = 4,
-        /// <summary>
-        /// Error messages
-        /// </summary>
-        Error = 5,
-        /// <summary>
-        /// Critical messages
-        /// </summary>
-        Critical = 6,
-        /// <summary>
-        /// No logging
-        /// </summary>
-        Off = 7
-    }
+    Unknown = 0,
+    /// <summary>
+    /// Trace messages
+    /// </summary>
+    Trace = 1,
+    /// <summary>
+    /// Debug messages
+    /// </summary>
+    Debug = 2,
+    /// <summary>
+    /// Info messages
+    /// </summary>
+    Info = 3,
+    /// <summary>
+    /// Warning messages
+    /// </summary>
+    Warning = 4,
+    /// <summary>
+    /// Error messages
+    /// </summary>
+    Error = 5,
+    /// <summary>
+    /// Critical messages
+    /// </summary>
+    Critical = 6,
+    /// <summary>
+    /// No logging
+    /// </summary>
+    Off = 7
 }

@@ -9,14 +9,14 @@
 #region
 #endregion
 
-namespace DotLogix.Core.Utils.Tracking.Snapshots {
+namespace DotLogix.Core.Utils.Tracking.Snapshots; 
+
+/// <summary>
+/// A factory to create snapshots
+/// </summary>
+public interface ISnapshotFactory {
     /// <summary>
-    /// A factory to create snapshots
+    /// Create a snapshot
     /// </summary>
-    public interface ISnapshotFactory {
-        /// <summary>
-        /// Create a snapshot
-        /// </summary>
-        ISnapshot CreateSnapshot(object target);
-    }
+    ISnapshot CreateSnapshot(object target);
 }

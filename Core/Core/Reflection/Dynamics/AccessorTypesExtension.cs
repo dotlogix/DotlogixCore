@@ -11,24 +11,24 @@ using System;
 using System.Reflection;
 #endregion
 
-namespace DotLogix.Core.Reflection.Dynamics {
+namespace DotLogix.Core.Reflection.Dynamics; 
+
+/// <summary>
+/// A static class providing extension methods for <see cref="AccessorTypes"/>
+/// </summary>
+public static class AccessorTypesExtension {
     /// <summary>
-    /// A static class providing extension methods for <see cref="AccessorTypes"/>
+    /// Get the internal representation of member types
     /// </summary>
-    public static class AccessorTypesExtension {
-        /// <summary>
-        /// Get the internal representation of member types
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static MemberTypes GetMemberTypes(this AccessorTypes accessorTypes) {
-            MemberTypes memberTypes = accessorTypes switch {
-                AccessorTypes.None => 0,
-                AccessorTypes.Property => MemberTypes.Property,
-                AccessorTypes.Field => MemberTypes.Field,
-                AccessorTypes.Any => MemberTypes.Property | MemberTypes.Field,
-                _ => throw new ArgumentOutOfRangeException(nameof(accessorTypes), accessorTypes, null)
-            };
-            return memberTypes;
-        }
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public static MemberTypes GetMemberTypes(this AccessorTypes accessorTypes) {
+        MemberTypes memberTypes = accessorTypes switch {
+            AccessorTypes.None => 0,
+            AccessorTypes.Property => MemberTypes.Property,
+            AccessorTypes.Field => MemberTypes.Field,
+            AccessorTypes.Any => MemberTypes.Property | MemberTypes.Field,
+            _ => throw new ArgumentOutOfRangeException(nameof(accessorTypes), accessorTypes, null)
+        };
+        return memberTypes;
     }
 }

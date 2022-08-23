@@ -6,14 +6,14 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.Common.Features {
+namespace DotLogix.Common.Features; 
+
+/// <summary>
+///     An interface to force a name
+/// </summary>
+public interface INamed {
     /// <summary>
-    ///     An interface to force a name
+    ///     The name
     /// </summary>
-    public interface INamed {
-        /// <summary>
-        ///     The name
-        /// </summary>
-        string Name { get; set; }
-    }
+    string Name { get; set; }
 }

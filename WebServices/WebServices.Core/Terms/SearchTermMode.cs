@@ -1,15 +1,15 @@
-﻿namespace DotLogix.WebServices.Core.Terms {
-    public enum SearchTermMode
-    {
-        Equals,
-        StartsWith,
-        Contains,
-        EndsWith,
+﻿namespace DotLogix.WebServices.Core.Terms; 
 
-        Like,
-        Wildcard,
+public enum SearchTermMode
+{
+    Equals,
+    StartsWith,
+    Contains,
+    EndsWith,
+
+    Like,
+    Wildcard,
         
-        Regex,
-        Fuzzy,
-    }
+    Regex,
+    Fuzzy,
 }

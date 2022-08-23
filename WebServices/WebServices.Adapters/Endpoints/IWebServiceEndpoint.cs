@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace DotLogix.WebServices.Adapters.Endpoints
+namespace DotLogix.WebServices.Adapters.Endpoints; 
+
+public interface IWebServiceEndpoint
 {
-    public interface IWebServiceEndpoint
-    {
-        Uri Uri { get; }
-    }
+    Uri Uri { get; }
 }

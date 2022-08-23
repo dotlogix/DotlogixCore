@@ -6,14 +6,14 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
-namespace DotLogix.WebServices.EntityFramework.Context {
+namespace DotLogix.WebServices.EntityFramework.Context; 
+
+/// <summary>
+/// An interface to represent a factory to create an <see cref="IEntityContext"/>
+/// </summary>
+public interface IEntityContextFactory {
     /// <summary>
-    /// An interface to represent a factory to create an <see cref="IEntityContext"/>
+    /// Creates a new instance of <see cref="IEntityContext"/>
     /// </summary>
-    public interface IEntityContextFactory {
-        /// <summary>
-        /// Creates a new instance of <see cref="IEntityContext"/>
-        /// </summary>
-        IEntityContext Create();
-    }
+    IEntityContext Create();
 }

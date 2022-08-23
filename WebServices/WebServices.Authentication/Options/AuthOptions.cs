@@ -9,12 +9,10 @@
 #region
 #endregion
 
-using System;
+namespace DotLogix.WebServices.Authentication.Options; 
 
-namespace DotLogix.WebServices.Authentication.Options {
-    public class AuthOptions {
-        public string Audience { get; set; }
-        public string Issuer { get; set; }
-        public string SigningKey { get; set; }
-    }
+public class AuthOptions {
+    public string Audience { get; set; }
+    public string Issuer { get; set; }
+    public string SigningKey { get; set; }
 }

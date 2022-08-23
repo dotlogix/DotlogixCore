@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace DotLogix.WebServices.EntityFramework.Database.Extensions;
+namespace DotLogix.WebServices.EntityFramework.Database; 
 
 public class NamingConventionsExtensionOptions : DbContextExtensionOptions {
     private INamingStrategy _namingStrategy;

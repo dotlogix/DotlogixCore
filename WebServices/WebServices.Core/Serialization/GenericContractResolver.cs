@@ -8,55 +8,55 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 #endregion
 
-namespace DotLogix.WebServices.Core.Serialization {
-    public sealed class GenericContractResolver : CamelCasePropertyNamesContractResolver {
-        private JsonNamingStrategy _namingStrategy;
+namespace DotLogix.WebServices.Core.Serialization; 
 
-        public new INamingStrategy NamingStrategy {
-            get => _namingStrategy?.NamingStrategy;
-            set {
-                if(value == null) {
-                    _namingStrategy = null;
-                    base.NamingStrategy = new DefaultNamingStrategy();
-                } else {
-                    _namingStrategy = new JsonNamingStrategy(value);
-                    base.NamingStrategy = _namingStrategy;
-                }
+public sealed class GenericContractResolver : CamelCasePropertyNamesContractResolver {
+    private JsonNamingStrategy _namingStrategy;
+
+    public new INamingStrategy NamingStrategy {
+        get => _namingStrategy?.NamingStrategy;
+        set {
+            if(value == null) {
+                _namingStrategy = null;
+                base.NamingStrategy = new DefaultNamingStrategy();
+            } else {
+                _namingStrategy = new JsonNamingStrategy(value);
+                base.NamingStrategy = _namingStrategy;
+            }
+        }
+    }
+
+    public GenericContractResolver(INamingStrategy namingStrategy = null) {
+        NamingStrategy = namingStrategy ?? NamingStrategies.CamelCase;
+    }
+
+    protected override JsonConverter ResolveContractConverter(Type objectType) {
+        var typeInfo = objectType.GetTypeInfo();
+        if(typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition) {
+            var jsonConverterAttribute = typeInfo.GetCustomAttribute<JsonConverterAttribute>();
+            if((jsonConverterAttribute is not null) && jsonConverterAttribute.ConverterType.GetTypeInfo().IsGenericTypeDefinition) {
+                return (JsonConverter)Activator.CreateInstance(jsonConverterAttribute.ConverterType.MakeGenericType(typeInfo.GenericTypeArguments), jsonConverterAttribute.ConverterParameters);
             }
         }
 
-        public GenericContractResolver(INamingStrategy namingStrategy = null) {
-            NamingStrategy = namingStrategy ?? NamingStrategies.CamelCase;
+        if(objectType.IsAssignableToGeneric(typeof(Optional<>), out var genericArgs)) {
+            return typeof(OptionalJsonConverter<>).MakeGenericType(genericArgs).Instantiate<JsonConverter>();
         }
 
-        protected override JsonConverter ResolveContractConverter(Type objectType) {
-            var typeInfo = objectType.GetTypeInfo();
-            if(typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition) {
-                var jsonConverterAttribute = typeInfo.GetCustomAttribute<JsonConverterAttribute>();
-                if((jsonConverterAttribute != null) && jsonConverterAttribute.ConverterType.GetTypeInfo().IsGenericTypeDefinition) {
-                    return (JsonConverter)Activator.CreateInstance(jsonConverterAttribute.ConverterType.MakeGenericType(typeInfo.GenericTypeArguments), jsonConverterAttribute.ConverterParameters);
-                }
-            }
+        return base.ResolveContractConverter(objectType);
+    }
 
-            if(objectType.IsAssignableToGeneric(typeof(Optional<>), out var genericArgs)) {
-                return typeof(OptionalJsonConverter<>).MakeGenericType(genericArgs).Instantiate<JsonConverter>();
-            }
+    private class JsonNamingStrategy : NamingStrategy {
+        public INamingStrategy NamingStrategy { get; }
 
-            return base.ResolveContractConverter(objectType);
+        public JsonNamingStrategy(INamingStrategy namingStrategy) {
+            NamingStrategy = namingStrategy;
+            ProcessDictionaryKeys = true;
+            OverrideSpecifiedNames = true;
         }
 
-        private class JsonNamingStrategy : NamingStrategy {
-            public INamingStrategy NamingStrategy { get; }
-
-            public JsonNamingStrategy(INamingStrategy namingStrategy) {
-                NamingStrategy = namingStrategy;
-                ProcessDictionaryKeys = true;
-                OverrideSpecifiedNames = true;
-            }
-
-            protected override string ResolvePropertyName(string name) {
-                return NamingStrategy?.Rewrite(name) ?? name;
-            }
+        protected override string ResolvePropertyName(string name) {
+            return NamingStrategy?.Rewrite(name) ?? name;
         }
     }
 }

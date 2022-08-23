@@ -1,9 +1,8 @@
-﻿namespace DotLogix.WebServices.Adapters.Endpoints
+﻿namespace DotLogix.WebServices.Adapters.Endpoints; 
+
+public enum EndpointType
 {
-    public enum EndpointType
-    {
-        Production,
-        Sandbox,
-        Local
-    }
+    Production,
+    Sandbox,
+    Local
 }

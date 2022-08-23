@@ -12,7 +12,7 @@ using DotLogix.Core.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace DotLogix.WebServices.EntityFramework.Extensions;
+namespace DotLogix.WebServices.EntityFramework.Extensions; 
 
 public static class LambdaExtensions {
     public static Lambda<TValue> Property<TEntity, TValue>(this Lambda<TEntity> entity, IReadOnlyProperty property)

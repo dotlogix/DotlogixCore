@@ -1,11 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
+using DotLogix.WebServices.EntityFramework.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
-namespace DotLogix.WebServices.EntityFramework.Database.Extensions;
+namespace DotLogix.WebServices.EntityFramework.Extensions; 
 
 [SuppressMessage("Usage", "EF1001:Internal EF Core API usage.")]
 public static class DbContextExtensions {

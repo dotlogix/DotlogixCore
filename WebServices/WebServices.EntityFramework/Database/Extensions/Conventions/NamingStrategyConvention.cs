@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
-namespace DotLogix.WebServices.EntityFramework.Database.Extensions;
+namespace DotLogix.WebServices.EntityFramework.Database; 
+
 public class NamingStrategyConvention :
     IEntityTypeAddedConvention,
     IEntityTypeAnnotationChangedConvention,

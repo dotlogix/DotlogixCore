@@ -2,10 +2,9 @@
 using System;
 #endregion
 
-namespace DotLogix.WebServices.Core.Time
+namespace DotLogix.WebServices.Core.Time; 
+
+public interface IDateTimeProvider
 {
-    public interface IDateTimeProvider
-    {
-        DateTime UtcNow { get; }
-    }
+    DateTime UtcNow { get; }
 }

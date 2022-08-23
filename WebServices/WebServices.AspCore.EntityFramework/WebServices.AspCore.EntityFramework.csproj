@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <AssemblyName>DotLogix.WebServices.AspCore.EntityFramework</AssemblyName>
+        <RootNamespace>DotLogix.WebServices.AspCore</RootNamespace>
+        <PackageId>DotLogix.WebServices.AspCore.EntityFramework</PackageId>
+        <OutputType>Library</OutputType>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WebServices.AspCore\WebServices.AspCore.csproj" />
+      <ProjectReference Include="..\WebServices.EntityFramework\WebServices.EntityFramework.csproj" />
+    </ItemGroup>
+</Project>

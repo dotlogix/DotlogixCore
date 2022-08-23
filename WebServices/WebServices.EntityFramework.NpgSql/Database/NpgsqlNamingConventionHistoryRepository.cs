@@ -11,7 +11,7 @@ using DotLogix.WebServices.EntityFramework.Conventions;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Migrations.Internal;
 
-namespace DotLogix.WebServices.EntityFramework.Database;
+namespace DotLogix.WebServices.EntityFramework.Database; 
 
 [SuppressMessage("Usage", "EF1001:Internal EF Core API usage.")]
 public class NpgsqlNamingConventionHistoryRepository : NpgsqlHistoryRepository {

@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using DotLogix.Core.Diagnostics;
 #endregion
 
-namespace DotLogix.WebServices.Core.Options {
-    public class LoggerOptions {
-        public LogLevels LogLevel { get; set; } = LogLevels.Debug;
-        public IDictionary<string, LogLevels> Sources { get; set; } = new Dictionary<string, LogLevels>();
-    }
+namespace DotLogix.WebServices.Core.Options; 
+
+public class LoggerOptions {
+    public LogLevels LogLevel { get; set; } = LogLevels.Debug;
+    public IDictionary<string, LogLevels> Sources { get; set; } = new Dictionary<string, LogLevels>();
 }

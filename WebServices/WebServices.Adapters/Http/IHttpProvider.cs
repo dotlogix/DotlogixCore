@@ -5,10 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace DotLogix.WebServices.Adapters.Http
+namespace DotLogix.WebServices.Adapters.Http; 
+
+public interface IHttpProvider : IDisposable
 {
-    public interface IHttpProvider : IDisposable
-    {
-        Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default, TimeSpan? timeout = null);
-    }
+    Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default, TimeSpan? timeout = null);
 }

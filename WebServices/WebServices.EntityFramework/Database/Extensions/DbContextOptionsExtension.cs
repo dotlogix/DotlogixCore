@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DotLogix.WebServices.EntityFramework.Database.Extensions;
+namespace DotLogix.WebServices.EntityFramework.Database; 
 
 public sealed class DbContextOptionsExtension<TOptions> : IDbContextOptionsExtension
     where TOptions : IDbContextExtensionOptions, new()

@@ -9,48 +9,47 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace DotLogix.WebServices.Testing.AspCore
+namespace DotLogix.WebServices.Testing.AspCore; 
+
+public class WebServerFactory<TStartup>: WebApplicationFactory<TStartup> where TStartup : class
 {
-    public class WebServerFactory<TStartup>: WebApplicationFactory<TStartup> where TStartup : class
+    public IConfiguration Configuration { get; }
+    public IServiceCollection ServiceOverrides { get; }
+
+    public WebServerFactory(IConfiguration configuration, IServiceCollection serviceOverrides)
     {
-        public IConfiguration Configuration { get; }
-        public IServiceCollection ServiceOverrides { get; }
+        Configuration = configuration;
+        ServiceOverrides = serviceOverrides;
+    }
 
-        public WebServerFactory(IConfiguration configuration, IServiceCollection serviceOverrides)
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        if(Configuration is not null)
         {
-            Configuration = configuration;
-            ServiceOverrides = serviceOverrides;
+            builder.UseConfiguration(Configuration);
         }
 
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        if(ServiceOverrides is not null)
         {
-            if(Configuration != null)
-            {
-                builder.UseConfiguration(Configuration);
-            }
-
-            if(ServiceOverrides!= null)
-            {
-                builder.ConfigureTestServices(OverrideServices);
-            }
+            builder.ConfigureTestServices(OverrideServices);
         }
+    }
 
-        private void OverrideServices(IServiceCollection services) {
-            foreach (var service in ServiceOverrides)
-            {
-                services.RemoveAll(service.ServiceType);
-                services.Add(service);
-            }
-            
-            services.RemoveAll(typeof(ILogTarget));
-            services.RemoveAll(typeof(IAsyncLogTarget));
-            services.AddLogTarget<NUnitLogTarget>();
-            
-            services.RemoveAll(typeof(IWebServiceEndpoint));
-            services.RemoveAll(typeof(IHttpProvider));
-
-            services.AddScoped<IHttpProvider>(_ => new HttpProvider(CreateClient()));
-            services.AddScoped<IWebServiceEndpoint>(_ => new StaticWebServiceEndpoint(ClientOptions.BaseAddress));
+    private void OverrideServices(IServiceCollection services) {
+        foreach (var service in ServiceOverrides)
+        {
+            services.RemoveAll(service.ServiceType);
+            services.Add(service);
         }
+            
+        services.RemoveAll(typeof(ILogTarget));
+        services.RemoveAll(typeof(IAsyncLogTarget));
+        services.AddLogTarget<NUnitLogTarget>();
+            
+        services.RemoveAll(typeof(IWebServiceEndpoint));
+        services.RemoveAll(typeof(IHttpProvider));
+
+        services.AddScoped<IHttpProvider>(_ => new HttpProvider(CreateClient()));
+        services.AddScoped<IWebServiceEndpoint>(_ => new StaticWebServiceEndpoint(ClientOptions.BaseAddress));
     }
 }

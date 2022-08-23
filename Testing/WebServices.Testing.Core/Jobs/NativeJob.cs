@@ -1,47 +1,46 @@
 using System;
 using System.Diagnostics;
 
-namespace DotLogix.WebServices.Testing.Jobs
+namespace DotLogix.WebServices.Testing.Jobs; 
+
+public sealed class NativeJob : IDisposable
 {
-    public sealed class NativeJob : IDisposable
+    public IntPtr Handle { get; private set; }
+
+    public NativeJob(IntPtr handle)
     {
-        public IntPtr Handle { get; private set; }
+        Handle = handle;
+    }
 
-        public NativeJob(IntPtr handle)
+    public NativeJob()
+    {
+        Handle = JobNativeMethods.CreateJobHandle();
+    }
+
+    public void AttachProcess(Process process)
+    {
+        if (Handle == IntPtr.Zero)
         {
-            Handle = handle;
+            throw new ObjectDisposedException(nameof(Handle));
         }
 
-        public NativeJob()
+        JobNativeMethods.AttachProcessToJob(Handle, process);
+    }
+
+    public void AttachProcess(int processId)
+    {
+        var process = Process.GetProcessById(processId);
+        AttachProcess(process);
+    }
+
+    public void Dispose()
+    {
+        if (Handle == IntPtr.Zero)
         {
-            Handle = JobNativeMethods.CreateJobHandle();
+            return;
         }
 
-        public void AttachProcess(Process process)
-        {
-            if (Handle == IntPtr.Zero)
-            {
-                throw new ObjectDisposedException(nameof(Handle));
-            }
-
-            JobNativeMethods.AttachProcessToJob(Handle, process);
-        }
-
-        public void AttachProcess(int processId)
-        {
-            var process = Process.GetProcessById(processId);
-            AttachProcess(process);
-        }
-
-        public void Dispose()
-        {
-            if (Handle == IntPtr.Zero)
-            {
-                return;
-            }
-
-            JobNativeMethods.CloseJobHandle(Handle);
-            Handle = IntPtr.Zero;
-        }
+        JobNativeMethods.CloseJobHandle(Handle);
+        Handle = IntPtr.Zero;
     }
 }

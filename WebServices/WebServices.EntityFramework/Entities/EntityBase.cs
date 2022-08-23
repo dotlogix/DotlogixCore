@@ -1,25 +1,23 @@
 // ==================================================
-// Copyright 2018(C) , DotLogix
-// File:  SimpleEntity.cs
+// Copyright 2014-2022(C), DotLogix
+// File:  EntityBase.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  17.02.2018
-// LastEdited:  01.08.2018
+// Created: 25.06.2022 03:32
+// LastEdited:  25.06.2022 03:32
 // ==================================================
 
-#region
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using DotLogix.Common.Features;
-#endregion
 
-namespace DotLogix.WebServices.EntityFramework.Entities {
-    /// <summary>
-    /// A base class for entities
-    /// </summary>
-    public abstract class EntityBase : IIdentity, IGuid {
-        /// <inheritdoc />
-        public int Id { get; set; }
+namespace DotLogix.WebServices.EntityFramework.Entities; 
 
-        /// <inheritdoc />
-        public Guid Guid { get; set; }
-    }
+public abstract class EntityBase : IIdentity, IGuid
+{
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+
+    [Key]
+    public Guid Guid { get; set; }
 }

@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.3" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.6" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.6" />
     </ItemGroup>
 
     <ItemGroup>
@@ -17,5 +17,9 @@
       <ProjectReference Include="..\..\Core\Core\Core.csproj" />
       <ProjectReference Include="..\..\Core\Core.Lambda\Core.Lambda.csproj" />
       <ProjectReference Include="..\WebServices.Core\WebServices.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Utils" />
     </ItemGroup>
 </Project>

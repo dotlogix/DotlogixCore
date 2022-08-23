@@ -4,7 +4,7 @@ using System.Text;
 using DotLogix.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DotLogix.WebServices.EntityFramework.Database.Extensions;
+namespace DotLogix.WebServices.EntityFramework.Database; 
 
 public abstract class DbContextExtensionOptions : IDbContextExtensionOptions {
     void IDbContextExtensionOptions.ApplyServices(IServiceCollection services) => ApplyServices(services);

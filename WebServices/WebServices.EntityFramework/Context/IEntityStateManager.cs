@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace DotLogix.WebServices.EntityFramework.Context; 
@@ -141,4 +142,10 @@ public interface IEntityStateManager {
     /// <inheritdoc cref="Detach(object[])" />
     IEnumerable<EntityEntry> Detach(IEnumerable<object> entities);
     #endregion
+
+    /// <inheritdoc cref="IStateManager.GetEntriesToSave" />
+    IEnumerable<EntityEntry> GetEntriesToSave(bool cascadeChanges = true);
+
+    /// <inheritdoc cref="IStateManager.GetEntriesForState" />
+    IEnumerable<EntityEntry> GetEntriesForState(bool added = false, bool modified = false, bool deleted = false, bool unchanged = false);
 }

@@ -9,7 +9,7 @@
 using DotLogix.WebServices.Adapters.Endpoints;
 using DotLogix.WebServices.Adapters.Http;
 
-namespace DotLogix.WebServices.Adapters.Client;
+namespace DotLogix.WebServices.Adapters.Client; 
 
 public class ErrorHandlingApiClient : ApiClient
 {

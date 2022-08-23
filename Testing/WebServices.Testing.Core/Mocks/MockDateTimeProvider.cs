@@ -1,32 +1,31 @@
 using System;
 using DotLogix.WebServices.Core.Time;
 
-namespace DotLogix.WebServices.Testing.Mocks
+namespace DotLogix.WebServices.Testing.Mocks; 
+
+public class MockDateTimeProvider : IDateTimeProvider
 {
-    public class MockDateTimeProvider : IDateTimeProvider
+    private Func<DateTime> _getCurrentFunc;
+
+    public MockDateTimeProvider()
     {
-        private Func<DateTime> _getCurrentFunc;
+        Reset();
+    }
 
-        public MockDateTimeProvider()
-        {
-            Reset();
-        }
+    public DateTime UtcNow => _getCurrentFunc.Invoke();
 
-        public DateTime UtcNow => _getCurrentFunc.Invoke();
+    public void UseTime(DateTime dateTime)
+    {
+        _getCurrentFunc = () => dateTime;
+    }
 
-        public void UseTime(DateTime dateTime)
-        {
-            _getCurrentFunc = () => dateTime;
-        }
+    public void UseTime(Func<DateTime> getTimeFunc)
+    {
+        _getCurrentFunc = getTimeFunc;
+    }
 
-        public void UseTime(Func<DateTime> getTimeFunc)
-        {
-            _getCurrentFunc = getTimeFunc;
-        }
-
-        public void Reset()
-        {
-            _getCurrentFunc = () => DateTime.UtcNow;
-        }
+    public void Reset()
+    {
+        _getCurrentFunc = () => DateTime.UtcNow;
     }
 }

@@ -9,14 +9,14 @@
 #region
 #endregion
 
-namespace DotLogix.WebServices.EntityFramework.Context {
+namespace DotLogix.WebServices.EntityFramework.Context; 
+
+/// <summary>
+/// An interface to represent a provider of <see cref="IEntitySet{TEntity}"/>
+/// </summary>
+public interface IEntitySetProvider {
     /// <summary>
-    /// An interface to represent a provider of <see cref="IEntitySet{TEntity}"/>
+    /// Get or create an <see cref="IEntitySet{TEntity}"/>
     /// </summary>
-    public interface IEntitySetProvider {
-        /// <summary>
-        /// Get or create an <see cref="IEntitySet{TEntity}"/>
-        /// </summary>
-        IEntitySet<TEntity> GetEntitySet<TEntity>() where TEntity : class, new();
-    }
+    IEntitySet<TEntity> Set<TEntity>() where TEntity : class;
 }

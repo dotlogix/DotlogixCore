@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace DotLogix.WebServices.Adapters.Http
+namespace DotLogix.WebServices.Adapters.Http; 
+
+public interface IAuthenticationTokenProvider
 {
-    public interface IAuthenticationTokenProvider
-    {
-        string GetAuthenticationToken(Uri url);
-    }
+    string GetAuthenticationToken(Uri url);
 }

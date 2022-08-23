@@ -13,34 +13,34 @@
  using DotLogix.Core.Extensions;
 #endregion
 
-namespace DotLogix.WebServices.Core {
-    public class CacheProvider : ICacheProvider {
-        private readonly Dictionary<string, Cache<object, object>> _cacheDict = new Dictionary<string, Cache<object, object>>(StringComparer.OrdinalIgnoreCase);
+namespace DotLogix.WebServices.Core; 
 
-        public Cache<object, object> Get(string name) => _cacheDict.GetValueOrDefault(name);
+public class CacheProvider : ICacheProvider {
+    private readonly Dictionary<string, Cache<object, object>> _cacheDict = new Dictionary<string, Cache<object, object>>(StringComparer.OrdinalIgnoreCase);
 
-        public Cache<object, object> GetOrCreate(string name, TimeSpan delay) {
-            return _cacheDict.GetOrAdd(name, () => new Cache<object,object>(delay));
-        }
-        
-        public Cache<object, object> Replace(string name, TimeSpan delay) {
-            var cache = new Cache<object,object>(delay);
-            _cacheDict[name] = cache;
-            return cache;
-        }
-        
-        public Cache<object, object> Remove(string name) {
-            return _cacheDict.TryPopValue(name, out var cache) ? cache : null;
-        }
+    public Cache<object, object> Get(string name) => _cacheDict.GetValueOrDefault(name);
 
-        public void Clear(string name) {
-            Get(name)?.Clear();
-        }
+    public Cache<object, object> GetOrCreate(string name, TimeSpan delay) {
+        return _cacheDict.GetOrAdd(name, () => new Cache<object,object>(delay));
+    }
         
-        public void Clear() {
-            foreach(var cache in _cacheDict.Values) {
-                cache.Clear();
-            }
+    public Cache<object, object> Replace(string name, TimeSpan delay) {
+        var cache = new Cache<object,object>(delay);
+        _cacheDict[name] = cache;
+        return cache;
+    }
+        
+    public Cache<object, object> Remove(string name) {
+        return _cacheDict.TryPopValue(name, out var cache) ? cache : null;
+    }
+
+    public void Clear(string name) {
+        Get(name)?.Clear();
+    }
+        
+    public void Clear() {
+        foreach(var cache in _cacheDict.Values) {
+            cache.Clear();
         }
     }
 }

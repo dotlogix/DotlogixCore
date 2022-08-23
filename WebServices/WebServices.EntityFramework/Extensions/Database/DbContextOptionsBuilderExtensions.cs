@@ -1,11 +1,9 @@
 using System;
-using DotLogix.Core.Utils.Naming;
-using DotLogix.WebServices.EntityFramework.Conventions;
-using DotLogix.WebServices.EntityFramework.Database.Extensions;
+using DotLogix.WebServices.EntityFramework.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace DotLogix.WebServices.EntityFramework.Extensions;
+namespace DotLogix.WebServices.EntityFramework.Extensions; 
 
 public static class DbContextOptionsBuilderExtensions {
     public static DbContextOptionsBuilder UseQueryExtensions(this DbContextOptionsBuilder builder, Action<QueryEnhancementOptions> configure = null) {

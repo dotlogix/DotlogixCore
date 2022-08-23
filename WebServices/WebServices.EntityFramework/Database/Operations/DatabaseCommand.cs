@@ -1,9 +1,9 @@
-namespace DotLogix.WebServices.EntityFramework.Database {
-    public class DatabaseCommand {
-        public string Name { get; }
+namespace DotLogix.WebServices.EntityFramework.Database; 
 
-        public DatabaseCommand(string name) {
-            Name = name;
-        }
+public class DatabaseCommand {
+    public string Name { get; }
+
+    public DatabaseCommand(string name) {
+        Name = name;
     }
 }

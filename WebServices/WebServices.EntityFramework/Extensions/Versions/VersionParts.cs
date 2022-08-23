@@ -1,8 +1,8 @@
-namespace DotLogix.WebServices.EntityFramework.Expressions {
-    public enum VersionParts {
-        Major,
-        Minor,
-        Build,
-        Revision
-    }
+namespace DotLogix.WebServices.EntityFramework.Extensions; 
+
+public enum VersionParts {
+    Major,
+    Minor,
+    Build,
+    Revision
 }

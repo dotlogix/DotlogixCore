@@ -8,12 +8,13 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\WebServices\WebServices.Adapters\WebServices.Adapters.csproj" />
+      <ProjectReference Include="..\..\WebServices\WebServices.AspCore.EntityFramework\WebServices.AspCore.EntityFramework.csproj" />
       <ProjectReference Include="..\..\WebServices\WebServices.AspCore\WebServices.AspCore.csproj" />
       <ProjectReference Include="..\WebServices.Testing.Core\WebServices.Testing.Core.csproj" />
       <ProjectReference Include="..\WebServices.Testing.EntityFramework\WebServices.Testing.EntityFramework.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.4" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.6" />
     </ItemGroup>
 </Project>

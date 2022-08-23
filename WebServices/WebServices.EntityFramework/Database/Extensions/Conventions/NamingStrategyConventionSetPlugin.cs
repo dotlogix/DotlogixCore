@@ -2,7 +2,7 @@ using DotLogix.WebServices.EntityFramework.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
-namespace DotLogix.WebServices.EntityFramework.Database.Extensions;
+namespace DotLogix.WebServices.EntityFramework.Database; 
 
 public class NamingStrategyConventionSetPlugin : IConventionSetPlugin
 {

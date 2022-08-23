@@ -1,18 +1,17 @@
 using System;
 
-namespace DotLogix.WebServices.Adapters.Endpoints
+namespace DotLogix.WebServices.Adapters.Endpoints; 
+
+public class StaticWebServiceEndpoint : IWebServiceEndpoint
 {
-    public class StaticWebServiceEndpoint : IWebServiceEndpoint
+    public Uri Uri { get; }
+
+    public StaticWebServiceEndpoint(Uri uri)
     {
-        public Uri Uri { get; }
+        Uri = uri;
+    }
 
-        public StaticWebServiceEndpoint(Uri uri)
-        {
-            Uri = uri;
-        }
-
-        public StaticWebServiceEndpoint(string url) : this(new Uri(url))
-        {
-        }
+    public StaticWebServiceEndpoint(string url) : this(new Uri(url))
+    {
     }
 }

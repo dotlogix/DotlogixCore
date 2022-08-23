@@ -1,11 +1,11 @@
 using System;
 
-namespace DotLogix.WebServices.EntityFramework.Context.Events {
-    public class QueryEventArgs : EventArgs {
-        public Type ResultType { get; }
+namespace DotLogix.WebServices.EntityFramework.Context.Events; 
 
-        public QueryEventArgs(Type resultType) {
-            ResultType = resultType;
-        }
+public class QueryEventArgs : EventArgs {
+    public Type ResultType { get; }
+
+    public QueryEventArgs(Type resultType) {
+        ResultType = resultType;
     }
 }

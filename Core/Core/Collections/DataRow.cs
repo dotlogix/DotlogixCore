@@ -24,9 +24,9 @@ namespace DotLogix.Core.Collections {
 
 		public int GetIndexOf(string name) { return HeaderMap.TryGetValue(name, out var idx) ? idx : -1; }
 
-        public bool TryGetIndexOf(string name, out int index) {
-            return HeaderMap.TryGetValue(name, out index);
-        }
+		public bool TryGetIndexOf(string name, out int index) {
+			return HeaderMap.TryGetValue(name, out index);
+		}
 
 		public bool TryGetValue(int index, out object value) {
 			if (index < 0 || index >= Values.Length) {
@@ -56,20 +56,20 @@ namespace DotLogix.Core.Collections {
 
 		public object GetValue(int index, object defaultValue) {
 			return TryGetValue(index, out var value)
-				       ? value
-				       : defaultValue;
+				? value
+				: defaultValue;
 		}
 
 		public T GetValueAs<T>(int index, T defaultValue) {
 			return TryGetValue(index, out var obj) && obj.TryConvertTo(out T value)
-				       ? value
-				       : defaultValue;
+				? value
+				: defaultValue;
 		}
 
 		public object GetValueAs(int index, Type type, object defaultValue) {
 			return TryGetValue(index, out var obj) && obj.TryConvertTo(type, out var value)
-				       ? value
-				       : defaultValue;
+				? value
+				: defaultValue;
 		}
 
 
@@ -96,20 +96,20 @@ namespace DotLogix.Core.Collections {
 
 		public object GetValue(string name, object defaultValue) {
 			return TryGetIndexOf(name, out var index)
-				       ? GetValue(index, defaultValue)
-				       : defaultValue;
+				? GetValue(index, defaultValue)
+				: defaultValue;
 		}
 
 		public T GetValueAs<T>(string name, T defaultValue) {
 			return TryGetIndexOf(name, out var index)
-				       ? GetValueAs(index, defaultValue)
-				       : defaultValue;
+				? GetValueAs(index, defaultValue)
+				: defaultValue;
 		}
 
 		public object GetValueAs(string name, Type type, object defaultValue) {
 			return TryGetIndexOf(name, out var index)
-				       ? GetValueAs(index, type, defaultValue)
-				       : defaultValue;
+				? GetValueAs(index, type, defaultValue)
+				: defaultValue;
 		}
 	}
 }

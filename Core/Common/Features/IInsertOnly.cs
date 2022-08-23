@@ -8,11 +8,11 @@
 
 namespace DotLogix.Common.Features {
     /// <summary>
-    /// An interface to represent insert only objects
+    ///     An interface to represent insert only objects
     /// </summary>
     public interface IInsertOnly {
         /// <summary>
-        /// A value to check if this object is active or not
+        ///     A value to check if this object is active or not
         /// </summary>
         bool IsActive { get; set; }
     }

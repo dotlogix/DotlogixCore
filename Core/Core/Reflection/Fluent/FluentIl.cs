@@ -33,8 +33,8 @@ namespace DotLogix.Core.Reflection.Fluent {
                 return null;
 
             var dynamicMethod = new DynamicMethod($"Dynamic{methodInfo.Name}", typeof(object),
-                                                  new[] {typeof(object), typeof(object[])},
-                                                  methodInfo.Module, true);
+                new[] {typeof(object), typeof(object[])},
+                methodInfo.Module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             var ps = methodInfo.GetParameters();
             var paramTypes = new Type[ps.Length];
@@ -51,16 +51,16 @@ namespace DotLogix.Core.Reflection.Fluent {
                 locals[i] = ilGen.DeclareLocal(paramTypes[i], true);
             for(var i = 0; i < paramTypes.Length; i++) {
                 ilGen.
-                Ldarg_1().
-                Ldc_I4_Auto(i).
-                Ldelem_Ref().
-                Unbox_AnyOrCast(paramTypes[i]).
-                Stloc(locals[i]);
+                    Ldarg_1().
+                    Ldc_I4_Auto(i).
+                    Ldelem_Ref().
+                    Unbox_AnyOrCast(paramTypes[i]).
+                    Stloc(locals[i]);
             }
 
             if(!methodInfo.IsStatic) {
                 ilGen.Ldarg_0().
-                      UnboxOrCast(methodInfo.DeclaringType);
+                    UnboxOrCast(methodInfo.DeclaringType);
             }
 
             for(var i = 0; i < paramTypes.Length; i++) {
@@ -80,11 +80,11 @@ namespace DotLogix.Core.Reflection.Fluent {
                 if(!ps[i].ParameterType.IsByRef)
                     continue;
                 ilGen.
-                Ldarg_1().
-                Ldc_I4_Auto(i).
-                Ldloc(locals[i]).
-                BoxIfNeeded(locals[i].LocalType).
-                Stelem_Ref();
+                    Ldarg_1().
+                    Ldc_I4_Auto(i).
+                    Ldloc(locals[i]).
+                    BoxIfNeeded(locals[i].LocalType).
+                    Stelem_Ref();
             }
 
             ilGen.Ret();
@@ -97,7 +97,7 @@ namespace DotLogix.Core.Reflection.Fluent {
         ///     Creates a dynamic method to call a reflected constructor info with minimum overhead
         /// </summary>
         public static CtorDelegate CreateConstructor(Type declaringType, ConstructorInfo constructorInfo,
-                                                     bool allowNonPublic = true) {
+            bool allowNonPublic = true) {
             if(declaringType == null)
                 throw new ArgumentNullException(nameof(declaringType));
 
@@ -123,19 +123,19 @@ namespace DotLogix.Core.Reflection.Fluent {
                 module = constructorInfo.Module;
                 parameters = constructorInfo.GetParameters();
                 ctorName = declaringType.IsArray
-                           ? $"{declaringType.GetElementType()?.Name}Array{parameters.Length}d"
-                           : declaringType.Name;
+                    ? $"{declaringType.GetElementType()?.Name}Array{parameters.Length}d"
+                    : declaringType.Name;
             }
 
             var dynamicMethod = new DynamicMethod($"DynamicCtor{ctorName}", typeof(object),
-                                                  new[] {typeof(object[])},
-                                                  module, true);
+                new[] {typeof(object[])},
+                module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             var result = ilGen.DeclareLocal(declaringType);
             if(constructorInfo == null) {
                 ilGen.
-                Ldloca(result).
-                Initobj(declaringType);
+                    Ldloca(result).
+                    Initobj(declaringType);
             } else {
                 var paramTypes = new Type[parameters.Length];
                 for(var i = 0; i < paramTypes.Length; i++) {
@@ -151,11 +151,11 @@ namespace DotLogix.Core.Reflection.Fluent {
                     locals[i] = ilGen.DeclareLocal(paramTypes[i], true);
                 for(var i = 0; i < paramTypes.Length; i++) {
                     ilGen.
-                    Ldarg_0().
-                    Ldc_I4_Auto(i).
-                    Ldelem_Ref().
-                    Unbox_AnyOrCast(paramTypes[i]).
-                    Stloc(locals[i]);
+                        Ldarg_0().
+                        Ldc_I4_Auto(i).
+                        Ldelem_Ref().
+                        Unbox_AnyOrCast(paramTypes[i]).
+                        Stloc(locals[i]);
                 }
 
                 for(var i = 0; i < paramTypes.Length; i++) {
@@ -166,23 +166,23 @@ namespace DotLogix.Core.Reflection.Fluent {
                 }
 
                 ilGen.Newobj(constructorInfo)
-                     .BoxIfNeeded(declaringType)
-                     .Stloc(result);
+                   .BoxIfNeeded(declaringType)
+                   .Stloc(result);
 
                 for(var i = 0; i < paramTypes.Length; i++) {
                     if(!parameters[i].ParameterType.IsByRef)
                         continue;
                     ilGen.
-                    Ldarg_0().
-                    Ldc_I4_Auto(i).
-                    Ldloc(locals[i]).
-                    BoxIfNeeded(locals[i].LocalType).
-                    Stelem_Ref();
+                        Ldarg_0().
+                        Ldc_I4_Auto(i).
+                        Ldloc(locals[i]).
+                        BoxIfNeeded(locals[i].LocalType).
+                        Stelem_Ref();
                 }
             }
 
             ilGen.Ldloc(result)
-                 .Ret();
+               .Ret();
             return (CtorDelegate)dynamicMethod.CreateDelegate(typeof(CtorDelegate));
         }
         #endregion
@@ -205,18 +205,18 @@ namespace DotLogix.Core.Reflection.Fluent {
             var propertyType = propertyInfo.PropertyType;
 
             var dynamicMethod = new DynamicMethod($"DynamicGet{propertyName}", typeof(object), new[] {typeof(object)},
-                                                  getMethod.Module, true);
+                getMethod.Module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             if(getMethod.IsStatic == false) {
                 ilGen.
-                Ldarg_0().
-                UnboxOrCast(declaringType);
+                    Ldarg_0().
+                    UnboxOrCast(declaringType);
             }
 
             ilGen.
-            CallOrVirt(getMethod).
-            BoxOrCast(propertyType).
-            Ret();
+                CallOrVirt(getMethod).
+                BoxOrCast(propertyType).
+                Ret();
             return (GetterDelegate)dynamicMethod.CreateDelegate(typeof(GetterDelegate));
         }
 
@@ -237,19 +237,19 @@ namespace DotLogix.Core.Reflection.Fluent {
             var propertyType = propertyInfo.PropertyType;
 
             var dynamicMethod = new DynamicMethod($"DynamicSet{propertyName}", typeof(void),
-                                                  new[] {typeof(object), typeof(object)}, propertyInfo.Module, true);
+                new[] {typeof(object), typeof(object)}, propertyInfo.Module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             if(setMethod.IsStatic == false) {
                 ilGen.
-                Ldarg_0().
-                UnboxOrCast(declaringType);
+                    Ldarg_0().
+                    UnboxOrCast(declaringType);
             }
 
             ilGen.
-            Ldarg_1().
-            Unbox_AnyOrCast(propertyType).
-            CallOrVirt(setMethod).
-            Ret();
+                Ldarg_1().
+                Unbox_AnyOrCast(propertyType).
+                CallOrVirt(setMethod).
+                Ret();
             return (SetterDelegate)dynamicMethod.CreateDelegate(typeof(SetterDelegate));
         }
 
@@ -270,16 +270,16 @@ namespace DotLogix.Core.Reflection.Fluent {
             var propertyType = typeof(TProperty);
 
             var dynamicMethod = new DynamicMethod($"DynamicGet{propertyName}", propertyType, new[] {declaringType},
-                                                  getMethod.Module, true);
+                getMethod.Module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             if(getMethod.IsStatic == false)
                 ilGen.LdargIfClassElseLdarga(declaringType, 0);
             ilGen.
-            LdargIfClassElseLdarga(declaringType, 0).
-            CallOrVirt(getMethod).
-            Ret();
+                LdargIfClassElseLdarga(declaringType, 0).
+                CallOrVirt(getMethod).
+                Ret();
             return (GetterDelegate<TInstance, TProperty>)
-            dynamicMethod.CreateDelegate(typeof(GetterDelegate<TInstance, TProperty>));
+                dynamicMethod.CreateDelegate(typeof(GetterDelegate<TInstance, TProperty>));
         }
 
         /// <summary>
@@ -299,16 +299,16 @@ namespace DotLogix.Core.Reflection.Fluent {
             var propertyType = propertyInfo.PropertyType;
 
             var dynamicMethod = new DynamicMethod($"DynamicSet{propertyName}", typeof(void),
-                                                  new[] {declaringType, propertyType}, propertyInfo.Module, true);
+                new[] {declaringType, propertyType}, propertyInfo.Module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             if(setMethod.IsStatic == false)
                 ilGen.LdargIfClassElseLdarga(declaringType, 0);
             ilGen.
-            Ldarg_1().
-            CallOrVirt(setMethod).
-            Ret();
+                Ldarg_1().
+                CallOrVirt(setMethod).
+                Ret();
             return (SetterDelegate<TInstance, TProperty>)
-            dynamicMethod.CreateDelegate(typeof(SetterDelegate<TInstance, TProperty>));
+                dynamicMethod.CreateDelegate(typeof(SetterDelegate<TInstance, TProperty>));
         }
         #endregion
 
@@ -326,7 +326,7 @@ namespace DotLogix.Core.Reflection.Fluent {
             var fieldType = fieldInfo.FieldType;
 
             var dynamicMethod = new DynamicMethod($"DynamicGet{fieldName}", typeof(object), new[] {typeof(object)},
-                                                  fieldInfo.Module, true);
+                fieldInfo.Module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             if(fieldInfo.IsLiteral) {
                 if(fieldType == typeof(bool)) {
@@ -344,21 +344,21 @@ namespace DotLogix.Core.Reflection.Fluent {
                     ilGen.Ldstr((string)fieldInfo.GetRawConstantValue());
                 else {
                     throw new
-                    NotSupportedException($"Creating a FieldGetter for type: {fieldType.Name} is unsupported.");
+                        NotSupportedException($"Creating a FieldGetter for type: {fieldType.Name} is unsupported.");
                 }
 
                 ilGen.Ret();
             } else if(fieldInfo.IsStatic) {
                 ilGen.Ldsfld(fieldInfo).
-                      BoxOrCast(fieldType).
-                      Ret();
+                    BoxOrCast(fieldType).
+                    Ret();
             } else {
                 ilGen.
-                Ldarg_0().
-                UnboxOrCast(declaringType).
-                Ldfld(fieldInfo).
-                BoxOrCast(fieldType).
-                Ret();
+                    Ldarg_0().
+                    UnboxOrCast(declaringType).
+                    Ldfld(fieldInfo).
+                    BoxOrCast(fieldType).
+                    Ret();
             }
 
             return (GetterDelegate)dynamicMethod.CreateDelegate(typeof(GetterDelegate));
@@ -379,22 +379,22 @@ namespace DotLogix.Core.Reflection.Fluent {
             var fieldType = fieldInfo.FieldType;
 
             var dynamicMethod = new DynamicMethod($"DynamicSet{fieldName}", typeof(void),
-                                                  new[] {typeof(object), typeof(object)}, fieldInfo.Module, true);
+                new[] {typeof(object), typeof(object)}, fieldInfo.Module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             if(fieldInfo.IsStatic) {
                 ilGen.
-                Ldarg_1().
-                Unbox_AnyOrCast(fieldType).
-                Stsfld(fieldInfo).
-                Ret();
+                    Ldarg_1().
+                    Unbox_AnyOrCast(fieldType).
+                    Stsfld(fieldInfo).
+                    Ret();
             } else {
                 ilGen.
-                Ldarg_0().
-                UnboxOrCast(declaringType).
-                Ldarg_1().
-                Unbox_AnyOrCast(fieldType).
-                Stfld(fieldInfo).
-                Ret();
+                    Ldarg_0().
+                    UnboxOrCast(declaringType).
+                    Ldarg_1().
+                    Unbox_AnyOrCast(fieldType).
+                    Stfld(fieldInfo).
+                    Ret();
             }
 
             return (SetterDelegate)dynamicMethod.CreateDelegate(typeof(SetterDelegate));
@@ -404,7 +404,7 @@ namespace DotLogix.Core.Reflection.Fluent {
         ///     Creates a dynamic method to call a getter of a field info with minimum overhead
         /// </summary>
         public static GetterDelegate<TInstance, TField> CreateGetter<TInstance, TField>(
-        FieldInfo fieldInfo, bool allowNonPublic = true) {
+            FieldInfo fieldInfo, bool allowNonPublic = true) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
             if(fieldInfo.IsPrivate && (allowNonPublic == false))
@@ -414,7 +414,7 @@ namespace DotLogix.Core.Reflection.Fluent {
             var fieldType = typeof(TField);
 
             var dynamicMethod = new DynamicMethod($"DynamicGet{fieldName}", fieldType, new[] {declaringType},
-                                                  fieldInfo.Module, true);
+                fieldInfo.Module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             if(fieldInfo.IsLiteral) {
                 if(fieldType == typeof(bool)) {
@@ -432,29 +432,29 @@ namespace DotLogix.Core.Reflection.Fluent {
                     ilGen.Ldstr((string)fieldInfo.GetRawConstantValue());
                 else {
                     throw new
-                    NotSupportedException($"Creating a FieldGetter for type: {fieldType.Name} is unsupported.");
+                        NotSupportedException($"Creating a FieldGetter for type: {fieldType.Name} is unsupported.");
                 }
 
                 ilGen.Ret();
             } else if(fieldInfo.IsStatic) {
                 ilGen.Ldsfld(fieldInfo).
-                      Ret();
+                    Ret();
             } else {
                 ilGen.
-                LdargIfClassElseLdarga(declaringType, 0).
-                Ldfld(fieldInfo).
-                Ret();
+                    LdargIfClassElseLdarga(declaringType, 0).
+                    Ldfld(fieldInfo).
+                    Ret();
             }
 
             return (GetterDelegate<TInstance, TField>)
-            dynamicMethod.CreateDelegate(typeof(GetterDelegate<TInstance, TField>));
+                dynamicMethod.CreateDelegate(typeof(GetterDelegate<TInstance, TField>));
         }
 
         /// <summary>
         ///     Creates a dynamic method to call a setter of a field info with minimum overhead
         /// </summary>
         public static SetterDelegate<TInstance, TField> CreateSetter<TInstance, TField>(
-        FieldInfo fieldInfo, bool allowNonPublic = true) {
+            FieldInfo fieldInfo, bool allowNonPublic = true) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
             if(fieldInfo.IsInitOnly || fieldInfo.IsLiteral)
@@ -466,23 +466,23 @@ namespace DotLogix.Core.Reflection.Fluent {
             var fieldType = fieldInfo.FieldType;
 
             var dynamicMethod = new DynamicMethod($"DynamicSet{fieldName}", typeof(void),
-                                                  new[] {declaringType, fieldType}, fieldInfo.Module, true);
+                new[] {declaringType, fieldType}, fieldInfo.Module, true);
             var ilGen = dynamicMethod.GetFluentIlGenerator();
             if(fieldInfo.IsStatic) {
                 ilGen.
-                Ldarg_1().
-                Stsfld(fieldInfo).
-                Ret();
+                    Ldarg_1().
+                    Stsfld(fieldInfo).
+                    Ret();
             } else {
                 ilGen.
-                LdargIfClassElseLdarga(declaringType, 0).
-                Ldarg_1().
-                Stfld(fieldInfo).
-                Ret();
+                    LdargIfClassElseLdarga(declaringType, 0).
+                    Ldarg_1().
+                    Stfld(fieldInfo).
+                    Ret();
             }
 
             return (SetterDelegate<TInstance, TField>)
-            dynamicMethod.CreateDelegate(typeof(SetterDelegate<TInstance, TField>));
+                dynamicMethod.CreateDelegate(typeof(SetterDelegate<TInstance, TField>));
         }
         #endregion
     }

@@ -11,11 +11,11 @@
 
 namespace DotLogix.Common.Features {
     /// <summary>
-    /// An interface to force an id
+    ///     An interface to force an id
     /// </summary>
     public interface IIdentity {
         /// <summary>
-        /// The id
+        ///     The id
         /// </summary>
         int Id { get; set; }
     }

@@ -35,8 +35,7 @@ namespace DotLogix.Core.Utils.Security {
         }
 
         /// <inheritdoc />
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value,
-                                         Type destinationType) {
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) {
             if(value is not EncryptedString encryptedString)
                 throw new ArgumentNullException(nameof(value));
             return encryptedString.ToEncryptedString();
@@ -44,7 +43,7 @@ namespace DotLogix.Core.Utils.Security {
 
         /// <inheritdoc />
         public override bool IsValid(ITypeDescriptorContext context, object value) {
-            return value is string stringValue && (stringValue.Length > 16);
+            return value is string { Length: > 16 };
         }
     }
 }

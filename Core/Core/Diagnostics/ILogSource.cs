@@ -108,7 +108,7 @@ namespace DotLogix.Core.Diagnostics {
     }
 
     /// <inheritdoc />
-    // ReSharper disable once UnusedTypeParameter
+// ReSharper disable once UnusedTypeParameter
     public interface ILogSource<T> : ILogSource {
     }
 }

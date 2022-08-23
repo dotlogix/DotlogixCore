@@ -5,7 +5,6 @@
 <#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Core\Core.Lambda\bin\Release\netstandard2.0\DotLogix.Core.Lambda.dll" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Linq.Expressions" #>
-<#@ import namespace="DotLogix.Core.Expressions" #>
 <#+
     public void WriteStaticMethod(MethodInfo method, bool asExtension = false, bool preserveExpressions = false)
     {

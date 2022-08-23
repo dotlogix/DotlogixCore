@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Utils.Tracking.Entries;
 using DotLogix.Core.Utils.Tracking.Manager;
@@ -99,7 +100,7 @@ namespace DotLogix.Core.Utils.Tracking {
                 if(property.IsDefined(typeof(ChangeTrackingKeyAttribute)) == false)
                     continue;
 
-                if(keyAccessor != null)
+                if(keyAccessor is not null)
                     throw new InvalidOperationException("Multiple change tracking keys are set for this type of entity you have to choose only one");
                 keyAccessor = dynamicProp;
             }

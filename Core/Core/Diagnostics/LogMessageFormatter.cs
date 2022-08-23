@@ -31,14 +31,14 @@ namespace DotLogix.Core.Diagnostics {
             lock(_lock) {
                 _stringBuilder.AppendLine($"{message.TimeStamp:G} - {message.LogLevel:G}, Type: {message.TypeName}, Method: {message.MethodName}, Thread: {message.ThreadName}");
             
-                if(message.Context is {Count: > 0}) {
+                if(message.Context is { Count: > 0 }) {
                     _stringBuilder.AppendLine("Context:");
-                    foreach (var kv in message.Context.OrderBy(kv => kv.Key)) {
-                        _stringBuilder.Append("  - ").Append(kv.Key).Append(": ").Append(kv.Value).AppendLine();
+                    foreach (var (key, value) in message.Context.OrderBy(kv => kv.Key)) {
+                        _stringBuilder.Append("  - ").Append(key).Append(": ").Append(value).AppendLine();
                     }
                 }
             
-                if(message.Message != null) {
+                if(message.Message is not null) {
                     _stringBuilder.AppendLine(message.Message);
                 }
                 _stringBuilder.AppendLine();

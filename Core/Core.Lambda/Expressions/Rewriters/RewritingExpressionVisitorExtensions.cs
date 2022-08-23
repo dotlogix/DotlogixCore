@@ -87,23 +87,17 @@ namespace DotLogix.Core.Expressions.Rewriters {
         }
 
         /// <inheritdoc cref="RewritingExpressionVisitor.Add(DotLogix.Core.Expressions.Rewriters.IMemberRewriter)" />
-        public static void RewriteMember(this RewritingExpressionVisitor visitor, MemberInfo memberInfo, Func<Expression, Type, Expression> rewrite) {
-            Expression RewriteMemberInternal(Expression instance, MemberInfo member, Type type) {
-                if(member != memberInfo) {
-                    return default;
-                }
-                return rewrite(instance, type);
+        public static void RewriteMember(this RewritingExpressionVisitor visitor, MemberInfo memberInfo, Func<Expression, Expression> rewrite) {
+            Expression RewriteMemberInternal(Expression instance, MemberInfo member) {
+                return member == memberInfo ? rewrite(instance) : default;
             }
             visitor.Add(new MemberRewriter(RewriteMemberInternal));
         }
 
         /// <inheritdoc cref="RewritingExpressionVisitor.Add(DotLogix.Core.Expressions.Rewriters.IMemberRewriter)" />
         public static void RewriteMember(this RewritingExpressionVisitor visitor, MemberInfo memberInfo, MemberInfo newMemberInfo) {
-            Expression RewriteMemberInternal(Expression instance, MemberInfo member, Type type) {
-                if(member != memberInfo) {
-                    return default;
-                }
-                return Expression.MakeMemberAccess(instance, newMemberInfo);
+            Expression RewriteMemberInternal(Expression instance, MemberInfo member) {
+                return member == memberInfo ? Expression.MakeMemberAccess(instance, newMemberInfo) : default(Expression);
             }
             visitor.Add(new MemberRewriter(RewriteMemberInternal));
         }

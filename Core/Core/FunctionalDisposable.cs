@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace DotLogix.Core
-{
+namespace DotLogix.Core {
     /// <summary>
     /// A functional class to wrap a value as a disposable to execute an action after disposal
     /// </summary>

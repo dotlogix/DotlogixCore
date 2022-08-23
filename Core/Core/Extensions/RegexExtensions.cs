@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace DotLogix.Core.Extensions
-{
+namespace DotLogix.Core.Extensions {
     /// <summary>
     /// A static class providing extension methods for <see cref="Regex"/>
     /// </summary>

@@ -6,7 +6,7 @@ using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Expressions {
     public static partial class Lambdas {
-#region ToLambda
+        #region ToLambda
         public static Expression<TDelegate> ToLambda<TDelegate>(this Lambda instance, params ParameterExpression[] parameters) where TDelegate : Delegate {
             return ToLambda<TDelegate>(instance, parameters.AsEnumerable());
         }
@@ -55,9 +55,9 @@ namespace DotLogix.Core.Expressions {
         public static Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>> ToLambda<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>(this Lambda<TResult> instance, ParameterExpression arg1, ParameterExpression arg2, ParameterExpression arg3, ParameterExpression arg4, ParameterExpression arg5, ParameterExpression arg6, ParameterExpression arg7, ParameterExpression arg8, ParameterExpression arg9, ParameterExpression arg10) {
             return ToLambda<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>>(instance, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
         }
-#endregion
+        #endregion
 
-#region Compile
+        #region Compile
         public static Func<TResult> Compile<TResult>(this Lambda<TResult> instance) {
             return ToLambda<Func<TResult>>(instance).Compile();
         }
@@ -91,9 +91,9 @@ namespace DotLogix.Core.Expressions {
         public static Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult> Compile<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>(this Lambda<TResult> instance, ParameterExpression arg1, ParameterExpression arg2, ParameterExpression arg3, ParameterExpression arg4, ParameterExpression arg5, ParameterExpression arg6, ParameterExpression arg7, ParameterExpression arg8, ParameterExpression arg9, ParameterExpression arg10) {
             return ToLambda<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>>(instance, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10).Compile();
         }
-#endregion
+        #endregion
 
-#region Evaluate
+        #region Evaluate
         public static object Evaluate(this Expression instance) {
             return Expression.Lambda<Func<object>>(instance, Array.Empty<ParameterExpression>()).Compile().Invoke();
         }
@@ -139,6 +139,6 @@ namespace DotLogix.Core.Expressions {
         public static TResult Evaluate<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>(this Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>> instance, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10) {
             return instance.Compile().Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
         }
-#endregion
+        #endregion
     }
 }

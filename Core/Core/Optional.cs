@@ -94,7 +94,7 @@ namespace DotLogix.Core {
         /// </summary>
         /// <param name="value"></param>
         public static implicit operator Optional<TValue>(TValue value) {
-            return new(value);
+            return new Optional<TValue>(value);
         }
 
 
@@ -146,7 +146,7 @@ namespace DotLogix.Core {
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode() {
-            return IsDefined && Value != null ? Value.GetHashCode() : 0;
+            return IsDefined && Value is not null ? Value.GetHashCode() : 0;
         }
 
         /// <summary>

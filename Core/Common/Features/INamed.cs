@@ -8,11 +8,11 @@
 
 namespace DotLogix.Common.Features {
     /// <summary>
-    /// An interface to force a name
+    ///     An interface to force a name
     /// </summary>
     public interface INamed {
         /// <summary>
-        /// The name
+        ///     The name
         /// </summary>
         string Name { get; set; }
     }

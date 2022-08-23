@@ -65,7 +65,7 @@ namespace DotLogix.Core.Types {
                 return new DataType(DataTypeFlags.Collection, type, elementType: elementType);
 
             var underlyingType = Nullable.GetUnderlyingType(type);
-            if(underlyingType != null) {
+            if(underlyingType is not null) {
                 var underlyingDataType = GetDataType(underlyingType);
                 return new DataType(DataTypeFlags.Nullable | underlyingDataType.Flags, type, underlyingType);
             }

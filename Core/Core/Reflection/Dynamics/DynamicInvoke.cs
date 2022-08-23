@@ -52,7 +52,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </summary>
         public int ParameterCount => Parameters.Length;
         internal DynamicInvoke(MethodInfo methodInfo, AccessModifiers access, VisibilityModifiers visibility,
-                               InvokeDelegate invokeDelegate) : base(methodInfo) {
+            InvokeDelegate invokeDelegate) : base(methodInfo) {
             MethodInfo = methodInfo;
             InvokeDelegate = invokeDelegate ?? throw new ArgumentNullException(nameof(invokeDelegate));
             Access = access;

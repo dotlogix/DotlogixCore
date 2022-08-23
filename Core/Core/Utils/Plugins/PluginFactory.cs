@@ -23,7 +23,7 @@ namespace DotLogix.Core.Utils.Plugins {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static IEnumerable<T> LoadPlugins<T>(string pluginPath, string filter = "*.dll",
-                                                    SearchOption searchOption = SearchOption.TopDirectoryOnly)
+            SearchOption searchOption = SearchOption.TopDirectoryOnly)
             where T : IPluginDefinition {
             var files = Directory.GetFiles(pluginPath, filter, searchOption);
             return LoadPlugins<T>(files);
@@ -46,7 +46,7 @@ namespace DotLogix.Core.Utils.Plugins {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static IEnumerable<PluginAssembly<T>> LoadPluginAssemblies<T>(IEnumerable<string> files,
-                                                                            bool validOnly = true)
+            bool validOnly = true)
             where T : IPluginDefinition {
             foreach(var file in files) {
                 var assembly = new PluginAssembly<T>(file);

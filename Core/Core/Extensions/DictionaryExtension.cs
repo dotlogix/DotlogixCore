@@ -29,7 +29,7 @@ namespace DotLogix.Core.Extensions {
         ///     Reverses a key value pair so value will be the key and the key will be the value
         /// </summary>
         public static KeyValuePair<TValue, TKey> Reverse<TKey, TValue>(this KeyValuePair<TKey, TValue> kvpair) {
-            return new(kvpair.Value, kvpair.Key);
+            return new KeyValuePair<TValue, TKey>(kvpair.Value, kvpair.Key);
         }
         #endregion
 
@@ -252,10 +252,10 @@ namespace DotLogix.Core.Extensions {
         /// </summary>
         public static TValue PopValueAs<TKey, TValue>(this IDictionary<TKey, object> dict, TKey key, TValue defaultValue) {
             return dict.TryGetValue(key, out var obj)
-                   && obj.TryConvertTo(out TValue value)
-                   && (dict.Remove(key) == false)
-                   ? value
-                   : defaultValue;
+             && obj.TryConvertTo(out TValue value)
+             && (dict.Remove(key) == false)
+                    ? value
+                    : defaultValue;
         }
 
         /// <summary>

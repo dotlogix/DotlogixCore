@@ -54,11 +54,11 @@ namespace DotLogix.Core.Reflection.Dynamics {
             ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
             AccessorType = accessorType;
             var accessMode = ValueAccessModes.None;
-            if(getter != null) {
+            if(getter is not null) {
                 Getter = getter;
                 accessMode |= ValueAccessModes.Read;
             }
-            if(setter != null) {
+            if(setter is not null) {
                 Setter = setter;
                 accessMode |= ValueAccessModes.Write;
             }
@@ -111,18 +111,13 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public override string ToString() {
-            switch(ValueAccessMode) {
-                case ValueAccessModes.None:
-                    return $"{DeclaringType.Name}.{Name}";
-                case ValueAccessModes.Read:
-                    return $"{DeclaringType.Name}.{Name}{{get;}}";
-                case ValueAccessModes.Write:
-                    return $"{DeclaringType.Name}.{Name}{{set;}}";
-                case ValueAccessModes.ReadWrite:
-                    return $"{DeclaringType.Name}.{Name}{{get; set;}}";
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return ValueAccessMode switch {
+                ValueAccessModes.None => $"{DeclaringType.Name}.{Name}",
+                ValueAccessModes.Read => $"{DeclaringType.Name}.{Name}{{get;}}",
+                ValueAccessModes.Write => $"{DeclaringType.Name}.{Name}{{set;}}",
+                ValueAccessModes.ReadWrite => $"{DeclaringType.Name}.{Name}{{get; set;}}",
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
     }
 }

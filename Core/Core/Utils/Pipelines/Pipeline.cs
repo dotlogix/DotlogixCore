@@ -3,9 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DotLogix.Core.Utils.Pipelines
-{
-
+namespace DotLogix.Core.Utils.Pipelines {
     /// <summary>
     /// A pipeline implementation
     /// </summary>

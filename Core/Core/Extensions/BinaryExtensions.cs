@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace DotLogix.Core.Extensions
-{
+namespace DotLogix.Core.Extensions {
     /// <summary>
     /// A static class providing extension methods for <see cref="byte"/> and <see cref="Stream"/>
     /// </summary>
@@ -85,12 +84,12 @@ namespace DotLogix.Core.Extensions
             if (data1.Length < startIndex+count || data2.Length < startIndex2+count)
                 return false;
 
-            int len = count;
-            int rem = len % (sizeof(long) * 16);
+            var len = count;
+            var rem = len % (sizeof(long) * 16);
             fixed (byte* bytes1 = data1, bytes2 = data2) {
-                long* b1 = (long*)(bytes1 + startIndex);
-                long* b2 = (long*)(bytes2 + startIndex2);
-                long* e1 = (long*)(bytes1 + startIndex + len - rem);
+                var b1 = (long*)(bytes1 + startIndex);
+                var b2 = (long*)(bytes2 + startIndex2);
+                var e1 = (long*)(bytes1 + startIndex + len - rem);
 
                 while (b1 < e1) {
                     if (*(b1) != *(b2) || *(b1 + 1) != *(b2 + 1) || 
@@ -107,7 +106,7 @@ namespace DotLogix.Core.Extensions
                 }
 
                 len = rem;
-                rem = rem % sizeof(long);
+                rem %= sizeof(long);
                 e1 = (long*)(bytes1 + len - rem);
 
                 while (b1 < e1) {

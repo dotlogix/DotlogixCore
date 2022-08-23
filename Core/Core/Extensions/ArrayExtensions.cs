@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace DotLogix.Core.Extensions
-{
+namespace DotLogix.Core.Extensions {
     /// <summary>
     /// 
     /// </summary>
@@ -28,7 +28,7 @@ namespace DotLogix.Core.Extensions
                 count = searchWithin.Length - startIndex;
 
             var endIndex = startIndex + count;
-            for(int i = startIndex; i < endIndex; i++) {
+            for(var i = startIndex; i < endIndex; i++) {
                 if(Equals(searchWithin[i], searchFor) == false)
                     continue;
 
@@ -38,6 +38,59 @@ namespace DotLogix.Core.Extensions
 
             if (endIndex - startIndex > 0)
                 yield return new ArraySegment<T>(searchWithin, startIndex, endIndex - startIndex);
+        }
+
+        /// <summary>
+        ///     Initializes every element of the <see cref="T:System.Array"></see> with the provided value.
+        /// </summary>
+        /// <param name="array">The array</param>
+        /// <param name="value">The value</param>
+        /// <returns></returns>
+        public static T[] Initialize<T>(this T[] array, T value) {
+            return Initialize(array, value, 0, array.Length);
+        }
+
+        /// <summary>
+        ///     Initializes every element of the <see cref="T:System.Array"></see> with the provided value.
+        /// </summary>
+        /// <param name="array">The array</param>
+        /// <param name="value">The value</param>
+        /// <param name="index">The start index</param>
+        /// <param name="count">The amount of elements to set</param>
+        /// <returns></returns>
+        public static T[] Initialize<T>(this T[] array, T value, int index, int count) {
+            var currentCount = Math.Min(count, 8);
+            var offset = index;
+            for (; offset < currentCount; offset++)
+                array[offset] = value;
+			
+            while(offset < array.Length) {
+                Array.Copy(array, index, array, offset, Math.Min(currentCount, array.Length - offset));
+                offset += currentCount;
+                currentCount <<= 1;
+            }
+            return array;
+        }
+
+		
+        /// <summary>
+        ///     Creates a <see cref="Array"></see> by repeating the value n times
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="count">The amount of elements in the array</param>
+        /// <returns></returns>
+        public static T[] CreateArray<T>(this T value, int count = 1) {
+            return new T[count].Initialize(value);
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="count">The amount of elements in the list</param>
+        /// <returns></returns>
+        public static Task<T[]> CreateArray<T>(this Task<T> value, int count = 1) {
+            return value.TransformAsync(v => v.Result.CreateArray(count));
         }
     }
 }

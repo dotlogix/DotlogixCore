@@ -52,7 +52,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                     fluentIlGenerator.Ldc_I4_8();
                     break;
                 default:
-                    if((value > -129) && (value < 128))
+                    if(value is > -129 and < 128)
                         fluentIlGenerator.Ldc_I4_S((sbyte)value);
                     else
                         fluentIlGenerator.Ldc_I4(value);
@@ -78,7 +78,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                     fluentIlGenerator.Ldarg_3();
                     break;
                 default:
-                    if((index > 0) && (index <= byte.MaxValue))
+                    if(index is > 0 and <= byte.MaxValue)
                         fluentIlGenerator.Ldarg_S((byte)index);
                     else
                         fluentIlGenerator.Ldarg(index);
@@ -88,7 +88,7 @@ namespace DotLogix.Core.Reflection.Fluent {
         }
 
         public static FluentIlGenerator Starg_Auto(this FluentIlGenerator fluentIlGenerator, short index) {
-            if((index > 0) && (index <= byte.MaxValue))
+            if(index is > 0 and <= byte.MaxValue)
                 fluentIlGenerator.Starg_S((byte)index);
             else
                 fluentIlGenerator.Starg(index);
@@ -96,7 +96,7 @@ namespace DotLogix.Core.Reflection.Fluent {
         }
 
         public static FluentIlGenerator Ldarga_Auto(this FluentIlGenerator fluentIlGenerator, short index) {
-            if((index > 0) && (index <= byte.MaxValue))
+            if(index is > 0 and <= byte.MaxValue)
                 fluentIlGenerator.Ldarga_S((byte)index);
             else
                 fluentIlGenerator.Ldarga(index);
@@ -104,7 +104,7 @@ namespace DotLogix.Core.Reflection.Fluent {
         }
 
         public static FluentIlGenerator LdargIfClassElseLdarga(this FluentIlGenerator fluentIlGenerator, Type type,
-                                                               short index) {
+            short index) {
             if(type.IsValueType)
                 Ldarga_Auto(fluentIlGenerator, index);
             else
@@ -129,7 +129,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                     fluentIlGenerator.Stloc_3();
                     break;
                 default:
-                    if((index > 0) && (index <= byte.MaxValue))
+                    if(index is > 0 and <= byte.MaxValue)
                         fluentIlGenerator.Stloc_S((byte)index);
                     else
                         fluentIlGenerator.Stloc(index);
@@ -153,7 +153,7 @@ namespace DotLogix.Core.Reflection.Fluent {
                     fluentIlGenerator.Ldloc_3();
                     break;
                 default:
-                    if((index > 0) && (index <= byte.MaxValue))
+                    if(index is > 0 and <= byte.MaxValue)
                         fluentIlGenerator.Ldloc_S((byte)index);
                     else
                         fluentIlGenerator.Ldloc(index);
@@ -163,7 +163,7 @@ namespace DotLogix.Core.Reflection.Fluent {
         }
 
         public static FluentIlGenerator Ldloca_Auto(this FluentIlGenerator fluentIlGenerator, short index) {
-            if((index > 0) && (index <= byte.MaxValue))
+            if(index is > 0 and <= byte.MaxValue)
                 fluentIlGenerator.Ldloca_S((byte)index);
             else
                 fluentIlGenerator.Ldloca(index);
@@ -181,7 +181,7 @@ namespace DotLogix.Core.Reflection.Fluent {
         }
 
         public static FluentIlGenerator CallOrVirt(this FluentIlGenerator fluentIlGenerator, MethodInfo methodInfo,
-                                                   Type[] optionalParameterTypes) {
+            Type[] optionalParameterTypes) {
             if(methodInfo.IsVirtual)
                 fluentIlGenerator.Callvirt(methodInfo, optionalParameterTypes);
             else

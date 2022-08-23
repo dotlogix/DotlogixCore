@@ -8,11 +8,11 @@
 
 namespace DotLogix.Common.Features {
     /// <summary>
-    /// An interface to force a title
+    ///     An interface to force a title
     /// </summary>
     public interface ITitled {
         /// <summary>
-        /// The title
+        ///     The title
         /// </summary>
         string Title { get; set; }
     }

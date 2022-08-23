@@ -74,20 +74,12 @@ namespace DotLogix.Core.Utils {
 
         /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin) {
-            long absolutePosition;
-            switch(origin) {
-                case SeekOrigin.Begin:
-                    absolutePosition = offset;
-                    break;
-                case SeekOrigin.Current:
-                    absolutePosition = _position + offset;
-                    break;
-                case SeekOrigin.End:
-                    absolutePosition = Length - offset;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
-            }
+            var absolutePosition = origin switch {
+                SeekOrigin.Begin => offset,
+                SeekOrigin.Current => _position + offset,
+                SeekOrigin.End => Length - offset,
+                _ => throw new ArgumentOutOfRangeException(nameof(origin), origin, null)
+            };
 
             if((absolutePosition < 0L) || (absolutePosition > Length))
                 throw new IOException("Seek to position outside of segment bounds");

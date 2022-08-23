@@ -147,22 +147,22 @@ namespace DotLogix.Core.Extensions {
             var tcs = new TaskCompletionSource<object>();
 
             task.ContinueWith(t => {
-                                  if (t.IsCanceled) { 
-                                      tcs.SetCanceled();
-                                      return;
-                                  }
+                    if (t.IsCanceled) { 
+                        tcs.SetCanceled();
+                        return;
+                    }
 
-                                  if (t.IsFaulted) {
-                                      if (t.Exception != null)
-                                          tcs.SetException(t.Exception.InnerExceptions);
-                                      else
-                                        tcs.SetException(new ArgumentException("Exception must be present for a faulted task"));
-                                      return;
-                                  }
+                    if (t.IsFaulted) {
+                        if (t.Exception is not null)
+                            tcs.SetException(t.Exception.InnerExceptions);
+                        else
+                            tcs.SetException(new ArgumentException("Exception must be present for a faulted task"));
+                        return;
+                    }
 
-                                  tcs.SetResult(Unpack(task));
-                              },
-                              TaskContinuationOptions.ExecuteSynchronously);
+                    tcs.SetResult(Unpack(task));
+                },
+                TaskContinuationOptions.ExecuteSynchronously);
             return tcs.Task;
         }
         
@@ -241,26 +241,26 @@ namespace DotLogix.Core.Extensions {
         public static Task<TTo> TransformAsync<TFrom, TTo>(this Task<TFrom> task, Func<Task<TFrom>, TTo> onComplete, Func<Task<TFrom>, TTo> onError = null, Func<Task<TFrom>, TTo> onCancel = null) {
             var tcs = new TaskCompletionSource<TTo>();
             task.ContinueWith(t => {
-                                  if(t.IsCanceled) {
-                                      if(onCancel != null)
-                                          tcs.SetResult(onCancel.Invoke(t));
-                                      else
-                                          tcs.SetCanceled();
-                                      return;
-                                  }
+                    if(t.IsCanceled) {
+                        if(onCancel is not null)
+                            tcs.SetResult(onCancel.Invoke(t));
+                        else
+                            tcs.SetCanceled();
+                        return;
+                    }
 
-                                  if(t.IsFaulted) {
-                                      if(onError != null)
-                                          tcs.SetResult(onError.Invoke(t));
-                                      else if(t.Exception != null)
-                                          tcs.SetException(t.Exception.InnerExceptions);
+                    if(t.IsFaulted) {
+                        if(onError is not null)
+                            tcs.SetResult(onError.Invoke(t));
+                        else if(t.Exception is not null)
+                            tcs.SetException(t.Exception.InnerExceptions);
 
-                                      return;
-                                  }
+                        return;
+                    }
 
-                                  tcs.SetResult(onComplete.Invoke(t));
-                              },
-                              TaskContinuationOptions.ExecuteSynchronously);
+                    tcs.SetResult(onComplete.Invoke(t));
+                },
+                TaskContinuationOptions.ExecuteSynchronously);
             return tcs.Task;
         }
 
@@ -277,34 +277,34 @@ namespace DotLogix.Core.Extensions {
         public static Task<TTo> TransformAsync<TFrom, TTo>(this Task<TFrom> task, Func<TFrom, TTo> onComplete, Func<Exception, TTo> onError = null, Func<TTo> onCancel = null) {
             var tcs = new TaskCompletionSource<TTo>();
             task.ContinueWith(t => {
-                                  if(t.IsCanceled) {
-                                      if(onCancel != null)
-                                          tcs.SetResult(onCancel.Invoke());
-                                      else
-                                          tcs.SetCanceled();
-                                      return;
-                                  }
+                    if(t.IsCanceled) {
+                        if(onCancel is not null)
+                            tcs.SetResult(onCancel.Invoke());
+                        else
+                            tcs.SetCanceled();
+                        return;
+                    }
 
-                                  if(t.IsFaulted) {
-                                      if(onError != null)
-                                          tcs.SetResult(onError.Invoke(t.Exception));
-                                      else if(t.Exception != null)
-                                          tcs.SetException(t.Exception.InnerExceptions);
+                    if(t.IsFaulted) {
+                        if(onError is not null)
+                            tcs.SetResult(onError.Invoke(t.Exception));
+                        else if(t.Exception is not null)
+                            tcs.SetException(t.Exception.InnerExceptions);
 
-                                      return;
-                                  }
+                        return;
+                    }
 
-                                  tcs.SetResult(onComplete.Invoke(t.Result));
-                              },
-                              TaskContinuationOptions.ExecuteSynchronously);
+                    tcs.SetResult(onComplete.Invoke(t.Result));
+                },
+                TaskContinuationOptions.ExecuteSynchronously);
             return tcs.Task;
         }
         
         private static GetterDelegate CreateAccessor(Type taskType) {
             var propertyInfo = taskType.GetProperty("Result");
-            return propertyInfo != null
-                       ? FluentIl.CreateGetter(propertyInfo)
-                       : null;
+            return propertyInfo is not null
+                ? FluentIl.CreateGetter(propertyInfo)
+                : null;
         }
     }
 }

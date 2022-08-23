@@ -26,23 +26,13 @@ namespace DotLogix.Core.Utils.Tracking.Snapshots {
         public static ISnapshot CreateSnapshot(object target, AccessorTypes includedAccessors = AccessorTypes.Property) {
             var dynamicType = target.GetType().CreateDynamicType();
 
-            IEnumerable<DynamicAccessor> accessors;
-            switch (includedAccessors) {
-                case AccessorTypes.None:
-                    accessors = Enumerable.Empty<DynamicAccessor>();
-                    break;
-                case AccessorTypes.Property:
-                    accessors = dynamicType.Properties;
-                    break;
-                case AccessorTypes.Field:
-                    accessors = dynamicType.Fields;
-                    break;
-                case AccessorTypes.Any:
-                    accessors = dynamicType.Accessors;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(includedAccessors), includedAccessors, null);
-            }
+            var accessors = includedAccessors switch {
+                AccessorTypes.None => Enumerable.Empty<DynamicAccessor>(),
+                AccessorTypes.Property => dynamicType.Properties,
+                AccessorTypes.Field => dynamicType.Fields,
+                AccessorTypes.Any => dynamicType.Accessors,
+                _ => throw new ArgumentOutOfRangeException(nameof(includedAccessors), includedAccessors, null)
+            };
             return CreateSnapshot(target, accessors.AsArray());
         }
         /// <summary>

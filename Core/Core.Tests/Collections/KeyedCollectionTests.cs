@@ -2,7 +2,7 @@
 using DotLogix.Core.Collections;
 using NUnit.Framework;
 
-namespace CoreTests.Collections {
+namespace Core.Tests.Collections {
     [TestFixture]
     public class KeyedCollectionTests : CollectionTests<int, KeyedCollection<int, int>> {
         private int _currentValue;

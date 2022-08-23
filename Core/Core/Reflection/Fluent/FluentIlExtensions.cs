@@ -16,55 +16,54 @@ namespace DotLogix.Core.Reflection.Fluent {
     /// <summary>
     /// A static class providing extension methods for reflection
     /// </summary>
-
     public static class FluentIlExtensions {
         /// <summary>
         /// Create a fluent implementation of an il generator
         /// </summary>
         public static FluentIlGenerator AsFluent(this ILGenerator ilGenerator) {
-            return new(ilGenerator);
+            return new FluentIlGenerator(ilGenerator);
         }
 
         /// <summary>
         /// Create a fluent implementation of an il generator
         /// </summary>
         public static FluentIlGenerator GetFluentIlGenerator(this DynamicMethod dynamicMethod) {
-            return new(dynamicMethod.GetILGenerator());
+            return new FluentIlGenerator(dynamicMethod.GetILGenerator());
         }
 
         /// <summary>
         /// Create a fluent implementation of an il generator
         /// </summary>
         public static FluentIlGenerator GetFluentIlGenerator(this ConstructorBuilder constructorBuilder) {
-            return new(constructorBuilder.GetILGenerator());
+            return new FluentIlGenerator(constructorBuilder.GetILGenerator());
         }
 
         /// <summary>
         /// Create a fluent implementation of an il generator
         /// </summary>
         public static FluentIlGenerator GetFluentIlGenerator(this MethodBuilder methodBuilder) {
-            return new(methodBuilder.GetILGenerator());
+            return new FluentIlGenerator(methodBuilder.GetILGenerator());
         }
 
         /// <summary>
         /// Create a fluent implementation of an il generator
         /// </summary>
         public static FluentIlGenerator GetFluentIlGenerator(this DynamicMethod dynamicMethod, int streamSize) {
-            return new(dynamicMethod.GetILGenerator(streamSize));
+            return new FluentIlGenerator(dynamicMethod.GetILGenerator(streamSize));
         }
 
         /// <summary>
         /// Create a fluent implementation of an il generator
         /// </summary>
         public static FluentIlGenerator GetFluentIlGenerator(this ConstructorBuilder constructorBuilder, int streamSize) {
-            return new(constructorBuilder.GetILGenerator(streamSize));
+            return new FluentIlGenerator(constructorBuilder.GetILGenerator(streamSize));
         }
 
         /// <summary>
         /// Create a fluent implementation of an il generator
         /// </summary>
         public static FluentIlGenerator GetFluentIlGenerator(this MethodBuilder methodBuilder, int streamSize) {
-            return new(methodBuilder.GetILGenerator(streamSize));
+            return new FluentIlGenerator(methodBuilder.GetILGenerator(streamSize));
         }
 
         /// <summary>

@@ -3,7 +3,7 @@ using DotLogix.Core.Reflection.Dynamics;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace CoreTests {
+namespace Core.Tests {
     [TestFixture]
     public class SimpleTest2 {
         [Test]

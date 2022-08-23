@@ -58,8 +58,8 @@ namespace DotLogix.Core.Reflection.Dynamics {
         public bool IsDefault => ParameterCount == 0;
 
         internal DynamicCtor(Type declaringType, ConstructorInfo constructorInfo, AccessModifiers access,
-                             VisibilityModifiers visibility,
-                             CtorDelegate ctorDelegate) : base(constructorInfo) {
+            VisibilityModifiers visibility,
+            CtorDelegate ctorDelegate) : base(constructorInfo) {
             CtorDelegate = ctorDelegate ?? throw new ArgumentNullException(nameof(ctorDelegate));
             ConstructorInfo = constructorInfo;
             Access = access;

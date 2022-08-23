@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace CoreTests.Collections {
+namespace Core.Tests.Collections {
     public abstract class ListCollectionTests<TValue, TList> : CollectionTests<TValue, TList> where TList : IList<TValue> {
         [Test]
         public override void Count_Operations() {

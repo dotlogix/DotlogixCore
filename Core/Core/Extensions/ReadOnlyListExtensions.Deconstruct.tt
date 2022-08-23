@@ -1,7 +1,7 @@
 <#@ template language="C#" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly Name="C:\Program Files\dotnet\sdk\6.0.101\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
-<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Assemblies\Release\DotLogix.Core\netstandard2.0\DotLogix.Core.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\assemblies\Release\DotLogix.Core.dll" #>
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace DotLogix.Core.Extensions {
         public static void Deconstruct<T>(this IReadOnlyList<T> values, out T item1<#for(var j = 1; j < i; j++) {#>, out T item<#=j+1#><#}#>) {
             EnsureLength(values, <#=i#>);
 <#
-            for(int j = 0; j < i; j++) {
+            for(var j = 0; j < i; j++) {
 #>
             item<#=j+1#> = values[<#=j#>];
 <#

@@ -12,11 +12,11 @@ using System;
 
 namespace DotLogix.Common.Features {
     /// <summary>
-    /// An interface to represent durations
+    ///     An interface to represent durations
     /// </summary>
     public interface IFixedDuration : IDuration {
         /// <summary>
-        /// The end of the duration in universal time
+        ///     The end of the duration in universal time
         /// </summary>
         new DateTime UntilUtc { get; set; }
     }

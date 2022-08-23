@@ -149,9 +149,9 @@ namespace DotLogix.Core.Extensions {
 
             using var concurrency = new SemaphoreSlim(maxDegreeOfParallelism, maxDegreeOfParallelism);
             var tasks = enumerable
-                       .Select(GetResultAsync)
-                       .Where(t => t.IsCompleted == false)
-                       .ToList();
+               .Select(GetResultAsync)
+               .Where(t => t.IsCompleted == false)
+               .ToList();
             if(tasks.Count > 0) {
                 await Task.WhenAll(tasks);
             }

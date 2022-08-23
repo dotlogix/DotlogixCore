@@ -61,7 +61,7 @@ namespace DotLogix.Core.Utils.Mappers {
         }
 
         public IMapper<TSource, TTarget> Build() {
-            if(_conversionFunc != null)
+            if(_conversionFunc is not null)
                 return new ValueConvertingMapper<TSource, TSourceValue, TTarget, TTargetValue>(ValueGetter, ValueSetter, _conversionFunc);
             return new ValueAutoConvertingMapper<TSource, TSourceValue, TTarget, TTargetValue>(ValueGetter, ValueSetter);
         }

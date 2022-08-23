@@ -48,9 +48,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <summary>Serves as the default hash function.</summary>
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() {
-            return (MemberInfo != null
-                    ? MemberInfo.GetHashCode()
-                    : 0);
+            return (MemberInfo is not null
+                ? MemberInfo.GetHashCode()
+                : 0);
         }
 
         /// <summary>Returns a value that indicates whether the values of two <see cref="T:DotLogix.Core.Reflection.Dynamics.DynamicMember" /> objects are equal.</summary>

@@ -62,7 +62,7 @@ namespace DotLogix.Core.Utils {
         /// </summary>
         /// <param name="valueInitializer"></param>
         public static implicit operator LazyMember<TValue>(Func<TValue> valueInitializer) {
-            return new(valueInitializer);
+            return new LazyMember<TValue>(valueInitializer);
         }
     }
 }

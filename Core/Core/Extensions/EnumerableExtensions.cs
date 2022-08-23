@@ -48,44 +48,45 @@ namespace DotLogix.Core.Extensions {
 			return items.Concat(source);
 		}
 		
-        /// <summary>
-        ///     Skips null values
-        /// </summary>
-        /// <param name="source">The initial enumerable</param>
-        /// <returns></returns>
-        public static IEnumerable<T> SkipNull<T>(this IEnumerable<T> source) where T : class {
-            return source.Where(s => s != null);
-        }
+		/// <summary>
+		///     Skips null values
+		/// </summary>
+		/// <param name="source">The initial enumerable</param>
+		/// <returns></returns>
+		public static IEnumerable<T> SkipNull<T>(this IEnumerable<T> source) where T : class {
+			return source.Where(s => s is not null);
+		}
 
-        /// <summary>
-        ///     Skips default values
-        /// </summary>
-        /// <param name="source">The initial enumerable</param>
-        /// <returns></returns>
-        public static IEnumerable<T> SkipDefault<T>(this IEnumerable<T> source) {
-            var defaultValue = default(T);
-            return source.Where(s => Equals(s, defaultValue));
-        }
+		/// <summary>
+		///     Skips default values
+		/// </summary>
+		/// <param name="source">The initial enumerable</param>
+		/// <returns></returns>
+		public static IEnumerable<T> SkipDefault<T>(this IEnumerable<T> source) {
+			var defaultValue = default(T);
+			return source.Where(s => Equals(s, defaultValue));
+		}
 
-        /// <summary>
-        ///     Skips default values
-        /// </summary>
-        /// <param name="source">The initial enumerable</param>
-        /// <returns></returns>
-        public static IEnumerable<object> SkipDefault(this IEnumerable<object> source) {
-	        return source.Where(s => Equals(s, s?.GetType().GetDefaultValue()));
-        }
+		/// <summary>
+		///     Skips default values
+		/// </summary>
+		/// <param name="source">The initial enumerable</param>
+		/// <returns></returns>
+		public static IEnumerable<object> SkipDefault(this IEnumerable<object> source) {
+			return source.Where(s => Equals(s, s?.GetType().GetDefaultValue()));
+		}
 
-        /// <summary>
-        ///     Skips default values
-        /// </summary>
-        /// <param name="source">The initial enumerable</param>
-        public static void ForEach<T>(this IEnumerable<T> source, Action<T> callback) {
-	        using var sourceEnumerator = source.GetEnumerator();
-	        while(sourceEnumerator.MoveNext()) {
-		        callback.Invoke(sourceEnumerator.Current);
-	        }
-        }
+		/// <summary>
+		///     Skips default values
+		/// </summary>
+		/// <param name="source">The initial enumerable</param>
+		/// <param name="callback">A callback to execute for each element</param>
+		public static void ForEach<T>(this IEnumerable<T> source, Action<T> callback) {
+			using var sourceEnumerator = source.GetEnumerator();
+			while(sourceEnumerator.MoveNext()) {
+				callback.Invoke(sourceEnumerator.Current);
+			}
+		}
 
 		/// <summary>
 		///     Creates an enumerable of items using a recursive selectorFunc
@@ -94,38 +95,38 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="selectChildrenFunc">A method to select the current children</param>
 		/// <returns></returns>
 		public static IEnumerable<TSource> EnumerateRecursive<TSource>(this IEnumerable<TSource> source, Func<TSource, IEnumerable<TSource>> selectChildrenFunc) {
-            var stack = new Stack<IEnumerator<TSource>>();
-            var enumerator = source.GetEnumerator();
+			var stack = new Stack<IEnumerator<TSource>>();
+			var enumerator = source.GetEnumerator();
 
-            try {
-                while (true) {
-                    if (enumerator.MoveNext()) {
-                        var element = enumerator.Current;
-                        yield return element;
+			try {
+				while (true) {
+					if (enumerator.MoveNext()) {
+						var element = enumerator.Current;
+						yield return element;
 
-                        var childEnumerator = selectChildrenFunc(element);
-                        if (childEnumerator == null)
-                            continue;
+						var childEnumerator = selectChildrenFunc(element);
+						if (childEnumerator == null)
+							continue;
 
-                        stack.Push(enumerator);
-                        enumerator = childEnumerator.GetEnumerator();
-                    } else if (stack.Count > 0) {
-                        enumerator.Dispose();
-                        enumerator = stack.Pop();
-                    } else {
-                        yield break;
-                    }
-                }
-            } finally {
-                enumerator.Dispose();
+						stack.Push(enumerator);
+						enumerator = childEnumerator.GetEnumerator();
+					} else if (stack.Count > 0) {
+						enumerator.Dispose();
+						enumerator = stack.Pop();
+					} else {
+						yield break;
+					}
+				}
+			} finally {
+				enumerator.Dispose();
 
-                while (stack.Count > 0) // Clean up in case of an exception.
-                {
-                    enumerator = stack.Pop();
-                    enumerator.Dispose();
-                }
-            }
-        }
+				while (stack.Count > 0) // Clean up in case of an exception.
+				{
+					enumerator = stack.Pop();
+					enumerator.Dispose();
+				}
+			}
+		}
 
 		/// <summary>
 		///     Creates an enumerable of items using a selectorFunc
@@ -136,8 +137,8 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="yieldInitial">A flag if the initial value should be yield or skipped</param>
 		/// <returns></returns>
 		public static IEnumerable<T> Enumerate<T>(this T initialValue,
-                                                  Func<T, T> selectNextFunc,
-                                                  Func<T, bool> hasNextFunc,
+			Func<T, T> selectNextFunc,
+			Func<T, bool> hasNextFunc,
 			bool yieldInitial = false) {
 			if (yieldInitial)
 				yield return initialValue;
@@ -154,9 +155,9 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="yieldInitial">A flag if the initial value should be yield or skipped</param>
 		/// <returns></returns>
 		public static IEnumerable<T> EnumerateUntil<T>(this T initialValue,
-		                                               Func<T, T> selectNextFunc,
-		                                               Func<T, bool> conditionFunc,
-		                                               bool yieldInitial = false) {
+			Func<T, T> selectNextFunc,
+			Func<T, bool> conditionFunc,
+			bool yieldInitial = false) {
 			if (yieldInitial)
 				yield return initialValue;
 
@@ -168,133 +169,58 @@ namespace DotLogix.Core.Extensions {
 		}
 
 		/// <summary>
-		///     Initializes every element of the <see cref="T:System.Array"></see> with the provided value.
+		///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
 		/// </summary>
-		/// <param name="array">The array</param>
 		/// <param name="value">The value</param>
+		/// <param name="count">The amount of elements in the list</param>
 		/// <returns></returns>
-		public static T[] Initialize<T>(this T[] array, T value) {
-			return Initialize(array, value, 0, array.Length);
+		public static IEnumerable<T> CreateEnumerable<T>(this T value, int count = 1) {
+			for (var i = 0; i < count; i++)
+				yield return value;
 		}
 
 		/// <summary>
-		///     Initializes every element of the <see cref="T:System.Array"></see> with the provided value.
+		///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
 		/// </summary>
-		/// <param name="array">The array</param>
 		/// <param name="value">The value</param>
-		/// <param name="index">The start index</param>
-		/// <param name="count">The amount of elements to set</param>
+		/// <param name="count">The amount of elements in the list</param>
 		/// <returns></returns>
-		public static T[] Initialize<T>(this T[] array, T value, int index, int count) {
-			var currentCount = Math.Min(count, 8);
-			var offset = index;
-			for (; offset < currentCount; offset++)
-				array[offset] = value;
-			
-			while(offset < array.Length) {
-				Array.Copy(array, index, array, offset, Math.Min(currentCount, array.Length - offset));
-				offset += currentCount;
-				currentCount <<= 1;
+		public static Task<IEnumerable<T>> CreateEnumerable<T>(this Task<T> value, int count = 1) {
+			return value.TransformAsync(v => v.Result.CreateEnumerable(count));
+		}
+
+		/// <summary>
+		///     Intercepts an enumerable and calling a method for each of the items
+		/// </summary>
+		/// <param name="source">The source enumerable</param>
+		/// <param name="interceptAction">The interception method</param>
+		/// <returns></returns>
+		public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Action<T> interceptAction) {
+			foreach (var value in source) {
+				interceptAction(value);
+				yield return value;
 			}
-			return array;
 		}
 
 		/// <summary>
-		///     Creates a <see cref="Array"></see> by repeating the value n times
-		/// </summary>
-		/// <param name="value">The value</param>
-		/// <param name="count">The amount of elements in the array</param>
-		/// <returns></returns>
-        public static T[] CreateArray<T>(this T value, int count = 1) {
-            return Initialize(new T[count], value);
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
-        /// </summary>
-        /// <param name="value">The value</param>
-        /// <param name="count">The amount of elements in the list</param>
-        /// <returns></returns>
-        public static Task<T[]> CreateArray<T>(this Task<T> value, int count = 1) {
-            return value.TransformAsync(v => v.Result.CreateArray(count));
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="List{T}"></see> by repeating the value n times
-        /// </summary>
-        /// <param name="value">The value</param>
-        /// <param name="count">The amount of elements in the list</param>
-        /// <returns></returns>
-        public static List<T> CreateList<T>(this T value, int count = 1) {
-            return CreateArray(value, count)
-            .ToList();
-        }
-        
-        /// <summary>
-        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
-        /// </summary>
-        /// <param name="value">The value</param>
-        /// <param name="count">The amount of elements in the list</param>
-        /// <returns></returns>
-        public static Task<List<T>> CreateList<T>(this Task<T> value, int count = 1) {
-            return value.TransformAsync(v => v.Result.CreateList(count));
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
-        /// </summary>
-        /// <param name="value">The value</param>
-        /// <param name="count">The amount of elements in the list</param>
-        /// <returns></returns>
-        public static IEnumerable<T> CreateEnumerable<T>(this T value, int count = 1) {
-            for (var i = 0; i < count; i++)
-                yield return value;
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
-        /// </summary>
-        /// <param name="value">The value</param>
-        /// <param name="count">The amount of elements in the list</param>
-        /// <returns></returns>
-        public static Task<IEnumerable<T>> CreateEnumerable<T>(this Task<T> value, int count = 1) {
-            return value.TransformAsync(v => v.Result.CreateEnumerable(count));
-        }
-
-        /// <summary>
-        ///     Intercepts an enumerable and calling a method for each of the items
-        /// </summary>
-        /// <param name="source">The source enumerable</param>
-        /// <param name="interceptAction">The interception method</param>
-        /// <returns></returns>
-        public static IEnumerable<T> Intercept<T>(this IEnumerable<T> source, Action<T> interceptAction) {
-	        foreach (var value in source) {
-		        interceptAction(value);
-		        yield return value;
-	        }
-        }
-
-        /// <summary>
 		///     A select, but with an additional argument
 		/// </summary>
 		/// <param name="source">The source enumerable</param>
 		/// <param name="selector">The selector method</param>
 		/// <param name="with">An additional parameter for the selector method</param>
 		/// <returns></returns>
-		public static IEnumerable<TTarget> SelectWith<TSource, TTarget, TWith>(this IEnumerable<TSource> source,
-                                                                               Func<TSource, TWith, TTarget> selector,
-                                                                               TWith with) {
+		public static IEnumerable<TTarget> SelectWith<TSource, TTarget, TWith>(this IEnumerable<TSource> source, Func<TSource, TWith, TTarget> selector, TWith with) {
 			return source.Select(s => selector(s, with));
 		}
 
-        /// <summary>
+		/// <summary>
 		///     Searches for differences of two enumerables using an equality comparer
 		/// </summary>
 		/// <param name="left">The first enumerable</param>
 		/// <param name="right">The second enumerable</param>
 		/// <param name="comparer">The comparer used to check equality</param>
 		/// <returns></returns>
-        public static DiffEnumerable<T> Diff<T>(this IEnumerable<T> left, IEnumerable<T> right, IEqualityComparer<T> comparer = null) {
+		public static DiffEnumerable<T> Diff<T>(this IEnumerable<T> left, IEnumerable<T> right, IEqualityComparer<T> comparer = null) {
 			comparer ??= EqualityComparer<T>.Default;
 
 			var leftOnly = new HashSet<T>(left, comparer);
@@ -311,26 +237,26 @@ namespace DotLogix.Core.Extensions {
 			return new DiffEnumerable<T>(leftOnly, intersect, rightOnly);
 		}
 
-        /// <summary>
-        ///     Searches for differences of an enumerable and a range of keys using a comparer
-        /// </summary>
-        /// <param name="enumerable">The first enumerable</param>
-        /// <param name="keySelector">The method to select the key to check equality</param>
-        /// <param name="keys">The second enumerable</param>
-        /// <param name="comparer">The comparer used to check equality</param>
-        /// <returns></returns>
-        public static DiffEnumerable<T, TKey> Diff<T, TKey>(this IEnumerable<T> enumerable, Func<T, TKey> keySelector, IEnumerable<TKey> keys, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
-            var dict = enumerable.ToDictionary(keySelector, comparer);
+		/// <summary>
+		///     Searches for differences of an enumerable and a range of keys using a comparer
+		/// </summary>
+		/// <param name="enumerable">The first enumerable</param>
+		/// <param name="keySelector">The method to select the key to check equality</param>
+		/// <param name="keys">The second enumerable</param>
+		/// <param name="comparer">The comparer used to check equality</param>
+		/// <returns></returns>
+		public static DiffEnumerable<T, TKey> Diff<T, TKey>(this IEnumerable<T> enumerable, Func<T, TKey> keySelector, IEnumerable<TKey> keys, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
+			var dict = enumerable.ToDictionary(keySelector, comparer);
 
-            var keyDiff = dict.Keys.Diff(keys, comparer);
-            var leftOnly = keyDiff.LeftOnly.Select(k => dict[k]).ToList();
-            var rightOnly = keyDiff.RightOnly.ToList();
-            var intersection = keyDiff.Intersect.Select(k => new DiffEnumerable<T, TKey>.DiffValue(dict[k], k)).ToList();
+			var keyDiff = dict.Keys.Diff(keys, comparer);
+			var leftOnly = keyDiff.LeftOnly.Select(k => dict[k]).ToList();
+			var rightOnly = keyDiff.RightOnly.ToList();
+			var intersection = keyDiff.Intersect.Select(k => new DiffEnumerable<T, TKey>.DiffValue(dict[k], k)).ToList();
 
-            return new DiffEnumerable<T, TKey>(leftOnly, intersection, rightOnly);
-        }
+			return new DiffEnumerable<T, TKey>(leftOnly, intersection, rightOnly);
+		}
 
-        /// <summary>
+		/// <summary>
 		///     Searches for differences of two enumerables using a common key and a comparer
 		/// </summary>
 		/// <param name="left">The first enumerable</param>
@@ -338,31 +264,31 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="keySelector">The method to select the key to check equality</param>
 		/// <param name="comparer">The comparer used to check equality</param>
 		/// <returns></returns>
-        public static DiffEnumerable<T, T> Diff<T, TKey>(this IEnumerable<T> left, IEnumerable<T> right, Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
+		public static DiffEnumerable<T, T> Diff<T, TKey>(this IEnumerable<T> left, IEnumerable<T> right, Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
 			return left.Diff(keySelector, right, keySelector, comparer);
 		}
 
-        /// <summary>
-        ///     Searches for differences of two enumerables using a common key and a comparer
-        /// </summary>
-        /// <param name="left">The first enumerable</param>
-        /// <param name="leftKeySelector">The method to select the key to check equality</param>
-        /// <param name="right">The second enumerable</param>
-        /// <param name="rightKeySelector">The method to select the key to check equality</param>
-        /// <param name="comparer">The comparer used to check equality</param>
-        /// <returns></returns>
-        public static DiffEnumerable<TLeft, TRight> Diff<TLeft, TRight, TKey>(this IEnumerable<TLeft> left, Func<TLeft, TKey> leftKeySelector, IEnumerable<TRight> right, Func<TRight, TKey> rightKeySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
-            var leftDictionary = left.ToDictionary(leftKeySelector, comparer);
-            var rightDictionary = right.ToDictionary(rightKeySelector, comparer);
+		/// <summary>
+		///     Searches for differences of two enumerables using a common key and a comparer
+		/// </summary>
+		/// <param name="left">The first enumerable</param>
+		/// <param name="leftKeySelector">The method to select the key to check equality</param>
+		/// <param name="right">The second enumerable</param>
+		/// <param name="rightKeySelector">The method to select the key to check equality</param>
+		/// <param name="comparer">The comparer used to check equality</param>
+		/// <returns></returns>
+		public static DiffEnumerable<TLeft, TRight> Diff<TLeft, TRight, TKey>(this IEnumerable<TLeft> left, Func<TLeft, TKey> leftKeySelector, IEnumerable<TRight> right, Func<TRight, TKey> rightKeySelector, IEqualityComparer<TKey> comparer = null) where TKey : IComparable {
+			var leftDictionary = left.ToDictionary(leftKeySelector, comparer);
+			var rightDictionary = right.ToDictionary(rightKeySelector, comparer);
 
-            var keyDiff = leftDictionary.Keys.Diff(rightDictionary.Keys, comparer);
+			var keyDiff = leftDictionary.Keys.Diff(rightDictionary.Keys, comparer);
 
-            var leftOnly = keyDiff.LeftOnly.Select(k => leftDictionary[k]).ToList();
-            var rightOnly = keyDiff.RightOnly.Select(k => rightDictionary[k]).ToList();
-            var intersection = keyDiff.Intersect.Select(k => new DiffEnumerable<TLeft, TRight>.DiffValue(leftDictionary[k], rightDictionary[k])).ToList();
+			var leftOnly = keyDiff.LeftOnly.Select(k => leftDictionary[k]).ToList();
+			var rightOnly = keyDiff.RightOnly.Select(k => rightDictionary[k]).ToList();
+			var intersection = keyDiff.Intersect.Select(k => new DiffEnumerable<TLeft, TRight>.DiffValue(leftDictionary[k], rightDictionary[k])).ToList();
 
-            return new DiffEnumerable<TLeft, TRight>(leftOnly, intersection, rightOnly);
-        }
+			return new DiffEnumerable<TLeft, TRight>(leftOnly, intersection, rightOnly);
+		}
 
 		/// <summary>
 		///     Converts a enumerable to a list, if it is not a compatible type already it will be copied to new list
@@ -421,19 +347,11 @@ namespace DotLogix.Core.Extensions {
 		}
 
 		/// <summary>
-		///     Takes the last n elements of a enumerable.
-		/// </summary>
-		public static T[] TakeLast<T>(this IEnumerable<T> enumerable, int count) {
-            return enumerable.AsList()
-                             .TakeLast(count);
-		}
-
-		/// <summary>
 		///     Takes the n random elements of a enumerable.
 		/// </summary>
 		public static IEnumerable<T> TakeRandom<T>(this IEnumerable<T> source, int count) {
-            return source.Shuffle()
-                         .Take(count);
+			return source.Shuffle()
+			   .Take(count);
 		}
 
 		/// <summary>
@@ -465,7 +383,7 @@ namespace DotLogix.Core.Extensions {
 				queue.CopyTo(target, index);
 				return;
 			}
-			
+
 			using var enumerator = source.GetEnumerator();
 			for(var i = 0; i < count && enumerator.MoveNext(); i++) {
 				target[index + i] = enumerator.Current;
@@ -497,44 +415,44 @@ namespace DotLogix.Core.Extensions {
 		/// <summary>
 		///     Returns the round robin mixed combination of a list of enumerables
 		/// </summary>
-        public static IEnumerable<TValue> Balance<TValue>(this IEnumerable<IEnumerable<TValue>> enumerables) {
-            return Balance<TValue, IEnumerable<TValue>>(enumerables);
-        }
+		public static IEnumerable<TValue> Balance<TValue>(this IEnumerable<IEnumerable<TValue>> enumerables) {
+			return Balance<TValue, IEnumerable<TValue>>(enumerables);
+		}
 
-        /// <summary>
-        ///     Returns the round robin mixed combination of a list of enumerables
-        /// </summary>
-        public static IEnumerable<TValue> Balance<TValue, TSource>(this IEnumerable<TSource> enumerables) where TSource : IEnumerable<TValue> {
-            Queue<IEnumerator<TValue>> queue = null;
+		/// <summary>
+		///     Returns the round robin mixed combination of a list of enumerables
+		/// </summary>
+		public static IEnumerable<TValue> Balance<TValue, TSource>(this IEnumerable<TSource> enumerables) where TSource : IEnumerable<TValue> {
+			Queue<IEnumerator<TValue>> queue = null;
 			try {
-                queue = new Queue<IEnumerator<TValue>>(enumerables.Select(enumerable => enumerable.GetEnumerator()));
+				queue = new Queue<IEnumerator<TValue>>(enumerables.Select(enumerable => enumerable.GetEnumerator()));
 				while (queue.Count > 0) {
 					var enumerator = queue.Dequeue();
 					if (enumerator.MoveNext()) {
 						yield return enumerator.Current;
 						queue.Enqueue(enumerator);
-                    } else
+					} else
 						enumerator.Dispose();
-					}
+				}
 			} finally {
-                if(queue != null) {
+				if(queue is not null) {
 					foreach (var enumerator in queue)
 						enumerator.Dispose();
+				}
 			}
 		}
-        }
-
-        /// <summary>
-        ///     Returns the combination of a list of enumerables
-        /// </summary>
-        public static IEnumerable<TValue> Concat<TValue>(this IEnumerable<IEnumerable<TValue>> enumerables) {
-            return Concat<TValue, IEnumerable<TValue>>(enumerables);
-        }
 
 		/// <summary>
 		///     Returns the combination of a list of enumerables
 		/// </summary>
-        public static IEnumerable<TValue> Concat<TValue, TSource>(this IEnumerable<TSource> enumerables) where TSource : IEnumerable<TValue> {
+		public static IEnumerable<TValue> Concat<TValue>(this IEnumerable<IEnumerable<TValue>> enumerables) {
+			return Concat<TValue, IEnumerable<TValue>>(enumerables);
+		}
+
+		/// <summary>
+		///     Returns the combination of a list of enumerables
+		/// </summary>
+		public static IEnumerable<TValue> Concat<TValue, TSource>(this IEnumerable<TSource> enumerables) where TSource : IEnumerable<TValue> {
 			foreach (var enumerable in enumerables) {
 				foreach (var value in enumerable)
 					yield return value;
@@ -544,15 +462,15 @@ namespace DotLogix.Core.Extensions {
 		/// <summary>
 		///     Returns the shuffled combination of a list of enumerables
 		/// </summary>
-        public static IEnumerable<TValue> Shuffle<TValue>(this IEnumerable<IEnumerable<TValue>> enumerables) {
-            return Shuffle<TValue, IEnumerable<TValue>>(enumerables);
-        }
+		public static IEnumerable<TValue> Shuffle<TValue>(this IEnumerable<IEnumerable<TValue>> enumerables) {
+			return Shuffle<TValue, IEnumerable<TValue>>(enumerables);
+		}
 
-        /// <summary>
-        ///     Returns the shuffled combination of a list of enumerables
-        /// </summary>
-        public static IEnumerable<TValue> Shuffle<TValue, TSource>(this IEnumerable<TSource> enumerables) where TSource : IEnumerable<TValue> {
-            var list = new List<TValue>();
+		/// <summary>
+		///     Returns the shuffled combination of a list of enumerables
+		/// </summary>
+		public static IEnumerable<TValue> Shuffle<TValue, TSource>(this IEnumerable<TSource> enumerables) where TSource : IEnumerable<TValue> {
+			var list = new List<TValue>();
 			foreach (var enumerable in enumerables)
 				list.AddRange(enumerable);
 			return list.Shuffle();
@@ -564,27 +482,23 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="enumerables"></param>
 		/// <param name="mode"></param>
 		/// <returns></returns>
-        public static IEnumerable<TValue> Combine<TValue>(this IEnumerable<IEnumerable<TValue>> enumerables, CombineMode mode) {
-            return Combine<TValue>(enumerables, mode);
-        }
+		public static IEnumerable<TValue> Combine<TValue>(this IEnumerable<IEnumerable<TValue>> enumerables, CombineMode mode) {
+			return Combine<TValue>(enumerables, mode);
+		}
 
-        /// <summary>
-        ///     Combines a list of enumerable using the given combination mode
-        /// </summary>
-        /// <param name="enumerables"></param>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public static IEnumerable<TValue> Combine<TValue, TSource>(this IEnumerable<TSource> enumerables, CombineMode mode) where TSource : IEnumerable<TValue> {
-			switch (mode) {
-				case CombineMode.Sequential:
-                    return enumerables.Concat<TValue, TSource>();
-				case CombineMode.RoundRobin:
-                    return enumerables.Balance<TValue, TSource>();
-				case CombineMode.Shuffled:
-                    return enumerables.Shuffle<TValue, TSource>();
-				default:
-					throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
-			}
+		/// <summary>
+		///     Combines a list of enumerable using the given combination mode
+		/// </summary>
+		/// <param name="enumerables"></param>
+		/// <param name="mode"></param>
+		/// <returns></returns>
+		public static IEnumerable<TValue> Combine<TValue, TSource>(this IEnumerable<TSource> enumerables, CombineMode mode) where TSource : IEnumerable<TValue> {
+			return mode switch {
+				CombineMode.Sequential => enumerables.Concat<TValue, TSource>(),
+				CombineMode.RoundRobin => enumerables.Balance<TValue, TSource>(),
+				CombineMode.Shuffled => enumerables.Shuffle<TValue, TSource>(),
+				_ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
+			};
 		}
 
 		/// <summary>
@@ -595,23 +509,15 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="otherEnumerable"></param>
 		/// <param name="mode"></param>
 		/// <returns></returns>
-        public static IEnumerable<T> Combine<T>(this IEnumerable<T> enumerable,
-                                                IEnumerable<T> otherEnumerable,
+		public static IEnumerable<T> Combine<T>(this IEnumerable<T> enumerable,
+			IEnumerable<T> otherEnumerable,
 			CombineMode mode) {
-			switch (mode) {
-				case CombineMode.Sequential:
-					return enumerable.Concat(otherEnumerable);
-				case CombineMode.RoundRobin:
-                    return Balance<T, IEnumerable<T>>(new[] {
-						enumerable, otherEnumerable
-					});
-				case CombineMode.Shuffled:
-                    return Shuffle<T, IEnumerable<T>>(new[] {
-						enumerable, otherEnumerable
-					});
-				default:
-					throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
-			}
+			return mode switch {
+				CombineMode.Sequential => enumerable.Concat(otherEnumerable),
+				CombineMode.RoundRobin => Balance<T, IEnumerable<T>>(new[] { enumerable, otherEnumerable }),
+				CombineMode.Shuffled => Shuffle<T, IEnumerable<T>>(new[] { enumerable, otherEnumerable }),
+				_ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
+			};
 		}
 
 		/// <summary>
@@ -620,18 +526,18 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="enumerables"></param>
 		/// <param name="mode"></param>
 		/// <returns></returns>
-        public static IEnumerable<TValue> Combine<TValue, TSource>(CombineMode mode, params TSource[] enumerables) where TSource : IEnumerable<TValue> {
-            return Combine<TValue, TSource>(enumerables, mode);
-        }
+		public static IEnumerable<TValue> Combine<TValue, TSource>(CombineMode mode, params TSource[] enumerables) where TSource : IEnumerable<TValue> {
+			return Combine<TValue, TSource>(enumerables, mode);
+		}
 
-        /// <summary>
-        ///     Combines a list of enumerable using the given combination mode
-        /// </summary>
-        /// <param name="enumerables"></param>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public static IEnumerable<TValue> Combine<TValue>(CombineMode mode, params IEnumerable<TValue>[] enumerables) {
-            return Combine<TValue, IEnumerable<TValue>>(mode, enumerables);
+		/// <summary>
+		///     Combines a list of enumerable using the given combination mode
+		/// </summary>
+		/// <param name="enumerables"></param>
+		/// <param name="mode"></param>
+		/// <returns></returns>
+		public static IEnumerable<TValue> Combine<TValue>(CombineMode mode, params IEnumerable<TValue>[] enumerables) {
+			return Combine<TValue, IEnumerable<TValue>>(mode, enumerables);
 		}
 
 		/// <summary>
@@ -669,11 +575,11 @@ namespace DotLogix.Core.Extensions {
 		/// <param name="parentKeySelector">The method to get the key of the parent element</param>
 		/// <returns></returns>
 		public static Hierarchy<TKey, TValue> ToHierarchy<TKey, TValue>(this IEnumerable<TValue> items,
-                                                                        Func<TValue, TKey> keySelector,
-                                                                        Func<TValue, TKey> parentKeySelector) where TKey : IComparable {
+			Func<TValue, TKey> keySelector,
+			Func<TValue, TKey> parentKeySelector) where TKey : IComparable {
 			var root = new Hierarchy<TKey, TValue>(default, default);
 			var dict = new Dictionary<TKey, Hierarchy<TKey, TValue>>();
-            var grouped = items.GroupBy(parentKeySelector.Invoke).ToList();
+			var grouped = items.GroupBy(parentKeySelector.Invoke).ToList();
 			while (grouped.Count > 0) {
 				var prevCount = grouped.Count;
 				for (var i = prevCount - 1; i >= 0; i--) {
@@ -693,47 +599,12 @@ namespace DotLogix.Core.Extensions {
 					}
 				}
 
-                if(grouped.Count == prevCount) {
-                    throw new InvalidOperationException("Can not resolve the whole hierarchy, maybe there are some cross dependencies");
-                }
-            }
+				if(grouped.Count == prevCount) {
+					throw new InvalidOperationException("Can not resolve the whole hierarchy, maybe there are some cross dependencies");
+				}
+			}
 
 			return root;
-		}
-
-		public static TValue MaxItem<TCompare, TValue>(this IEnumerable<TValue> values, Func<TValue, TCompare> selectorFunc)
-			where TValue : class
-			where TCompare : IComparable<TCompare> {
-			TValue maxItem = default;
-			TCompare maxValue = default;
-
-			foreach (var value in values) {
-				var compareValue = selectorFunc.Invoke(value);
-				if (maxItem != null && compareValue.CompareTo(maxValue) <= 0)
-					continue;
-
-				maxItem = value;
-				maxValue = compareValue;
-			}
-
-			return maxItem;
-		}
-		public static TValue MinItem<TCompare, TValue>(this IEnumerable<TValue> values, Func<TValue, TCompare> selectorFunc)
-			where TValue : class
-			where TCompare : IComparable<TCompare> {
-			TValue minItem = default;
-			TCompare minValue = default;
-
-			foreach (var value in values) {
-				var compareValue = selectorFunc.Invoke(value);
-				if (minItem != null && compareValue.CompareTo(minValue) >= 0)
-					continue;
-
-				minItem = value;
-				minValue = compareValue;
-			}
-
-			return minItem;
 		}
 	}
 }

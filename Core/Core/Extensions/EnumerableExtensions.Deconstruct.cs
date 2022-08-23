@@ -7,17 +7,20 @@ namespace DotLogix.Core.Extensions {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 1);
         }
+
         public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1, out T item2) {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 2);
             item2 = EnsureNext(enumerator, 2, 2);
         }
+
         public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1, out T item2, out T item3) {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 3);
             item2 = EnsureNext(enumerator, 2, 3);
             item3 = EnsureNext(enumerator, 3, 3);
         }
+
         public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1, out T item2, out T item3, out T item4) {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 4);
@@ -25,6 +28,7 @@ namespace DotLogix.Core.Extensions {
             item3 = EnsureNext(enumerator, 3, 4);
             item4 = EnsureNext(enumerator, 4, 4);
         }
+
         public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1, out T item2, out T item3, out T item4, out T item5) {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 5);
@@ -33,6 +37,7 @@ namespace DotLogix.Core.Extensions {
             item4 = EnsureNext(enumerator, 4, 5);
             item5 = EnsureNext(enumerator, 5, 5);
         }
+
         public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1, out T item2, out T item3, out T item4, out T item5, out T item6) {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 6);
@@ -42,6 +47,7 @@ namespace DotLogix.Core.Extensions {
             item5 = EnsureNext(enumerator, 5, 6);
             item6 = EnsureNext(enumerator, 6, 6);
         }
+
         public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1, out T item2, out T item3, out T item4, out T item5, out T item6, out T item7) {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 7);
@@ -52,6 +58,7 @@ namespace DotLogix.Core.Extensions {
             item6 = EnsureNext(enumerator, 6, 7);
             item7 = EnsureNext(enumerator, 7, 7);
         }
+
         public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1, out T item2, out T item3, out T item4, out T item5, out T item6, out T item7, out T item8) {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 8);
@@ -63,6 +70,7 @@ namespace DotLogix.Core.Extensions {
             item7 = EnsureNext(enumerator, 7, 8);
             item8 = EnsureNext(enumerator, 8, 8);
         }
+
         public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1, out T item2, out T item3, out T item4, out T item5, out T item6, out T item7, out T item8, out T item9) {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 9);
@@ -75,6 +83,7 @@ namespace DotLogix.Core.Extensions {
             item8 = EnsureNext(enumerator, 8, 9);
             item9 = EnsureNext(enumerator, 9, 9);
         }
+
         public static void Deconstruct<T>(this IEnumerable<T> enumerable, out T item1, out T item2, out T item3, out T item4, out T item5, out T item6, out T item7, out T item8, out T item9, out T item10) {
             using var enumerator = enumerable.GetEnumerator();
             item1 = EnsureNext(enumerator, 1, 10);
@@ -88,10 +97,12 @@ namespace DotLogix.Core.Extensions {
             item9 = EnsureNext(enumerator, 9, 10);
             item10 = EnsureNext(enumerator, 10, 10);
         }
-        private static T EnsureNext<T>(IEnumerator<T> enumerator, int count, int required){
+
+        private static T EnsureNext<T>(IEnumerator<T> enumerator, int count, int required) {
             if(enumerator.MoveNext() == false) {
-                throw new IndexOutOfRangeException($"Can not deconstruct an enumerable with {count} elements to a tuple with {required} items");          
+                throw new IndexOutOfRangeException($"Can not deconstruct an enumerable with {count} elements to a tuple with {required} items");
             }
+
             return enumerator.Current;
         }
     }

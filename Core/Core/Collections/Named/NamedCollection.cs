@@ -72,29 +72,29 @@ namespace DotLogix.Core.Collections {
         /// <inheritdoc />
         public virtual Optional<object> Get(string key) {
             return TryGet(key, out var value)
-                   ? new Optional<object>(value)
-                   : default;
+                ? new Optional<object>(value)
+                : default;
         }
 
         /// <inheritdoc />
         public virtual object Get(string key, object defaultValue) {
             return TryGet(key, out var value)
-                   ? value
-                   : defaultValue;
+                ? value
+                : defaultValue;
         }
 
         /// <inheritdoc />
         public virtual Optional<T> Get<T>(string key) {
             return TryGet(key, out T value)
-                   ? new Optional<T>(value)
-                   : default;
+                ? new Optional<T>(value)
+                : default;
         }
 
         /// <inheritdoc />
         public virtual T Get<T>(string key, T defaultValue) {
             return TryGet(key, out T value)
-                   ? value
-                   : defaultValue;
+                ? value
+                : defaultValue;
         }
 
         /// <inheritdoc />

@@ -8,11 +8,11 @@
 
 namespace DotLogix.Common.Features {
     /// <summary>
-    /// An interface to force an order value
+    ///     An interface to force an order value
     /// </summary>
     public interface IOrdered {
         /// <summary>
-        /// The order priority
+        ///     The order priority
         /// </summary>
         int Order { get; set; }
     }

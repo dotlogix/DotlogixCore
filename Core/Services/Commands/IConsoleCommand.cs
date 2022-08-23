@@ -1,26 +1,28 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace DotLogix.Core.Services.Commands {
     /// <summary>
-    /// An interface representing a console command
+    ///     An interface representing a console command
     /// </summary>
     public interface IConsoleCommand {
         /// <summary>
-        /// The name
+        ///     The name
         /// </summary>
         string Name { get; }
+
         /// <summary>
-        /// The description
+        ///     The description
         /// </summary>
         string Description { get; }
+
         /// <summary>
-        /// The help text
+        ///     The help text
         /// </summary>
         string HelpText { get; }
+
         /// <summary>
-        /// A callback to execute an action
+        ///     A callback to execute an action
         /// </summary>
-        Task ExecuteAsync(CommandArgs args);
+        Task ExecuteAsync(CommandContext context);
     }
 }

@@ -38,8 +38,8 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Copies the value type located at the address of an object (type &amp;, * or native int) to the address of the
-        ///     destination object (type &amp;, * or native int).
+        ///     Copies the value type located at the address of an object (typeÂ &amp;,Â *Â orÂ native int) to the address of the
+        ///     destination object (typeÂ &amp;,Â *Â orÂ native int).
         /// </summary>
         public FluentIlGenerator Cpobj(Type type) {
             IlGenerator.Emit(OpCodes.Cpobj, type);
@@ -64,7 +64,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         /// <summary>
         ///     Allocates a certain number of bytes from the local dynamic memory pool and pushes the address (a transient
-        ///     pointer, type *) of the first allocated byte onto the evaluation stack.
+        ///     pointer, typeÂ *) of the first allocated byte onto the evaluation stack.
         /// </summary>
         public FluentIlGenerator Localloc() {
             IlGenerator.Emit(OpCodes.Localloc);
@@ -124,7 +124,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         /// <summary>
         ///     Indicates that an address currently atop the evaluation stack might not be aligned to the natural size of the
-        ///     immediately following ldind, stind, ldfld, stfld, ldobj, stobj, initblk, or cpblk instruction.
+        ///     immediately followingÂ ldind,Â stind,Â ldfld,Â stfld,Â ldobj,Â stobj,Â initblk, orÂ cpblkÂ instruction.
         /// </summary>
         public FluentIlGenerator Unaligned(Label label) {
             IlGenerator.Emit(OpCodes.Unaligned, label);
@@ -133,7 +133,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
 
         /// <summary>
         ///     Indicates that an address currently atop the evaluation stack might not be aligned to the natural size of the
-        ///     immediately following ldind, stind, ldfld, stfld, ldobj, stobj, initblk, or cpblk instruction.
+        ///     immediately followingÂ ldind,Â stind,Â ldfld,Â stfld,Â ldobj,Â stobj,Â initblk, orÂ cpblkÂ instruction.
         /// </summary>
         public FluentIlGenerator Unaligned(byte alignment) {
             IlGenerator.Emit(OpCodes.Unaligned, alignment);
@@ -149,7 +149,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Fills space if opcodes are patched. No meaningful operation is performed although a processing cycle can be
+        ///     Fills space if opcodes are patched.Â No meaningful operation is performed although a processing cycle can be
         ///     consumed.
         /// </summary>
         public FluentIlGenerator Nop() {
@@ -182,7 +182,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes an unmanaged pointer (type native int) to the native code implementing a specific method onto the
+        ///     Pushes an unmanaged pointer (typeÂ native int) to the native code implementing a specific method onto the
         ///     evaluation stack.
         /// </summary>
         public FluentIlGenerator Ldftn(MethodInfo methodInfo) {
@@ -191,7 +191,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Pushes an unmanaged pointer (type native int) to the native code implementing a particular virtual method
+        ///     Pushes an unmanaged pointer (typeÂ native int) to the native code implementing a particular virtual method
         ///     associated with a specified object onto the evaluation stack.
         /// </summary>
         public FluentIlGenerator Ldvirtftn(MethodInfo methodInfo) {
@@ -216,7 +216,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Retrieves the address (type &amp;) embedded in a typed reference.
+        ///     Retrieves the address (typeÂ &amp;) embedded in a typed reference.
         /// </summary>
         public FluentIlGenerator Refanyval(Type type) {
             IlGenerator.Emit(OpCodes.Refanyval, type);

@@ -4,8 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using DotLogix.Core.Utils;
 
-namespace DotLogix.Core.Extensions
-{
+namespace DotLogix.Core.Extensions {
     /// <summary>
     /// A static class providing extension methods for <see cref="Stream"/>
     /// </summary>

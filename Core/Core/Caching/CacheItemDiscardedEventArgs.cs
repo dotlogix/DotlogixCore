@@ -24,8 +24,8 @@ namespace DotLogix.Core.Caching {
         /// The reason source
         /// </summary>
         public CacheItemDiscardSource Source => Ancestors.Count > 0
-                                                ? CacheItemDiscardSource.Ancestor
-                                                : CacheItemDiscardSource.Self;
+            ? CacheItemDiscardSource.Ancestor
+            : CacheItemDiscardSource.Self;
 
         /// <summary>
         /// The source elements if the item was discarded as a dependency

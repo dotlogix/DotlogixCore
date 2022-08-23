@@ -1,13 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace DotLogix.Core.Services.Commands {
     /// <summary>
-    /// A basic console command
+    ///     A basic console command
     /// </summary>
     public abstract class ConsoleCommand : IConsoleCommand {
-        private string _helpText;
         private string _description;
+        private string _helpText;
 
         /// <inheritdoc />
         public string Name { get; }
@@ -20,14 +19,15 @@ namespace DotLogix.Core.Services.Commands {
 
 
         /// <summary>
-        ///   Creates a new instance of <see cref="ConsoleCommand"/>
+        ///     Creates a new instance of <see cref="ConsoleCommand" />
         /// </summary>
         protected ConsoleCommand(string name) {
             Name = name;
         }
 
         /// <inheritdoc />
-        public abstract Task ExecuteAsync(CommandArgs args);
+        public abstract Task ExecuteAsync(CommandContext context);
+
         protected abstract string CreateHelpText();
         protected abstract string CreateDescription();
     }

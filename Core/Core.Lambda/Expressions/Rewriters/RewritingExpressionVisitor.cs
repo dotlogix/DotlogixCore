@@ -8,9 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Expressions.Rewriters {
     /// <summary>
@@ -123,7 +121,7 @@ namespace DotLogix.Core.Expressions.Rewriters {
 
         /// <inheritdoc />
         protected override Expression VisitMember(MemberExpression node) {
-            var rewritten = RewriteOrDefault(_memberRewriters, r => r.Rewrite(node.Expression, node.Member, node.Type));
+            var rewritten = RewriteOrDefault(_memberRewriters, r => r.Rewrite(node.Expression, node.Member));
             return rewritten is null
                 ? base.VisitMember(node)
                 : base.Visit(rewritten)!;

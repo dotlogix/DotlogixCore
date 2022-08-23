@@ -41,7 +41,7 @@ namespace DotLogix.Core.Collections {
             get {
                 Hierarchy<TKey, TValue> ancestor;
                 var current = this;
-                while((ancestor = current.Ancestor) != null)
+                while((ancestor = current.Ancestor) is not null)
                     current = ancestor;
                 return current;
             }
@@ -60,7 +60,7 @@ namespace DotLogix.Core.Collections {
         /// <summary>
         /// Checks if the node has an ancestor
         /// </summary>
-        public bool HasAncestor => Ancestor != null;
+        public bool HasAncestor => Ancestor is not null;
 
         /// <summary>
         /// The key
@@ -106,7 +106,7 @@ namespace DotLogix.Core.Collections {
         /// <returns></returns>
         public IEnumerable<Hierarchy<TKey, TValue>> Ancestors() {
             var current = this;
-            while((current = current.Ancestor) != null)
+            while((current = current.Ancestor) is not null)
                 yield return current;
         }
 
@@ -216,7 +216,7 @@ namespace DotLogix.Core.Collections {
             if(child == null)
                 throw new ArgumentNullException(nameof(child));
 
-            if(child.Ancestor != null && child.Ancestor != this)
+            if(child.Ancestor is not null && child.Ancestor != this)
                 throw new ArgumentException(nameof(Hierarchy<TKey, TValue>) + " already has an ancestor", nameof(child));
 
             child.Ancestor = this;

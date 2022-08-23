@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace CoreTests {
+namespace Core.Tests {
     [TestFixture]
     public abstract class SimpleTest {
         [SetUp]

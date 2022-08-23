@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using DotLogix.Core.Expressions;
 using DotLogix.Core.Expressions.Rewriters;
 
 namespace DotLogix.Core.Expressions {

@@ -12,11 +12,11 @@ using System;
 
 namespace DotLogix.Common.Features {
     /// <summary>
-    /// An interface to force a guid key
+    ///     An interface to force a guid key
     /// </summary>
     public interface IGuid {
         /// <summary>
-        /// The guid
+        ///     The guid
         /// </summary>
         Guid Guid { get; set; }
     }

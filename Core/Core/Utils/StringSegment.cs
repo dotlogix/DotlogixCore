@@ -41,8 +41,8 @@ namespace DotLogix.Core.Utils {
         public bool Equals(StringSegment other)
         {
             return Offset == other.Offset
-                && Count == other.Count
-                && Buffer == other.Buffer;
+             && Count == other.Count
+             && Buffer == other.Buffer;
         }
 
         public override bool Equals(object obj)
@@ -56,7 +56,7 @@ namespace DotLogix.Core.Utils {
             {
                 var hashCode = Offset;
                 hashCode = (hashCode * 397) ^ Count;
-                hashCode = (hashCode * 397) ^ (Buffer != null ? Buffer.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Buffer is not null ? Buffer.GetHashCode() : 0);
                 return hashCode;
             }
         }

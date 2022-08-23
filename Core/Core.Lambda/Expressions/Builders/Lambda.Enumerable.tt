@@ -1,6 +1,5 @@
 <#@ template language="C#" #>
 <#@ include file="MethodTemplates.ttinclude" once="true"#>
-<#@ import namespace="DotLogix.Core.Expressions" #>
 <#
     var type = typeof(Enumerable);
     var methods = type

@@ -54,7 +54,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         ///     <inheritdoc cref="OpCodes.Calli"/>
         /// </summary>
         public FluentIlGenerator Calli(CallingConventions callingConvention, Type returnType, Type[] parameterTypes,
-                                       Type[] optionalParameterTypes) {
+            Type[] optionalParameterTypes) {
             IlGenerator.EmitCalli(OpCodes.Calli, callingConvention, returnType, parameterTypes, optionalParameterTypes);
             return this;
         }

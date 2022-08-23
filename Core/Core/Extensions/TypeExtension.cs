@@ -85,7 +85,7 @@ namespace DotLogix.Core.Extensions {
         /// <returns></returns>
         public static IEnumerable<Type> GetBaseTypes(this Type type, bool asTypeDefinition = false, bool genericOnly = false) {
             type = type.BaseType;
-            while(type != null) {
+            while(type is not null) {
                 if(asTypeDefinition && type.IsGenericType)
                     yield return type.GetGenericTypeDefinition();
                 else if(genericOnly == false)
@@ -148,8 +148,8 @@ namespace DotLogix.Core.Extensions {
         /// <returns></returns>
         public static object GetDefaultValue(this Type type) {
             return type.IsClass == false
-                       ? DefaultValues.GetOrAdd(type, Instantiate)
-                       : null;
+                ? DefaultValues.GetOrAdd(type, Instantiate)
+                : null;
         }
 
         #region TypeCheck
@@ -284,14 +284,15 @@ namespace DotLogix.Core.Extensions {
         #endregion
 
         #region IsAssignableTo
+
         /// <summary>
         ///     Determines if a type is assignable to another type
         /// </summary>
-        /// <param name="sourceType">The type to check</param>
-        /// <param name="targetType">The target type</param>
+        /// <param name="targetType">The type to check</param>
+        /// <typeparam name="TSource">The source type</typeparam>
         /// <returns></returns>
-        public static bool IsAssignableTo(this Type sourceType, Type targetType) {
-            return targetType.IsAssignableFrom(sourceType);
+        public static bool IsAssignableFrom<TSource>(this Type targetType) {
+            return typeof(TSource).IsAssignableFrom(targetType);
         }
 
         /// <summary>
@@ -321,8 +322,8 @@ namespace DotLogix.Core.Extensions {
             }
             
             var targetCandidates = targetType.IsInterface
-                                       ? GetInterfacesAssignableTo(sourceType, true, true)
-                                       : GetBaseTypes(sourceType, true, true);
+                ? GetInterfacesAssignableTo(sourceType, true, true)
+                : GetBaseTypes(sourceType, true, true);
             return targetCandidates.Any(candidate => candidate == targetType);
         }
 
@@ -349,8 +350,8 @@ namespace DotLogix.Core.Extensions {
             }
 
             var targetCandidates = targetType.IsInterface
-                                       ? GetInterfacesAssignableTo(sourceType, genericOnly: true)
-                                       : GetBaseTypes(sourceType, genericOnly: true);
+                ? GetInterfacesAssignableTo(sourceType, genericOnly: true)
+                : GetBaseTypes(sourceType, genericOnly: true);
             var genericTargetType = targetCandidates.FirstOrDefault(candidate => candidate.GetGenericTypeDefinition() == targetType);
             if(genericTargetType == null)
                 return false;
@@ -379,8 +380,8 @@ namespace DotLogix.Core.Extensions {
                     var parameterType = parameters[i].ParameterType;
 
                     valid = expectedType.IsGenericTypeDefinition
-                                ? parameterType.IsAssignableToGeneric(expectedType)
-                                : parameterType.IsAssignableTo(expectedType);
+                        ? parameterType.IsAssignableToGeneric(expectedType)
+                        : parameterType.IsAssignableTo(expectedType);
                 }
 
                 if(valid) {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace CoreTests.Collections {
+namespace Core.Tests.Collections {
     public abstract class CollectionTests<TValue, TCollection> where TCollection : ICollection<TValue> {
 
         public TCollection Collection { get; private set; }

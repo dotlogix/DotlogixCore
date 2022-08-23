@@ -81,7 +81,7 @@ namespace DotLogix.Core.Types {
 
         /// <inheritdoc />
         public override int GetHashCode() {
-            return Type != null ? Type.GetHashCode() : 0;
+            return Type is not null ? Type.GetHashCode() : 0;
         }
     }
 }

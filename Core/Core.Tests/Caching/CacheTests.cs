@@ -5,7 +5,7 @@ using DotLogix.Core.Caching;
 using DotLogix.Core.Extensions;
 using NUnit.Framework;
 
-namespace CoreTests.Caching {
+namespace Core.Tests.Caching {
     [TestFixture]
     public class CacheTests {
         private Cache<string, string> _cache;

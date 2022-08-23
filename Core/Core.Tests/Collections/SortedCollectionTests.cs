@@ -1,7 +1,7 @@
 ﻿using DotLogix.Core.Collections;
 using NUnit.Framework;
 
-namespace CoreTests.Collections {
+namespace Core.Tests.Collections {
     [TestFixture]
     public class SortedCollectionTests : CollectionTests<int, SortedCollection<int>> {
         private int _currentValue;

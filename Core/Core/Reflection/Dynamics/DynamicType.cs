@@ -21,9 +21,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
     /// </summary>
     public class DynamicType {
         private const BindingFlags AllBindingFlags = BindingFlags.Instance |
-                                                     BindingFlags.Static |
-                                                     BindingFlags.Public |
-                                                     BindingFlags.NonPublic;
+            BindingFlags.Static |
+            BindingFlags.Public |
+            BindingFlags.NonPublic;
 
 
         private readonly ConcurrentDictionary<MemberInfo, object> _memberMap = new();
@@ -48,8 +48,8 @@ namespace DotLogix.Core.Reflection.Dynamics {
         public string Name { get; }
 
         public DynamicCtor DefaultConstructor => _defaultConstructor.IsDefined
-                                                 ? _defaultConstructor.Value
-                                                 : (_defaultConstructor = CreateDefaultConstructor()).Value;
+            ? _defaultConstructor.Value
+            : (_defaultConstructor = CreateDefaultConstructor()).Value;
 
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <summary>
         ///     Checks if there is a default constructor
         /// </summary>
-        public bool HasDefaultConstructor => DefaultConstructor != null;
+        public bool HasDefaultConstructor => DefaultConstructor is not null;
 
         /// <summary>
         ///     Creates a new instance of <see cref="DynamicType" />
@@ -121,7 +121,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         public IEnumerable<DynamicCtor> GetConstructors(BindingFlags bindingAttr) {
             var ctors = Type.GetConstructors(bindingAttr);
             return ctors.Select(RegisterConstructor)
-                        .SkipNull();
+               .SkipNull();
         }
 
         /// <summary>
@@ -164,9 +164,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </exception>
         public DynamicCtor GetConstructor(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers) {
             var ctor = Type.GetConstructor(bindingAttr, binder, callConvention, types, modifiers);
-            return ctor != null
-                   ? RegisterConstructor(ctor)
-                   : null;
+            return ctor is not null
+                ? RegisterConstructor(ctor)
+                : null;
         }
 
         /// <summary>
@@ -209,9 +209,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </exception>
         public DynamicCtor GetConstructor(BindingFlags bindingAttr, Binder binder, Type[] types, ParameterModifier[] modifiers) {
             var ctor = Type.GetConstructor(bindingAttr, binder, types, modifiers);
-            return ctor != null
-                   ? RegisterConstructor(ctor)
-                   : null;
+            return ctor is not null
+                ? RegisterConstructor(ctor)
+                : null;
         }
 
         /// <summary>Searches for a public instance constructor whose parameters match the types in the specified array.</summary>
@@ -232,9 +232,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <exception cref="T:System.ArgumentException"><paramref name="types">types</paramref> is multidimensional.</exception>
         public DynamicCtor GetConstructor(params Type[] types) {
             var ctor = Type.GetConstructor(types);
-            return ctor != null
-                   ? RegisterConstructor(ctor)
-                   : null;
+            return ctor is not null
+                ? RegisterConstructor(ctor)
+                : null;
         }
         #endregion
 
@@ -255,7 +255,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         public IEnumerable<DynamicField> GetFields(BindingFlags bindingAttr) {
             var fields = Type.GetFields(bindingAttr);
             return fields.Select(RegisterField)
-                         .SkipNull();
+               .SkipNull();
         }
 
         /// <summary>
@@ -271,9 +271,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </exception>
         public DynamicField GetField(string name) {
             var field = Type.GetField(name);
-            return field != null
-                   ? RegisterField(field)
-                   : null;
+            return field is not null
+                ? RegisterField(field)
+                : null;
         }
 
         /// <summary>Searches for the specified field, using the specified binding constraints.</summary>
@@ -286,9 +286,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
         public DynamicField GetField(string name, BindingFlags bindingAttr) {
             var field = Type.GetField(name, bindingAttr);
-            return field != null
-                   ? RegisterField(field)
-                   : null;
+            return field is not null
+                ? RegisterField(field)
+                : null;
         }
         #endregion
 
@@ -310,7 +310,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         public IEnumerable<DynamicInvoke> GetMethods(BindingFlags bindingAttr) {
             var methods = Type.GetMethods(bindingAttr);
             return methods.Select(RegisterMethod)
-                          .SkipNull();
+               .SkipNull();
         }
 
         /// <summary>Searches for the method with the specified name.</summary>
@@ -320,9 +320,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
         public DynamicInvoke GetMethod(string name) {
             var method = Type.GetMethod(name);
-            return method != null
-                   ? RegisterMethod(method)
-                   : null;
+            return method is not null
+                ? RegisterMethod(method)
+                : null;
         }
 
         /// <summary>Searches for the specified method, using the specified binding constraints.</summary>
@@ -339,9 +339,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
         public DynamicInvoke GetMethod(string name, BindingFlags bindingAttr) {
             var method = Type.GetMethod(name, bindingAttr);
-            return method != null
-                   ? RegisterMethod(method)
-                   : null;
+            return method is not null
+                ? RegisterMethod(method)
+                : null;
         }
 
         /// <summary>
@@ -389,9 +389,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </exception>
         public DynamicInvoke GetMethod(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers) {
             var method = Type.GetMethod(name, bindingAttr, binder, callConvention, types, modifiers);
-            return method != null
-                   ? RegisterMethod(method)
-                   : null;
+            return method is not null
+                ? RegisterMethod(method)
+                : null;
         }
 
         /// <summary>
@@ -434,15 +434,15 @@ namespace DotLogix.Core.Reflection.Dynamics {
         ///     <paramref name="modifiers">modifiers</paramref> is multidimensional.
         /// </exception>
         public DynamicInvoke GetMethod(
-        string name,
-        BindingFlags bindingAttr,
-        Binder binder,
-        Type[] types,
-        ParameterModifier[] modifiers) {
+            string name,
+            BindingFlags bindingAttr,
+            Binder binder,
+            Type[] types,
+            ParameterModifier[] modifiers) {
             var method = Type.GetMethod(name, bindingAttr, binder, types, modifiers);
-            return method != null
-                   ? RegisterMethod(method)
-                   : null;
+            return method is not null
+                ? RegisterMethod(method)
+                : null;
         }
 
         /// <summary>Searches for the specified public method whose parameters match the specified argument types.</summary>
@@ -468,9 +468,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <exception cref="T:System.ArgumentException"><paramref name="types">types</paramref> is multidimensional.</exception>
         public DynamicInvoke GetMethod(string name, params Type[] types) {
             var method = Type.GetMethod(name, types);
-            return method != null
-                   ? RegisterMethod(method)
-                   : null;
+            return method is not null
+                ? RegisterMethod(method)
+                : null;
         }
 
         /// <summary>Searches for the specified public method whose parameters match the specified argument types and modifiers.</summary>
@@ -502,9 +502,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </exception>
         public DynamicInvoke GetMethod(string name, Type[] types, ParameterModifier[] modifiers) {
             var method = Type.GetMethod(name, types, modifiers);
-            return method != null
-                   ? RegisterMethod(method)
-                   : null;
+            return method is not null
+                ? RegisterMethod(method)
+                : null;
         }
         #endregion
 
@@ -526,7 +526,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         public IEnumerable<DynamicProperty> GetProperties(BindingFlags bindingAttr) {
             var properties = Type.GetProperties(bindingAttr);
             return properties.Select(RegisterProperty)
-                             .SkipNull();
+               .SkipNull();
         }
 
         /// <summary>Searches for the property with the specified name.</summary>
@@ -536,9 +536,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
         public DynamicProperty GetProperty(string name) {
             var property = Type.GetProperty(name);
-            return property != null
-                   ? RegisterProperty(property)
-                   : null;
+            return property is not null
+                ? RegisterProperty(property)
+                : null;
         }
 
         /// <summary>Searches for the specified property, using the specified binding constraints.</summary>
@@ -555,9 +555,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <exception cref="T:System.ArgumentNullException"><paramref name="name">name</paramref> is null.</exception>
         public DynamicProperty GetProperty(string name, BindingFlags bindingAttr) {
             var property = Type.GetProperty(name, bindingAttr);
-            return property != null
-                   ? RegisterProperty(property)
-                   : null;
+            return property is not null
+                ? RegisterProperty(property)
+                : null;
         }
 
         /// <summary>
@@ -602,16 +602,16 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </exception>
         /// <exception cref="T:System.NullReferenceException">An element of <paramref name="types">types</paramref> is null.</exception>
         public DynamicProperty GetProperty(
-        string name,
-        BindingFlags bindingAttr,
-        Binder binder,
-        Type returnType,
-        Type[] types,
-        ParameterModifier[] modifiers) {
+            string name,
+            BindingFlags bindingAttr,
+            Binder binder,
+            Type returnType,
+            Type[] types,
+            ParameterModifier[] modifiers) {
             var property = Type.GetProperty(name, bindingAttr, binder, returnType, types, modifiers);
-            return property != null
-                   ? RegisterProperty(property)
-                   : null;
+            return property is not null
+                ? RegisterProperty(property)
+                : null;
         }
 
         /// <summary>Searches for the property with the specified name and return type.</summary>
@@ -625,9 +625,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </exception>
         public DynamicProperty GetProperty(string name, Type returnType) {
             var property = Type.GetProperty(name, returnType);
-            return property != null
-                   ? RegisterProperty(property)
-                   : null;
+            return property is not null
+                ? RegisterProperty(property)
+                : null;
         }
 
         /// <summary>Searches for the specified public property whose parameters match the specified argument types.</summary>
@@ -654,9 +654,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <exception cref="T:System.NullReferenceException">An element of <paramref name="types">types</paramref> is null.</exception>
         public DynamicProperty GetProperty(string name, Type returnType, Type[] types) {
             var property = Type.GetProperty(name, returnType, types);
-            return property != null
-                   ? RegisterProperty(property)
-                   : null;
+            return property is not null
+                ? RegisterProperty(property)
+                : null;
         }
 
         /// <summary>Searches for the specified public property whose parameters match the specified argument types and modifiers.</summary>
@@ -689,14 +689,14 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </exception>
         /// <exception cref="T:System.NullReferenceException">An element of <paramref name="types">types</paramref> is null.</exception>
         public DynamicProperty GetProperty(
-        string name,
-        Type returnType,
-        Type[] types,
-        ParameterModifier[] modifiers) {
+            string name,
+            Type returnType,
+            Type[] types,
+            ParameterModifier[] modifiers) {
             var property = Type.GetProperty(name, returnType, types, modifiers);
-            return property != null
-                   ? RegisterProperty(property)
-                   : null;
+            return property is not null
+                ? RegisterProperty(property)
+                : null;
         }
 
         /// <summary>Searches for the specified public property whose parameters match the specified argument types.</summary>
@@ -722,9 +722,9 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <exception cref="T:System.NullReferenceException">An element of <paramref name="types">types</paramref> is null.</exception>
         public DynamicProperty GetProperty(string name, params Type[] types) {
             var property = Type.GetProperty(name, types);
-            return property != null
-                   ? RegisterProperty(property)
-                   : null;
+            return property is not null
+                ? RegisterProperty(property)
+                : null;
         }
         #endregion
 
@@ -787,7 +787,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </exception>
         public DynamicAccessor GetAccessor(string name, Type returnType) {
             var accessor = GetProperty(name, returnType);
-            if(accessor != null)
+            if(accessor is not null)
                 return accessor;
 
             var field = GetField(name);
@@ -795,8 +795,8 @@ namespace DotLogix.Core.Reflection.Dynamics {
                 return null;
 
             return field.ValueType == returnType
-                   ? field
-                   : null;
+                ? field
+                : null;
         }
         #endregion
 
@@ -805,19 +805,14 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// <summary>
         ///     Tries to resolve the corresponding dynamic constructor
         /// </summary>
-        public DynamicMember Resolve(MemberInfo memberInfo)
-        {
-            switch(memberInfo) {
-                case ConstructorInfo constructorInfo:
-                    return Resolve(constructorInfo);
-                case FieldInfo fieldInfo:
-                    return Resolve(fieldInfo);
-                case MethodInfo methodInfo:
-                    return Resolve(methodInfo);
-                case PropertyInfo propertyInfo:
-                    return Resolve(propertyInfo);
-            }
-            return null;
+        public DynamicMember Resolve(MemberInfo memberInfo) {
+            return memberInfo switch {
+                ConstructorInfo constructorInfo => Resolve(constructorInfo),
+                FieldInfo fieldInfo => Resolve(fieldInfo),
+                MethodInfo methodInfo => Resolve(methodInfo),
+                PropertyInfo propertyInfo => Resolve(propertyInfo),
+                _ => null
+            };
         }
 
         /// <summary>
@@ -864,18 +859,18 @@ namespace DotLogix.Core.Reflection.Dynamics {
         #region Helper
         public DynamicCtor CreateDefaultConstructor() {
             var defaultCtor = Type.GetConstructor(Type.EmptyTypes);
-            if(defaultCtor != null)
+            if(defaultCtor is not null)
                 return RegisterConstructor(defaultCtor);
             return Type.IsValueType
-                   ? Type.CreateDefaultCtor()
-                   : null;
+                ? Type.CreateDefaultCtor()
+                : null;
         }
 
         private DynamicCtor[] CreateConstructors() {
             var dynamicCtors = Type.GetConstructors(AllBindingFlags)
-                                   .Select(RegisterConstructor)
-                                   .SkipNull()
-                                   .ToList();
+               .Select(RegisterConstructor)
+               .SkipNull()
+               .ToList();
             if(Type.IsValueType && (dynamicCtors.Any(c => c.IsDefault) == false))
                 dynamicCtors.Add(DefaultConstructor);
             return dynamicCtors.ToArray();
@@ -883,23 +878,23 @@ namespace DotLogix.Core.Reflection.Dynamics {
 
         private DynamicInvoke[] CreateMethods() {
             return Type.GetMethods(AllBindingFlags)
-                       .Select(RegisterMethod)
-                       .SkipNull()
-                       .ToArray();
+               .Select(RegisterMethod)
+               .SkipNull()
+               .ToArray();
         }
 
         private DynamicField[] CreateFields() {
             return Type.GetFields(AllBindingFlags)
-                       .Select(RegisterField)
-                       .SkipNull()
-                       .ToArray();
+               .Select(RegisterField)
+               .SkipNull()
+               .ToArray();
         }
 
         private DynamicProperty[] CreateProperties() {
             return Type.GetProperties(AllBindingFlags)
-                       .Select(RegisterProperty)
-                       .SkipNull()
-                       .ToArray();
+               .Select(RegisterProperty)
+               .SkipNull()
+               .ToArray();
         }
 
         private DynamicCtor RegisterConstructor(ConstructorInfo constructorInfo) {

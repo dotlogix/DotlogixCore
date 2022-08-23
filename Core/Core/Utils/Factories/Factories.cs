@@ -3,8 +3,7 @@ using System.Reflection;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
 
-namespace DotLogix.Core.Utils.Factories
-{
+namespace DotLogix.Core.Utils.Factories {
     /// <summary>
     /// A static class to create instantiators
     /// </summary>
@@ -27,7 +26,7 @@ namespace DotLogix.Core.Utils.Factories
             if(targetProperty == null)
                 throw new ArgumentException($"The type {singletonType.GetFriendlyName()} does not define a static property {propertyName}", nameof(singletonType));
 
-            if(constraintType != null && targetProperty.PropertyType.IsAssignableTo(constraintType) == false)
+            if(constraintType is not null && targetProperty.PropertyType.IsAssignableTo(constraintType) == false)
                 throw new ArgumentException($"The property {targetProperty} of type {singletonType.GetFriendlyName()} is not assignable to constraint {constraintType.GetFriendlyName()}", nameof(constraintType));
 
             return new SingletonFactory(targetProperty.CreateDynamicProperty());
@@ -49,7 +48,7 @@ namespace DotLogix.Core.Utils.Factories
             if(targetProperty == null)
                 throw new ArgumentException($"The type {singletonType.GetFriendlyName()} does not define a static property {propertyName}", nameof(singletonType));
 
-            if(constraintType != null && targetProperty.PropertyType.IsAssignableTo(constraintType) == false)
+            if(constraintType is not null && targetProperty.PropertyType.IsAssignableTo(constraintType) == false)
                 throw new ArgumentException($"The property {targetProperty} of type {singletonType.GetFriendlyName()} is not assignable to constraint {constraintType.GetFriendlyName()}", nameof(constraintType));
 
             return new SingletonFactory<T>(targetProperty.CreateDynamicProperty());
@@ -69,7 +68,7 @@ namespace DotLogix.Core.Utils.Factories
             if (type.IsGenericTypeDefinition)
                 throw new ArgumentException($"The type {type.GetFriendlyName()} can not be an open generic type", nameof(type));
 
-            if (constraintType != null && type.IsAssignableTo(constraintType) == false)
+            if (constraintType is not null && type.IsAssignableTo(constraintType) == false)
                 throw new ArgumentException($"The type {type.GetFriendlyName()} is not assignable to constraint {constraintType.GetFriendlyName()}", nameof(constraintType));
 
             var targetCtor = type.CreateDefaultCtor();
@@ -92,7 +91,7 @@ namespace DotLogix.Core.Utils.Factories
             if (type.IsGenericTypeDefinition)
                 throw new ArgumentException($"The type {type.GetFriendlyName()} can not be an open generic type", nameof(type));
 
-            if (constraintType != null && type.IsAssignableTo(constraintType) == false)
+            if (constraintType is not null && type.IsAssignableTo(constraintType) == false)
                 throw new ArgumentException($"The type {type.GetFriendlyName()} is not assignable to constraint {constraintType.GetFriendlyName()}", nameof(constraintType));
 
             var targetCtor = type.CreateDefaultCtor();
@@ -146,7 +145,7 @@ namespace DotLogix.Core.Utils.Factories
             if (type.IsGenericTypeDefinition)
                 throw new ArgumentException($"The type {type.GetFriendlyName()} can not be an open generic type", nameof(type));
 
-            if (constraintType != null && type.IsAssignableTo(constraintType) == false)
+            if (constraintType is not null && type.IsAssignableTo(constraintType) == false)
                 throw new ArgumentException($"The type {type.GetFriendlyName()} is not assignable to constraint {constraintType.GetFriendlyName()}", nameof(constraintType));
 
             var targetCtor = type.CreateDynamicCtor(parameterTypes);
@@ -169,7 +168,7 @@ namespace DotLogix.Core.Utils.Factories
             if (type.IsGenericTypeDefinition)
                 throw new ArgumentException($"The type {type.GetFriendlyName()} can not be an open generic type", nameof(type));
 
-            if (constraintType != null && type.IsAssignableTo(constraintType) == false)
+            if (constraintType is not null && type.IsAssignableTo(constraintType) == false)
                 throw new ArgumentException($"The type {type.GetFriendlyName()} is not assignable to constraint {constraintType.GetFriendlyName()}", nameof(constraintType));
 
             var targetCtor = type.CreateDynamicCtor(parameterTypes);

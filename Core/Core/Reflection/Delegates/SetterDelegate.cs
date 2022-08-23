@@ -10,7 +10,6 @@ namespace DotLogix.Core.Reflection.Delegates {
     /// <summary>
     /// A delegate to represent setters
     /// </summary>
-
     public delegate void SetterDelegate(object instance, object value);
 
     /// <summary>

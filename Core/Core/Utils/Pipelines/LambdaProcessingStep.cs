@@ -40,7 +40,7 @@ namespace DotLogix.Core.Utils.Pipelines {
         /// <param name="next"></param>
         /// <returns></returns>
         public static implicit operator LambdaProcessingStep<TIn, TNext, TResult>(Func<TIn, Func<TNext, Task<TResult>>, Task<TResult>> next) {
-            return new(next);
+            return new LambdaProcessingStep<TIn, TNext, TResult>(next);
         }
     }
 
@@ -70,7 +70,7 @@ namespace DotLogix.Core.Utils.Pipelines {
         /// </summary>
         /// <param name="next"></param>
         public static implicit operator LambdaProcessingStep<TIn, TResult>(Func<TIn, Task<TResult>> next) {
-            return new(next);
+            return new LambdaProcessingStep<TIn, TResult>(next);
         }
     }
 }

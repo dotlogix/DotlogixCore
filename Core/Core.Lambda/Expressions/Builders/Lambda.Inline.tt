@@ -1,7 +1,7 @@
 <#@ template language="C#" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly Name="C:\Program Files\dotnet\sdk\6.0.101\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll" #>
-<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\Assemblies\Debug\DotLogix.Core\netstandard2.0\DotLogix.Core.dll" #>
+<#@ assembly name="C:\Users\alexa\source\git\c-sharp\DotLogix\Core\assemblies\Release\DotLogix.Core.dll" #>
 <#@ import namespace="System.Linq" #>
 using System;
 using System.Collections;

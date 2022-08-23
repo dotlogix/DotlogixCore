@@ -22,7 +22,7 @@ namespace DotLogix.Core.Extensions {
         /// <param name="collection"></param>
         /// <returns></returns>
         public static ReadOnlyObservableCollection<T> AsReadonly<T>(this ObservableCollection<T> collection) {
-            return new(collection);
+            return new ReadOnlyObservableCollection<T>(collection);
         }
     }
 }

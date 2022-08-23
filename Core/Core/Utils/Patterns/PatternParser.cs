@@ -40,23 +40,23 @@ namespace DotLogix.Core.Utils.Patterns {
         static PatternParser() {
             var parser = new PatternParser();
             parser.AddPattern(new RegexPatternType("guid", "d", new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
-                                                                                                                                 {"n", "[0-9A-Fa-f]{32}"},
-                                                                                                                                 {"d", "[0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}"},
-                                                                                                                                 {"b", "\\{[0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}\\}"},
-                                                                                                                                 {"p", "\\([0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}\\)"}
-                                                                                                                                 }));
+                {"n", "[0-9A-Fa-f]{32}"},
+                {"d", "[0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}"},
+                {"b", "\\{[0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}\\}"},
+                {"p", "\\([0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}\\)"}
+            }));
             parser.AddPattern(new RepeatedRegexPatternType("any", "."));
             parser.AddPattern(new RepeatedRegexPatternType("number", "\\d"));
             parser.AddPattern(new RepeatedRegexPatternType("hex", "[0-9a-fA-F]"));
             parser.AddPattern(new RepeatedRegexPatternType("word", "", new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
-                                                                                                                                        {"", "\\w"},
-                                                                                                                                        {"s", "[\\w\\s]"}
-                                                                                                                                        }));
+                {"", "\\w"},
+                {"s", "[\\w\\s]"}
+            }));
             parser.AddPattern(new RepeatedRegexPatternType("letter", "", new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
-                                                                                                                                          {"", "[a-zA-Z]"},
-                                                                                                                                          {"u", "[A-Z]"},
-                                                                                                                                          {"l", "[a-z]"}
-                                                                                                                                          }));
+                {"", "[a-zA-Z]"},
+                {"u", "[A-Z]"},
+                {"l", "[a-z]"}
+            }));
             Default = parser;
         }
 

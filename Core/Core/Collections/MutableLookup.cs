@@ -290,7 +290,7 @@ namespace DotLogix.Core.Collections {
         public MutableLookup(int capacity, IEqualityComparer<TKey> comparer) : base(capacity, comparer, CreateCollection) { }
 
         private static List<TValue> CreateCollection() {
-            return new();
+            return new List<TValue>();
         }
     }
 }

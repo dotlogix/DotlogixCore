@@ -2,7 +2,7 @@
 using DotLogix.Core.Collections;
 using NUnit.Framework;
 
-namespace CoreTests.Collections {
+namespace Core.Tests.Collections {
     [TestFixture]
     public class DataTableTests {
         private const string DefinitivelyNotExistingHeader = "definitively_not_existing_header";
@@ -163,12 +163,47 @@ namespace CoreTests.Collections {
 
         [Test]
         public void GetValueAs_NonExistingHeader_ReturnsDefaultValue() {
-            var row = CreateSimpleDataRow(out var headers, out var values);
+            var row = CreateSimpleDataRow(out _, out _);
 
             var defaultValue = int.MaxValue;
             Assert.That(row.GetValueAs(DefinitivelyNotExistingHeader, defaultValue), Is.EqualTo(defaultValue));
         }
+        [Test]
+        public void GetValueAsObject_ValidIndex_ReturnsCorrectValue() {
+            var row = CreateSimpleDataRow(out var headers, out var values);
 
+            var defaultValue = int.MaxValue;
+            for (var i = 0; i < headers.Length; i++) {
+                Assert.That(row.GetValueAs(i, typeof(int), defaultValue), Is.EqualTo(values[i]));
+            }
+        }
+
+        [Test]
+        public void GetValueAsObject_OutOfRangeIndex_ReturnsDefaultValue() {
+            var row = CreateSimpleDataRow(out _, out var values);
+
+            var defaultValue = int.MaxValue;
+            Assert.That(row.GetValueAs(int.MinValue, typeof(int), defaultValue), Is.EqualTo(defaultValue));
+            Assert.That(row.GetValueAs(values.Length, typeof(int), defaultValue), Is.EqualTo(defaultValue));
+        }
+
+        [Test]
+        public void GetValueAsObject_ExistingHeader_ReturnsCorrectValue() {
+            var row = CreateSimpleDataRow(out var headers, out var values);
+
+            var defaultValue = new object();
+            for (var i = 0; i < headers.Length; i++) {
+                Assert.That(row.GetValueAs(headers[i], typeof(int), defaultValue), Is.EqualTo(values[i]));
+            }
+        }
+
+        [Test]
+        public void GetValueAsObject_NonExistingHeader_ReturnsDefaultValue() {
+            var row = CreateSimpleDataRow(out _, out _);
+
+            var defaultValue = int.MaxValue;
+            Assert.That(row.GetValueAs(DefinitivelyNotExistingHeader, typeof(int), defaultValue), Is.EqualTo(defaultValue));
+        }
 
         [Test]
         public void TryGetValueAs_ValidIndex_ReturnsTrueAndCorrectValue() {
@@ -211,10 +246,58 @@ namespace CoreTests.Collections {
         public void TryGetValueAs_ExistingHeader_AutoConvertsAndReturnCorrectValue() {
             var table = CreateSimpleTable(out var headers, out _);
             var row = table.Skip(1).First();
-            var defaultValue = new object();
+            
             for(var i = 0; i < headers.Length; i++) {
 
                 Assert.That(row.TryGetValueAs<int>(headers[i], out var value), Is.True);
+                Assert.That(value, Is.EqualTo(i));
+            }
+        }
+        
+        [Test]
+        public void TryGetValueAsObject_ValidIndex_ReturnsTrueAndCorrectValue() {
+            var row = CreateSimpleDataRow(out var headers, out var values);
+
+            for (var i = 0; i < headers.Length; i++) {
+                Assert.That(row.TryGetValueAs(i, typeof(int), out var value), Is.True);
+                Assert.That(value, Is.EqualTo(values[i]));
+            }
+        }
+
+        [Test]
+        public void TryGetValueAsObject_OutOfRangeIndex_FalseAndDefaultValue() {
+            var row = CreateSimpleDataRow(out _, out _);
+
+            Assert.That(row.TryGetValueAs(int.MinValue, typeof(int), out var value), Is.False);
+            Assert.That(value, Is.Null);
+        }
+
+        [Test]
+        public void TryGetValueAsObject_ExistingHeader_TrueAndReturnsCorrectValue() {
+            var row = CreateSimpleDataRow(out var headers, out var values);
+
+            for (var i = 0; i < headers.Length; i++) {
+
+                Assert.That(row.TryGetValueAs(headers[i], typeof(int), out var value), Is.True);
+                Assert.That(value, Is.EqualTo(values[i]));
+            }
+        }
+
+        [Test]
+        public void TryGetValueAsObject_NonExistingHeader_ReturnsFalseAndDefaultValue() {
+            var row = CreateSimpleDataRow(out _, out _);
+
+            Assert.That(row.TryGetValueAs(DefinitivelyNotExistingHeader, typeof(int), out var value), Is.False);
+            Assert.That(value, Is.Null);
+        }
+
+        [Test]
+        public void TryGetValueAsObject_ExistingHeader_AutoConvertsAndReturnCorrectValue() {
+            var table = CreateSimpleTable(out var headers, out _);
+            var row = table.Skip(1).First();
+            for(var i = 0; i < headers.Length; i++) {
+
+                Assert.That(row.TryGetValueAs(headers[i], typeof(int), out var value), Is.True);
                 Assert.That(value, Is.EqualTo(i));
             }
         }
@@ -222,7 +305,7 @@ namespace CoreTests.Collections {
 
         [Test]
         public void DataTable_Values_MatchesInput() {
-            var row = CreateSimpleDataRow(out var headers, out var values);
+            var row = CreateSimpleDataRow(out _, out var values);
 
             CollectionAssert.AreEqual(row.Values, values);
         }
@@ -251,16 +334,16 @@ namespace CoreTests.Collections {
         }
         private DataTable CreateSimpleTable(out string[] headers, out object[][] rows) {
             headers = new[] {
-                                "field1",
-                                "field2",
-                                "field3",
-                                "field4",
-                                };
+                "field1",
+                "field2",
+                "field3",
+                "field4",
+            };
 
             rows = new[] {
-                             new object[] {0, 1, 2, 3, 4},
-                             new object[] {"0", "1", "2", "3", "4"}
-                             };
+                new object[] {0, 1, 2, 3, 4},
+                new object[] {"0", "1", "2", "3", "4"}
+            };
 
             return new DataTable(headers, rows);
         }

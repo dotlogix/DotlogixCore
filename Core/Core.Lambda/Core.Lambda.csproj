@@ -52,5 +52,8 @@
       <Compile Update="Expressions\Builders\Lambda.Call.cs">
         <DependentUpon>Lambda.Call.tt</DependentUpon>
       </Compile>
+      <Compile Update="Expressions\Builders\Lambda.Inline.cs">
+        <DependentUpon>Lambda.Inline.tt</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

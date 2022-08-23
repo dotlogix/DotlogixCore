@@ -23,7 +23,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// Create a dynamic type representation of a system type
         /// </summary>
         public static DynamicType CreateDynamicType(this Type type) {
-            return new(type);
+            return new DynamicType(type);
         }
         #endregion
 
@@ -61,7 +61,7 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// Create a dynamic type representation of a constructor
         /// </summary>
         public static DynamicCtor CreateDynamicCtor(this Type declaringType, Type[] parameterTypes,
-                                                    bool allowNonPublic = true) {
+            bool allowNonPublic = true) {
             if(declaringType == null)
                 throw new ArgumentNullException(nameof(declaringType));
 
@@ -165,13 +165,11 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// Create a dynamic type representation of a property
         /// </summary>
         public static DynamicAccessor CreateDynamicAccessor(this MemberInfo memberInfo) {
-            switch(memberInfo) {
-                case FieldInfo fieldInfo:
-                    return CreateDynamicField(fieldInfo);
-                case PropertyInfo propertyInfo:
-                    return CreateDynamicProperty(propertyInfo);
-            }
-            return null;
+            return memberInfo switch {
+                FieldInfo fieldInfo => CreateDynamicField(fieldInfo),
+                PropertyInfo propertyInfo => CreateDynamicProperty(propertyInfo),
+                _ => null
+            };
         }
         
         /// <summary>
@@ -202,20 +200,14 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </summary>
         public static VisibilityModifiers GetVisibilityModifiers(MethodBase methodBase) {
             var methodAttributes = methodBase.Attributes & MethodAttributes.MemberAccessMask;
-            switch(methodAttributes) {
-                case MethodAttributes.Private:
-                    return VisibilityModifiers.Private;
-                case MethodAttributes.Assembly:
-                    return VisibilityModifiers.Internal;
-                case MethodAttributes.Family:
-                    return VisibilityModifiers.Protected;
-                case MethodAttributes.FamORAssem:
-                    return VisibilityModifiers.ProtectedInternal;
-                case MethodAttributes.Public:
-                    return VisibilityModifiers.Public;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return methodAttributes switch {
+                MethodAttributes.Private => VisibilityModifiers.Private,
+                MethodAttributes.Assembly => VisibilityModifiers.Internal,
+                MethodAttributes.Family => VisibilityModifiers.Protected,
+                MethodAttributes.FamORAssem => VisibilityModifiers.ProtectedInternal,
+                MethodAttributes.Public => VisibilityModifiers.Public,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         /// <summary>
@@ -223,24 +215,16 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </summary>
         public static VisibilityModifiers GetVisibilityModifiers(Type type) {
             var typeAttributes = type.Attributes & TypeAttributes.VisibilityMask;
-            switch(typeAttributes) {
-                case TypeAttributes.NotPublic:
-                    return VisibilityModifiers.Internal;
-                case TypeAttributes.Public:
-                    return VisibilityModifiers.Public;
-                case TypeAttributes.NestedPublic:
-                    return VisibilityModifiers.Public;
-                case TypeAttributes.NestedPrivate:
-                    return VisibilityModifiers.Private;
-                case TypeAttributes.NestedFamily:
-                    return VisibilityModifiers.Protected;
-                case TypeAttributes.NestedAssembly:
-                    return VisibilityModifiers.Internal;
-                case TypeAttributes.NestedFamORAssem:
-                    return VisibilityModifiers.ProtectedInternal;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return typeAttributes switch {
+                TypeAttributes.NotPublic => VisibilityModifiers.Internal,
+                TypeAttributes.Public => VisibilityModifiers.Public,
+                TypeAttributes.NestedPublic => VisibilityModifiers.Public,
+                TypeAttributes.NestedPrivate => VisibilityModifiers.Private,
+                TypeAttributes.NestedFamily => VisibilityModifiers.Protected,
+                TypeAttributes.NestedAssembly => VisibilityModifiers.Internal,
+                TypeAttributes.NestedFamORAssem => VisibilityModifiers.ProtectedInternal,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         /// <summary>
@@ -248,20 +232,14 @@ namespace DotLogix.Core.Reflection.Dynamics {
         /// </summary>
         public static VisibilityModifiers GetVisibilityModifiers(FieldInfo fieldInfo) {
             var fieldAttributes = fieldInfo.Attributes & FieldAttributes.FieldAccessMask;
-            switch(fieldAttributes) {
-                case FieldAttributes.Private:
-                    return VisibilityModifiers.Private;
-                case FieldAttributes.Assembly:
-                    return VisibilityModifiers.Internal;
-                case FieldAttributes.Family:
-                    return VisibilityModifiers.Protected;
-                case FieldAttributes.FamORAssem:
-                    return VisibilityModifiers.ProtectedInternal;
-                case FieldAttributes.Public:
-                    return VisibilityModifiers.Public;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return fieldAttributes switch {
+                FieldAttributes.Private => VisibilityModifiers.Private,
+                FieldAttributes.Assembly => VisibilityModifiers.Internal,
+                FieldAttributes.Family => VisibilityModifiers.Protected,
+                FieldAttributes.FamORAssem => VisibilityModifiers.ProtectedInternal,
+                FieldAttributes.Public => VisibilityModifiers.Public,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
         #endregion
 

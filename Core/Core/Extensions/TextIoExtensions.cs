@@ -33,7 +33,7 @@ namespace DotLogix.Core.Extensions {
             do
             {
                 var firstCharAsync = reader.ReadAsync(buffer, 0, buffer.Length)
-                    .ContinueWith(task =>
+                   .ContinueWith(task =>
                     {
                         count = task.Result;
 
@@ -76,7 +76,7 @@ namespace DotLogix.Core.Extensions {
             var buffer = new char[bufferSize];
             var count = 0;
             while((count = reader.Read(buffer, 0, buffer.Length)) > 0) {
-                for(int i = 0; i < count; i++) {
+                for(var i = 0; i < count; i++) {
                     var chr = buffer[i];
                     action?.Invoke(chr);
                     yield return chr;

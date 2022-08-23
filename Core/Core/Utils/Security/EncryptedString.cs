@@ -151,7 +151,7 @@ namespace DotLogix.Core.Utils.Security {
         /// Creates a new instance of <see cref="EncryptedString"/> using the plain text
         /// </summary>
         public static EncryptedString FromClearText(string plain) {
-            return new(plain);
+            return new EncryptedString(plain);
         }
 
         /// <summary>

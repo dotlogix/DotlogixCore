@@ -26,22 +26,22 @@ namespace DotLogix.Core.Services {
         public string ServiceName { get; }
 
         /// <summary>
-        ///     A collection of commands for user interactive mode
+        ///     The command processor of this service
         /// </summary>
-        protected CommandProcessor CommandProcessor { get; }
+        protected ICommandProcessor CommandProcessor { get; private set; }
 
         /// <summary>
         ///     The configuration of this service
         /// </summary>
-        protected IConfiguration Configuration { get; set; }
-        
+        protected IConfiguration Configuration { get; private set; }
+
         /// <summary>
         ///     The service provider of this service
         /// </summary>
-        protected IServiceProvider ServiceProvider { get; set; }
-        
+        protected IServiceProvider ServiceProvider { get; private set; }
+
         /// <summary>
-        ///     The logger of this service
+        ///     The default log source of this service
         /// </summary>
         protected ILogSource LogSource { get; set; }
 
@@ -50,30 +50,16 @@ namespace DotLogix.Core.Services {
         /// </summary>
         public Service(string serviceName) {
             ServiceName = serviceName;
-            CommandProcessor = new CommandProcessor();
-            CommandProcessor.Commands.Add(
-                new LambdaConsoleCommand(
-                    "exit",
-                    "Closes the application",
-                    (_, _) => Task.CompletedTask
-                )
-            );
         }
 
         /// <summary>
         ///     A callback to start the service
         /// </summary>
         protected virtual Task OnStartAsync(string[] args) {
-            var builder = new ConfigurationBuilder();
-            OnConfigure(builder, args);
-            Configuration = builder.Build();
-
-            var services = new ServiceCollection();
-            OnConfigureServices(services, args);
-            ServiceProvider = services.BuildServiceProvider();
-                
-            var logSourceProvider = ServiceProvider.GetRequiredService<ILogSourceProvider>();
-            LogSource = logSourceProvider.Create(GetType());
+            Configuration = CreateConfiguration(args);
+            ServiceProvider = CreateServiceProvider(args);
+            CommandProcessor = CreateCommandProcessor(args);
+            LogSource = CreateLogSource();
             return Task.CompletedTask;
         }
 
@@ -81,6 +67,10 @@ namespace DotLogix.Core.Services {
         ///     A callback to stop the service
         /// </summary>
         protected virtual Task OnStopAsync() {
+            Configuration = null;
+            ServiceProvider = null;
+            CommandProcessor = null;
+            LogSource = null;
             return Task.CompletedTask;
         }
 
@@ -88,38 +78,69 @@ namespace DotLogix.Core.Services {
         ///     Start the service loop
         /// </summary>
         public virtual async Task RunAsync(string[] args) {
+            int? exitCode = null;
             try {
                 await OnStartAsync(args).ConfigureAwait(false);
-                await OnProcessUserInputAsync().ConfigureAwait(false);
-            } catch (Exception e) {
+                exitCode = await OnProcessUserInputAsync().ConfigureAwait(false);
+            } catch(Exception e) {
                 LogSource.Critical(e);
-                Environment.ExitCode = e.HResult; // error code
+                exitCode = e.HResult; // error code
             } finally {
                 await OnStopAsync().ConfigureAwait(false);
+                Environment.ExitCode = exitCode.GetValueOrDefault();
             }
         }
 
-        #region Configuring
+        protected virtual async Task<int?> OnProcessUserInputAsync() {
+            var input = Console.In;
+            int? exitCode = null;
+            while(exitCode.HasValue == false) {
+                var line = await input.ReadLineAsync();
+                if(string.IsNullOrWhiteSpace(line)) continue;
+                exitCode = await CommandProcessor.ProcessAsync(line);
+            }
 
-        protected virtual void OnConfigureServices(IServiceCollection services, string[] args) {
-            
+            return exitCode;
         }
 
-        protected virtual void OnConfigure(IConfigurationBuilder configuration, string[] args) {
-            
+        #region Logging
+        protected virtual ILogSource CreateLogSource() {
+            return ServiceProvider.GetRequiredService<ILogSourceProvider>().Create(GetType());
         }
         #endregion
 
+        #region Configuration
+        protected virtual IConfiguration CreateConfiguration(string[] args) {
+            var configuration = new ConfigurationBuilder();
+            OnConfigure(configuration, args);
+            return configuration.Build();
+        }
 
-        #region OnCommand
-        protected virtual async Task OnProcessUserInputAsync() {
-            var input = Console.In;
-            string line;
-            while((line = await input.ReadLineAsync()) is not "exit") {
-                if(line is null)
-                    continue;
-                await CommandProcessor.ProcessAsync(line);
-            }
+        protected virtual void OnConfigure(IConfigurationBuilder configuration, string[] args) {
+        }
+        #endregion
+
+        #region Services
+        protected virtual IServiceProvider CreateServiceProvider(string[] args) {
+            var services = new ServiceCollection();
+            OnConfigureServices(services, args);
+            return services.BuildServiceProvider();
+        }
+
+        protected virtual void OnConfigureServices(IServiceCollection services, string[] args) {
+        }
+        #endregion
+
+        #region Commands
+        protected virtual ICommandProcessor CreateCommandProcessor(string[] args) {
+            var processor = new CommandProcessorBuilder();
+            processor.UseServiceProvider(ServiceProvider);
+            OnConfigureCommands(processor, args);
+            return processor.Build();
+        }
+
+        protected virtual void OnConfigureCommands(ICommandProcessorBuilder processor, string[] args) {
+            processor.UseDefaultCommands();
         }
         #endregion
     }

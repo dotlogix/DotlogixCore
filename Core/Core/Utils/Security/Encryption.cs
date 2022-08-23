@@ -19,20 +19,20 @@ namespace DotLogix.Core.Utils.Security {
     /// </summary>
     public static class Encryption {
         private static readonly byte[] Salt = {
-                                                  0x49,
-                                                  0x76,
-                                                  0x61,
-                                                  0x6e,
-                                                  0x20,
-                                                  0x4d,
-                                                  0x65,
-                                                  0x64,
-                                                  0x76,
-                                                  0x65,
-                                                  0x64,
-                                                  0x65,
-                                                  0x76
-                                              };
+            0x49,
+            0x76,
+            0x61,
+            0x6e,
+            0x20,
+            0x4d,
+            0x65,
+            0x64,
+            0x76,
+            0x65,
+            0x64,
+            0x65,
+            0x76
+        };
 
         /// <summary>
         ///     Obfuscates an array of bytes with an XOr-Algorithm

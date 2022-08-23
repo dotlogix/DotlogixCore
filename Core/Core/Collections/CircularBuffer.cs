@@ -19,8 +19,9 @@ namespace DotLogix.Core.Collections {
         /// <inheritdoc />
         public int Count => _queue.Count;
 
-        public bool AllowOverride { get; }
         public int Capacity { get; }
+
+        public bool AllowOverride { get; }
 
         public CircularBuffer(int capacity, bool allowOverride = true) {
             AllowOverride = allowOverride;
@@ -41,7 +42,7 @@ namespace DotLogix.Core.Collections {
             return _queue.Peek();
         }
 
-        public void Enqueue(T item) {
+        public void Push(T item) {
             if(_queue.Count >= Capacity) {
                 if(AllowOverride) {
                     _queue.Dequeue();
@@ -53,8 +54,12 @@ namespace DotLogix.Core.Collections {
             _queue.Enqueue(item);
         }
 
-        public T Dequeue() {
+        public T Pop() {
             return _queue.Dequeue();
+        }
+
+        public void Clear() {
+            _queue.Clear();
         }
     }
 }

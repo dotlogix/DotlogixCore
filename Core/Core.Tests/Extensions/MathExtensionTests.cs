@@ -1,7 +1,7 @@
 ﻿using DotLogix.Core.Extensions;
 using NUnit.Framework;
 
-namespace CoreTests.Extensions {
+namespace Core.Tests.Extensions {
     [TestFixture]
     public class MathExtensionTests {
         [TestCase(0, 1)]

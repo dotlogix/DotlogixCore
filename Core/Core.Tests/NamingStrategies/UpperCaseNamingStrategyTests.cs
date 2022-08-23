@@ -1,7 +1,7 @@
 ﻿using DotLogix.Core.Utils.Naming;
 using NUnit.Framework;
 
-namespace CoreTests.NamingStrategies {
+namespace Core.Tests.NamingStrategies {
     [TestFixture]
     public class UpperCaseNamingStrategyTests {
 

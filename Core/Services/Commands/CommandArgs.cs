@@ -2,41 +2,41 @@
 
 namespace DotLogix.Core.Services.Commands {
     /// <summary>
-    /// A helper struct to hold command arguments
+    ///     A helper struct to hold command arguments
     /// </summary>
     public struct CommandArgs {
         /// <summary>
-        /// No arguments
+        ///     No arguments
         /// </summary>
-        public static CommandArgs Empty { get; } = new CommandArgs(null, null);
+        public static CommandArgs Empty { get; } = new(null, null);
 
         /// <summary>
-        /// Creates a new instance of <see cref="CommandArgs"/>
+        ///     The amount of provided arguments
         /// </summary>
-        public CommandArgs(IDictionary<string, string> named, IList<string> unnamed) {
+        public int Count => (Named?.Count ?? 0) + (Unnamed?.Count ?? 0);
+
+        /// <summary>
+        ///     The named arguments
+        /// </summary>
+        public IReadOnlyDictionary<string, string> Named { get; }
+
+        /// <summary>
+        ///     The unnamed arguments
+        /// </summary>
+        public IList<string> Unnamed { get; }
+
+        /// <summary>
+        ///     Creates a new instance of <see cref="CommandArgs" />
+        /// </summary>
+        public CommandArgs(IReadOnlyDictionary<string, string> named, IList<string> unnamed) {
             Named = named;
             Unnamed = unnamed;
         }
 
         /// <summary>
-        /// Check if there are parameters
+        ///     Destruct struct
         /// </summary>
-        public bool IsEmpty => (Named == null || Named.Count == 0) && (Unnamed == null || Unnamed.Count == 0);
-
-        /// <summary>
-        /// The named arguments
-        /// </summary>
-        public IDictionary<string, string> Named { get; }
-        /// <summary>
-        /// The unnamed arguments
-        /// </summary>
-        public IList<string> Unnamed { get; }
-
-        
-        /// <summary>
-        /// Destruct struct
-        /// </summary>
-        public void Deconstruct(out IDictionary<string, string> named, out IList<string> unnamed) {
+        public void Deconstruct(out IReadOnlyDictionary<string, string> named, out IList<string> unnamed) {
             named = Named;
             unnamed = Unnamed;
         }

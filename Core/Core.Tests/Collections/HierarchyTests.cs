@@ -4,7 +4,7 @@ using DotLogix.Core.Collections;
 using DotLogix.Core.Extensions;
 using NUnit.Framework;
 
-namespace CoreTests.Collections {
+namespace Core.Tests.Collections {
     [TestFixture]
     public class HierarchyTests {
         private const string DefinitivelyNotExistingKey = "definitively_not_existing_header";
@@ -154,15 +154,15 @@ namespace CoreTests.Collections {
         [Test]
         public void Ancestors_ReturnsCorrectAncestors() {
             var hierarchyData = new[] {
-                                      new HierarchyData("0", null),
-                                      new HierarchyData("1", null),
-                                      new HierarchyData("2", null),
-                                      new HierarchyData("0.0", "0"),
-                                      new HierarchyData("0.1", "0"),
-                                      new HierarchyData("0.2", "0"),
-                                      new HierarchyData("1.0", "1"),
-                                      new HierarchyData("1.0.1", "1.0"),
-                                      };
+                new HierarchyData("0", null),
+                new HierarchyData("1", null),
+                new HierarchyData("2", null),
+                new HierarchyData("0.0", "0"),
+                new HierarchyData("0.1", "0"),
+                new HierarchyData("0.2", "0"),
+                new HierarchyData("1.0", "1"),
+                new HierarchyData("1.0.1", "1.0"),
+            };
 
             var hierarchy = hierarchyData.ToHierarchy(d => d.Key, d => d.ParentKey);
             var child0 = hierarchy.GetChild("0");

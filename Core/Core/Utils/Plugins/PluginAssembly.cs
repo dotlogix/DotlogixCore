@@ -74,7 +74,7 @@ namespace DotLogix.Core.Utils.Plugins {
                     for(var i = 0; i < count; i++)
                         instances[i] = validType[i].Instantiate<T>(args);
                 } catch(Exception e) {
-                    if(LastError != null) {
+                    if(LastError is not null) {
                         var exceptions = LastError is AggregateException ae ? ae.InnerExceptions.ToList() : new List<Exception> {LastError};
                         exceptions.Add(e);
                         LastError = new AggregateException(exceptions);

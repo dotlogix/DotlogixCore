@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using DotLogix.Core.Types;
 using DotLogix.Core.Utils;
 #endregion
@@ -197,18 +196,17 @@ namespace DotLogix.Core.Extensions {
 
             separator ??= string.Empty;
             using var enumerator = values.GetEnumerator();
-
             if(!enumerator.MoveNext()) {
                 return sb;
             }
 
-            if(enumerator.Current != null) {
+            if(enumerator.Current is not null) {
                 sb.Append(enumerator.Current);
             }
 
             while(enumerator.MoveNext()) {
                 sb.Append(separator);
-                if(enumerator.Current != null) {
+                if(enumerator.Current is not null) {
                     sb.Append(enumerator.Current);
                 }
             }
@@ -226,18 +224,17 @@ namespace DotLogix.Core.Extensions {
             }
 
             using var enumerator = values.GetEnumerator();
-
             if(!enumerator.MoveNext()) {
                 return sb;
             }
 
-            if(enumerator.Current != null) {
+            if(enumerator.Current is not null) {
                 sb.Append(enumerator.Current);
             }
 
             while(enumerator.MoveNext()) {
                 sb.Append(separator);
-                if(enumerator.Current != null) {
+                if(enumerator.Current is not null) {
                     sb.Append(enumerator.Current);
                 }
             }
@@ -720,7 +717,7 @@ namespace DotLogix.Core.Extensions {
 
         public static string TrimEnd(this string value, string suffix)
         {
-            return suffix is not null && value.EndsWith(suffix)
+            return suffix  is not null && value.EndsWith(suffix)
                 ? value.Substring(0, value.Length - suffix.Length)
                 : value;
         }
@@ -731,8 +728,8 @@ namespace DotLogix.Core.Extensions {
         
         public static string Trim(this string value, string prefix, string suffix)
         {
-            var hasPrefix = prefix is not null && value.StartsWith(prefix);
-            var hasSuffix = suffix is not null && value.EndsWith(suffix);
+            var hasPrefix = prefix  is not null && value.StartsWith(prefix);
+            var hasSuffix = suffix  is not null && value.EndsWith(suffix);
 
             if (hasPrefix != hasSuffix)
             {
@@ -981,6 +978,7 @@ namespace DotLogix.Core.Extensions {
                 StringSimilarity.Trigrams => GetTrigramDistance(value, other),
                 _ => throw new ArgumentOutOfRangeException(nameof(function), function, null)
             };
+
             return distance;
         }
         
@@ -1112,24 +1110,16 @@ namespace DotLogix.Core.Extensions {
         /// <summary>
         ///   Gets the corresponding string comparer
         /// </summary>
-        public static StringComparer ToStringComparer(this StringComparison comparison)
-        {
-            switch(comparison) {
-                case StringComparison.CurrentCulture:
-                    return StringComparer.CurrentCulture;
-                case StringComparison.CurrentCultureIgnoreCase:
-                    return StringComparer.CurrentCultureIgnoreCase;
-                case StringComparison.InvariantCulture:
-                    return StringComparer.InvariantCulture;
-                case StringComparison.InvariantCultureIgnoreCase:
-                    return StringComparer.InvariantCultureIgnoreCase;
-                case StringComparison.Ordinal:
-                    return StringComparer.Ordinal;
-                case StringComparison.OrdinalIgnoreCase:
-                    return StringComparer.OrdinalIgnoreCase;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null);
-            }
+        public static StringComparer ToStringComparer(this StringComparison comparison) {
+            return comparison switch {
+                StringComparison.CurrentCulture => StringComparer.CurrentCulture,
+                StringComparison.CurrentCultureIgnoreCase => StringComparer.CurrentCultureIgnoreCase,
+                StringComparison.InvariantCulture => StringComparer.InvariantCulture,
+                StringComparison.InvariantCultureIgnoreCase => StringComparer.InvariantCultureIgnoreCase,
+                StringComparison.Ordinal => StringComparer.Ordinal,
+                StringComparison.OrdinalIgnoreCase => StringComparer.OrdinalIgnoreCase,
+                _ => throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null)
+            };
         }
     }
 }

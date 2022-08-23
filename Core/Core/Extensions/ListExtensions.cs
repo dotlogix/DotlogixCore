@@ -9,6 +9,8 @@
 #region
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using DotLogix.Core.Utils;
 #endregion
 
@@ -157,6 +159,26 @@ namespace DotLogix.Core.Extensions {
         public static void RemoveRange<T>(this ICollection<T> list, IEnumerable<T> collection) {
             foreach(var value in collection)
                 list.Remove(value);
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="List{T}"></see> by repeating the value n times
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="count">The amount of elements in the list</param>
+        /// <returns></returns>
+        public static List<T> CreateList<T>(this T value, int count = 1) {
+            return value.CreateArray(count).ToList();
+        }
+        
+        /// <summary>
+        ///     Creates a <see cref="IEnumerable{T}" /> by repeating the value n times
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="count">The amount of elements in the list</param>
+        /// <returns></returns>
+        public static Task<List<T>> CreateList<T>(this Task<T> value, int count = 1) {
+            return value.TransformAsync(v => v.Result.CreateList(count));
         }
     }
 }

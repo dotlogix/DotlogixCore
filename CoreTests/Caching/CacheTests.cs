@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using DotLogix.Core;
 using DotLogix.Core.Caching;
@@ -19,6 +20,7 @@ namespace CoreTests {
 
 
         #region Cache Store
+        [Test]
         public void Cache_Store_NonExisting() {
             var expectedItem = CreateSimpleItem("test", "testValue");
             expectedItem.Children.Add("child1");
@@ -35,6 +37,7 @@ namespace CoreTests {
             AssertItemsAreEqual(storedItem, expectedItem);
         }
 
+        [Test]
         public void Cache_Store_Existing_NoPreserve() {
             var expectedItem = CreateSimpleItem("test", "testValue");
 
@@ -53,6 +56,7 @@ namespace CoreTests {
             AssertItemsAreEqual(secondItem, expectedItem);
         }
 
+        [Test]
         public void Cache_Store_Existing_Preserve() {
             var expectedItem = CreateSimpleItem("test", "testValue");
             expectedItem.Children.Add("child1");
@@ -79,12 +83,14 @@ namespace CoreTests {
 
         #region Cache Retrieve
 
+        [Test]
         public void Cache_Retrieve_NonExisting_ReturnsNull() {
             CacheItem<string, string> expectedItem = null;
             Assert.DoesNotThrow(() => { expectedItem = _cache.RetrieveItem("nonExistingKey"); });
             Assert.That(expectedItem, Is.Null);
         }
 
+        [Test]
         public void Cache_Retrieve_Existing() {
             var expectedItem = CreateSimpleItem("test", "testValue");
             expectedItem.Children.Add("child1");
@@ -98,9 +104,100 @@ namespace CoreTests {
         }
 
         #endregion
-        
+
+        #region Cache Discard
+
+        [Test]
+        public void Cache_Discard_NonExisting_ReturnsFalse() {
+            Assert.That(_cache.Discard("nonExistingKey"), Is.False);
+        }
+
+        [Test]
+        public void Cache_Discard_Existing() {
+            var childItem = CreateSimpleItem("child1", "testValue");
+            var parentItem = CreateSimpleItem("test", "testValue");
+            parentItem.Children.Add("child1");
+
+            StoreItem(_cache, parentItem);
+            StoreItem(_cache, childItem);
+
+            Assert.That(_cache.IsAlive(parentItem.Key), Is.True);
+            Assert.That(_cache.IsAlive(childItem.Key), Is.True);
+            Assert.That(_cache.Discard(parentItem.Key), Is.True);
+
+
+            Assert.That(_cache.IsAlive(parentItem.Key), Is.False);
+            Assert.That(_cache.IsAlive(childItem.Key), Is.False);
+        }
+
+        [Test]
+        public void Cache_DiscardChildren_NonExisting_ReturnsFalse() {
+            Assert.That(_cache.DiscardChildren("nonExistingKey"), Is.False);
+        }
+
+        [Test]
+        public void Cache_DiscardChildren_Existing() {
+            var childItem = CreateSimpleItem("child1", "testValue");
+            var parentItem = CreateSimpleItem("test", "testValue");
+            parentItem.Children.Add("child1");
+
+            parentItem = StoreItem(_cache, parentItem);
+            childItem = StoreItem(_cache, childItem);
+
+            Assert.That(_cache.IsAlive(parentItem.Key), Is.True);
+            Assert.That(_cache.IsAlive(childItem.Key), Is.True);
+            Assert.That(_cache.DiscardChildren(parentItem.Key), Is.True);
+
+            Assert.That(_cache.IsAlive(parentItem.Key), Is.True);
+            Assert.That(parentItem.HasChildren, Is.False);
+            Assert.That(_cache.IsAlive(childItem.Key), Is.False);
+        }
+
+
+        [Test]
+        public void Cache_DiscardEvent_Existing() {
+            var childItem = CreateSimpleItem("child1", "testValue");
+            var parentItem = CreateSimpleItem("test", "testValue");
+            parentItem.Children.Add("child1");
+
+            parentItem = StoreItem(_cache, parentItem);
+            childItem = StoreItem(_cache, childItem);
+
+            CacheItemsDiscardedEventArgs<string, string> args = null;
+            _cache.ItemsDiscarded += (s, a) => args = a;
+
+
+            Assert.That(_cache.IsAlive(parentItem.Key), Is.True);
+            Assert.That(_cache.IsAlive(childItem.Key), Is.True);
+            Assert.That(_cache.Discard(parentItem.Key), Is.True);
+
+            Assert.That(args.Reason, Is.EqualTo(CacheItemDiscardReason.Discarded));
+            Assert.That(args.DiscardedItems.Count, Is.EqualTo(2));
+
+            var parentItemArgs = args.DiscardedItems.FirstOrDefault(i => i.Item.Key == parentItem.Key);
+            var childItemArgs = args.DiscardedItems.FirstOrDefault(i => i.Item.Key == childItem.Key);
+            
+            Assert.That(parentItemArgs, Is.Not.Null);
+            Assert.That(childItemArgs, Is.Not.Null);
+
+            Assert.That(parentItemArgs.Reason, Is.EqualTo(CacheItemDiscardReason.Discarded));
+            Assert.That(parentItemArgs.Source, Is.EqualTo(CacheItemDiscardSource.Self));
+            Assert.That(parentItemArgs.Ancestors, Is.Empty);
+            Assert.That(parentItemArgs.Dependencies.Count, Is.EqualTo(1));
+            Assert.That(parentItemArgs.Dependencies, Contains.Item(childItemArgs));
+
+            Assert.That(childItemArgs.Reason, Is.EqualTo(CacheItemDiscardReason.Discarded));
+            Assert.That(childItemArgs.Source, Is.EqualTo(CacheItemDiscardSource.Ancestor));
+            Assert.That(childItemArgs.Ancestors.Count, Is.EqualTo(1));
+            Assert.That(childItemArgs.Ancestors, Contains.Item(parentItemArgs));
+            Assert.That(childItemArgs.Dependencies, Is.Empty);
+        }
+
+        #endregion
+
         #region CacheItem Basics
 
+        [Test]
         public void CacheItem_Properties() {
             var firstItem = CreateSimpleItem("key", "value");
             Assert.That(firstItem.HasAssociatedValues, Is.False);
@@ -110,12 +207,14 @@ namespace CoreTests {
             firstItem.AssociatedValues.Add(propPair.Key, propPair.Value);
             Assert.That(firstItem.HasAssociatedValues, Is.True);
             Assert.That(firstItem.AssociatedValues, Is.Not.Null);
-            Assert.That(firstItem.AssociatedValues, Contains.Value(propPair));
+            Assert.That(firstItem.AssociatedValues.TryGetValue(propPair.Key, out var av), Is.True);
+            Assert.That(av, Is.EqualTo(propPair.Value));
 
             firstItem.AssociatedValues.Clear();
             Assert.That(firstItem.HasAssociatedValues, Is.False);
         }
 
+        [Test]
         public void CacheItem_Children() {
             var firstItem = CreateSimpleItem("key", "value");
             Assert.That(firstItem.HasChildren, Is.False);
@@ -124,7 +223,7 @@ namespace CoreTests {
             Assert.That(canAdd, Is.True);
             Assert.That(firstItem.HasChildren, Is.True);
             Assert.That(firstItem.Children, Is.Not.Null);
-            Assert.That(firstItem.Children, Contains.Value("child1"));
+            Assert.That(firstItem.Children, Contains.Item("child1"));
 
             firstItem.Children.Clear();
             Assert.That(firstItem.HasChildren, Is.False);
@@ -154,7 +253,7 @@ namespace CoreTests {
                 storedItem.AssociatedValues.Union(item.AssociatedValues);
             }
 
-            return item;
+            return storedItem;
         }
 
         private static void AssertItemsAreEqual<TKey, TValue>(CacheItem<TKey, TValue> actual, CacheItem<TKey, TValue> expected) {

@@ -13,7 +13,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright (c) 2018 DotLogix</Copyright>
-    <Version>2.0.7</Version>
+    <Version>2.2.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Configurations>Debug;Release;</Configurations>
   </PropertyGroup>
@@ -24,6 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Patterns\StateMachine.cs" />
     <Compile Remove="Utils\CommandLineParser.cs" />
   </ItemGroup>
 

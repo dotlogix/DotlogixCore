@@ -153,12 +153,84 @@ namespace DotLogix.Core.Caching {
             if(_cacheItems.TryRemove(key, out var item) == false)
                 return false;
 
-            ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(new[] {item}));
+            ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems.Values.ToList(), CacheItemDiscardReason.Discarded));
             return true;
         }
 
         /// <summary>
         ///     Forces a revalidation of all items in the cache and removes exeeded items
+        /// </summary>
+        public bool DiscardChildren(TKey key) {
+            var discardedItems = new Dictionary<TKey, CacheItemDiscardedEventArgs<TKey, TValue>>();
+            if(_cacheItems.TryGetValue(key, out var item)) {
+                if(item.HasChildren) {
+                    foreach(var dependentKey in item.Children) {
+                        DiscardRecursive(dependentKey, CacheItemDiscardReason.Discarded, discardedItems);
+                    }
+                    item.Children.Clear();
+                }
+            }
+
+            if (discardedItems.Count <= 0)
+                return false;
+
+            ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems.Values.ToList(), CacheItemDiscardReason.Discarded));
+            return true;
+        }
+
+        /// <summary>
+        ///     Retrieves a cache item by its key. Returns null if the key is not present
+        /// </summary>
+        public CacheItem<TKey, TValue> RetrieveItem(TKey key) {
+            return _cacheItems.TryGetValue(key, out var item) ? item : null;
+        }
+
+        /// <summary>
+        ///     Tries to retrieve a cache item by its key.
+        /// </summary>
+        public bool TryRetrieveItem(TKey key, out CacheItem<TKey, TValue> item) {
+            return _cacheItems.TryGetValue(key, out item);
+        }
+
+        /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        public CacheItem<TKey, TValue> RetrieveOrCreateItem(TKey key, Func<TKey, TValue> createFunc, ICachePolicy policy = null, bool updatePolicy = true) {
+            CacheItem<TKey, TValue> AddValueFactory(TKey k) {
+                var value = createFunc.Invoke(k);
+                return new CacheItem<TKey, TValue>(k, value, policy);
+            }
+
+            CacheItem<TKey, TValue> UpdateValueFactory(TKey k, CacheItem<TKey, TValue> existing) {
+                existing.Policy = policy;
+                return existing;
+            }
+
+            if (updatePolicy)
+                return _cacheItems.AddOrUpdate(key, AddValueFactory, UpdateValueFactory);
+            return _cacheItems.GetOrAdd(key, AddValueFactory);
+        }
+
+        /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        public CacheItem<TKey, TValue> RetrieveOrCreateItem(TKey key, TValue value, ICachePolicy policy = null, bool updatePolicy = true) {
+            CacheItem<TKey, TValue> AddValueFactory(TKey k) {
+                return new CacheItem<TKey, TValue>(k, value, policy);
+            }
+
+            CacheItem<TKey, TValue> UpdateValueFactory(TKey k, CacheItem<TKey, TValue> existing) {
+                existing.Policy = policy;
+                return existing;
+            }
+
+            if (updatePolicy)
+                return _cacheItems.AddOrUpdate(key, AddValueFactory, UpdateValueFactory);
+            return _cacheItems.GetOrAdd(key, AddValueFactory);
+        }
+
+        /// <summary>
+        ///     Forces a re validation of all items in the cache and removes exceeded items
         /// </summary>
         public void Cleanup() {
             if(_cacheItems.IsEmpty)
@@ -204,5 +276,38 @@ namespace DotLogix.Core.Caching {
         IEnumerator IEnumerable.GetEnumerator() {
             return GetEnumerator();
         }
+
+        #region Helper
+
+        private void OnItemsDiscarded(IReadOnlyList<CacheItemDiscardedEventArgs<TKey, TValue>> discardedItems) {
+            ItemsDiscarded?.Invoke(this, new CacheItemsDiscardedEventArgs<TKey, TValue>(discardedItems));
+        }
+
+        private CacheItemDiscardedEventArgs<TKey, TValue> DiscardRecursive(TKey key, CacheItemDiscardReason reason, IDictionary<TKey, CacheItemDiscardedEventArgs<TKey, TValue>> discardedItems) {
+            if(discardedItems.TryGetValue(key, out var currentArgs))
+                return currentArgs;
+
+            if (_cacheItems.TryRemove(key, out var item) == false) {
+                return null;
+            }
+
+            currentArgs = new CacheItemDiscardedEventArgs<TKey, TValue>(item, reason);
+            discardedItems.Add(key, currentArgs);
+
+
+            if(item.HasChildren == false)
+                return currentArgs;
+
+            foreach(var dependentKey in item.Children) {
+                var dependencyItem = DiscardRecursive(dependentKey, reason, discardedItems);
+
+                dependencyItem.Ancestors.Add(currentArgs);
+                currentArgs.Dependencies.Add(dependencyItem);
+            }
+
+            return currentArgs;
+        }
+
+        #endregion
     }
 }

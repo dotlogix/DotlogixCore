@@ -16,10 +16,12 @@ namespace DotLogix.Core.Collections {
 
 		public int GetIndexOf(string name) { return HeaderMap.TryGetValue(name, out var idx) ? idx : -1; }
 
-		public bool TryGetIndexOf(string name, out int index) { return HeaderMap.TryGetValue(name, out index); }
+        public bool TryGetIndexOf(string name, out int index) {
+            return HeaderMap.TryGetValue(name, out index);
+        }
 
 		public bool TryGetValue(int index, out object value) {
-			if (index < 0 || index > Values.Length) {
+			if (index < 0 || index >= Values.Length) {
 				value = default;
 				return false;
 			}

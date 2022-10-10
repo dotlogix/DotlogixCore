@@ -26,7 +26,15 @@ namespace DotLogix.Core.Caching {
         /// <summary>
         /// The policy to check validity
         /// </summary>
-        public ICachePolicy Policy { get; }
+        public bool HasChildren => _children != null && _children.Count > 0;
+        /// <summary>
+        ///     Check if there are dependent cache keys
+        /// </summary>
+        public bool HasAssociatedValues => _associatedValues != null && _associatedValues.Count > 0;
+        /// <summary>
+        ///     The dependent keys
+        /// </summary>
+        public HashSet<TKey> Children => _children ?? (_children = new HashSet<TKey>());
 
         /// <summary>
         /// Creates a new instance of <see cref="CacheItem{TKey,TValue}"/>

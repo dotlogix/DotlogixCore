@@ -369,9 +369,9 @@ namespace DotLogix.Core.Reflection.Fluent {
         public static SetterDelegate CreateSetter(FieldInfo fieldInfo, bool allowNonPublic = true) {
             if(fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
-            if(fieldInfo.IsInitOnly || fieldInfo.IsLiteral)
+            if(fieldInfo.IsLiteral)
                 return null;
-            if(fieldInfo.IsPrivate && (allowNonPublic == false))
+            if((fieldInfo.IsInitOnly || fieldInfo.IsPrivate) && (allowNonPublic == false))
                 return null;
             var fieldName = fieldInfo.Name;
             var declaringType = fieldInfo.DeclaringType;

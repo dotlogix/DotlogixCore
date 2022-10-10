@@ -8,6 +8,7 @@
 
 #region
 using System;
+using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.State;
 #endregion
@@ -16,13 +17,14 @@ namespace DotLogix.Core.Rest.Server.Http {
     public class WebRequestResult {
         public bool Succeed => (ReturnValue != null) || (Exception == null);
         public bool Handled { get; private set; }
-        public IAsyncHttpContext Context { get; }
+        public IAsyncHttpContext HttpContext { get; }
         public HttpStatusCode CustomStatusCode { get; set; }
         public object ReturnValue { get; private set; }
+        public Type ReturnType { get; set; }
         public Exception Exception { get; private set; }
 
-        public WebRequestResult(IAsyncHttpContext context) {
-            Context = context;
+        public WebRequestResult(IAsyncHttpContext httpContext) {
+            HttpContext = httpContext;
         }
 
         public void SetResult(object result) {
@@ -41,6 +43,8 @@ namespace DotLogix.Core.Rest.Server.Http {
 
             Handled = true;
             ReturnValue = result;
+            if(ReturnType == null || result != null && result.GetType().IsAssignableTo(ReturnType) == false)
+                ReturnType = result.GetType();
             return true;
         }
 

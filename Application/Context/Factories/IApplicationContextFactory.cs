@@ -7,7 +7,13 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Application.Context.Factories {
+    /// <summary>
+    /// An interface to represent a factory to create <see cref="IApplicationContext"/>
+    /// </summary>
     public interface IApplicationContextFactory {
+        /// <summary>
+        /// Creates a new instance of <see cref="IApplicationContext"/>
+        /// </summary>
         IApplicationContext Create();
     }
 }

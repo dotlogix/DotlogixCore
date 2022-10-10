@@ -7,22 +7,39 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using DotLogix.Architecture.Domain.Context;
 using DotLogix.Architecture.Domain.Services;
 using DotLogix.Architecture.Domain.UoW;
 #endregion
 
 namespace DotLogix.Architecture.Application.Context {
+    /// <summary>
+    /// An implementation of the <see cref="IApplicationContext"/> interface
+    /// </summary>
     public class ApplicationContext : IApplicationContext {
+        /// <summary>
+        /// The internal domain context
+        /// </summary>
         protected IDomainContext DomainContext { get; }
+        /// <summary>
+        /// The internal unit of work
+        /// </summary>
         protected IUnitOfWork UnitOfWork { get; }
 
+        /// <inheritdoc />
+        public IDictionary<string, object> Variables { get; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Creates a new instance of <see cref="ApplicationContext"/>
+        /// </summary>
         public ApplicationContext(IDomainContext domainContext, IUnitOfWork unitOfWork) {
             DomainContext = domainContext;
             UnitOfWork = unitOfWork;
         }
 
-        public TService UseService<TService>() where TService : class, IDomainService {
+        /// <inheritdoc />
+        public virtual TService UseService<TService>() where TService : class, IDomainService {
             return DomainContext.UseService<TService>(UnitOfWork);
         }
     }

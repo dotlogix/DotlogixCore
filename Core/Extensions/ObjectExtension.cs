@@ -13,16 +13,38 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="object"/>
+    /// </summary>
     public static class ObjectExtension {
+        /// <summary>
+        /// Replaces null values with the provided value
+        /// </summary>
+        /// <param name="source">The object</param>
+        /// <param name="exchangeValue">The default value</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static T ExchangeIfDefault<T>(this T source, T exchangeValue = default) {
             return Equals(source, default(T)) ? exchangeValue : source;
         }
 
+        /// <summary>
+        /// Get the <see cref="DataType"/> of an object instance
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns></returns>
         public static DataType GetDataType(this object instance) {
             return DataTypeConverter.Instance.GetDataType(instance);
         }
 
         #region Convert
+        /// <summary>
+        /// Converts a value to another type using type converters
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="targetType">The target type</param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
         public static object ConvertTo(this object value, Type targetType) {
             if(TryConvertTo(value, targetType, out var convertedValue) == false) {
                 throw new
@@ -31,6 +53,14 @@ namespace DotLogix.Core.Extensions {
             return convertedValue;
         }
 
+        /// <summary>
+        /// Tries to convert a value to another type using type converters
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="targetType">The target type</param>
+        /// <param name="target">The target value</param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
         public static bool TryConvertTo(this object value, Type targetType, out object target) {
             if(value == null) {
                 target = targetType.GetDefaultValue();
@@ -55,27 +85,46 @@ namespace DotLogix.Core.Extensions {
                 }
             }
 
-            var sourceTypeConverter = TypeDescriptor.GetConverter(sourceType);
+            try {
+	            var sourceTypeConverter = TypeDescriptor.GetConverter(sourceType);
 
-            if(sourceTypeConverter.CanConvertTo(targetType)) {
-                target = sourceTypeConverter.ConvertTo(value, targetType);
-                return true;
-            }
+	            if (sourceTypeConverter.CanConvertTo(targetType)) {
+		            target = sourceTypeConverter.ConvertTo(value, targetType);
+		            return true;
+	            }
 
-            var targetTypeConverter = TypeDescriptor.GetConverter(targetType);
-            if(targetTypeConverter.CanConvertFrom(sourceType)) {
-                target = targetTypeConverter.ConvertFrom(value);
-                return true;
-            }
-            target = default;
-            return false;
-        }
+	            var targetTypeConverter = TypeDescriptor.GetConverter(targetType);
+	            if (targetTypeConverter.CanConvertFrom(sourceType)) {
+		            target = targetTypeConverter.ConvertFrom(value);
+		            return true;
+	            }
+            } catch {
+	            // ignored
+						}
+						target = default;
+			            return false;
+				}
 
+        /// <summary>
+        /// Converts a value to another type using type converters
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <typeparam name="TTarget">The target type</typeparam>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
         public static TTarget ConvertTo<TTarget>(this object value) {
             var targetType = typeof(TTarget);
             return (TTarget)ConvertTo(value, targetType);
         }
 
+        /// <summary>
+        /// Tries to convert a value to another type using type converters
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <typeparam name="TTarget">The target type</typeparam>
+        /// <param name="target">The target value</param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
         public static bool TryConvertTo<TTarget>(this object value, out TTarget target) {
             var targetType = typeof(TTarget);
             if(TryConvertTo(value, targetType, out var convertedValue)) {

@@ -11,7 +11,13 @@ using System.Reflection;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
+    /// <summary>
+    /// A representation of a field
+    /// </summary>
     public sealed class DynamicField : DynamicAccessor {
+        /// <summary>
+        /// The original field info
+        /// </summary>
         public FieldInfo FieldInfo { get; }
 
         internal DynamicField(FieldInfo fieldInfo, DynamicGetter getter, DynamicSetter setter) :

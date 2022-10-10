@@ -20,42 +20,59 @@ using DotLogix.Core.Tracking.Snapshots;
 #endregion
 
 namespace DotLogix.Core.Tracking {
+    /// <inheritdoc />
     public class ChangeTracker : IChangeTracker {
+        /// <summary>
+        /// The inner dictionary to hold data
+        /// </summary>
         protected readonly Dictionary<Type, IChangeTrackingEntryManager> EntryManagers = new Dictionary<Type, IChangeTrackingEntryManager>();
 
+        /// <inheritdoc />
         public IEnumerable<IChangeTrackingEntry> Entries => EntryManagers.Values.SelectMany(em => em.Entries);
 
+        /// <inheritdoc />
         public void MarkAsAdded(object target) {
             EnsureEntry(target).MarkAsAdded();
         }
 
+        /// <inheritdoc />
         public void MarkAsDeleted(object target) {
             EnsureEntry(target).MarkAsDeleted();
         }
 
+        /// <inheritdoc />
         public void MarkAsModified(object target) {
             EnsureEntry(target).MarkAsModified();
         }
 
+        /// <inheritdoc />
         public void Attach(object target) {
             EnsureEntry(target);
         }
 
+        /// <inheritdoc />
         public void Detach(object target) {
             var type = target.GetType();
             if(EntryManagers.TryGetValue(type, out var entryManager) && entryManager.TryGetEntry(target, out var entry))
                 entryManager.Remove(entry);
         }
 
+        /// <inheritdoc />
         public IChangeTrackingEntry Entry(object target) {
             return EnsureEntry(target, false);
         }
 
+        /// <summary>
+        /// Ensure an entry exists
+        /// </summary>
         protected IChangeTrackingEntry EnsureEntry(object target, bool autoAttach = true) {
             var entryManager = EnsureEntryManager(target);
             return entryManager.EnsureEntry(target, autoAttach);
         }
 
+        /// <summary>
+        /// Ensure an entry manager exists
+        /// </summary>
         protected IChangeTrackingEntryManager EnsureEntryManager(object target) {
             var type = target.GetType();
             if(EntryManagers.TryGetValue(type, out var entryManager))
@@ -66,6 +83,9 @@ namespace DotLogix.Core.Tracking {
             return entryManager;
         }
 
+        /// <summary>
+        /// Create an entry manager
+        /// </summary>
         protected virtual IChangeTrackingEntryManager CreateEntryManager(Type type) {
             var trackedAccessors = new List<DynamicAccessor>();
             DynamicAccessor keyAccessor = null;
@@ -92,6 +112,9 @@ namespace DotLogix.Core.Tracking {
             return new ChangeTrackingEntryManager(snapshotFactory, keyAccessor);
         }
 
+        /// <summary>
+        /// Create a snapshot factory
+        /// </summary>
         protected virtual ISnapshotFactory CreateSnapshotFactory(Type type, List<DynamicAccessor> trackedAccessors) {
             ISnapshotFactory snapshotFactory;
             if(type.IsAssignableTo(typeof(INotifyPropertyChanged)))

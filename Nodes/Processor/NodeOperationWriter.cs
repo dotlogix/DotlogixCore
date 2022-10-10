@@ -8,52 +8,63 @@
 
 #region
 using System.Collections.Generic;
+using System.Threading.Tasks;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
-    public class NodeOperationWriter : INodeWriter {
+    public class NodeOperationWriter : IAsyncNodeWriter {
         private readonly List<NodeOperation> _operations = new List<NodeOperation>();
 
         public IEnumerable<NodeOperation> Operations => _operations;
 
-        public void BeginMap() {
+        public ValueTask BeginMapAsync() {
             _operations.Add(new NodeOperation(NodeOperationTypes.BeginMap));
+            return default;
         }
 
-        public void BeginMap(string name) {
+        public ValueTask BeginMapAsync(string name) {
             _operations.Add(new NodeOperation(NodeOperationTypes.BeginMap, name));
+            return default;
         }
 
-        public void EndMap() {
+        public ValueTask EndMapAsync() {
             _operations.Add(new NodeOperation(NodeOperationTypes.EndMap));
+            return default;
         }
 
-        public void BeginList() {
+        public ValueTask BeginListAsync() {
             _operations.Add(new NodeOperation(NodeOperationTypes.BeginList));
+            return default;
         }
 
-        public void BeginList(string name) {
+        public ValueTask BeginListAsync(string name) {
             _operations.Add(new NodeOperation(NodeOperationTypes.BeginList, name));
+            return default;
         }
 
-        public void EndList() {
+        public ValueTask EndListAsync() {
             _operations.Add(new NodeOperation(NodeOperationTypes.EndList));
+            return default;
         }
 
-        public void WriteValue(string name, object value) {
+        public ValueTask WriteValueAsync(string name, object value) {
             _operations.Add(new NodeOperation(NodeOperationTypes.WriteValue, name, value));
+            return default;
         }
 
-        public void WriteValue(object value) {
+        public ValueTask WriteValueAsync(object value) {
             _operations.Add(new NodeOperation(NodeOperationTypes.WriteValue, value: value));
+            return default;
         }
 
-        public void AutoComplete() {
+        public ValueTask AutoCompleteAsync() {
             _operations.Add(new NodeOperation(NodeOperationTypes.AutoComplete));
+            return default;
         }
 
-        public void Execute(NodeOperation operation) {
+        public ValueTask ExecuteAsync(NodeOperation operation) {
             _operations.Add(operation);
+            return default;
         }
     }
 }

@@ -1,13 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Reflection.Dynamics;
+using DotLogix.Core.Utils.Instantiators;
 
 namespace DotLogix.Core.Utils
 {
+    /// <summary>
+    /// A static class to create instantiators
+    /// </summary>
     public static class Instantiator {
+        /// <summary>
+        /// Create an instantiator with a singleton property
+        /// </summary>
         public static IInstantiator UseSingletonProperty(Type singletonType, string propertyName = "Instance", Type constraintType = null) {
             if(singletonType == null)
                 throw new ArgumentNullException(nameof(singletonType));
@@ -28,7 +33,9 @@ namespace DotLogix.Core.Utils
 
             return new SingletonInstantiator(targetProperty.CreateDynamicProperty());
         }
-
+        /// <summary>
+        /// Create an instantiator using the default constructor
+        /// </summary>
         public static IInstantiator UseDefaultCtor(Type type, Type constraintType = null)
         {
             if (type == null)
@@ -50,10 +57,43 @@ namespace DotLogix.Core.Utils
 
             return new DynamicInstantiator(targetCtor);
         }
-
+        /// <summary>
+        /// Create an instantiator using a delegate
+        /// </summary>
         public static IInstantiator UseDelegate(Func<object> instantiateFunc)
         {
             return new DelegateInstantiator(instantiateFunc);
+        }
+        /// <summary>
+        /// Create an instantiator using a delegate
+        /// </summary>
+        public static IArgsInstantiator UseDelegate(Func<object[], object> instantiateFunc)
+        {
+            return new DelegateArgsInstantiator(instantiateFunc);
+        }
+        /// <summary>
+        /// Create an instantiator using a constructor
+        /// </summary>
+        public static IArgsInstantiator UseCtor(Type type, Type[] parameterTypes, Type constraintType = null)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (type.IsAbstract)
+                throw new ArgumentException($"The type {type.GetFriendlyName()} can not be an abstract class", nameof(type));
+            if (type.IsInterface)
+                throw new ArgumentException($"The type {type.GetFriendlyName()} can not be an interface", nameof(type));
+            if (type.IsGenericTypeDefinition)
+                throw new ArgumentException($"The type {type.GetFriendlyName()} can not be an open generic type", nameof(type));
+
+            if (constraintType != null && type.IsAssignableTo(constraintType) == false)
+                throw new ArgumentException($"The type {type.GetFriendlyName()} is not assignable to constraint {constraintType.GetFriendlyName()}", nameof(constraintType));
+
+            var targetCtor = type.CreateDynamicCtor(parameterTypes);
+            if (targetCtor == null)
+                throw new ArgumentException($"The type {type.GetFriendlyName()} does not define a default constructor", nameof(type));
+
+            return new DynamicArgsInstantiator(targetCtor);
         }
     }
 }

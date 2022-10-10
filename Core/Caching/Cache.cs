@@ -8,6 +8,7 @@
 
 #region
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,6 +51,11 @@ namespace DotLogix.Core.Caching {
         public TimeSpan CheckPolicyInterval { get; }
 
         /// <summary>
+        ///     The current amount of items
+        /// </summary>
+        public int Count => _cacheItems.Count;
+
+        /// <summary>
         ///     Get the value for a given key. Returns default if value can not be found
         /// </summary>
         public TValue this[TKey key] => Retrieve(key);
@@ -77,8 +83,38 @@ namespace DotLogix.Core.Caching {
         /// <summary>
         ///     Retrieves a value by its key. Returns default if the key is not present
         /// </summary>
-        public TValue Retrieve(TKey key) {
-            return _cacheItems.TryGetValue(key, out var item) ? item.Value : default;
+        public TValue Retrieve(TKey key, TValue defaultValue = default) {
+            return _cacheItems.TryGetValue(key, out var item) ? item.Value : defaultValue;
+        }
+
+        /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        public TValue RetrieveOrCreate(TKey key, Func<TKey, TValue> createFunc, ICachePolicy policy = null, bool updatePolicy = true) {
+            CacheItem<TKey, TValue> AddValueFactory(TKey k) {
+                var value = createFunc.Invoke(k);
+                return new CacheItem<TKey, TValue>(k, value, policy);
+            }
+
+            CacheItem<TKey, TValue> UpdateValueFactory(TKey k, CacheItem<TKey, TValue> existing) {
+                return new CacheItem<TKey, TValue>(k, existing.Value, policy);
+            }
+
+            if (updatePolicy)
+                return _cacheItems.AddOrUpdate(key, AddValueFactory, UpdateValueFactory).Value;
+            return _cacheItems.GetOrAdd(key, AddValueFactory).Value;
+        }
+
+        /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        public TValue RetrieveOrCreate(TKey key, TValue value, ICachePolicy policy = null, bool updatePolicy = true) {
+            CacheItem<TKey, TValue> AddValueFactory(TKey k) { return new CacheItem<TKey, TValue>(k, value, policy); }
+            CacheItem<TKey, TValue> UpdateValueFactory(TKey k, CacheItem<TKey, TValue> existing) { return new CacheItem<TKey, TValue>(k, existing.Value, policy); }
+
+            if (updatePolicy)
+                return _cacheItems.AddOrUpdate(key, AddValueFactory, UpdateValueFactory).Value;
+            return _cacheItems.GetOrAdd(key, AddValueFactory).Value;
         }
 
         /// <summary>
@@ -95,8 +131,8 @@ namespace DotLogix.Core.Caching {
         /// <summary>
         ///     Gets and remove a value by its key. Returns default if the key is not present
         /// </summary>
-        public TValue Pop(TKey key) {
-            return _cacheItems.TryRemove(key, out var item) ? item.Value : default;
+        public TValue Pop(TKey key, TValue defaultValue = default) {
+            return _cacheItems.TryRemove(key, out var item) ? item.Value : defaultValue;
         }
 
         /// <summary>
@@ -156,5 +192,17 @@ namespace DotLogix.Core.Caching {
         ///     Occures when items are discarded in the cache
         /// </summary>
         public event EventHandler<CacheItemsDiscardedEventArgs<TKey, TValue>> ItemsDiscarded;
+
+        /// <summary>Returns an enumerator that iterates through the collection.</summary>
+        /// <returns>An enumerator that can be used to iterate through the collection.</returns>
+        public IEnumerator<CacheItem<TKey, TValue>> GetEnumerator() {
+            return _cacheItems.Values.ToList().GetEnumerator();
+        }
+
+        /// <summary>Returns an enumerator that iterates through a collection.</summary>
+        /// <returns>An <see cref="T:System.Collections.IEnumerator"></see> object that can be used to iterate through the collection.</returns>
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
+        }
     }
 }

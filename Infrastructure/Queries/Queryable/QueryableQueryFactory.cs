@@ -7,24 +7,37 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using System.Linq;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+    /// <summary>
+    /// An implementation of the <see cref="IQueryableQueryFactory"/>
+    /// </summary>
     public class QueryableQueryFactory : IQueryableQueryFactory {
+        /// <summary>
+        /// The static singleton instance
+        /// </summary>
         public static IQueryableQueryFactory Instance { get; } = new QueryableQueryFactory();
-        private QueryableQueryFactory() { }
+        /// <summary>
+        /// Creates a new instance of <see cref="QueryableQuery{TValue}"/>
+        /// </summary>
+        protected QueryableQueryFactory() { }
 
-        public IQuery<T> CreateQuery<T>(IQueryable<T> queryable) {
-            return new QueryableQuery<T>(queryable, this);
+        /// <inheritdoc />
+        public virtual IQuery<T> CreateQuery<T>(IQueryable<T> queryable, IEnumerable<IQueryInterceptor> interceptors) {
+            return new QueryableQuery<T>(queryable, this, interceptors);
         }
 
-        public IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable) {
-            return new OrderedQueryableQuery<T>(queryable, this);
+        /// <inheritdoc />
+        public virtual IOrderedQuery<T> CreateQuery<T>(IOrderedQueryable<T> queryable, IEnumerable<IQueryInterceptor> interceptors) {
+            return new OrderedQueryableQuery<T>(queryable, this, interceptors);
         }
 
-        public IQueryExecutor<T> CreateExecutor<T>(IQueryable<T> queryable) {
-            return new QueryableQueryExecutor<T>(queryable);
+        /// <inheritdoc />
+        public virtual IQueryExecutor<T> CreateExecutor<T>(IQuery<T> query) {
+            return new InterceptableQueryExecutor<T>(query, q => new QueryableQueryExecutor<T>(q));
         }
     }
 }

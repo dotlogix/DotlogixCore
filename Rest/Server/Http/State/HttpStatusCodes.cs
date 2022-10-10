@@ -97,5 +97,9 @@ namespace DotLogix.Core.Rest.Server.Http.State {
             public static readonly HttpStatusCode NotExtended = new HttpStatusCode(510, "Not Extended");
             public static readonly HttpStatusCode NetworkAuthenticationRequired = new HttpStatusCode(511, "Network Authentication Required");
         }
+
+        public static HttpStatusCodeGroup GetGroup(int code) {
+            return (HttpStatusCodeGroup)((code / 100) % 10);
+        }
     }
 }

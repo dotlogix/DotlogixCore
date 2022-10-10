@@ -7,9 +7,12 @@
 // ==================================================
 
 #region
-using DotLogix.Architecture.Infrastructure.Entities.Options;
+using DotLogix.Architecture.Common.Options;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Entities {
+    /// <summary>
+    /// An interface combining <see cref="IInsertOnlyEntity"/> and <see cref="IOrdered"/> interface
+    /// </summary>
     public interface IEntity : IInsertOnlyEntity, IOrdered { }
 }

@@ -1,20 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Text;
 using DotLogix.Core.Extensions;
 
 namespace DotLogix.Core.Nodes
 {
+    /// <summary>
+    /// Creates a dynamic object with a internal hierarchy structure cast-able to matching types
+    /// </summary>
     public class DynamicNode : DynamicObject
     {
-        public NodeContainer Node { get; }
+        private readonly ConverterSettings _settings;
 
-        private DynamicNode(NodeContainer node)
-        {
+        /// <summary>
+        /// The internal node
+        /// </summary>
+        public Node Node { get; }
+
+        private DynamicNode(Node node, ConverterSettings settings = null) {
+            this._settings = settings ?? new ConverterSettings();
             Node = node;
         }
 
+        /// <inheritdoc />
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
             if (indexes.Length != 1)
@@ -31,15 +38,16 @@ namespace DotLogix.Core.Nodes
                     childNode = nodeList.GetChild(index);
                     break;
                 case NodeMap nodeMap when objIndex is string name:
-                    childNode = nodeMap.GetChild(name);
+                    childNode = nodeMap.GetChild(_settings.NamingStrategy?.TransformName(name) ?? name);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            result = ToValue(childNode);
+            result = new DynamicNode(childNode, _settings);
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             if (!(Node is NodeMap nodeMap))
@@ -47,11 +55,12 @@ namespace DotLogix.Core.Nodes
                 result = null;
                 return false;
             }
-            var childNode = nodeMap.GetChild(binder.Name);
-            result = ToValue(childNode);
+            var childNode = nodeMap.GetChild(_settings.NamingStrategy?.TransformName(binder.Name) ?? binder.Name);
+            result = new DynamicNode(childNode, _settings);
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object value)
         {
             if (indexes.Length != 1)
@@ -74,6 +83,7 @@ namespace DotLogix.Core.Nodes
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
             if (!(Node is NodeMap nodeMap))
@@ -84,6 +94,7 @@ namespace DotLogix.Core.Nodes
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TryConvert(ConvertBinder binder, out object result)
         {
             if(binder.ReturnType.IsAssignableTo<Node>()) {
@@ -97,7 +108,7 @@ namespace DotLogix.Core.Nodes
 
             try
             {
-                result = Nodes.ToObject(Node, binder.ReturnType);
+                result = Node.ToObject(binder.ReturnType, _settings);
                 return true;
             }
             catch
@@ -116,38 +127,32 @@ namespace DotLogix.Core.Nodes
                 case DynamicNode dynNode:
                     return dynNode.Node;
                 default:
-                    return Nodes.ToNode(value);
+                    return Nodes.ToNode(value, _settings);
             }
         }
 
-        private object ToValue(Node node)
+        /// <summary>
+        /// Creates a dynamic object using a existing node
+        /// </summary>
+        public static dynamic From(Node node, ConverterSettings settings = null)
         {
-            switch (node.Type)
-            {
-                case NodeTypes.Empty:
-                case NodeTypes.Value:
-                    return ((NodeValue)node).Value;
-                case NodeTypes.List:
-                case NodeTypes.Map:
-                    return new DynamicNode((NodeContainer)node);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return new DynamicNode(node, settings);
         }
 
-        public static dynamic From(NodeContainer nodeContainer)
+        /// <summary>
+        /// Creates a dynamic object using a new node map
+        /// </summary>
+        public static dynamic Map(ConverterSettings settings = null)
         {
-            return new DynamicNode(nodeContainer);
+            return new DynamicNode(new NodeMap(), settings);
         }
 
-        public static dynamic Map()
+        /// <summary>
+        /// Creates a dynamic object using a ne node list
+        /// </summary>
+        public static dynamic List(ConverterSettings settings = null)
         {
-            return new DynamicNode(new NodeMap());
-        }
-
-        public static dynamic List()
-        {
-            return new DynamicNode(new NodeList());
+            return new DynamicNode(new NodeList(), settings);
         }
     }
 }

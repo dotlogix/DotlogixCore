@@ -7,7 +7,13 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Domain.UoW {
+    /// <summary>
+    /// An interface to represent a factory to create a <see cref="IUnitOfWorkContext"/>
+    /// </summary>
     public interface IUnitOfWorkContextFactory {
+        /// <summary>
+        /// Creates a new <see cref="IUnitOfWorkContext"/>
+        /// </summary>
         IUnitOfWorkContext BeginContext();
     }
 }

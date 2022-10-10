@@ -16,38 +16,73 @@ using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
+    /// <summary>
+    /// A static logging interface
+    /// </summary>
     public static class Log {
         private static readonly ParrallelLogger Logger = ParrallelLogger.Instance;
-
+        /// <summary>
+        /// The level to log messages
+        /// </summary>
         public static LogLevels LogLevel {
             get => Logger.CurrentLogLevel;
             set => Logger.CurrentLogLevel = value;
         }
 
+        /// <summary>
+        /// Initialize the log instance
+        /// </summary>
+        /// <returns></returns>
         public static bool Initialize() {
             return Logger.Initialize();
         }
 
+        /// <summary>
+        /// Attach loggers to the log instance
+        /// </summary>
+        /// <param name="loggers"></param>
+        /// <returns></returns>
         public static bool AttachLoggers(params ILogger[] loggers) {
             return Logger.AttachLogger(loggers);
         }
 
+        /// <summary>
+        /// Attach loggers to the log instance
+        /// </summary>
+        /// <param name="loggers"></param>
+        /// <returns></returns>
         public static bool AttachLoggers(IEnumerable<ILogger> loggers) {
             return Logger.AttachLogger(loggers);
         }
 
+        /// <summary>
+        /// Detach some loggers from the log instance
+        /// </summary>
+        /// <param name="loggers"></param>
+        /// <returns></returns>
         public static bool DetachLoggers(params ILogger[] loggers) {
             return Logger.DetachLogger(loggers);
         }
-
+        /// <summary>
+        /// Detach some loggers from the log instance
+        /// </summary>
+        /// <param name="loggers"></param>
+        /// <returns></returns>
         public static bool DetachLoggers(IEnumerable<ILogger> loggers) {
             return Logger.DetachLogger(loggers);
         }
-
+        /// <summary>
+        /// Shutdown the log instance
+        /// </summary>
+        /// <returns></returns>
         public static bool Shutdown() {
             return Logger.Shutdown();
         }
 
+        /// <summary>
+        /// Write a trace message to the loggers
+        /// </summary>
+        /// <param name="message"></param>
         public static void Trace(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Trace))
                 return;
@@ -55,6 +90,10 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Write a trace message to the loggers
+        /// </summary>
+        /// <param name="messageFunc"></param>
         public static void Trace(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Trace))
                 return;
@@ -62,6 +101,10 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Write a debug message to the loggers
+        /// </summary>
+        /// <param name="message"></param>
         public static void Debug(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Debug))
                 return;
@@ -69,6 +112,10 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Write a debug message to the loggers
+        /// </summary>
+        /// <param name="messageFunc"></param>
         public static void Debug(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Debug))
                 return;
@@ -76,6 +123,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a method enter message to the loggers
+        /// </summary>
         public static void MethodEnter() {
             if(Logger.IsLoggingDisabled(LogLevels.Trace))
                 return;
@@ -84,6 +134,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a method exit message to the loggers
+        /// </summary>
         public static void MethodExit() {
             if(Logger.IsLoggingDisabled(LogLevels.Trace))
                 return;
@@ -92,6 +145,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes an info message to the loggers
+        /// </summary>
         public static void Info(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Info))
                 return;
@@ -99,6 +155,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes an info message to the loggers
+        /// </summary>
         public static void Info(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Info))
                 return;
@@ -106,13 +165,39 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a warning message to the loggers
+        /// </summary>
         public static void Warn(string message) {
-            if(Logger.IsLoggingDisabled(LogLevels.Warning))
+            if (Logger.IsLoggingDisabled(LogLevels.Warning))
                 return;
             var logMessage = CreateLogMessage(LogLevels.Warning, message, 2);
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a warning message to the loggers
+        /// </summary>
+        public static void Warn(Exception exception) {
+            if (Logger.IsLoggingDisabled(LogLevels.Warning))
+                return;
+
+            if (exception is AggregateException ae) {
+                foreach (var inner in ae.InnerExceptions)
+                    Warn(inner);
+            } else if (exception.InnerException != null)
+                Warn(exception.InnerException);
+
+
+            var message = exception.Message + "\n" + exception.StackTrace;
+
+            var logMessage = CreateLogMessage(LogLevels.Warning, message, exception.TargetSite);
+            Logger.Log(logMessage);
+        }
+
+        /// <summary>
+        /// Writes a warning message to the loggers
+        /// </summary>
         public static void Warn(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Warning))
                 return;
@@ -120,6 +205,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a error message to the loggers
+        /// </summary>
         public static void Error(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Error))
                 return;
@@ -127,6 +215,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a error message to the loggers
+        /// </summary>
         public static void Error(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Error))
                 return;
@@ -134,6 +225,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a error message to the loggers
+        /// </summary>
         public static void Error(Exception exception) {
             if(Logger.IsLoggingDisabled(LogLevels.Error))
                 return;
@@ -151,6 +245,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a critical message to the loggers
+        /// </summary>
         public static void Critical(Exception exception) {
             if(Logger.IsLoggingDisabled(LogLevels.Critical))
                 return;
@@ -168,6 +265,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a critical message to the loggers
+        /// </summary>
         public static void Critical(string message) {
             if(Logger.IsLoggingDisabled(LogLevels.Critical))
                 return;
@@ -176,6 +276,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a critical message to the loggers
+        /// </summary>
         public static void Critical(Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(LogLevels.Critical))
                 return;
@@ -184,6 +287,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a custom message to the loggers
+        /// </summary>
         public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, string message) {
             if(Logger.IsLoggingDisabled(logLevel))
                 return;
@@ -200,6 +306,9 @@ namespace DotLogix.Core.Diagnostics {
             Logger.Log(logMessage);
         }
 
+        /// <summary>
+        /// Writes a custom message to the loggers
+        /// </summary>
         public static void Custom(LogLevels logLevel, string methodName, string className, string threadName, Func<string> messageFunc) {
             if(Logger.IsLoggingDisabled(logLevel))
                 return;

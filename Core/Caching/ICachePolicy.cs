@@ -15,6 +15,11 @@ namespace DotLogix.Core.Caching {
     ///     A common interface for cache policies
     /// </summary>
     public interface ICachePolicy {
+        /// <summary>
+        /// A callback method to check if an item should be dropped
+        /// </summary>
+        /// <param name="timeStampUtc">The timestamp when the check is happening</param>
+        /// <returns></returns>
         bool HasExpired(DateTime timeStampUtc);
     }
 }

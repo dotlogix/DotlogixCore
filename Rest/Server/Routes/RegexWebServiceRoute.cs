@@ -9,7 +9,6 @@
 #region
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Processors;
 #endregion
@@ -19,7 +18,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
         public Regex Regex { get; }
 
         public RegexWebServiceRoute(int routeIndex, string pattern, HttpMethods acceptedRequests, IWebRequestProcessor requestProcessor, int priority) : base(routeIndex, pattern, acceptedRequests, requestProcessor, priority) {
-            Regex = new Regex(Pattern);
+            Regex = new Regex(Pattern, RegexOptions.Compiled);
         }
 
 

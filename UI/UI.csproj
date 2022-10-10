@@ -229,6 +229,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y $(TargetDir)$(TargetName).dll $(SolutionDir)..\assemblies\$(ConfigurationName)
+xcopy /Y $(TargetDir)$(TargetName).pdb $(SolutionDir)..\assemblies\$(ConfigurationName)</PostBuildEvent>
   </PropertyGroup>
 </Project>

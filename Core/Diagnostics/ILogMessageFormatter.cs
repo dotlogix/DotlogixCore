@@ -6,8 +6,19 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
+using System.IO;
+
 namespace DotLogix.Core.Diagnostics {
+    /// <summary>
+    /// An interface for log message formatters
+    /// </summary>
     public interface ILogMessageFormatter {
-        string Format(LogMessage logMessage);
+        /// <summary>
+        /// Formats a log message
+        /// </summary>
+        /// <param name="logMessage"></param>
+        /// <param name="writer"></param>
+        /// <returns></returns>
+        bool Format(LogMessage logMessage, TextWriter writer);
     }
 }

@@ -7,7 +7,7 @@
 // ==================================================
 
 #region
-using DotLogix.Core.Rest.Server.Http.Context;
+using DotLogix.Core.Rest.Server.Http.Parameters;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http {

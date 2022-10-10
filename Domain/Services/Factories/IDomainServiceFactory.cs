@@ -12,7 +12,13 @@ using DotLogix.Architecture.Domain.UoW;
 #endregion
 
 namespace DotLogix.Architecture.Domain.Services.Factories {
+    /// <summary>
+    /// An interface representing a factory to create <see cref="IDomainService"/>
+    /// </summary>
     public interface IDomainServiceFactory {
+        /// <summary>
+        /// Creates a new instance of <see cref="IDomainService"/>
+        /// </summary>
         IDomainService Create(IDomainContext domainContext, IUnitOfWorkContextFactory uowContextFactory);
     }
 }

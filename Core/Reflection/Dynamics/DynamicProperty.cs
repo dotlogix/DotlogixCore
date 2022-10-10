@@ -11,7 +11,13 @@ using System.Reflection;
 #endregion
 
 namespace DotLogix.Core.Reflection.Dynamics {
+    /// <summary>
+    /// A representation of a property
+    /// </summary>
     public sealed class DynamicProperty : DynamicAccessor {
+        /// <summary>
+        /// The original property info
+        /// </summary>
         public PropertyInfo PropertyInfo { get; }
 
         internal DynamicProperty(PropertyInfo propertyInfo, DynamicGetter getter, DynamicSetter setter) :

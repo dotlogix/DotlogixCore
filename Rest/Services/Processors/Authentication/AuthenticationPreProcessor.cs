@@ -12,12 +12,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes;
+using DotLogix.Core.Rest.Authentication.Base;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Exceptions;
-using DotLogix.Core.Rest.Services.Processors.Authentication.Base;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Processors.Authentication {
@@ -31,34 +30,33 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
 
         public AuthenticationPreProcessor(int priority, params IAuthenticationMethod[] authMethods) : this(priority, authMethods.AsEnumerable()) { }
 
-        public override Task ProcessAsync(WebServiceContext webServiceContext) {
-            var authenticationDescriptor = webServiceContext.Route.RequestProcessor.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
+        public override Task ProcessAsync(WebServiceContext context) {
+            var authenticationDescriptor = context.Route.RequestProcessor.Descriptors.GetCustomDescriptor<AuthenticationDescriptor>();
             if((authenticationDescriptor != null) && (authenticationDescriptor.RequiresAuthentication == false))
                 return Task.CompletedTask;
 
-            var request = webServiceContext.HttpRequest;
-            var result = webServiceContext.RequestResult;
+            var request = context.HttpRequest;
             var headerParameters = request.HeaderParameters;
 
-            if(headerParameters.TryGetValue(AuthorizationParameterName, out string authParameter) == false) {
-                SetInvalidFormatException(result);
+            if(headerParameters.TryGetValueAs(AuthorizationParameterName, out string authParameter) == false) {
+                SetInvalidFormatException(context);
                 return Task.CompletedTask;
             }
 
             var authValue = authParameter.Split();
             if((authValue.Length != 2) || (_authorizationMethods.TryGetValue(authValue[0], out var authMethod) == false)) {
-                SetInvalidFormatException(result);
+                SetInvalidFormatException(context);
                 return Task.CompletedTask;
             }
 
-            return authMethod.AuthenticateAsync(result, authValue[1]);
+            return authMethod.AuthenticateAsync(context, authValue[1]);
         }
 
-        protected void SetUnauthorizedException(WebRequestResult webRequestResult, string message) {
-            webRequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));
+        protected void SetUnauthorizedException(WebServiceContext context, string message) {
+            context.RequestResult.SetException(new RestException(HttpStatusCodes.ClientError.Unauthorized, message));
         }
 
-        protected void SetInvalidFormatException(WebRequestResult webRequestResult) {
+        protected void SetInvalidFormatException(WebServiceContext context) {
             var messageBuilder = new StringBuilder();
             messageBuilder.AppendLine("The data you provided for authorization is in an invalid format.");
             messageBuilder.Append("Supported formats are:");
@@ -68,7 +66,7 @@ namespace DotLogix.Core.Rest.Services.Processors.Authentication {
                     messageBuilder.Append($"\n\t{authorizationMethod.Name} {supportedDataFormat}");
             }
 
-            SetUnauthorizedException(webRequestResult, messageBuilder.ToString());
+            SetUnauthorizedException(context, messageBuilder.ToString());
         }
     }
 }

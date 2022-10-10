@@ -9,7 +9,6 @@
 #region
 using System;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Routes;
 #endregion
@@ -23,7 +22,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             Context = asyncHttpContext;
             Route = route;
             Router = asyncWebRequestRouter;
-            if(Context.Request.HeaderParameters.TryGetValue(AsyncWebRequestRouter.EventSubscriptionChannelParameterName, out string channel))
+            if(Context.Request.HeaderParameters.TryGetValueAs(AsyncWebRequestRouter.EventSubscriptionChannelParameterName, out string channel))
                 Channel = channel;
         }
 
@@ -54,7 +53,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             return Equals((WebServiceEventSubscription)obj);
         }
 
-        /// <summary>Serves as the default hash function.</summary>
+        /// <summary>Serves as the default hash method.</summary>
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() {
             return Guid.GetHashCode();

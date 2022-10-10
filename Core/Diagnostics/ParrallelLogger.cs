@@ -13,6 +13,9 @@ using System.Threading;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
+    /// <summary>
+    /// A background-threaded hub for log messages
+    /// </summary>
     public class ParrallelLogger : ILogger {
         private readonly Thread _loggingThread;
         private readonly ManualResetEvent _logWait;
@@ -22,10 +25,23 @@ namespace DotLogix.Core.Diagnostics {
         private ILogger[] _currentReceivers = new ILogger[0];
         private bool _loggersChanged;
 
+        /// <summary>
+        /// The singleton instance
+        /// </summary>
         public static ParrallelLogger Instance { get; } = new ParrallelLogger();
 
+        /// <summary>
+        /// The sync root
+        /// </summary>
         public object SyncRoot { get; }
+
+        /// <summary>
+        /// A flag if the logger is initialized
+        /// </summary>
         public bool Initialized { get; private set; }
+        /// <summary>
+        /// The current log level
+        /// </summary>
         public LogLevels CurrentLogLevel { get; set; } = LogLevels.Off;
 
         private ParrallelLogger() {
@@ -39,8 +55,10 @@ namespace DotLogix.Core.Diagnostics {
             _receiverWait = new ManualResetEvent(false);
         }
 
+        /// <inheritdoc />
         public string Name => "ParrallelLogger";
 
+        /// <inheritdoc />
         public bool Log(LogMessage logMessage) {
             if(IsLoggingDisabled(logMessage.LogLevel))
                 return false;
@@ -54,6 +72,7 @@ namespace DotLogix.Core.Diagnostics {
             return true;
         }
 
+        /// <inheritdoc />
         public bool Initialize() {
             lock(SyncRoot) {
                 if(Initialized)
@@ -70,6 +89,7 @@ namespace DotLogix.Core.Diagnostics {
             return true;
         }
 
+        /// <inheritdoc />
         public bool Shutdown() {
             lock(SyncRoot) {
                 if(Initialized == false)
@@ -121,6 +141,11 @@ namespace DotLogix.Core.Diagnostics {
             }
         }
 
+        /// <summary>
+        /// Attach loggers to the hub
+        /// </summary>
+        /// <param name="loggers"></param>
+        /// <returns></returns>
         public bool AttachLogger(IEnumerable<ILogger> loggers) {
             if(loggers == null)
                 return true;
@@ -140,6 +165,11 @@ namespace DotLogix.Core.Diagnostics {
             return loggerList.All(l => l.Initialize());
         }
 
+        /// <summary>
+        /// Detach loggers to the hub
+        /// </summary>
+        /// <param name="loggers"></param>
+        /// <returns></returns>
         public bool DetachLogger(IEnumerable<ILogger> loggers) {
             if(loggers == null)
                 return true;
@@ -158,10 +188,20 @@ namespace DotLogix.Core.Diagnostics {
             return loggerList.All(l => l.Shutdown());
         }
 
+        /// <summary>
+        /// Determines if a log level is high enough
+        /// </summary>
+        /// <param name="logLevel"></param>
+        /// <returns></returns>
         public bool IsLoggingEnabled(LogLevels logLevel) {
             return CurrentLogLevel <= logLevel;
         }
 
+        /// <summary>
+        /// Determines if a log level is to low
+        /// </summary>
+        /// <param name="logLevel"></param>
+        /// <returns></returns>
         public bool IsLoggingDisabled(LogLevels logLevel) {
             return CurrentLogLevel > logLevel;
         }

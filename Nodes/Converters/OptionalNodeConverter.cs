@@ -7,26 +7,52 @@
 // ==================================================
 
 #region
+using System;
+using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to optional values
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
     public class OptionalNodeConverter<TValue> : NodeConverter {
-        public OptionalNodeConverter(DataType dataType) : base(dataType) { }
+        /// <summary>
+        /// Creates a new instance of <see cref="OptionalNodeConverter{TValue}"/>
+        /// </summary>
+        public OptionalNodeConverter(TypeSettings typeSettings) : base(typeSettings) { }
 
-        public override void Write(object instance, string rootName, INodeWriter writer) {
-            var opt = (Optional<TValue>)instance;
-            if(opt.IsDefined)
-                Nodes.WriteTo(rootName, opt.Value, typeof(TValue), writer);
+        /// <inheritdoc />
+        public override ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+            if(!(instance is Optional<TValue> opt))
+                return default;
+
+            if (opt.IsDefined == false)
+                return default;
+
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
+
+            if (scopedSettings.ShouldEmitValue(opt.Value) == false)
+                return default;
+
+            return childConverter.WriteAsync(opt.Value, name, writer, scopedSettings.ChildSettings);
         }
 
-        public override object ConvertToObject(Node node) {
+        /// <inheritdoc />
+        public override object ConvertToObject(Node node, IConverterSettings settings) {
             if(node.Type == NodeTypes.Empty)
                 return new Optional<TValue>(default);
 
-            var value = Nodes.ToObject<TValue>(node);
-            return new Optional<TValue>(value);
+
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
+
+            var optionalValue = childConverter.ConvertToObject(node, scopedSettings.ChildSettings);
+            return new Optional<TValue>((TValue)optionalValue);
+
         }
     }
 }

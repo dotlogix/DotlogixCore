@@ -9,13 +9,16 @@
 #region
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq.Expressions;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
-using DotLogix.Core.Extensions;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Running;
+using Benchmarks.Serializers;
+using DotLogix.Core;
+using DotLogix.Core.Diagnostics;
 using DotLogix.Core.Nodes;
 using DotLogix.Core.Nodes.Processor;
-using DotLogix.Core.Reflection.Dynamics;
 #endregion
 
 namespace TestApp {
@@ -85,20 +88,101 @@ namespace TestApp {
 
     internal class Program {
         public class Person {
+            [NodeProperty(Name = "test")]
+            public string FirstName { get; set; }
+
+
+
+            [NodeProperty(NamingStrategy = typeof(SnakeCaseNamingStrategy))]
+            public string LastName { get; set; }
+
+
+
+            [NodeChild(EmitMode = EmitMode.IgnoreDefault)]
+            public IEnumerable<int> Enumerable { get; set; }
+
+
+            [NodeProperty(EmitMode = EmitMode.IgnoreDefault, NumberFormat = "X8")]
+            public int DefaultInt { get; set; } = 255;
+
+
+
+            [NodeProperty(EmitMode = EmitMode.IgnoreDefault)]
+            public string DefaultString { get; set; }
+
+
+            [NodeProperty(EmitMode = EmitMode.IgnoreDefault, NumberFormat = "P")]
+            public double PerctDouble { get; set; } = 0.85;
+
+
+
+            [NodeProperty(EmitMode = EmitMode.IgnoreNull)]
+            public Optional<string> DefaultOptionalString { get; set; }
+        }
+
+        public class PersonPlain {
             public string FirstName { get; set; }
             public string LastName { get; set; }
+            public IEnumerable<int> Enumerable { get; set; }
+            public int DefaultInt { get; set; }
+            public string DefaultString { get; set; }
+            public Optional<string> DefaultOptionalString { get; set; }
         }
 
         private static async Task Main(string[] args) {
-            var json = "{\"name\":\"Alex\",\"id\":1,\"guid\":\"605f282d-f216-4588-bede-512753ffc0cb\"}";
-            var node = JsonNodes.ToNode<NodeMap>(json);
-            node.AddChild("person", Nodes.ToNode(new Person{FirstName="Alex", LastName = "Schill"}));
-            node.GetChild<NodeMap>("person").AddChild("childPerson", Nodes.ToNode(new Person { FirstName = "Alex", LastName = "Schill" }));
-            var flat = node.Flatten();
-            Console.WriteLine(JsonNodes.ToJson(flat, JsonNodesFormatter.Idented));
+            Log.LogLevel = LogLevels.Trace;
+            Log.AttachLoggers(new ConsoleLogger(120, 100));
+            Log.Initialize();
 
-            Console.Read();
+
+            Log.Info("Test");
+            try {
+                throw new Exception("error 1234");
+            } catch(Exception e) {
+                Log.Error(e);
+            }
+
+            Console.ReadLine();
+
+
+            //var config = new DebugBuildConfig();
+            //BenchmarkRunner.Run<SerializeToString<Models.SmallClass>>();
+            //BenchmarkRunner.Run<SerializeToString<Models.ThousandSmallClassDictionary>>();
+            //BenchmarkRunner.Run<DeserializeFromString<Models.ThousandSmallClassDictionary>>();
+
+            //var model = new Models.ThousandSmallClassDictionary();
+
+            //Benchmark(model, 1);
+
+
+            //Benchmark(person, 100_000);
+
+            Console.ReadLine();
         }
 
+        private static void Benchmark<T>(T person, int iterations) {
+            // Warmup
+            string json = JsonNodes.ToJson(person);
+            T result = JsonNodes.FromJson<T>(json);
+
+            Console.WriteLine($"Benchmark: {typeof(T).Name}");
+
+            var watch = new Stopwatch();
+
+            watch.Start();
+            for (int i = 0; i < iterations; i++)
+                json = JsonNodes.ToJson(person);
+            watch.Stop();
+            Console.WriteLine($"Serialization: {watch.Elapsed.TotalMilliseconds}ms");
+
+            watch.Restart();
+            for (int i = 0; i < iterations; i++)
+                result = JsonNodes.FromJson<T>(json);
+            watch.Stop();
+            Console.WriteLine($"Deserialization: {watch.Elapsed.TotalMilliseconds}ms");
+
+            Console.Write(json);
+            Console.Write(result);
+        }
     }
 }

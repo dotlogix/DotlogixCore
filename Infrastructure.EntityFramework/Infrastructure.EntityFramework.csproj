@@ -1,25 +1,45 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>DotLogix.Infrastructure.EntityFramework</AssemblyName>
     <RootNamespace>DotLogix.Architecture.Infrastructure.EntityFramework</RootNamespace>
     <Company>DotLogix</Company>
     <Product>DotLogix Architecture</Product>
     <PackageId>DotLogix.Architecture.Infrastructure.EntityFramework</PackageId>
     <Authors>DotLogix</Authors>
-  </PropertyGroup>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	<RepositoryType>git</RepositoryType>
+	<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+	<AssemblyVersion>1.1</AssemblyVersion>
+    <FileVersion>1.1</FileVersion>
+    <Version>2.0.14</Version>
+		<Configurations>Debug;Release;</Configurations>
+	</PropertyGroup>
 
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>..\assemblies\docs\DotLogix.Infrastructure.EntityFramework.xml</DocumentationFile>
+    <WarningsAsErrors>NU1605;</WarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
-  </Target>
 
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <ItemGroup>
+      <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+      <AssemblyFiles Include="bin\$(Configuration)\**\*.*" Exclude="**\*.deps.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+    <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />
+  </Target>
 </Project>

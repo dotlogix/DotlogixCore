@@ -12,14 +12,29 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Factories {
+    /// <summary>
+    /// An implementation of the <see cref="INodeConverterFactory"/> for primitives
+    /// </summary>
     public class ValueNodeConverterFactory : NodeConverterFactoryBase {
-        public override bool TryCreateConverter(NodeTypes nodeType, DataType dataType, out INodeConverter converter) {
+        private readonly bool _useJsonValues;
+
+        /// <inheritdoc />
+        public ValueNodeConverterFactory(bool useJsonValues) {
+            _useJsonValues = useJsonValues;
+        }
+
+        /// <inheritdoc />
+        public override bool TryCreateConverter(INodeConverterResolver resolver, TypeSettings typeSettings, out IAsyncNodeConverter converter) {
             converter = null;
-            if(nodeType != NodeTypes.Value)
+            if(typeSettings.NodeType != NodeTypes.Value)
                 return false;
-            if((dataType.Flags & DataTypeFlags.CategoryMask) != DataTypeFlags.Primitive)
+            if((typeSettings.DataType.Flags & DataTypeFlags.CategoryMask) != DataTypeFlags.Primitive)
                 return false;
-            converter = new ValueNodeConverter(dataType);
+
+            //if(_useJsonValues)
+            //    converter = new JsonValueNodeConverter(typeSettings);
+            //else
+                converter = new ValueNodeConverter(typeSettings);
             return true;
         }
     }

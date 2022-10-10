@@ -7,8 +7,10 @@
 // ==================================================
 
 #region
+using System.Collections.Generic;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.Processors.Json;
 using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
@@ -22,6 +24,7 @@ namespace DotLogix.Core.Rest.Server.Routes {
 
         int RouteIndex { get; }
         int Priority { get; }
+        bool IsRooted { get; set; }
         HttpMethods AcceptedRequests { get; }
         RouteMatch Match(HttpMethods method, string path);
     }

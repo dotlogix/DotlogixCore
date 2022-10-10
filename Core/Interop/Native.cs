@@ -10,6 +10,7 @@
 using System;
 using System.Runtime.InteropServices;
 using DotLogix.Core.Interop.Structs;
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Core.Interop {

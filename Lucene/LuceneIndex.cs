@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#region
+using System.Collections.Generic;
 using System.Linq;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
@@ -7,58 +8,68 @@ using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
+#endregion
 
-namespace DotLogix.Lucene {
-    public class LuceneIndex : ILuceneIndex {
+namespace DotLogix.Core.Lucene {
+    /// <summary>
+    ///     An implementation of the <see cref="ILuceneIndex" /> interface
+    /// </summary>
+    public abstract class LuceneIndex : ILuceneIndex {
         private Analyzer _analyzer;
+
+
+        private IndexWriter _indexWriter;
+        private SearcherManager _searcherManager;
+        private ReaderManager _readerManager;
         private Directory _directory;
 
-        public LuceneIndex(Version version, string indexPath) {
-            Version = version;
-            IndexPath = indexPath;
-        }
 
-        public void Dispose() {
-            _analyzer?.Dispose();
-            _directory?.Dispose();
-            _analyzer = null;
-            _directory = null;
-        }
-
+        /// <inheritdoc />
+        public SearcherManager SearcherManager => _searcherManager ?? (_searcherManager = CreateSearcherManager());
+        /// <inheritdoc />
+        public ReaderManager ReaderManager => _readerManager ?? (_readerManager = CreateReaderManager());
+        /// <inheritdoc />
+        public IndexWriter IndexWriter => _indexWriter ?? (_indexWriter = CreateIndexWriter());
+        /// <inheritdoc />
         public Analyzer Analyzer => _analyzer ?? (_analyzer = CreateAnalyzer());
-        public Directory Directory => _directory ?? (_directory = FSDirectory.Open(IndexPath));
-        public Version Version { get; }
-        public string IndexPath { get; }
-        #region Index
-        public void CreateNew() {
-            using(var writer = CreateIndexWriter(true)) {
+        /// <inheritdoc />
+        public Directory Directory => _directory ?? (_directory = CreateDirectory());
+
+        /// <summary>
+        ///     Creates a new instance of <see cref="LuceneIndex" />
+        /// </summary>
+        public LuceneIndex(LuceneVersion version) {
+            Version = version;
+        }
+
+
+        /// <inheritdoc />
+
+        /// <inheritdoc />
+        public LuceneVersion Version { get; }
+
+
+        #region Documents
+        /// <inheritdoc />
+        public virtual void AddDocument(Document document, bool commit = true) {
+            using(var writer = CreateIndexWriter()) {
+                writer.AddDocument(document);
                 writer.Commit();
             }
         }
-        #endregion
-        #region Documents
-        public void AddDocument(Document document, bool commit = true) {
-            using(var writer = CreateIndexWriter()) {
-                writer.AddDocument(document);
-                writer.Optimize();
-                if(commit)
-                    writer.Commit();
-            }
+
+        /// <inheritdoc />
+        public virtual void UpdateDocument(Term matchTerm, Document document, bool commit = true) {
+            var writer = IndexWriter;
+            writer.UpdateDocument(matchTerm, document);
+            if(commit)
+                writer.Commit();
         }
 
-        public void UpdateDocument(Term matchTerm, Document document, bool commit = true) {
-            using(var writer = CreateIndexWriter()) {
-                writer.UpdateDocument(matchTerm, document);
-                writer.Optimize();
-                if(commit)
-                    writer.Commit();
-            }
-        }
-
-        public void RemoveDocument(Term matchTerm, bool commit = true) {
+        /// <inheritdoc />
+        public virtual void RemoveDocument(Term matchTerm, bool commit = true) {
             using(var writer = CreateIndexWriter()) {
                 writer.DeleteDocuments(matchTerm);
-                writer.Optimize();
                 if(commit)
                     writer.Commit();
             }
@@ -66,21 +77,26 @@ namespace DotLogix.Lucene {
         #endregion
 
         #region Query
-        public DocumentResult QueryResult(Query query) {
+        /// <inheritdoc />
+        public virtual DocumentResult QueryResult(Query query) {
             return QueryResults(query, 1).FirstOrDefault();
         }
 
 
-        public IEnumerable<DocumentResult> QueryResults(Query query, int count, bool order = true) {
+        /// <inheritdoc />
+        public virtual IEnumerable<DocumentResult> QueryResults(Query query, int count, bool order = true) {
             var collector = TopScoreDocCollector.Create(count, order);
-            var results = new List<DocumentResult>();
-            using(var searcher = CreateIndexSearcher()) {
+            List<DocumentResult> results;
+            IndexSearcher searcher = null;
+            try {
+                searcher = SearcherManager.Acquire();
                 searcher.Search(query, collector);
 
-                foreach(var scoreDoc in collector.TopDocs().ScoreDocs) {
-                    var doc = searcher.Doc(scoreDoc.Doc);
-                    results.Add(new DocumentResult(scoreDoc.Score, doc));
-                }
+                var topDocs = collector.GetTopDocs();
+                results = topDocs.ScoreDocs.Select(scoreDoc => new DocumentResult(scoreDoc.Score, searcher.Doc(scoreDoc.Doc))).ToList();
+            } finally {
+                if(searcher != null)
+                    SearcherManager.Release(searcher);
             }
 
             return results;
@@ -88,17 +104,48 @@ namespace DotLogix.Lucene {
         #endregion
 
         #region Create
+        /// <summary>
+        ///     Create a new <see cref="Analyzer"/>
+        /// </summary>
+        /// <returns></returns>
         protected virtual Analyzer CreateAnalyzer() {
             return new StandardAnalyzer(Version);
         }
 
-        protected virtual IndexWriter CreateIndexWriter(bool createIndex=false) {
-            return new IndexWriter(Directory, Analyzer, createIndex, IndexWriter.MaxFieldLength.UNLIMITED);
+        /// <summary>
+        /// Create a new <see cref="IndexWriter"/>
+        /// </summary>
+        protected virtual IndexWriter CreateIndexWriter(OpenMode openMode = OpenMode.CREATE_OR_APPEND) {
+            return new IndexWriter(Directory, new IndexWriterConfig(Version, Analyzer) {OpenMode = openMode});
         }
 
-        protected virtual IndexSearcher CreateIndexSearcher() {
-            return new IndexSearcher(Directory, true);
+        /// <summary>
+        /// Create a new <see cref="Directory"/>
+        /// </summary>
+        protected abstract Directory CreateDirectory();
+
+        /// <summary>
+        /// Create a new <see cref="SearcherManager"/>
+        /// </summary>
+        protected virtual SearcherManager CreateSearcherManager() {
+            return new SearcherManager(IndexWriter, true, new SearcherFactory());
+        }
+
+        /// <summary>
+        /// Create a new <see cref="ReaderManager"/>
+        /// </summary>
+        protected virtual ReaderManager CreateReaderManager() {
+            return new ReaderManager(IndexWriter, true);
         }
         #endregion
+
+        /// <inheritdoc />
+        public virtual void Dispose() {
+            _searcherManager?.Dispose();
+            _readerManager?.Dispose();
+            _indexWriter?.Dispose();
+            _analyzer?.Dispose();
+            _directory?.Dispose();
+        }
     }
 }

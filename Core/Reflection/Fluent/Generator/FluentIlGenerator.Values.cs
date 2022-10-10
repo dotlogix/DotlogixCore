@@ -50,7 +50,7 @@ namespace DotLogix.Core.Reflection.Fluent.Generator {
         }
 
         /// <summary>
-        ///     Tests whether an object reference (type O) is an instance of a particular class.
+        ///     Tests whether an object reference (type O) is a new instance of a particular class.
         /// </summary>
         public FluentIlGenerator Isinst(Type type) {
             IlGenerator.Emit(OpCodes.Isinst, type);

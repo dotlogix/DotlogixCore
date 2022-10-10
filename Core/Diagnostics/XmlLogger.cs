@@ -14,6 +14,9 @@ using System.Xml.Linq;
 #endregion
 
 namespace DotLogix.Core.Diagnostics {
+    /// <summary>
+    /// A xml logger implementation
+    /// </summary>
     public class XmlLogger : LoggerBase, IDisposable {
         private const int Delay = 30000;
         private readonly DateTime _dateTime = DateTime.Now;
@@ -22,10 +25,20 @@ namespace DotLogix.Core.Diagnostics {
         private readonly XElement _xRoot;
         private bool _docChanged;
 
+        /// <summary>
+        /// The log directory
+        /// </summary>
         public string Directory { get; }
+        /// <summary>
+        /// The log file name
+        /// </summary>
         public string LogFile { get; }
+        /// <summary>
+        /// The sync root
+        /// </summary>
         public object SyncRoot { get; }
 
+        /// <inheritdoc />
         public XmlLogger(string directory, string prefix = null) : base("XmlLogger") {
             SyncRoot = new object();
             Directory = directory;
@@ -38,10 +51,12 @@ namespace DotLogix.Core.Diagnostics {
             _saveTimer = new Timer(obj => Save(), null, Delay, Delay);
         }
 
+        /// <inheritdoc />
         public void Dispose() {
             Shutdown();
         }
 
+        /// <inheritdoc />
         public override bool Log(LogMessage message) {
             var xLog = new XElement("log");
             xLog.SetElementValue("utc", message.UtcTimeStamp.ToString("G"));
@@ -57,6 +72,7 @@ namespace DotLogix.Core.Diagnostics {
             return true;
         }
 
+        /// <inheritdoc />
         public override bool Shutdown() {
             lock(SyncRoot) {
                 if(_docChanged)

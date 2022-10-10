@@ -14,50 +14,53 @@ using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="string"/>
+    /// </summary>
     public static class StringExtensions {
         /// <summary>
-        ///     Counts the occurances of a character in a string.
+        ///     Counts the occurrences of a character in a string.
         /// </summary>
         /// <param name="str">The string</param>
         /// <param name="character">The character to count</param>
-        public static int OccurancesOf(this string str, char character) {
-            return OccurancesOf(str.ToCharArray(), character, 0, str.Length, out _);
+        public static int OccurrencesOf(this string str, char character) {
+            return OccurrencesOf(str.ToCharArray(), character, 0, str.Length, out _);
         }
 
         /// <summary>
-        ///     Counts the occurances of a character in a string.
+        ///     Counts the occurrences of a character in a string.
         /// </summary>
         /// <param name="str">The string</param>
         /// <param name="character">The character to count</param>
         /// <param name="start">The start index in the array</param>
         /// <param name="count">The maximum length to count</param>
-        public static int OccurancesOf(this string str, char character, int start, int count) {
-            return OccurancesOf(str.ToCharArray(), character, start, count, out _);
+        public static int OccurrencesOf(this string str, char character, int start, int count) {
+            return OccurrencesOf(str.ToCharArray(), character, start, count, out _);
         }
 
         /// <summary>
-        ///     Counts the occurances of a character in a char array.
+        ///     Counts the occurrences of a character in a char array.
         /// </summary>
         /// <param name="chars">The char array</param>
         /// <param name="character">The character to count</param>
-        public static int OccurancesOf(this char[] chars, char character) {
-            return OccurancesOf(chars, character, 0, chars.Length, out _);
+        public static int OccurrencesOf(this char[] chars, char character) {
+            return OccurrencesOf(chars, character, 0, chars.Length, out _);
         }
 
         /// <summary>
-        ///     Counts the occurances of a character in a char array.
+        ///     Counts the occurrences of a character in a char array.
         /// </summary>
         /// <param name="chars">The char array</param>
         /// <param name="character">The character to count</param>
         /// <param name="start">The start index in the array</param>
         /// <param name="count">The maximum length to count</param>
         /// <returns></returns>
-        public static int OccurancesOf(this char[] chars, char character, int start, int count) {
-            return OccurancesOf(chars, character, start, count, out _);
+        public static int OccurrencesOf(this char[] chars, char character, int start, int count) {
+            return OccurrencesOf(chars, character, start, count, out _);
         }
 
         /// <summary>
-        ///     Counts the occurances of a character in a char array. Also outputs the position of the last occurance of the
+        ///     Counts the occurrences of a character in a char array. Also outputs the position of the last occurance of the
         ///     character
         /// </summary>
         /// <param name="chars">The char array</param>
@@ -66,18 +69,18 @@ namespace DotLogix.Core.Extensions {
         /// <param name="count">The maximum length to count</param>
         /// <param name="lastOccurence">The position of the last occurance of the character</param>
         /// <returns></returns>
-        public static int OccurancesOf(this char[] chars, char character, int start, int count, out int lastOccurence) {
+        public static int OccurrencesOf(this char[] chars, char character, int start, int count, out int lastOccurence) {
             lastOccurence = -1;
 
-            var occurances = 0;
+            var occurrences = 0;
             for(var i = start; i < (start + count); i++) {
                 if(chars[i] != character)
                     continue;
 
-                occurances++;
+                occurrences++;
                 lastOccurence = i;
             }
-            return occurances;
+            return occurrences;
         }
 
         /// <summary>
@@ -118,6 +121,11 @@ namespace DotLogix.Core.Extensions {
             return value.Substring(0, length);
         }
 
+        /// <summary>
+        /// Wraps a line of text after at a maximum amount of characters.<br></br>
+        /// Line breaks will be inserted after the last possible word
+        /// </summary>
+        /// <returns></returns>
         public static string[] WordWrap(this string value, int wrapAfter) {
             var result = new List<string>();
             var lines = value.Split('\n');
@@ -166,6 +174,10 @@ namespace DotLogix.Core.Extensions {
         }
 
         #region Join
+        /// <summary>
+        /// Appends some values to a <see cref="StringBuilder"/> and places a separator between each item
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
         public static StringBuilder AppendJoin<T>(this StringBuilder sb, string separator, IEnumerable<T> values) {
             if(values == null)
                 throw new ArgumentNullException(nameof(values));
@@ -432,11 +444,11 @@ namespace DotLogix.Core.Extensions {
         public static bool TryParseTo(this string value, Type targetType, out object target) {
             target = null;
             var dataType = targetType.ToDataType();
-            if((dataType.Flags & DataTypeFlags.Primitive) == 0)
+            if ((dataType.Flags & DataTypeFlags.Primitive) == 0)
                 return false;
 
             bool result;
-            switch(dataType.Flags & DataTypeFlags.PrimitiveMask) {
+            switch (dataType.Flags & DataTypeFlags.PrimitiveMask) {
                 case DataTypeFlags.Guid:
                     result = Guid.TryParse(value, out var guid);
                     target = guid;
@@ -454,8 +466,13 @@ namespace DotLogix.Core.Extensions {
                         target = Enum.Parse(targetType, value);
                         result = true;
                     } catch {
-                        target = null;
-                        result = false;
+                        try {
+                            target = Enum.Parse(targetType, value, true);
+                            result = true;
+                        } catch {
+                            target = null;
+                            result = false;
+                        }
                     }
                     break;
                 case DataTypeFlags.SByte:
@@ -573,6 +590,29 @@ namespace DotLogix.Core.Extensions {
         #endregion
 
         #region SubStringUntil
+        /// <summary>
+        /// Get the value between two <see cref="string"/> delimiters
+        /// </summary>
+        /// <returns></returns>
+        public static string SubstringBetween(this string value, string startValue, string endValue, int startIndex=0, int count=-1, StringComparison comparison = StringComparison.OrdinalIgnoreCase) {
+            if(count < 0)
+                count = value.Length-startIndex;
+
+            startIndex = value.IndexOf(startValue, startIndex, count, comparison);
+            if(startIndex == -1)
+                return null;
+
+            startIndex += startValue.Length;
+            var endIndex = value.IndexOf(endValue, startIndex + 1, count - startIndex - 1, comparison);
+            if(endIndex == -1)
+                return null;
+            return value.Substring(startIndex, endIndex - startIndex);
+        }
+
+        /// <summary>
+        /// Get the value between before a any of the <see cref="char"/> delimiter
+        /// </summary>
+        /// <returns></returns>
         public static string SubstringUntil(this string value, int start, int count, params char[] delimiters) {
             var idx = value.IndexOfAny(delimiters, start, count);
             if(idx == -1)
@@ -580,6 +620,10 @@ namespace DotLogix.Core.Extensions {
             return value.Substring(start, idx - start);
         }
 
+        /// <summary>
+        /// Get the value between before a any of the <see cref="char"/> delimiter
+        /// </summary>
+        /// <returns></returns>
         public static string SubstringUntil(this string value, params char[] delimiters) {
             var idx = value.IndexOfAny(delimiters);
             if(idx == -1)

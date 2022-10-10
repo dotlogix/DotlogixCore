@@ -11,13 +11,23 @@ using System;
 #endregion
 
 namespace DotLogix.Core.Utils {
+    /// <summary>
+    /// A property created on the fly
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
     public class LazyMember<TValue> {
         private readonly object _lock = new object();
         private readonly Func<TValue> _valueInitializer;
         private TValue _value;
 
+        /// <summary>
+        /// Checks if the value has been created already
+        /// </summary>
         public bool HasValue { get; private set; }
 
+        /// <summary>
+        /// Get or create a value
+        /// </summary>
         public TValue Value {
             get {
                 if(HasValue) //Atomic read
@@ -27,10 +37,17 @@ namespace DotLogix.Core.Utils {
             }
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="LazyMember{TValue}"/>
+        /// </summary>
+        /// <param name="valueInitializer"></param>
         public LazyMember(Func<TValue> valueInitializer) {
             _valueInitializer = valueInitializer ?? throw new ArgumentNullException(nameof(valueInitializer));
         }
 
+        /// <summary>
+        /// Get or create the value manually
+        /// </summary>
         public void EnsureValue() {
             lock(_lock) {
                 if(HasValue) //Recheck because of possible racing condition
@@ -40,6 +57,10 @@ namespace DotLogix.Core.Utils {
             }
         }
 
+        /// <summary>
+        /// Create a new instance of <see cref="LazyMember{TValue}"/> using an initializer function
+        /// </summary>
+        /// <param name="valueInitializer"></param>
         public static implicit operator LazyMember<TValue>(Func<TValue> valueInitializer) {
             return new LazyMember<TValue>(valueInitializer);
         }

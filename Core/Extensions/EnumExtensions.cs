@@ -11,6 +11,9 @@ using System;
 #endregion
 
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="Enum"/>
+    /// </summary>
     public static class EnumExtensions {
         /// <summary>
         ///     Converts a enum value to int

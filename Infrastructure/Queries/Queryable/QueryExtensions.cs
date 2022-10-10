@@ -14,12 +14,16 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
+
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="IQuery{T}"/>
+    /// </summary>
     public static class QueryExtensions {
         #region Any
-
         public static Task<bool> AnyAsync<TSource>(this IQuery<TSource> source, CancellationToken cancellationToken = default) {
             return source.QueryExecutor.AnyAsync(cancellationToken);
         }
@@ -313,31 +317,31 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
         #region To
 
         public static Task<List<TSource>> ToListAsync<TSource>(this IQuery<TSource> source, CancellationToken cancellationToken = default) {
-            return source.QueryExecutor.ToAsyncEnumerable().ToList(cancellationToken);
+            return source.QueryExecutor.ToListAsync(cancellationToken);
         }
 
         public static Task<IEnumerable<TSource>> ToEnumerableAsync<TSource>(this IQuery<TSource> source, CancellationToken cancellationToken = default) {
-            return source.QueryExecutor.ToAsyncEnumerable().ToList(cancellationToken).ConvertResult<IEnumerable<TSource>, List<TSource>>();
+            return source.QueryExecutor.ToListAsync(cancellationToken).ConvertResult<IEnumerable<TSource>, List<TSource>>();
         }
 
         public static Task<TSource[]> ToArrayAsync<TSource>(this IQuery<TSource> source, CancellationToken cancellationToken = default) {
-            return source.QueryExecutor.ToAsyncEnumerable().ToArray(cancellationToken);
+            return source.QueryExecutor.ToArrayAsync(cancellationToken);
         }
 
         public static Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQuery<TSource> source, Func<TSource, TKey> keySelector, CancellationToken cancellationToken = default) {
-            return source.QueryExecutor.ToAsyncEnumerable().ToDictionary(keySelector, cancellationToken);
+            return source.QueryExecutor.ToDictionaryAsync(keySelector, cancellationToken);
         }
 
         public static Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQuery<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default) {
-            return source.QueryExecutor.ToAsyncEnumerable().ToDictionary(keySelector, comparer, cancellationToken);
+            return source.QueryExecutor.ToDictionaryAsync(keySelector, comparer, cancellationToken);
         }
 
         public static Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQuery<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, CancellationToken cancellationToken = default) {
-            return source.QueryExecutor.ToAsyncEnumerable().ToDictionary(keySelector, elementSelector, cancellationToken);
+            return source.QueryExecutor.ToDictionaryAsync(keySelector, elementSelector, cancellationToken);
         }
 
         public static Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQuery<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default) {
-            return source.QueryExecutor.ToAsyncEnumerable().ToDictionary(keySelector, elementSelector, comparer, cancellationToken);
+            return source.QueryExecutor.ToDictionaryAsync(keySelector, elementSelector, comparer, cancellationToken);
         }
 
         public static IQueryable<T> ToQueryable<T>(this IQuery<T> source)
@@ -354,7 +358,21 @@ namespace DotLogix.Architecture.Infrastructure.Queries.Queryable {
         }
 
         public static Task ForEachAsync<T>(this IQuery<T> source, Action<T> action, CancellationToken cancellationToken = default) {
-            return source.QueryExecutor.ToAsyncEnumerable().ForEachAsync(action, cancellationToken);
+            return source.QueryExecutor.ToListAsync(cancellationToken).ContinueWith(task => task.Result.ForEach(action), TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnRanToCompletion);
+        }
+
+        public static IQuery<T> InterceptQuery<T>(this IQuery<T> query, Func<IQueryInterceptionContext, bool> beforeExecutFunc, Func<IQueryInterceptionContext, bool> afterExecuteFunc, Func<IQueryInterceptionContext, bool> onErrorFunc) {
+            return query.InterceptQuery(new QueryInterceptor(beforeExecutFunc, afterExecuteFunc, onErrorFunc));
+        }
+
+        public static IQuery<T> InterceptQueryBeforeExecute<T>(this IQuery<T> query, Func<IQueryInterceptionContext, bool> interceptor) {
+            return query.InterceptQuery(new QueryInterceptor(beforeExecuteFunc:interceptor));
+        }
+        public static IQuery<T> InterceptQueryResult<T>(this IQuery<T> query, Func<IQueryInterceptionContext, bool> interceptor) {
+            return query.InterceptQuery(new QueryInterceptor(afterExecuteFunc: interceptor));
+        }
+        public static IQuery<T> InterceptQueryError<T>(this IQuery<T> query, Func<IQueryInterceptionContext, bool> interceptor) {
+            return query.InterceptQuery(new QueryInterceptor(onErrorFunc: interceptor));
         }
 
         #endregion

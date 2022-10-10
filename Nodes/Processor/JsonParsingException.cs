@@ -8,24 +8,38 @@
 
 #region
 using System;
-using DotLogix.Core.Extensions;
 #endregion
 
 namespace DotLogix.Core.Nodes.Processor {
+    /// <summary>
+    /// An exception thrown by a json parser
+    /// </summary>
     public class JsonParsingException : Exception {
+        /// <summary>
+        /// The current character position
+        /// </summary>
         public int Position { get; }
+        /// <summary>
+        /// The line number
+        /// </summary>
         public int Line { get; }
+        /// <summary>
+        /// The position in line
+        /// </summary>
         public int LinePosition { get; }
+        /// <summary>
+        /// The context characters in front of the error
+        /// </summary>
         public string Near { get; }
 
-        public JsonParsingException(int position, char[] json, string message) : base(message) {
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonParsingException"/>
+        /// </summary>
+        public JsonParsingException(string message, int position, int line, int linePosition, string near) : base(message) {
             Position = position;
-            Line = json.OccurancesOf('\n', 0, position, out var lastNewLine);
-            LinePosition = lastNewLine == -1 ? position : position - lastNewLine;
-
-            var nearStart = Math.Max(position - 10, 0);
-            var nearEnd = Math.Min(nearStart + 20, json.Length);
-            Near = new string(json, nearStart, nearEnd - nearStart);
+            Line = line;
+            LinePosition = linePosition;
+            Near = near;
         }
     }
 }

@@ -7,8 +7,22 @@
 // ==================================================
 
 namespace DotLogix.Core.Utils.Patterns {
+    /// <summary>
+    /// A pattern type to match regex expressions
+    /// </summary>
     public interface IRegexPatternType {
+        /// <summary>
+        /// The name
+        /// </summary>
         string Name { get; }
-        string GetRegexPattern(string variant, string[] args);
+
+        /// <summary>
+        /// Tries to convert the arguments to a valid regex expression
+        /// </summary>
+        /// <param name="variant"></param>
+        /// <param name="args"></param>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        bool TryGetRegexPattern(string variant, string[] args, out string pattern);
     }
 }

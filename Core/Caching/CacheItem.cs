@@ -13,10 +13,27 @@ namespace DotLogix.Core.Caching {
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     public class CacheItem<TKey, TValue> {
+        /// <summary>
+        /// The key
+        /// </summary>
         public TKey Key { get; }
+
+        /// <summary>
+        /// The value
+        /// </summary>
         public TValue Value { get; }
+
+        /// <summary>
+        /// The policy to check validity
+        /// </summary>
         public ICachePolicy Policy { get; }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="CacheItem{TKey,TValue}"/>
+        /// </summary>
+        /// <param name="key">The key</param>
+        /// <param name="value">The value</param>
+        /// <param name="policy">The policy to check validity</param>
         public CacheItem(TKey key, TValue value, ICachePolicy policy) {
             Key = key;
             Value = value;

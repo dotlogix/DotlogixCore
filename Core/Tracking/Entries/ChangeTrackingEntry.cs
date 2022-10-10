@@ -14,6 +14,7 @@ using DotLogix.Core.Tracking.Snapshots;
 #endregion
 
 namespace DotLogix.Core.Tracking.Entries {
+    /// <inheritdoc />
     public class ChangeTrackingEntry : IChangeTrackingEntry {
         private readonly IChangeTrackingEntryManager _entryManager;
         private readonly ISnapshot _snapshot;
@@ -21,6 +22,9 @@ namespace DotLogix.Core.Tracking.Entries {
         private TrackedState _currentState;
         private bool _forceModified;
 
+        /// <summary>
+        /// Create a new instance of <see cref="ChangeTrackingEntry"/>
+        /// </summary>
         public ChangeTrackingEntry(object key, IChangeTrackingEntryManager entryManager, ISnapshot snapshot, TrackedState initialState = TrackedState.Detached) {
             _entryManager = entryManager;
             Key = key;
@@ -28,13 +32,19 @@ namespace DotLogix.Core.Tracking.Entries {
             _currentState = initialState;
         }
 
+        /// <inheritdoc />
         public IReadOnlyDictionary<string, object> OldValues => _snapshot.OldValues;
+        /// <inheritdoc />
         public IReadOnlyDictionary<string, object> CurrentValues => _snapshot.CurrentValues;
+        /// <inheritdoc />
         public IReadOnlyDictionary<string, object> ChangedValues => _forceModified ? _snapshot.CurrentValues : _snapshot.ChangedValues;
 
+        /// <inheritdoc />
         public object Key { get; }
+        /// <inheritdoc />
         public object Target => _snapshot.Target;
 
+        /// <inheritdoc />
         public TrackedState CurrentState {
             get {
                 switch(_currentState) {
@@ -56,6 +66,7 @@ namespace DotLogix.Core.Tracking.Entries {
             }
         }
 
+        /// <inheritdoc />
         public void MarkAsAdded() {
             if(_currentState == TrackedState.Detached)
                 Attach();
@@ -63,6 +74,7 @@ namespace DotLogix.Core.Tracking.Entries {
             _forceModified = false;
         }
 
+        /// <inheritdoc />
         public void MarkAsDeleted() {
             switch(_currentState) {
                 case TrackedState.Detached:
@@ -77,6 +89,7 @@ namespace DotLogix.Core.Tracking.Entries {
             _forceModified = false;
         }
 
+        /// <inheritdoc />
         public void MarkAsModified() {
             if(_currentState == TrackedState.Detached)
                 Attach();
@@ -85,18 +98,21 @@ namespace DotLogix.Core.Tracking.Entries {
             _forceModified = true;
         }
 
+        /// <inheritdoc />
         public void Attach() {
             _entryManager.Add(this);
             if(_currentState == TrackedState.Detached)
                 _currentState = TrackedState.Unchanged;
         }
 
+        /// <inheritdoc />
         public void Detach() {
             _entryManager.Remove(this);
             _currentState = TrackedState.Detached;
             _forceModified = false;
         }
 
+        /// <inheritdoc />
         public void RevertChanges() {
             _snapshot.RevertChanges();
             if(_currentState == TrackedState.Modified)
@@ -104,6 +120,7 @@ namespace DotLogix.Core.Tracking.Entries {
             _forceModified = false;
         }
 
+        /// <inheritdoc />
         public void Reset() {
             _snapshot.AcceptChanges();
             _currentState = TrackedState.Unchanged;

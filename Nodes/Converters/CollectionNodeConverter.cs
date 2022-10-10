@@ -11,52 +11,89 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Reflection.Dynamics;
 using DotLogix.Core.Types;
 #endregion
 
 namespace DotLogix.Core.Nodes.Converters {
+    /// <summary>
+    /// An implementation of the <see cref="IAsyncNodeConverter"/> interface to convert arrays
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class CollectionNodeConverter<T> : NodeConverter {
         private readonly DynamicCtor _ctor;
-        private readonly Type _elementType = typeof(T);
-        private readonly bool _isDefaultCtor;
 
-        public CollectionNodeConverter(DataType dataType) : base(dataType) {
+        /// <summary>
+        /// Creates a new instance of <see cref="CollectionNodeConverter{T}"/>
+        /// </summary>
+        public CollectionNodeConverter(TypeSettings typeSettings) : base(typeSettings) {
             var enumerableType = typeof(IEnumerable<T>);
-            var dynamicType = Type.CreateDynamicType(MemberTypes.Constructor);
+            var dynamicType = typeSettings.DynamicType;
             _ctor = dynamicType.GetConstructor(enumerableType);
             if(_ctor != null)
                 return;
 
-            _ctor = dynamicType.GetDefaultConstructor();
-            if(_ctor != null) {
-                _isDefaultCtor = true;
+            _ctor = dynamicType.DefaultConstructor;
+            if(_ctor == null)
+                throw new InvalidOperationException($"Collection type has to define an empty constructor or one with single argument {enumerableType.FullName}");
+
+        }
+
+        /// <inheritdoc />
+        public override async ValueTask WriteAsync(object instance, string name, IAsyncNodeWriter writer, IConverterSettings settings) {
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
+
+            if (scopedSettings.ShouldEmitValue(instance) == false)
+                return;
+
+            ValueTask task;
+            if (instance == null) {
+                task = writer.WriteValueAsync(name, null);
+                if (task.IsCompletedSuccessfully == false)
+                    await task;
                 return;
             }
 
-            throw new InvalidOperationException($"Collection type has to define an empty constructor or one with single argument {enumerableType.FullName}");
+
+            if (!(instance is IEnumerable<T> values))
+                throw new ArgumentException($"Expected instance of type \"IEnumerable<T>\" got \"{instance.GetType()}\"");
+
+            task = writer.BeginListAsync(name);
+            if(task.IsCompletedSuccessfully == false)
+                await task;
+
+            foreach (var value in values) {
+                task = childConverter.WriteAsync(value, null, writer, scopedSettings.ChildSettings);
+                if(task.IsCompletedSuccessfully == false)
+                    await task;
+            }
+            
+            task = writer.EndListAsync();
+            if(task.IsCompletedSuccessfully == false)
+                await task;
         }
 
-        public override void Write(object instance, string rootName, INodeWriter writer) {
-            if(!(instance is IEnumerable<T> values))
-                throw new ArgumentException("Instance is not type of IEnumerable<T>");
-            writer.BeginList(rootName);
-            foreach(var value in values)
-                Nodes.WriteTo(null, value, _elementType, writer);
-            writer.EndList();
-        }
+        /// <inheritdoc />
+        public override object ConvertToObject(Node node, IConverterSettings settings) {
+            if (node.Type == NodeTypes.Empty)
+                return default;
 
-        public override object ConvertToObject(Node node) {
-            if(!(node is NodeList nodeList))
-                throw new ArgumentException("Node is not a NodeList");
+            if (!(node is NodeList nodeList))
+                throw new ArgumentException($"Expected node of type \"NodeList\" got \"{node.Type}\"");
+
+            var scopedSettings = settings.GetScoped(TypeSettings);
+            var childConverter = TypeSettings.ChildSettings.Converter;
+
             var children = nodeList.Children().ToArray();
             var childCount = children.Length;
             var array = new T[childCount];
             for(var i = 0; i < childCount; i++)
-                array[i] = (T)Nodes.ToObject(children[i], _elementType);
+                array[i] = (T)childConverter.ConvertToObject(children[i], scopedSettings.ChildSettings);
 
-            if(_isDefaultCtor == false)
+            if(_ctor.IsDefault == false)
                 return _ctor.Invoke((IEnumerable<T>)array);
 
             var collection = (ICollection<T>)_ctor.Invoke();

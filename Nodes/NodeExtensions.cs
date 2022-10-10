@@ -218,5 +218,18 @@ namespace DotLogix.Core.Nodes {
         }
         #endregion
         #endregion
+
+        public static Node Clone(this Node node) {
+            var reader = new NodeReader(node);
+            var writer = new NodeWriter();
+            var task = reader.CopyToAsync(writer);
+            if(task.IsCompletedSuccessfully == false)
+                task.ConfigureAwait(false).GetAwaiter().GetResult();
+            return writer.Root;
+        }
+
+        public static TNode Clone<TNode>(this TNode node) where TNode : Node {
+            return (TNode)Clone((Node)node);
+        }
     }
 }

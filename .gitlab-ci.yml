@@ -1,0 +1,18 @@
+image: microsoft/dotnet:latest
+
+stages:
+    - build
+    - test
+
+variables:
+    solution: "Core.sln"
+    configuration: "Release"
+    version: "1.0.0"
+
+build:
+    stage: build
+    artifacts:
+        paths:
+        - nuget
+    script:
+        - "dotnet build $solution -c $configuration -p:Version=$version"

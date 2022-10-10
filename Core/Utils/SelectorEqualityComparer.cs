@@ -12,23 +12,23 @@ using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Utils {
-    public class SelectorEqualityComparer<T, TKey> : IEqualityComparer<T> where TKey : IComparable {
+    /// <inheritdoc />
+    public class SelectorEqualityComparer<T, TKey> : IEqualityComparer<T> {
         private readonly Func<T, TKey> _comparableSelector;
 
+        /// <inheritdoc />
         public SelectorEqualityComparer(Func<T, TKey> comparableSelector) {
             _comparableSelector = comparableSelector;
         }
 
+        /// <inheritdoc />
         public bool Equals(T x, T y) {
-            return Equals(_comparableSelector(x), _comparableSelector(y));
+            return Equals(_comparableSelector.Invoke(x), _comparableSelector.Invoke(y));
         }
 
+        /// <inheritdoc />
         public int GetHashCode(T x) {
-            return _comparableSelector(x).GetHashCode();
-        }
-
-        public int Compare(T x, T y) {
-            return _comparableSelector(x).CompareTo(_comparableSelector(y));
+            return _comparableSelector.Invoke(x).GetHashCode();
         }
     }
 }

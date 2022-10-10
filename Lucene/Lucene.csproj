@@ -1,18 +1,44 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<Company>DotLogix</Company>
+		<Product>DotLogix Core</Product>
+		<PackageId>DotLogix.Core.Lucene</PackageId>
+		<Authors>DotLogix</Authors>
+		<AssemblyName>DotLogix.Lucene</AssemblyName>
+		<RootNamespace>DotLogix.Core.Lucene</RootNamespace>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RepositoryUrl>https://github.com/dotlogix/DotlogixCore</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<RepositoryType>git</RepositoryType>
+		<Copyright>Copyright (c) 2018 DotLogix</Copyright>
+		<Version>2.0.1</Version>
+		<Configurations>Debug;Release;</Configurations>
+	</PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>DotLogix.Lucene</AssemblyName>
-    <RootNamespace>DotLogix.Lucene</RootNamespace>
-    <SignAssembly>false</SignAssembly>
+    <DocumentationFile>..\assemblies\docs\$(AssemblyName).xml</DocumentationFile>
+    <WarningsAsErrors>NU1605;</WarningsAsErrors>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetDir)$(TargetName).* $(SolutionDir)..\assemblies\$(ConfigurationName)\" />
+	<ItemGroup>
+	  <PackageReference Include="Lucene.Net" Version="4.8.0-beta00005" />
+	  <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00005" />
+	  <PackageReference Include="Lucene.Net.Queries" Version="4.8.0-beta00005" />
+	  <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00005" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Core\Core.csproj" />
+	</ItemGroup>
+
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <ItemGroup>
+      <PackageFiles Include="bin\$(Configuration)\*.nupkg" />
+      <AssemblyFiles Include="bin\$(Configuration)\**\*.*" Exclude="**\*.deps.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AssemblyFiles)" DestinationFiles="@(AssemblyFiles->'..\assemblies\$(Configuration)\$(PackageId)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+    <Move SourceFiles="@(PackageFiles)" DestinationFolder="..\nuget\$(Configuration)" />
   </Target>
-
-  <ItemGroup>
-    <PackageReference Include="Lucene.Net" Version="3.0.3" />
-  </ItemGroup>
-
 </Project>

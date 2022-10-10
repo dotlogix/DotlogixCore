@@ -1,105 +1,250 @@
 ﻿// ==================================================
-// Copyright 2018(C) , DotLogix
+// Copyright 2019(C) , DotLogix
 // File:  KeyedCollection.cs
 // Author:  Alexander Schill <alexander@schillnet.de>.
-// Created:  05.03.2018
-// LastEdited:  01.08.2018
+// Created:  15.08.2018
+// LastEdited:  07.02.2019
 // ==================================================
 
 #region
+
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using DotLogix.Core.Extensions;
+
 #endregion
 
 namespace DotLogix.Core.Collections {
-    public class KeyedCollection<TKey, TValue> : ICollection<TValue>, IReadOnlyCollection<TValue> {
-        private readonly ConcurrentDictionary<TKey, TValue> _dictionary;
-        private readonly Func<TValue, TKey> _keySelector;
+	/// <summary>
+	/// A collection indexed by a unique key
+	/// </summary>
+	/// <typeparam name="TKey">They key</typeparam>
+	/// <typeparam name="TValue">The value</typeparam>
+	public class KeyedCollection<TKey, TValue> : ICollection<TValue>, IReadOnlyCollection<TValue> {
+		/// <summary>
+		/// The internal dictionary
+		/// </summary>
+		protected ConcurrentDictionary<TKey, TValue> InnerDictionary { get; }
 
-        public TValue this[TKey key] => _dictionary[key];
+		/// <summary>
+		/// The selector method
+		/// </summary>
+		protected Func<TValue, TKey> KeySelector { get; }
 
-        public KeyedCollection(Func<TValue, TKey> keySelector) {
-            _keySelector = keySelector;
-            _dictionary = new ConcurrentDictionary<TKey, TValue>();
-        }
+		/// <summary>
+		/// Get a value by its key
+		/// </summary>
+		/// <param name="key">The key</param>
+		/// <returns></returns>
+		public TValue this[TKey key] => InnerDictionary[key];
 
-        public KeyedCollection(Func<TValue, TKey> keySelector, IEnumerable<TValue> values) {
-            _keySelector = keySelector;
-            _dictionary = new ConcurrentDictionary<TKey, TValue>(values.ToDictionary(keySelector));
-        }
+		/// <summary>
+		/// Creates a new instance of <see cref="KeyedCollection{TKey,TValue}"/>
+		/// </summary>
+		/// <param name="keySelector">The key selector</param>
+		public KeyedCollection(Func<TValue, TKey> keySelector) {
+			KeySelector = keySelector;
+			InnerDictionary = new ConcurrentDictionary<TKey, TValue>();
+		}
 
-        public KeyedCollection(Func<TValue, TKey> keySelector, IEqualityComparer<TKey> equalityComparer) {
-            _keySelector = keySelector;
-            _dictionary = new ConcurrentDictionary<TKey, TValue>(equalityComparer);
-        }
+		/// <summary>
+		/// Creates a new instance of <see cref="KeyedCollection{TKey,TValue}"/>
+		/// </summary>
+		/// <param name="keySelector">The key selector</param>
+		/// <param name="values">The initial values</param>
+		public KeyedCollection(Func<TValue, TKey> keySelector, IEnumerable<TValue> values) {
+			KeySelector = keySelector;
+			InnerDictionary = new ConcurrentDictionary<TKey, TValue>(values.ToDictionary(keySelector));
+		}
 
-        public KeyedCollection(Func<TValue, TKey> keySelector, IEqualityComparer<TKey> equalityComparer, IEnumerable<TValue> values) {
-            _keySelector = keySelector;
-            _dictionary = new ConcurrentDictionary<TKey, TValue>(values.ToDictionary(keySelector, equalityComparer));
-        }
+		/// <summary>
+		/// Creates a new instance of <see cref="KeyedCollection{TKey,TValue}"/>
+		/// </summary>
+		/// <param name="keySelector">The key selector</param>
+		/// <param name="equalityComparer">The equality comparer</param>
+		public KeyedCollection(Func<TValue, TKey> keySelector, IEqualityComparer<TKey> equalityComparer) {
+			KeySelector = keySelector;
+			InnerDictionary = new ConcurrentDictionary<TKey, TValue>(equalityComparer);
+		}
 
-        public void CopyTo(TValue[] array, int arrayIndex) {
-            _dictionary.Values.CopyTo(array, arrayIndex);
-        }
+		/// <summary>
+		/// Creates a new instance of <see cref="KeyedCollection{TKey,TValue}"/>
+		/// </summary>
+		/// <param name="keySelector">The key selector</param>
+		/// <param name="equalityComparer">The equality comparer</param>
+		/// <param name="values">The initial values</param>
+		public KeyedCollection(Func<TValue, TKey> keySelector, IEqualityComparer<TKey> equalityComparer,
+			IEnumerable<TValue> values) {
+			KeySelector = keySelector;
+			InnerDictionary = new ConcurrentDictionary<TKey, TValue>(values.ToDictionary(keySelector, equalityComparer));
+		}
 
-        public int Count => _dictionary.Count;
+		/// <inheritdoc />
 
-        public bool IsReadOnly => false;
+		/// <summary>
+		/// The keys of the collection
+		/// </summary>
+		public IEnumerable<TKey> Keys => InnerDictionary.Keys.ToList();
 
-        public void Clear() {
-            _dictionary.Clear();
-        }
+		/// <summary>
+		/// The key value paires of the collection
+		/// </summary>
+		public IEnumerable<KeyValuePair<TKey, TValue>> Pairs => InnerDictionary.ToList();
 
-        public bool Contains(TValue value) {
-            return _dictionary.ContainsKey(_keySelector.Invoke(value));
-        }
 
-        void ICollection<TValue>.Add(TValue value) {
-            if(TryAdd(value) == false)
-                throw new Exception("A value with this key already exists");
-        }
+		#region ICollection
 
-        bool ICollection<TValue>.Remove(TValue value) {
-            return TryRemove(value);
-        }
+		/// <summary>
+		/// Get the amount of items in the collection
+		/// </summary>
+		public int Count => InnerDictionary.Count;
 
-        public IEnumerator<TValue> GetEnumerator() {
-            return _dictionary.Values.GetEnumerator();
-        }
+		public bool IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>)InnerDictionary).IsReadOnly;
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
-        }
+		/// <inheritdoc />
+		public void CopyTo(TValue[] array, int arrayIndex) {
+			InnerDictionary.Values.CopyTo(array, arrayIndex);
+		}
 
-        public bool TryAdd(TValue value) {
-            return _dictionary.TryAdd(_keySelector.Invoke(value), value);
-        }
+		/// <summary>
+		/// Add an item to the collection
+		/// </summary>
+		/// <param name="value"></param>
+		public void Add(TValue value) {
+			if (TryAdd(value) == false)
+				throw new Exception("A value with this key already exists");
+		}
 
-        public TValue GetOrAdd(TValue value) {
-            return _dictionary.GetOrAdd(_keySelector.Invoke(value), value);
-        }
+		/// <summary>
+		/// Tries to remove a value from the collection
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public bool Remove(TValue value) { return InnerDictionary.TryRemove(KeySelector.Invoke(value), out var _); }
 
-        public void AddOrUpdate(TValue value) {
-            _dictionary[_keySelector.Invoke(value)] = value;
-        }
+		/// <summary>
+		/// Checks if the collection contains a value
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public bool Contains(TValue value) { return InnerDictionary.ContainsKey(KeySelector.Invoke(value)); }
 
-        public bool TryRemove(TValue value) {
-            return _dictionary.TryRemove(_keySelector.Invoke(value), out _);
-        }
+		/// <summary>
+		/// Removes all values from the collection
+		/// </summary>
+		public void Clear() { InnerDictionary.Clear(); }
 
-        public bool TryGetValue(TKey key, out TValue value) {
-            return _dictionary.TryGetValue(key, out value);
-        }
+		/// <inheritdoc />
+		IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
 
-        public bool TryRemoveKey(TKey key) {
-            return _dictionary.TryRemove(key, out _);
-        }
+		/// <inheritdoc />
+		public IEnumerator<TValue> GetEnumerator() { return InnerDictionary.Values.GetEnumerator(); }
 
-        public bool ContainsKey(TKey key) {
-            return _dictionary.ContainsKey(key);
-        }
-    }
+		#endregion
+
+		#region ICollection of object
+
+		public void Add(object item) {
+			if (!(item is TValue value))
+				throw new Exception($"The value is not assignable to target type {typeof(TValue).GetFriendlyName()}");
+			if (TryAdd(value) == false)
+				throw new Exception("A value with this key already exists");
+		}
+
+		public bool Remove(object item) {
+			if (!(item is TValue value))
+				throw new Exception($"The value is not assignable to target type {typeof(TValue).GetFriendlyName()}");
+			return Remove(value);
+		}
+
+		public bool Contains(object item) {
+			if (!(item is TValue value))
+				throw new Exception($"The value is not assignable to target type {typeof(TValue).GetFriendlyName()}");
+			return Contains(value);
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Tries to add a value to the collection
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public bool TryAdd(TValue value) { return InnerDictionary.TryAdd(KeySelector.Invoke(value), value); }
+
+		/// <summary>
+		/// Tries to add a value to the collection
+		/// </summary>
+		/// <param name="values"></param>
+		/// <returns></returns>
+		public void TryAdd(IEnumerable<TValue> values) {
+			foreach (var value in values)
+				TryAdd(value);
+		}
+
+		/// <summary>
+		/// Get the existing item or adds a new one matched by their keys
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public TValue GetOrAdd(TValue value) { return InnerDictionary.GetOrAdd(KeySelector.Invoke(value), value); }
+
+		/// <summary>
+		/// Get the existing item or adds a new one matched by their keys
+		/// </summary>
+		/// <param name="values"></param>
+		/// <returns></returns>
+		public IEnumerable<TValue> GetOrAdd(IEnumerable<TValue> values) { return values.Select(GetOrAdd).ToList(); }
+
+		/// <summary>
+		/// Add or update a value to the collection
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public void AddOrUpdate(TValue value) { InnerDictionary[KeySelector.Invoke(value)] = value; }
+
+		/// <summary>
+		/// Add or update a value to the collection
+		/// </summary>
+		/// <param name="values"></param>
+		/// <returns></returns>
+		public void AddOrUpdate(IEnumerable<TValue> values) {
+			foreach (var value in values)
+				AddOrUpdate(value);
+		}
+
+		/// <summary>
+		/// Tries to get a value by key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public bool TryGet(TKey key, out TValue value) { return InnerDictionary.TryGetValue(key, out value); }
+
+		/// <summary>
+		/// Tries to remove the value with the matching key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
+		public bool TryRemoveKey(TKey key) { return InnerDictionary.TryRemove(key, out var _); }
+
+		/// <summary>
+		/// Tries to remove the value with the matching key
+		/// </summary>
+		/// <param name="keys"></param>
+		/// <returns></returns>
+		public bool TryRemoveKey(IEnumerable<TKey> keys) {
+			return keys.Aggregate(true, (current, value) => current & TryRemoveKey(value));
+		}
+
+		/// <summary>
+		/// Checks if a key exists in the collection
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
+		public bool ContainsKey(TKey key) { return InnerDictionary.ContainsKey(key); }
+	}
 }

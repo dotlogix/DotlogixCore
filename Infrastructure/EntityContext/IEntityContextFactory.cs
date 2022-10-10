@@ -7,7 +7,13 @@
 // ==================================================
 
 namespace DotLogix.Architecture.Infrastructure.EntityContext {
+    /// <summary>
+    /// An interface to represent a factory to create an <see cref="IEntityContext"/>
+    /// </summary>
     public interface IEntityContextFactory {
+        /// <summary>
+        /// Creates a new instance of <see cref="IEntityContext"/>
+        /// </summary>
         IEntityContext Create();
     }
 }

@@ -13,13 +13,24 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+
+#pragma warning disable 1591
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Queries {
+    /// <summary>
+    /// An interface to represent a query executor
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IQueryExecutor<T> {
         #region To
-
-        IAsyncEnumerable<T> ToAsyncEnumerable();
+        Task<List<T>> ToListAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<T>> ToEnumerableAsync(CancellationToken cancellationToken = default);
+        Task<T[]> ToArrayAsync(CancellationToken cancellationToken = default);
+        Task<Dictionary<TKey, T>> ToDictionaryAsync<TKey>(Func<T, TKey> keySelector, CancellationToken cancellationToken = default);
+        Task<Dictionary<TKey, T>> ToDictionaryAsync<TKey>(Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default);
+        Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TKey, TElement>(Func<T, TKey> keySelector, Func<T, TElement> elementSelector, CancellationToken cancellationToken = default);
+        Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TKey, TElement>(Func<T, TKey> keySelector, Func<T, TElement> elementSelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default);
         IQueryable<T> ToQueryable();
 
         #endregion

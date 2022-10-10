@@ -10,11 +10,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using DotLogix.Core.Nodes;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 #endregion
 
 namespace DotLogix.Core.Rest.Server.Http.Context {
@@ -22,14 +20,12 @@ namespace DotLogix.Core.Rest.Server.Http.Context {
         IDictionary<string, object> HeaderParameters { get; }
         IDictionary<string, object> QueryParameters { get; }
         IDictionary<string, object> UrlParameters { get; }
-        IDictionary<string, object> UserDefinedParameters { get; }
         Uri Url { get; }
         HttpMethods HttpMethod { get; }
         MimeType ContentType { get; }
         long ContentLength64 { get; }
         Encoding ContentEncoding { get; }
         Stream InputStream { get; }
-        HttpListenerRequest OriginalRequest { get; }
         Task<int> ReadDataFromRequestStreamAsync(byte[] data, int offset, int count);
         Task<byte[]> ReadDataFromRequestStreamAsync();
         Task<string> ReadStringFromRequestStreamAsync();

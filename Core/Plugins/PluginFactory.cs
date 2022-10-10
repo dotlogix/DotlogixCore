@@ -13,7 +13,15 @@ using System.Linq;
 #endregion
 
 namespace DotLogix.Core.Plugins {
+    /// <summary>
+    /// A factory implementation to load plugins
+    /// </summary>
     public static class PluginFactory {
+        /// <summary>
+        /// Load all matching plugin types and create a new instance of the matching types
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static IEnumerable<T> LoadPlugins<T>(string pluginPath, string filter = "*.dll",
                                                     SearchOption searchOption = SearchOption.TopDirectoryOnly)
             where T : IPluginDefinition {
@@ -21,13 +29,23 @@ namespace DotLogix.Core.Plugins {
             return LoadPlugins<T>(files);
         }
 
+        /// <summary>
+        /// Load all matching plugin types and create a new instance of the matching types
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static IEnumerable<T> LoadPlugins<T>(IEnumerable<string> files)
             where T : IPluginDefinition {
-            var assemblies = LoadPluginAsseblies<T>(files);
+            var assemblies = LoadPluginAssemblies<T>(files);
             return assemblies.SelectMany(a => a.Instances);
         }
 
-        public static IEnumerable<PluginAssembly<T>> LoadPluginAsseblies<T>(IEnumerable<string> files,
+        /// <summary>
+        /// Load all matching files as plugin assemblies
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static IEnumerable<PluginAssembly<T>> LoadPluginAssemblies<T>(IEnumerable<string> files,
                                                                             bool validOnly = true)
             where T : IPluginDefinition {
             foreach(var file in files) {

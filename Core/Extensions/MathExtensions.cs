@@ -6,155 +6,26 @@
 // LastEdited:  01.08.2018
 // ==================================================
 
+using System;
+using DotLogix.Core.Utils.Patterns;
+
 namespace DotLogix.Core.Extensions {
+    /// <summary>
+    /// A static class providing extension methods for numbers/>
+    /// </summary>
     public static class MathExtensions {
         #region Clamp
         /// <summary>
-        ///     Clamps a value between min and max value
+        ///     Checks if a value is between min and max value
         /// </summary>
-        /// <param name="value">The value to clamp</param>
+        /// <param name="value">The value to check</param>
         /// <param name="min">The min value</param>
         /// <param name="max">The max value</param>
         /// <returns></returns>
-        public static byte Clamp(this byte value, byte min, byte max) {
-            if(value < min)
+        public static T Clamp<T>(this T value, T min, T max) where T : IComparable<T> {
+            if(value.CompareTo(min) < 0)
                 return min;
-            if(value > max)
-                return max;
-            return value;
-        }
-
-        /// <summary>
-        ///     Clamps a value between min and max value
-        /// </summary>
-        /// <param name="value">The value to clamp</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static sbyte Clamp(this sbyte value, sbyte min, sbyte max) {
-            if(value < min)
-                return min;
-            if(value > max)
-                return max;
-            return value;
-        }
-
-        /// <summary>
-        ///     Clamps a value between min and max value
-        /// </summary>
-        /// <param name="value">The value to clamp</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static short Clamp(this short value, short min, short max) {
-            if(value < min)
-                return min;
-            if(value > max)
-                return max;
-            return value;
-        }
-
-        /// <summary>
-        ///     Clamps a value between min and max value
-        /// </summary>
-        /// <param name="value">The value to clamp</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static ushort Clamp(this ushort value, ushort min, ushort max) {
-            if(value < min)
-                return min;
-            if(value > max)
-                return max;
-            return value;
-        }
-
-        /// <summary>
-        ///     Clamps a value between min and max value
-        /// </summary>
-        /// <param name="value">The value to clamp</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static int Clamp(this int value, int min, int max) {
-            if(value < min)
-                return min;
-            if(value > max)
-                return max;
-            return value;
-        }
-
-        /// <summary>
-        ///     Clamps a value between min and max value
-        /// </summary>
-        /// <param name="value">The value to clamp</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static uint Clamp(this uint value, uint min, uint max) {
-            if(value < min)
-                return min;
-            if(value > max)
-                return max;
-            return value;
-        }
-
-        /// <summary>
-        ///     Clamps a value between min and max value
-        /// </summary>
-        /// <param name="value">The value to clamp</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static long Clamp(this long value, long min, long max) {
-            if(value < min)
-                return min;
-            if(value > max)
-                return max;
-            return value;
-        }
-
-        /// <summary>
-        ///     Clamps a value between min and max value
-        /// </summary>
-        /// <param name="value">The value to clamp</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static ulong Clamp(this ulong value, ulong min, ulong max) {
-            if(value < min)
-                return min;
-            if(value > max)
-                return max;
-            return value;
-        }
-
-        /// <summary>
-        ///     Clamps a value between min and max value
-        /// </summary>
-        /// <param name="value">The value to clamp</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static float Clamp(this float value, float min, float max) {
-            if(value < min)
-                return min;
-            if(value > max)
-                return max;
-            return value;
-        }
-
-        /// <summary>
-        ///     Clamps a value between min and max value
-        /// </summary>
-        /// <param name="value">The value to clamp</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static double Clamp(this double value, double min, double max) {
-            if(value < min)
-                return min;
-            if(value > max)
+            if(value.CompareTo(max) > 0)
                 return max;
             return value;
         }
@@ -168,107 +39,22 @@ namespace DotLogix.Core.Extensions {
         /// <param name="min">The min value</param>
         /// <param name="max">The max value</param>
         /// <returns></returns>
-        public static bool LaysBetween(this byte value, byte min, byte max) {
-            return (value >= min) && (value <= max);
+        public static bool LaysBetween<T>(this T value, T min, T max) where T : IComparable<T> {
+            return value.CompareTo(min) >= 0 && value.CompareTo(max) <= 0;
         }
 
         /// <summary>
         ///     Checks if a value is between min and max value
         /// </summary>
         /// <param name="value">The value to check</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
+        /// <param name="range">The range</param>
         /// <returns></returns>
-        public static bool LaysBetween(this sbyte value, sbyte min, sbyte max) {
-            return (value >= min) && (value <= max);
-        }
-
-        /// <summary>
-        ///     Checks if a value is between min and max value
-        /// </summary>
-        /// <param name="value">The value to check</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static bool LaysBetween(this short value, short min, short max) {
-            return (value >= min) && (value <= max);
-        }
-
-        /// <summary>
-        ///     Checks if a value is between min and max value
-        /// </summary>
-        /// <param name="value">The value to check</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static bool LaysBetween(this ushort value, ushort min, ushort max) {
-            return (value >= min) && (value <= max);
-        }
-
-        /// <summary>
-        ///     Checks if a value is between min and max value
-        /// </summary>
-        /// <param name="value">The value to check</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static bool LaysBetween(this int value, int min, int max) {
-            return (value >= min) && (value <= max);
-        }
-
-        /// <summary>
-        ///     Checks if a value is between min and max value
-        /// </summary>
-        /// <param name="value">The value to check</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static bool LaysBetween(this uint value, uint min, uint max) {
-            return (value >= min) && (value <= max);
-        }
-
-        /// <summary>
-        ///     Checks if a value is between min and max value
-        /// </summary>
-        /// <param name="value">The value to check</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static bool LaysBetween(this long value, long min, long max) {
-            return (value >= min) && (value <= max);
-        }
-
-        /// <summary>
-        ///     Checks if a value is between min and max value
-        /// </summary>
-        /// <param name="value">The value to check</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static bool LaysBetween(this ulong value, ulong min, ulong max) {
-            return (value >= min) && (value <= max);
-        }
-
-        /// <summary>
-        ///     Checks if a value is between min and max value
-        /// </summary>
-        /// <param name="value">The value to check</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static bool LaysBetween(this float value, float min, float max) {
-            return (value >= min) && (value <= max);
-        }
-
-        /// <summary>
-        ///     Checks if a value is between min and max value
-        /// </summary>
-        /// <param name="value">The value to check</param>
-        /// <param name="min">The min value</param>
-        /// <param name="max">The max value</param>
-        /// <returns></returns>
-        public static bool LaysBetween(this double value, double min, double max) {
-            return (value >= min) && (value <= max);
+        public static bool LaysBetween(this int value, Range range) {
+            if(range.Min.HasValue && value < range.Min.Value)
+                return false;
+            if (range.Max.HasValue && value > range.Max.Value)
+                return false;
+            return true;
         }
         #endregion
 

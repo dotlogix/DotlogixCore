@@ -10,12 +10,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
-using DotLogix.Core.Nodes;
 using DotLogix.Core.Rest.Server.Http.Context;
 using DotLogix.Core.Rest.Server.Http.State;
 using DotLogix.Core.Rest.Server.Routes;
 using DotLogix.Core.Rest.Services.Context;
 using DotLogix.Core.Rest.Services.Processors;
+using DotLogix.Core.Rest.Services.Processors.Json;
 using DotLogix.Core.Rest.Services.Writer;
 #endregion
 
@@ -55,8 +55,8 @@ namespace DotLogix.Core.Rest.Server.Http {
                 await asyncHttpContext.Response.CompleteAsync();
                 return;
             }
-            if(asyncHttpContext.Request.HeaderParameters.TryGetValue(EventSubscriptionParameterName, out string eventName)) {
-                if(ServerEvents.TryGetValue(eventName, out var serverEvent) == false) {
+            if(asyncHttpContext.Request.HeaderParameters.TryGetValueAs(EventSubscriptionParameterName, out string eventName)) {
+                if(ServerEvents.TryGet(eventName, out var serverEvent) == false) {
                     await asyncHttpContext.Response.WriteToResponseStreamAsync("The event subscription could not be handled, because the event is not registered on the server");
                     asyncHttpContext.Response.StatusCode = HttpStatusCodes.ClientError.BadRequest;
                     await asyncHttpContext.Response.CompleteAsync();
@@ -69,14 +69,16 @@ namespace DotLogix.Core.Rest.Server.Http {
         }
 
         public async Task HandleAsync(IAsyncHttpContext asyncHttpContext, IWebServiceRoute route) {
-            using(var webServiceContext = new WebServiceContext(asyncHttpContext, route)) {
+            var parameterProviders = new List<IParameterProvider>(ParameterProviders.Http) { ParameterProviders.Variables };
+
+            using (var webServiceContext = new WebServiceContext(asyncHttpContext, route, parameterProviders)) {
                 // start of processing
                 await ProcessRequest(webServiceContext);
                 // end of processing
 
                 var writer = route.WebRequestResultWriter ?? DefaultResultWriter;
                 if(asyncHttpContext.Response.IsCompleted == false)
-                    await writer.WriteAsync(webServiceContext.RequestResult);
+                    await writer.WriteAsync(webServiceContext);
             }
         }
 
@@ -86,30 +88,7 @@ namespace DotLogix.Core.Rest.Server.Http {
             var httpMethod = asyncHttpRequest.HttpMethod;
             var path = asyncHttpRequest.Url.LocalPath;
 
-            route = null;
-            RouteMatch routeMatch = null;
-            var routePriority = int.MinValue;
-            var matchLength = int.MinValue;
-            foreach(var serverRoute in ServerRoutes) {
-                if((serverRoute.AcceptedRequests & httpMethod) == 0) // route does not accept the type of the request
-                    continue;
-
-                if(serverRoute.Priority < routePriority) // another route has a higher priority
-                    continue;
-
-                var match = serverRoute.Match(httpMethod, path);
-                if(match.Success == false) // match is not successful
-                    continue;
-
-                if(match.Length < matchLength) // another route better matches the path
-                    continue;
-
-                route = serverRoute;
-                routeMatch = match;
-                routePriority = serverRoute.Priority;
-                matchLength = match.Length;
-            }
-
+            var routeMatch = ServerRoutes.FindBestMatch(httpMethod, path, out route);
             if(routeMatch == null)
                 return false;
 

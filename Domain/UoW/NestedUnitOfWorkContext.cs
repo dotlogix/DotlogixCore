@@ -12,25 +12,41 @@ using DotLogix.Architecture.Infrastructure.Repositories;
 #endregion
 
 namespace DotLogix.Architecture.Domain.UoW {
+    /// <summary>
+    /// A wrapper class for a nested <see cref="IUnitOfWorkContext"/>
+    /// </summary>
     public class NestedUnitOfWorkContext : IUnitOfWorkContext {
+        /// <summary>
+        /// The parent context
+        /// </summary>
         protected IUnitOfWorkContext ParentContext { get; }
-
+        /// <summary>
+        /// Create a new instance of <see cref="NestedUnitOfWorkContext"/>
+        /// </summary>
         public NestedUnitOfWorkContext(IUnitOfWorkContext parentContext) {
             ParentContext = parentContext;
         }
 
+        /// <inheritdoc />
         public IUnitOfWorkContext BeginContext() {
             return ParentContext.BeginContext();
         }
 
+        /// <inheritdoc />
         public TRepo UseRepository<TRepo>() where TRepo : IRepository {
             return ParentContext.UseRepository<TRepo>();
         }
 
-        public Task CompleteAsync() {
-            return Task.CompletedTask;
-        }
+		/// <inheritdoc />
+		public Task CompleteAsync() {
+#if NET45
+			return Task.FromResult<object>(null);
+#else
+			return Task.CompletedTask;
+#endif
+		}
 
+        /// <inheritdoc />
         public void Dispose() { }
     }
 }

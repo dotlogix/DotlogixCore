@@ -14,8 +14,9 @@ using System.Threading.Tasks;
 using DotLogix.Core.Extensions;
 using DotLogix.Core.Rest.Server.Http;
 using DotLogix.Core.Rest.Server.Http.Context;
-using DotLogix.Core.Rest.Server.Http.Mime;
+using DotLogix.Core.Rest.Server.Http.Headers;
 using DotLogix.Core.Rest.Server.Http.State;
+using DotLogix.Core.Rest.Services.Context;
 #endregion
 
 namespace DotLogix.Core.Rest.Services.Writer {
@@ -23,27 +24,30 @@ namespace DotLogix.Core.Rest.Services.Writer {
         public static IAsyncWebRequestResultWriter Instance { get; } = new WebRequestResultStreamWriter();
         protected WebRequestResultStreamWriter() { }
 
-        protected override async Task WriteResultAsync(IAsyncHttpResponse asyncHttpResponse, WebRequestResult webRequestResult) {
-            var returnValue = webRequestResult.ReturnValue;
+        protected override async Task WriteResultAsync(WebServiceContext context) {
+            var httpResponse = context.HttpResponse;
+            var requestResult = context.RequestResult;
+
+            var returnValue = requestResult.ReturnValue;
             if(returnValue == null) {
-                asyncHttpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
+                httpResponse.StatusCode = HttpStatusCodes.Success.NoContent;
                 return;
             }
 
-            var result = await GetStreamResult(webRequestResult);
-            asyncHttpResponse.ContentType = result.ContentType;
+            var result = await GetStreamResult(requestResult);
+            httpResponse.ContentType = result.ContentType;
             try {
                 if(result.SendInChunks) {
                     var chunkSize = result.ChunkSize;
-                    asyncHttpResponse.ChunkSize = chunkSize;
+                    httpResponse.ChunkSize = chunkSize;
                     var buffer = new byte[chunkSize];
                     int read;
                     while((read = await result.OutputStream.ReadAsync(buffer, 0, chunkSize)) > 0) {
-                        await asyncHttpResponse.WriteToResponseStreamAsync(buffer, 0, read);
-                        await asyncHttpResponse.CompleteChunksAsync();
+                        await httpResponse.WriteToResponseStreamAsync(buffer, 0, read);
+                        await httpResponse.CompleteChunksAsync();
                     }
                 } else
-                    await result.OutputStream.CopyToAsync(asyncHttpResponse.OutputStream);
+                    await result.OutputStream.CopyToAsync(httpResponse.OutputStream);
             } finally {
                 result.OutputStream?.Dispose();
             }

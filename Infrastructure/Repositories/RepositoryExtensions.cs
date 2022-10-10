@@ -8,28 +8,65 @@
 
 #region
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using DotLogix.Architecture.Infrastructure.Entities;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Repositories {
+    /// <summary>
+    /// A static class providing extension methods for <see cref="IRepository{TEntity, TKey}"/>
+    /// </summary>
     public static class RepositoryExtensions {
-        public static async Task RemoveByFilterAsync<TEntity>(this IRepository<TEntity> repository, Expression<Func<TEntity, bool>> filterExpression) where TEntity : class, ISimpleEntity {
-            var entities = await repository.FilterAllAsync(filterExpression);
-            repository.RemoveRange(entities);
-        }
+        /// <summary>
+        /// Queries the matching entities and remove them
+        /// </summary>
+        public static async ValueTask<IEnumerable<TEntity>> RemoveWhereAsync<TEntity>(this IRepository<TEntity> repository, Expression<Func<TEntity, bool>> filterExpression) where TEntity : class, new() {
+            var asyncResult = repository.WhereAsync(filterExpression);
+            if(!asyncResult.IsCompletedSuccessfully)
+	            await asyncResult;
 
-        public static async Task RemoveByIdAsync<TEntity>(this IRepository<TEntity> repository, int id) where TEntity : class, ISimpleEntity {
-            var entity = await repository.GetAsync(id);
-            if(entity != null)
-                repository.Remove(entity);
-        }
+            if(asyncResult.Result != null)
+	            asyncResult = repository.RemoveRangeAsync(asyncResult.Result);
 
-        public static async Task RemoveByGuidAsync<TEntity>(this IRepository<TEntity> repository, Guid guid) where TEntity : class, ISimpleEntity {
-            var entity = await repository.GetAsync(guid);
-            if(entity != null)
-                repository.Remove(entity);
+            if(!asyncResult.IsCompletedSuccessfully)
+	            await asyncResult;
+
+            return asyncResult.Result;
+		}
+
+        /// <summary>
+        /// Queries the matching entity and remove it
+        /// </summary>
+        public static async ValueTask<TEntity> RemoveByKeyAsync<TKey, TEntity>(this IRepository<TKey, TEntity> repository, TKey key) where TEntity : class, new() {
+	        var asyncResult = repository.GetAsync(key);
+	        if(!asyncResult.IsCompletedSuccessfully)
+		        await asyncResult;
+
+	        if(asyncResult.Result != null)
+		        asyncResult = repository.RemoveAsync(asyncResult.Result);
+
+	        if(!asyncResult.IsCompletedSuccessfully)
+		        await asyncResult;
+
+	        return asyncResult.Result;
+		}
+
+        /// <summary>
+        /// Queries the matching entity and remove it
+        /// </summary>
+        public static async ValueTask<IEnumerable<TEntity>> RemoveByKeyAsync<TKey, TEntity>(this IRepository<TKey, TEntity> repository, IEnumerable<TKey> keys) where TEntity : class, new() {
+            var asyncResult = repository.GetRangeAsync(keys);
+            if (!asyncResult.IsCompletedSuccessfully)
+                await asyncResult;
+
+            if (asyncResult.Result != null)
+                asyncResult = repository.RemoveRangeAsync(asyncResult.Result);
+
+            if (!asyncResult.IsCompletedSuccessfully)
+                await asyncResult;
+
+            return asyncResult.Result;
         }
     }
 }

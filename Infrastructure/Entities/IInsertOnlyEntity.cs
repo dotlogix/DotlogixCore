@@ -7,9 +7,14 @@
 // ==================================================
 
 #region
-using DotLogix.Architecture.Infrastructure.Entities.Options;
+using DotLogix.Architecture.Common.Options;
+using DotLogix.Architecture.Infrastructure.Attributes;
 #endregion
 
 namespace DotLogix.Architecture.Infrastructure.Entities {
+    /// <summary>
+    /// An interface combining <see cref="ISimpleEntity"/> and <see cref="IInsertOnly"/> interface
+    /// </summary>
+    [InsertOnly]
     public interface IInsertOnlyEntity : ISimpleEntity, IInsertOnly { }
 }

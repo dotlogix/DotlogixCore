@@ -17,12 +17,21 @@ namespace DotLogix.Core.Caching {
     public class ValidUntilCachePolicy : ICachePolicy {
         private readonly DateTime _validUntilUtc;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="ValidUntilCachePolicy"/>
+        /// </summary>
+        /// <param name="duration">The duration until the item expires</param>
         public ValidUntilCachePolicy(TimeSpan duration) : this(DateTime.UtcNow + duration) { }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="ValidUntilCachePolicy"/>
+        /// </summary>
+        /// <param name="validUntilUtc">The time when the item has expired</param>
         public ValidUntilCachePolicy(DateTime validUntilUtc) {
             _validUntilUtc = validUntilUtc;
         }
 
+        /// <inheritdoc />
         public bool HasExpired(DateTime timeStampUtc) {
             return timeStampUtc > _validUntilUtc;
         }

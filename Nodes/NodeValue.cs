@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using DotLogix.Core.Extensions;
+using DotLogix.Core.Nodes.Processor;
 using DotLogix.Core.Types;
 #endregion
 
@@ -18,7 +19,19 @@ namespace DotLogix.Core.Nodes {
         private DataType _dataType;
 
         private object _value;
-        public override NodeTypes Type => Value == null ? NodeTypes.Empty : NodeTypes.Value;
+
+        public override NodeTypes Type {
+            get {
+                if(Value is JsonPrimitive primitive) {
+                    return primitive.Type == JsonPrimitiveType.Null
+                           ? NodeTypes.Empty
+                           : NodeTypes.Value;
+                }
+                return Value == null
+                       ? NodeTypes.Empty
+                       : NodeTypes.Value;
+            }
+        }
 
         public DataType DataType => _dataType ?? (_dataType = Value.GetDataType());
 
@@ -49,7 +62,9 @@ namespace DotLogix.Core.Nodes {
         }
 
         public object GetValue(Type targetType, object defaultValue) {
-            return Value.TryConvertTo(targetType, out var value) ? value : defaultValue;
+            return Value.TryConvertTo(targetType, out var value)
+                   ? value
+                   : defaultValue;
         }
 
         public TValue GetValue<TValue>() {
@@ -57,14 +72,32 @@ namespace DotLogix.Core.Nodes {
         }
 
         public TValue GetValue<TValue>(TValue defaultValue) {
-            return Value.TryConvertTo<TValue>(out var value) ? value : defaultValue;
+            if(TryGetValue(out TValue value))
+                return value;
+            return defaultValue;
         }
 
         public bool TryGetValue<TValue>(out TValue value) {
-            return Value.TryConvertTo(out value);
+            if(TryGetValue(typeof(TValue), out var obj)) {
+                value = (TValue)obj;
+                return true;
+            }
+
+            value = default;
+            return false;
         }
 
         public bool TryGetValue(Type targetType, out object value) {
+            if(Value is JsonPrimitive primitive) {
+                try {
+                    value = primitive.ToObject(targetType, ConverterSettings.JsonDefault);
+                    return true;
+                } catch(Exception) {
+                    value = default;
+                    return false;
+                }
+            }
+
             return Value.TryConvertTo(targetType, out value);
         }
         #endregion

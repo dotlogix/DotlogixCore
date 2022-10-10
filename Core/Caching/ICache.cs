@@ -8,14 +8,25 @@
 
 #region
 using System;
+using System.Collections.Generic;
 #endregion
 
 namespace DotLogix.Core.Caching {
-    public interface ICache<TKey, TValue> {
+    /// <summary>
+    /// An interface for cache implementations
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    public interface ICache<TKey, TValue> : IEnumerable<CacheItem<TKey, TValue>> {
         /// <summary>
         ///     The timespan to check if values are no longer valid
         /// </summary>
         TimeSpan CheckPolicyInterval { get; }
+        
+        /// <summary>
+        ///     The current amount of items
+        /// </summary>
+        int Count { get; }
 
         /// <summary>
         ///     Get the value for a given key. Returns default if value can not be found
@@ -46,7 +57,7 @@ namespace DotLogix.Core.Caching {
         /// <summary>
         ///     Retrieves a value by its key. Returns default if the key is not present
         /// </summary>
-        TValue Retrieve(TKey key);
+        TValue Retrieve(TKey key, TValue defaultValue = default);
 
         /// <summary>
         ///     Trys to retrieve a value by its key.
@@ -54,9 +65,19 @@ namespace DotLogix.Core.Caching {
         bool TryRetrieve(TKey key, out TValue value);
 
         /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        TValue RetrieveOrCreate(TKey key, Func<TKey, TValue> createFunc, ICachePolicy policy = null, bool updatePolicy = true);
+
+        /// <summary>
+        ///     Retrieves a value by its key. Creates one if the key is not present
+        /// </summary>
+        TValue RetrieveOrCreate(TKey key, TValue value, ICachePolicy policy = null, bool updatePolicy = true);
+
+        /// <summary>
         ///     Gets and remove a value by its key. Returns default if the key is not present
         /// </summary>
-        TValue Pop(TKey key);
+        TValue Pop(TKey key, TValue defaultValue = default);
 
         /// <summary>
         ///     Tries to get and remove a value by its key.

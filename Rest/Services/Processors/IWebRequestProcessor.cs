@@ -16,7 +16,7 @@ namespace DotLogix.Core.Rest.Services.Processors {
     public interface IWebRequestProcessor {
         WebRequestProcessorDescriptorCollection Descriptors { get; }
         int Priority { get; }
-        Task ProcessAsync(WebServiceContext webServiceContext);
+        Task ProcessAsync(WebServiceContext context);
         bool ShouldExecute(WebServiceContext webServiceContext);
     }
 }
